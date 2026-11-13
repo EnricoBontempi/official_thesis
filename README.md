@@ -2,7 +2,8 @@
 
 **Author:** Enrico Bontempi  
 **Host Group:** Deng Lab, Massachusetts Institute of Technology (MIT)  
-**Thesis Proposal:** [docs/proposal.md](docs/proposal.md)
+**Thesis Proposal:** [docs/proposal.md](docs/proposal.md)  
+**Month 1 Roadmap:** [roadmap_month1.md](roadmap_month1.md)
 
 ## Overview
 
