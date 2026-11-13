@@ -1,0 +1,70 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+conda-meta/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Large Data & Datasets (never commit raw or processed tensors)
+data/raw/*
+data/interim/*
+data/processed/*
+data/external/*
+!data/**/.gitkeep
+!data/**/README.md
+*.h5
+*.hdf5
+*.nc
+*.zarr/
+*.npy
+*.npz
+*.parquet
+*.arrow
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+
+# Experiment logs, checkpoints & local outputs
+outputs/
+checkpoints/
+wandb/
+lightning_logs/
+mlruns/
+tensorboard/
+runs/
+
+# Jupyter / IPython
+.ipynb_checkpoints/
+
+# IDEs & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# LaTeX / Thesis build artifacts
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
