@@ -1,0 +1,69 @@
+# Locked operating-condition splits for RealPDEBench combustion (numerical).
+# Entire trajectories / all time snapshots belonging to a condition stay in one split.
+# Protocol lock date: 2026-11-14 (Step 1.4)
+
+dataset: RealPDEBench/combustion/numerical
+n_conditions_total: 30
+partition_rule: entire_operating_condition_withholding
+grid: [128, 128]
+channels:
+  temperature: 10
+  velocity_i: 11
+  velocity_j: 12
+  velocity_k: 13
+
+train:
+  description: >
+    20 conditions spanning NH3 in {0,20,40,80}% and phi in [0.85, 1.25].
+    Used for fitting normalizers, POD/baselines, and neural training.
+  n: 20
+  sim_ids:
+    - 0NH3_0.85.h5
+    - 0NH3_0.9.h5
+    - 0NH3_1.h5
+    - 0NH3_1.1.h5
+    - 0NH3_1.15.h5
+    - 0NH3_1.2.h5
+    - 0NH3_1.25.h5
+    - 20NH3_0.85.h5
+    - 20NH3_0.9.h5
+    - 20NH3_1.05.h5
+    - 20NH3_1.2.h5
+    - 20NH3_1.25.h5
+    - 40NH3_0.85.h5
+    - 40NH3_1.h5
+    - 40NH3_1.1.h5
+    - 40NH3_1.2.h5
+    - 80NH3_0.9.h5
+    - 80NH3_1.05.h5
+    - 80NH3_1.15.h5
+    - 80NH3_1.2.h5
+
+val:
+  description: >
+    3 conditions withheld strictly for model / hyperparameter selection.
+    Never used for test reporting of the locked protocol.
+  n: 3
+  sim_ids:
+    - 0NH3_1.05.h5
+    - 20NH3_1.1.h5
+    - 40NH3_0.9.h5
+
+test_interp:
+  description: >
+    3 conditions inside / on the interior of the training (NH3%, phi) hull.
+  n: 3
+  sim_ids:
+    - 20NH3_1.h5        # interior in NH3% and phi
+    - 40NH3_1.15.h5     # phi bracketed by train 1.10 and 1.20 at 40% NH3
+    - 60NH3_0.95.h5     # NH3 blend interpolation between 40% and 80%
+
+test_extrap:
+  description: >
+    4 conditions outside or at the frontier of the training parameter range.
+  n: 4
+  sim_ids:
+    - 20NH3_0.75.h5     # leanest phi in dataset (below train min phi=0.85)
+    - 0NH3_1.3.h5       # richest phi at pure CH4 (above train max phi=1.25)
+    - 20NH3_1.3.h5      # richest phi at 20% NH3 (above train max phi=1.25)
+    - 80NH3_1.25.h5     # high-NH3 + rich frontier corner

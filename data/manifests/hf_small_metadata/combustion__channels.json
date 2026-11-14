@@ -1,0 +1,32 @@
+{
+  "scenario": "combustion",
+  "real": {
+    "fields": [
+      {"key": "observed", "shape": "(T, H, W)"}
+    ]
+  },
+  "numerical": {
+    "fields": [
+      {"key": "observed", "shape": "(T, H, W)"},
+      {"key": "numerical", "shape": "(T, H, W, 15)"}
+    ],
+    "numerical_axis_names": [
+      {"index": 0,  "name": "Absolute_Pressure"},
+      {"index": 1,  "name": "Chemistry_Heat_Release_Rate"},
+      {"index": 2,  "name": "Mole_Fraction_of_CH4"},
+      {"index": 3,  "name": "Mole_Fraction_of_CO"},
+      {"index": 4,  "name": "Mole_Fraction_of_CO2"},
+      {"index": 5,  "name": "Mole_Fraction_of_H2O"},
+      {"index": 6,  "name": "Mole_Fraction_of_NH2"},
+      {"index": 7,  "name": "Mole_Fraction_of_NH3"},
+      {"index": 8,  "name": "Mole_Fraction_of_OH"},
+      {"index": 9,  "name": "Pressure"},
+      {"index": 10, "name": "Temperature"},
+      {"index": 11, "name": "Velocity[i]"},
+      {"index": 12, "name": "Velocity[j]"},
+      {"index": 13, "name": "Velocity[k]"},
+      {"index": 14, "name": "Velocity_Magnitude"}
+    ]
+  },
+  "note": "The `observed` column stores the measurable modality (OH* chemiluminescence intensity for real, surrogate-mapped intensity for numerical). The `numerical` column packs 15 simulation fields along the last axis in the order given by `numerical_axis_names`."
+}

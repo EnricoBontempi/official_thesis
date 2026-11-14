@@ -1,0 +1,85 @@
+# Standardized observation layouts on the 128 x 128 combustion grid.
+# Missing locations are NEVER filled with physical zeros — use sparse tokens.
+
+grid: [128, 128]
+n_pixels: 16384
+seed_eval_default: 20261114
+
+variable_ids:
+  velocity_i: 11
+  velocity_j: 12
+  velocity_k: 13
+  temperature: 10
+
+task_modes:
+  temperature_free:
+    description: "Task A — sparse (u,v) [= Velocity i,j] only → full T"
+    observed_vars: [velocity_i, velocity_j]
+  temperature_assisted:
+    description: "Task B — sparse (u,v) + K sparse T anchors → full T"
+    observed_vars: [velocity_i, velocity_j]
+    temperature_anchor_counts: [1, 4, 9, 16, 32]
+
+random_sparse:
+  random_0.5pct:
+    fraction: 0.005
+    n_points_approx: 82
+  random_1pct:
+    fraction: 0.01
+    n_points_approx: 164
+  random_2pct:
+    fraction: 0.02
+    n_points_approx: 328
+  random_5pct:
+    fraction: 0.05
+    n_points_approx: 819
+  random_10pct:
+    fraction: 0.10
+    n_points_approx: 1638
+  random_20pct:
+    fraction: 0.20
+    n_points_approx: 3277
+
+structured_rakes:
+  axial_line_mid:
+    description: "Horizontal cut across the V-jet at the symmetry axis (row 64)"
+    type: horizontal_line
+    row: 64
+  axial_line_upper_branch:
+    description: "Horizontal cut through upper annular branch"
+    type: horizontal_line
+    row: 40
+  axial_line_lower_branch:
+    description: "Horizontal cut through lower annular branch"
+    type: horizontal_line
+    row: 88
+  radial_line_inlet:
+    description: "Vertical cut near right inlet (cold jets enter from x+)"
+    type: vertical_line
+    col: 110
+  radial_line_mid:
+    description: "Vertical cut across both branches at mid-domain"
+    type: vertical_line
+    col: 64
+  radial_line_downstream:
+    description: "Vertical cut toward left (downstream of V)"
+    type: vertical_line
+    col: 32
+
+localized_missing:
+  missing_shear_layer_box:
+    description: >
+      40x40 occluded block over the right-side V-jet reaction zone
+      (rows 44-84, cols 80-120 inclusive start:end exclusive end+1 for python slices)
+    type: box
+    row_start: 44
+    row_end: 84
+    col_start: 80
+    col_end: 120
+  missing_irz_core_box:
+    description: "Central Inner Recirculation Zone occlusion"
+    type: box
+    row_start: 48
+    row_end: 80
+    col_start: 48
+    col_end: 80

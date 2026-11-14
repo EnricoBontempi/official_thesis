@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "combustion-recon"
+version = "0.1.0"
+description = "Neural reconstruction of hidden temperature fields from sparse observations in turbulent combustion (MIT MSc Thesis, Deng Lab)."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [
+  { name = "Enrico Bontempi" },
+]
+keywords = [
+  "combustion",
+  "temperature-reconstruction",
+  "sparse-observations",
+  "RealPDEBench",
+  "scientific-ml",
+]
+dependencies = [
+  "numpy",
+  "scipy",
+  "h5py",
+  "torch",
+  "huggingface_hub",
+  "pyyaml",
+  "matplotlib",
+  "scikit-learn",
+  "pytest",
+  "requests",
+  "pyarrow",
+  "datasets",
+  "pandas",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+combustion_recon = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

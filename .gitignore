@@ -9,10 +9,15 @@ venv/
 env/
 conda-meta/
 
+# Hugging Face Hub download caches used during reconnaissance
+data/manifests/_hf_tmp/
+data/manifests/hf_cache_tmp/
+
 # Distribution / packaging
 build/
 dist/
 *.egg-info/
+src/*.egg-info/
 .eggs/
 
 # Large Data & Datasets (never commit raw or processed tensors)

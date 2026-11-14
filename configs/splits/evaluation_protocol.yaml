@@ -1,0 +1,48 @@
+locked_date: '2026-11-14'
+splits_file: configs/splits/splits_interp_extrap.yaml
+train_norm_stats: data/manifests/train_norm_stats.json
+geometry_note: "Annular V-flame: cold jets enter from right boundary (col\u2248127);\
+  \ symmetry about row\u224864; Velocity[j]=axial, Velocity[i]=transverse, Velocity[k]=swirl."
+high_temperature_regions:
+  Omega_high:
+    definition: T(x,y) >= T_high
+    T_high_K: 2100.0
+    role: primary fixed high-temperature region for IoU / conditional RMSE
+  Omega_peak:
+    definition: T(x,y) >= T_peak
+    T_peak_K: 2200.0
+    role: secondary peak thermal core diagnostic
+  Omega_jet:
+    definition: T(x,y) < T_jet
+    T_jet_K: 1800.0
+    role: reaction/mixing layer & cold jet zone diagnostic
+train_temperature_summary:
+  mean_K: 2039.2799770831712
+  std_K: 331.5785227688801
+  min_K: -359.2659606933594
+  max_K: 3001.66552734375
+  p50_K: 2122.868408203125
+  p95_K: 2256.4748657226564
+high_t_coverage_by_split:
+  train:
+    mean_frac_Omega_high: 0.602276435939745
+    mean_frac_Omega_peak: 0.18521835426281
+    mean_frac_Omega_jet: 0.0924697624332365
+  val:
+    mean_frac_Omega_high: 0.858930845449671
+    mean_frac_Omega_peak: 0.31916332483172477
+    mean_frac_Omega_jet: 0.068639457533603
+  test_interp:
+    mean_frac_Omega_high: 0.8243810325468776
+    mean_frac_Omega_peak: 0.2542752773190228
+    mean_frac_Omega_jet: 0.08799861340488609
+  test_extrap:
+    mean_frac_Omega_high: 0.11581399546808627
+    mean_frac_Omega_peak: 0.0011872878258136557
+    mean_frac_Omega_jet: 0.1216396501456303
+reporting_rules:
+- Always report metrics per operating condition (never only pooled).
+- Temperature-free and temperature-assisted tasks reported separately.
+- Observation-layout changes evaluated separately from operating-condition changes.
+- Normalization statistics fitted on train split only.
+- Missing observations never encoded as physical zeros.

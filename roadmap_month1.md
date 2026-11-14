@@ -36,7 +36,7 @@ Month 1 establishes the empirical and methodological foundation for the entire s
 ## Step-by-Step Execution Plan
 
 ### Step 1.1 — Repository Scaffolding & Environment Setup
-- **Status:** `[ ] Pending`
+- **Status:** `[x] Completed`
 - **Objective:** Create a clean, modular Python package structure (`combustion_recon`) and reproducible environment so every subsequent script writes standardized manifests, tables, and plots.
 - **Concrete Actions:**
   1. Create the repository directory skeleton:
@@ -56,7 +56,7 @@ Month 1 establishes the empirical and methodological foundation for the entire s
 ---
 
 ### Step 1.2 — Remote Reconnaissance of RealPDEBench (Pre-Download Inspection)
-- **Status:** `[ ] Pending`
+- **Status:** `[x] Completed`
 - **Objective:** Inspect the structure, file sizes, licensing, and loader conventions of the RealPDEBench Combustion dataset *before* committing to a multi-gigabyte data transfer.
 - **Concrete Actions:**
   1. Query the HuggingFace Hub API (`AI4Science-WestlakeU/RealPDEBench`) to list all files associated with the `combustion` subset, recording exact paths, file formats (`.h5`, `.npy`, `.pt`, etc.), and byte sizes.
@@ -73,7 +73,7 @@ Month 1 establishes the empirical and methodological foundation for the entire s
 ---
 
 ### Step 1.3 — Pilot Data Transfer & Trajectory Deep Audit
-- **Status:** `[ ] Pending`
+- **Status:** `[x] Completed` (pilot + full 30-shard numerical staging & audit)
 - **Objective:** Download representative trajectories first to verify tensor layouts and physical consistency, then stage the usable numerical combustion trajectories and produce a complete inventory of operating conditions.
 - **Concrete Actions:**
   1. **Pilot download:** Download 1–2 numerical trajectories into `data/raw/` and inspect their internal structure (HDF5 keys/attributes or array shapes).
@@ -93,7 +93,7 @@ Month 1 establishes the empirical and methodological foundation for the entire s
 ---
 
 ### Step 1.4 — Operating-Condition Splits, Observation Masks & Evaluation Protocol Lock
-- **Status:** `[ ] Pending`
+- **Status:** `[x] Completed`
 - **Objective:** Lock the experimental protocol before any model development so that all future baseline and neural experiments are strictly comparable and leakage-free.
 - **Concrete Actions:**
   1. **Map the operating-condition parameter space:** Plot the available operating conditions in parameter space (e.g., equivalence ratio $\phi$ vs. $\text{NH}_3/\text{CH}_4$ ratio).
@@ -125,7 +125,7 @@ Month 1 establishes the empirical and methodological foundation for the entire s
 ---
 
 ### Step 1.5 — Inexpensive Feasibility Checks: Does Velocity Carry Temperature Information?
-- **Status:** `[ ] Pending`
+- **Status:** `[x] Completed`
 - **Objective:** Quantify how much thermal information is physically and statistically recoverable from velocity observations $(u, v)$ alone, where that relationship breaks down across operating conditions, and how much sparse $T$ anchors help.
 - **Concrete Actions:**
   1. **Kinematic & Physical Coupling Analysis (Full-Grid Sanity Check):**
@@ -155,7 +155,7 @@ Month 1 establishes the empirical and methodological foundation for the entire s
 ---
 
 ### Step 1.6 — Literature Synthesis, GLU Architecture Alignment & Supervisor Sign-Off
-- **Status:** `[ ] Pending`
+- **Status:** `[x] Completed (2026-11-14)` — `docs/month1/05_literature_and_glu_notes.md`, `docs/month1/06_supervisor_review_brief.md`
 - **Objective:** Translate the empirical findings from Steps 1.2–1.5 and the laboratory's prior work (`GLU`) into a concrete, supervisor-approved model design for Month 2.
 - **Concrete Actions:**
   1. **Focused technical review of the 3 anchor papers:**
@@ -183,9 +183,9 @@ Month 1 establishes the empirical and methodological foundation for the entire s
 
 ## Summary Checklist for Month 1 Completion
 
-- [ ] **Step 1.1:** Repo directory structure, `pyproject.toml`, and local environment verified.
-- [ ] **Step 1.2:** Remote inspection of `RealPDEBench` combustion files, sizes, and channel specs completed.
-- [ ] **Step 1.3:** Pilot trajectory inspected; full numerical dataset staged; `operating_conditions.yaml` and `02_data_audit_report.md` generated.
-- [ ] **Step 1.4:** Operating-condition splits (`Train` / `Val` / `Test-Interp` / `Test-Extrap`), high-temperature region threshold, observation masks, and anti-leakage pytest suite locked.
-- [ ] **Step 1.5:** Inexpensive velocity-to-temperature feasibility checks (kinematic proxies, local regression, Gappy POD, temperature-free vs. temperature-assisted) executed and documented.
-- [ ] **Step 1.6:** GLU architecture review completed and Month 1 Supervisor Review Brief ready for Deng Lab meeting.
+- [x] **Step 1.1:** Repo directory structure, `pyproject.toml`, and local environment verified.
+- [x] **Step 1.2:** Remote inspection of `RealPDEBench` combustion files, sizes, and channel specs completed.
+- [x] **Step 1.3:** All 30 numerical shards staged & audited; `operating_conditions.yaml`, `month1_30_conditions_inventory.csv`, `fig05`, and `docs/month1/02_data_audit_report.md` written.
+- [x] **Step 1.4:** Operating-condition splits (`Train` / `Val` / `Test-Interp` / `Test-Extrap`), high-temperature region threshold, observation masks, and anti-leakage pytest suite locked.
+- [x] **Step 1.5:** Inexpensive velocity-to-temperature feasibility checks (kinematic proxies, local regression, Gappy POD, temperature-free vs. temperature-assisted) executed and documented.
+- [x] **Step 1.6:** GLU architecture review completed and Month 1 Supervisor Review Brief ready for Deng Lab meeting.
