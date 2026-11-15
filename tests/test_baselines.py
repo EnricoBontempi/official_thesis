@@ -9,6 +9,7 @@ from combustion_recon.models.baselines import (
     GappyPODReconstructor,
     GlobalTrainMeanPredictor,
     ParamConditionedMeanPredictor,
+    apply_anchor_offset,
 )
 
 
@@ -130,3 +131,84 @@ def test_gappy_pod_empty_mask_returns_mean_field():
     empty = np.zeros((24, 24), dtype=bool)
     pred = pod.reconstruct(fr["vi"], fr["vj"], fr["vk"], vel_mask=empty, nh3=0.0, phi=1.0)
     np.testing.assert_allclose(pred, pod.mean_T)
+
+
+def test_gappy_pod_stores_modal_variances_and_anchor_offset_reduces_bias():
+    frames = _synthetic_frames(20, H=32, W=32, seed=3)
+    pod = GappyPODReconstructor.fit(
+        frames, R=8, ridge_lambda=1e-3, w_T=20.0, max_train_frames=None, seed=0
+    )
+    assert pod.modal_variances.shape == (8,)
+    assert np.all(pod.modal_variances > 0)
+    fr = frames[-1]
+    # Inject a large global T offset into the "true" field relative to mean
+    T_shift = fr["T"] + 80.0
+    vel_mask = build_layout_mask("random_5pct", seed=9, height=32, width=32)
+    t_mask = temperature_anchor_mask(9, seed=12, height=32, width=32, nested=True)
+    pred_tf = pod.reconstruct(
+        fr["vi"], fr["vj"], fr["vk"], vel_mask=vel_mask, nh3=fr["nh3"], phi=fr["phi"]
+    )
+    pred_ao = pod.reconstruct(
+        fr["vi"],
+        fr["vj"],
+        fr["vk"],
+        vel_mask=vel_mask,
+        T_obs=T_shift,
+        T_mask=t_mask,
+        nh3=fr["nh3"],
+        phi=fr["phi"],
+        use_temperature_block=False,
+        anchor_offset=True,
+    )
+    bias_tf = float((pred_tf - T_shift).mean())
+    bias_ao = float((pred_ao - T_shift).mean())
+    assert abs(bias_ao) < abs(bias_tf)
+
+
+def test_apply_anchor_offset_exact_on_constant_bias():
+    T0 = np.full((8, 8), 1000.0)
+    T_obs = np.full((8, 8), 1050.0)
+    mask = np.zeros((8, 8), dtype=bool)
+    mask[0, 0] = True
+    mask[1, 1] = True
+    pred, b = apply_anchor_offset(T0, T_obs, mask, tau=0.0)
+    assert abs(b - 50.0) < 1e-12
+    np.testing.assert_allclose(pred, 1050.0)
+
+
+def test_param_mean_loco_auto_and_no_intercept_penalty():
+    from combustion_recon.models.baselines import _PENALTY
+
+    assert _PENALTY[0, 0] == 0.0
+    assert np.all(np.diag(_PENALTY)[1:] == 1.0)
+    # Synthetic condition means with clear NH3 + phi dependence
+    H = W = 16
+    fields, ops = [], []
+    for nh3 in (0.0, 0.2, 0.4, 0.8):
+        for phi in (0.85, 1.0, 1.15, 1.25):
+            T = np.full((H, W), 1500.0 + 500.0 * nh3 + 200.0 * (phi - 1.0) + 50.0 * (phi - 1.0) ** 2)
+            fields.append(T)
+            ops.append((nh3, phi))
+    model = ParamConditionedMeanPredictor.fit(fields, ops, ridge_alpha="auto")
+    assert model.selected_basis in ("quadratic", "piecewise_phi1")
+    assert model.selected_ridge_alpha in (1e-8, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1)
+    assert np.isfinite(model.loco_rmse_K)
+    pred = model.predict(0.4, 1.0)
+    assert pred.shape == (H, W)
+    # Should recover near the generating mean at a train-like point
+    assert abs(float(pred.mean()) - (1500.0 + 200.0)) < 30.0
+
+
+def test_oracle_pod_projection_beats_sparse_gappy():
+    frames = _synthetic_frames(24, H=32, W=32, seed=5)
+    pod = GappyPODReconstructor.fit(frames, R=8, max_train_frames=None, seed=0)
+    fr = frames[0]
+    oracle = pod.project_oracle_T(fr["T"], nh3=fr["nh3"], phi=fr["phi"])
+    mask = build_layout_mask("random_5pct", seed=1, height=32, width=32)
+    sparse = pod.reconstruct(
+        fr["vi"], fr["vj"], fr["vk"], vel_mask=mask, nh3=fr["nh3"], phi=fr["phi"]
+    )
+    rmse_o = float(np.sqrt(np.mean((oracle - fr["T"]) ** 2)))
+    rmse_s = float(np.sqrt(np.mean((sparse - fr["T"]) ** 2)))
+    assert rmse_o < rmse_s
+    assert np.isfinite(oracle).all()

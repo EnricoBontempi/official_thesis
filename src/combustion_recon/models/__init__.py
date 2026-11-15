@@ -5,6 +5,7 @@ from combustion_recon.models.baselines import (
     GlobalTrainMeanPredictor,
     LocalVelocityTemperatureRegressor,
     ParamConditionedMeanPredictor,
+    apply_anchor_offset,
 )
 
 __all__ = [
@@ -12,4 +13,5 @@ __all__ = [
     "GlobalTrainMeanPredictor",
     "LocalVelocityTemperatureRegressor",
     "ParamConditionedMeanPredictor",
+    "apply_anchor_offset",
 ]

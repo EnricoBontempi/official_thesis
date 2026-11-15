@@ -10,6 +10,8 @@ from combustion_recon.data.masks import (
     build_observation_tokens,
     masked_field_to_tokens,
     random_sparse_mask,
+    stable_seed,
+    temperature_anchor_mask,
 )
 
 
@@ -114,3 +116,20 @@ def test_unobserved_sites_not_emitted_as_zero():
     assert values[0] == 3.14
     # If we incorrectly zero-filled all pixels we'd get 32*32 tokens — guard against that
     assert len(values) != H * W
+
+
+def test_stable_seed_is_deterministic():
+    assert stable_seed("a", 1) == stable_seed("a", 1)
+    assert stable_seed("a", 1) != stable_seed("a", 2)
+
+
+def test_nested_temperature_anchors_are_monotone():
+    seed = 123
+    m1 = temperature_anchor_mask(1, seed=seed, height=64, width=64, nested=True)
+    m4 = temperature_anchor_mask(4, seed=seed, height=64, width=64, nested=True)
+    m16 = temperature_anchor_mask(16, seed=seed, height=64, width=64, nested=True)
+    assert m1.sum() == 1
+    assert m4.sum() == 4
+    assert m16.sum() == 16
+    assert np.all(m4[m1])
+    assert np.all(m16[m4])

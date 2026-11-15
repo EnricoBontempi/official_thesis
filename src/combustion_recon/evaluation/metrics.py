@@ -5,8 +5,7 @@ Always report **per operating condition**; never only a pooled average.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Any, Iterable, Mapping, Sequence
+from typing import Any, Mapping, Sequence
 
 import numpy as np
 import pandas as pd
@@ -47,11 +46,10 @@ def field_errors(
 
 
 def spatial_bias(pred: np.ndarray, true: np.ndarray) -> dict[str, Any]:
-    """Family 2 — spatial / signed bias."""
+    """Family 2 — spatial / signed bias + centered pattern RMSE."""
     p = np.asarray(pred, dtype=np.float64)
     t = np.asarray(true, dtype=np.float64)
     bias_map = p - t
-    # If time dimension present (T,H,W), average over time
     if bias_map.ndim == 3:
         bias_map_2d = bias_map.mean(axis=0)
         mean_signed = float(bias_map.mean())
@@ -61,8 +59,13 @@ def spatial_bias(pred: np.ndarray, true: np.ndarray) -> dict[str, Any]:
     else:
         bias_map_2d = bias_map.reshape(-1)
         mean_signed = float(bias_map.mean())
+    rmse = float(np.sqrt(np.mean(bias_map**2)))
+    # RMSE^2 = bias^2 + centered_rmse^2  (exact for mean bias)
+    centered = float(np.sqrt(max(rmse**2 - mean_signed**2, 0.0)))
     return {
         "mean_signed_error_K": mean_signed,
+        "centered_rmse_K": centered,
+        "abs_bias_K": float(abs(mean_signed)),
         "spatial_bias_map": bias_map_2d,
     }
 
@@ -87,6 +90,19 @@ def _conditional_rmse_mae(pred: np.ndarray, true: np.ndarray, mask: np.ndarray) 
     return float(np.sqrt(np.mean(err**2))), float(np.mean(np.abs(err))), n
 
 
+def _safe_iou_dice(true_mask: np.ndarray, pred_mask: np.ndarray) -> tuple[float, float]:
+    """IoU/Dice with both-empty → 1.0 (perfect agreement on empty sets)."""
+    inter = float(np.logical_and(true_mask, pred_mask).sum())
+    union = float(np.logical_or(true_mask, pred_mask).sum())
+    pred_n = float(pred_mask.sum())
+    true_n = float(true_mask.sum())
+    if union == 0.0:
+        return 1.0, 1.0
+    iou = inter / union
+    dice = 2.0 * inter / (pred_n + true_n + 1e-12)
+    return float(iou), float(dice)
+
+
 def high_temperature_region_errors(
     pred: np.ndarray,
     true: np.ndarray,
@@ -95,29 +111,32 @@ def high_temperature_region_errors(
     t_peak: float = DEFAULT_T_PEAK,
     t_jet: float = DEFAULT_T_JET,
 ) -> dict[str, float]:
-    """Family 3 — errors inside Ω_high / Ω_peak / Ω_jet plus mask overlap."""
+    """Family 3 — errors inside Ω_high / Ω_peak / Ω_jet / non-high plus mask overlap."""
     p = np.asarray(pred, dtype=np.float64)
     t = np.asarray(true, dtype=np.float64)
     omega_high = region_mask(t, t_high, "ge")
     omega_hat = region_mask(p, t_high, "ge")
     omega_peak = region_mask(t, t_peak, "ge")
     omega_jet = region_mask(t, t_jet, "lt")
+    omega_non_high = ~omega_high
 
     rmse_h, mae_h, n_h = _conditional_rmse_mae(p, t, omega_high)
     rmse_peak, mae_peak, n_peak = _conditional_rmse_mae(p, t, omega_peak)
     rmse_jet, mae_jet, n_jet = _conditional_rmse_mae(p, t, omega_jet)
+    rmse_nh, mae_nh, n_nh = _conditional_rmse_mae(p, t, omega_non_high)
 
-    inter = np.logical_and(omega_high, omega_hat)
-    union = np.logical_or(omega_high, omega_hat)
-    inter_n = float(inter.sum())
-    union_n = float(union.sum())
-    pred_n = float(omega_hat.sum())
+    iou, dice = _safe_iou_dice(omega_high, omega_hat)
     true_n = float(omega_high.sum())
-    iou = inter_n / (union_n + 1e-12)
-    dice = 2.0 * inter_n / (pred_n + true_n + 1e-12)
+    pred_n = float(omega_hat.sum())
     area_true = true_n / (omega_high.size + 1e-12)
     area_pred = pred_n / (omega_hat.size + 1e-12)
     rel_area_err = abs(area_pred - area_true) / (area_true + 1e-12)
+
+    # Condition-relative top-25% hot core: T >= P75(T_true)
+    p75 = float(np.percentile(t, 75))
+    core_true = t >= p75
+    core_pred = p >= p75
+    top25_iou, top25_dice = _safe_iou_dice(core_true, core_pred)
 
     return {
         "high_rmse_K": rmse_h,
@@ -126,12 +145,24 @@ def high_temperature_region_errors(
         "high_iou": float(iou),
         "high_dice": float(dice),
         "high_rel_area_error": float(rel_area_err),
+        "non_high_rmse_K": rmse_nh,
+        "non_high_mae_K": mae_nh,
         "peak_rmse_K": rmse_peak,
         "peak_mae_K": mae_peak,
         "jet_rmse_K": rmse_jet,
         "jet_mae_K": mae_jet,
         "frac_omega_high_true": float(area_true),
         "frac_omega_high_pred": float(area_pred),
+        "top25pct_iou": float(top25_iou),
+        "top25pct_dice": float(top25_dice),
+        "top25pct_threshold_K": p75,
+        # aliases requested in Step 1.5 review
+        "high_t_rmse": rmse_h,
+        "jet_rmse": rmse_jet,
+        "non_high_t_rmse": rmse_nh,
+        "high_t_iou": float(iou),
+        "high_t_dice": float(dice),
+        "rel_Temp_2100_iou": float(iou),
     }
 
 
@@ -165,10 +196,15 @@ def evaluate_sample(
 ) -> dict[str, Any]:
     """Compute all four metric families for one sample / condition snapshot."""
     out: dict[str, Any] = {"sim_id": sim_id, "split": split}
-    out.update(field_errors(pred, true, train_sigma_T=train_sigma_T))
+    fe = field_errors(pred, true, train_sigma_T=train_sigma_T)
+    out.update(fe)
     bias = spatial_bias(pred, true)
     out["mean_signed_error_K"] = bias["mean_signed_error_K"]
-    # keep map out of flat tables by default
+    out["centered_rmse_K"] = bias["centered_rmse_K"]
+    out["abs_bias_K"] = bias["abs_bias_K"]
+    out["bias"] = bias["mean_signed_error_K"]
+    out["centered_rmse"] = bias["centered_rmse_K"]
+    out["rmse"] = fe["rmse_K"]
     out["_spatial_bias_map"] = bias["spatial_bias_map"]
     out.update(
         high_temperature_region_errors(

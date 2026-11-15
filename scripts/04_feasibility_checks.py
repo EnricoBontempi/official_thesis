@@ -22,6 +22,7 @@ from sklearn.feature_selection import mutual_info_regression
 
 from combustion_recon.data.masks import (
     build_layout_mask,
+    stable_seed,
     temperature_anchor_mask,
 )
 from combustion_recon.evaluation.metrics import evaluate_sample
@@ -30,6 +31,7 @@ from combustion_recon.models.baselines import (
     GlobalTrainMeanPredictor,
     LocalVelocityTemperatureRegressor,
     ParamConditionedMeanPredictor,
+    apply_anchor_offset,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -40,9 +42,27 @@ RAW = ROOT / "data" / "raw" / "combustion" / "hf_dataset" / "numerical"
 TABLES = ROOT / "results" / "tables"
 FIGS = ROOT / "results" / "figures" / "month1_feasibility"
 
-FRAME_MAIN = np.arange(0, 2001, 50)  # 41 frames
-FRAME_SEEN = np.arange(25, 2000, 100)  # ~20 frames held-out times on train trajs
+# Temporal protocol: fit on first 75%, buffer ≥2τ_c, evaluate seen on last 20%
+FRAME_FIT = np.arange(0, 1500, 40)  # 38 frames/traj → 760
+FRAME_SEEN = np.arange(1600, 2001, 40)  # 11 frames/traj → 220
+FRAME_EVAL = np.arange(0, 2001, 50)  # 41 frames for val/interp/extrap
 SEED = 20261114
+SUMMARY_METRICS = [
+    "rmse_K",
+    "mae_K",
+    "mean_signed_error_K",
+    "abs_bias_K",
+    "centered_rmse_K",
+    "high_rmse_K",
+    "jet_rmse_K",
+    "non_high_rmse_K",
+    "high_iou",
+    "high_dice",
+    "top25pct_iou",
+    "mean_level_abs_error_K",
+    "p95_abs_error_K",
+    "r2",
+]
 
 
 def parse_sim_id(sim_id: str) -> tuple[int, float]:
@@ -101,13 +121,11 @@ def frame_pack(traj: dict[str, Any], fi: int, nh3: float, phi: float) -> dict[st
 
 
 def kinematic_fields(vi, vj, x, y):
-    """Physical derivatives. Preferred: vj along x (axial), vi along y (transverse)."""
-    # np.gradient(axis=1) ~ ∂/∂col ~ ∂/∂x ; axis=0 ~ ∂/∂row ~ ∂/∂y
     dx = float(np.median(np.diff(x)))
     dy = float(np.median(np.diff(y)))
     dvi_dy, dvi_dx = np.gradient(vi, dy, dx)
     dvj_dy, dvj_dx = np.gradient(vj, dy, dx)
-    div_preferred = dvj_dx + dvi_dy  # ∂vj/∂x + ∂vi/∂y
+    div_preferred = dvj_dx + dvi_dy
     div_alt = dvi_dx + dvj_dy
     vort = np.abs(dvi_dx - dvj_dy)
     strain = np.sqrt(dvi_dx**2 + dvi_dy**2 + dvj_dx**2 + dvj_dy**2)
@@ -131,13 +149,15 @@ def corr_block(a: np.ndarray, b: np.ndarray, max_mi: int = 8000, seed: int = 0) 
     return {"pearson": pear, "spearman": spear, "mutual_info": mi}
 
 
-# -------------------- Evaluation helpers --------------------
 def eval_prediction(pred, true, sim_id, split, sigma_T) -> dict[str, Any]:
     return evaluate_sample(pred, true, train_sigma_T=sigma_T, sim_id=sim_id, split=split)
 
 
+def mask_seed(sim_id: str, frame: int, tag: str = "vel") -> int:
+    return stable_seed(SEED, sim_id, frame, tag)
+
+
 def extract_frame_bank(sim_ids: list[str], frames: np.ndarray, smap: dict[str, Path]) -> list[dict[str, Any]]:
-    """Load each trajectory once, keep only selected frames, free the rest."""
     out: list[dict[str, Any]] = []
     for sid in sim_ids:
         print(f"  load {sid}", flush=True)
@@ -158,100 +178,160 @@ def main() -> None:
     sigma_T = float(json.loads(STATS.read_text())["fields"]["Temperature"]["std"])
     rng = np.random.default_rng(SEED)
 
-    # ========== Check 1 (loads train trajs one-by-one) ==========
-    print("\n=== Check 1: kinematic coupling ===", flush=True)
-    # Minimal cache for check1: load inside run_check1
-    def run_check1_streaming(train_ids):
-        rows = []
-        pooled = {k: [] for k in ("vi", "vj", "vk", "umag", "div", "div_alt", "vort", "strain", "T")}
+    # ========== Check 1 (skip slow MI loop if CSV already present) ==========
+    check1_csv = TABLES / "month1_check1_kinematic_correlations.csv"
+    amb_ids = ["0NH3_1.h5", "40NH3_1.h5", "80NH3_1.05.h5"]
+
+    def _ambiguity_and_front_sanity():
         amb_curves = {}
-        for sid in train_ids:
-            print(f"  check1 {sid}", flush=True)
+        front_pearson = None
+        for sid in amb_ids:
+            if sid not in smap:
+                continue
+            print(f"  amb/fig07 {sid}", flush=True)
             traj = load_traj(smap[sid])
             nh3, phi = parse_sim_id(sid)
-            frames = FRAME_MAIN[::2]
-            packs = [frame_pack(traj, fi, nh3 / 100.0, phi) for fi in frames]
-            vi = np.stack([p["vi"] for p in packs])
-            vj = np.stack([p["vj"] for p in packs])
-            vk = np.stack([p["vk"] for p in packs])
+            frames = FRAME_FIT[::2]
+            packs = [frame_pack(traj, int(fi), nh3 / 100.0, phi) for fi in frames]
             umag = np.stack([p["umag"] for p in packs])
             T = np.stack([p["T"] for p in packs])
-            divs, diva, vorts, strains = [], [], [], []
-            for p in packs:
-                d, da, vo, st = kinematic_fields(p["vi"], p["vj"], traj["x"], traj["y"])
-                divs.append(d)
-                diva.append(da)
-                vorts.append(vo)
-                strains.append(st)
-            div = np.stack(divs)
-            div_alt = np.stack(diva)
-            vort = np.stack(vorts)
-            strain = np.stack(strains)
-            for name, arr in [
-                ("vi", vi),
-                ("vj", vj),
-                ("vk", vk),
-                ("umag", umag),
-                ("div_preferred", div),
-                ("div_alt", div_alt),
-                ("vort", vort),
-                ("strain", strain),
-            ]:
-                c = corr_block(arr, T, seed=hash(sid) % (2**32))
-                rows.append({"scope": "within_condition", "sim_id": sid, "feature": name, **c})
-            for k, arr in [
-                ("vi", vi),
-                ("vj", vj),
-                ("vk", vk),
-                ("umag", umag),
-                ("div", div),
-                ("div_alt", div_alt),
-                ("vort", vort),
-                ("strain", strain),
-                ("T", T),
-            ]:
-                pooled[k].append(arr.ravel()[::80])
-            if (nh3 in (0, 40) and abs(phi - 1.0) < 0.06) or (nh3 == 80 and abs(phi - 1.05) < 1e-6):
-                um = umag.ravel()
-                tt = T.ravel()
-                bins = np.linspace(0, float(np.quantile(um, 0.99)), 16)
-                inds = np.digitize(um, bins) - 1
-                centers, means = [], []
-                for b in range(len(bins) - 1):
-                    m = inds == b
-                    if m.sum() < 50:
-                        continue
-                    centers.append(0.5 * (bins[b] + bins[b + 1]))
-                    means.append(float(tt[m].mean()))
-                amb_curves[sid] = (np.array(centers), np.array(means), nh3)
-            del traj, packs, vi, vj, vk, umag, T, div, div_alt, vort, strain
-        Tp = np.concatenate(pooled["T"])
-        for name in ("vi", "vj", "vk", "umag", "div", "div_alt", "vort", "strain"):
-            c = corr_block(np.concatenate(pooled[name]), Tp, seed=1)
-            rows.append({"scope": "pooled_train", "sim_id": "ALL_TRAIN", "feature": name, **c})
-        return pd.DataFrame(rows), amb_curves
+            um = umag.ravel()
+            tt = T.ravel()
+            bins = np.linspace(0, float(np.quantile(um, 0.99)), 16)
+            inds = np.digitize(um, bins) - 1
+            centers, means = [], []
+            for b in range(len(bins) - 1):
+                m = inds == b
+                if m.sum() < 50:
+                    continue
+                centers.append(0.5 * (bins[b] + bins[b + 1]))
+                means.append(float(tt[m].mean()))
+            amb_curves[sid] = (np.array(centers), np.array(means), nh3)
+            if sid == "0NH3_1.h5":
+                fr = packs[len(packs) // 2]
+                div, _, _, _ = kinematic_fields(fr["vi"], fr["vj"], traj["x"], traj["y"])
+                dTy, dTx = np.gradient(fr["T"])
+                gT = np.sqrt(dTx**2 + dTy**2)
+                front_pearson = float(np.corrcoef(np.abs(div).ravel(), gT.ravel())[0, 1])
+            del traj, packs
+        return amb_curves, front_pearson
 
-    df1, amb_curves = run_check1_streaming(splits["train"])
-    df1.to_csv(TABLES / "month1_check1_kinematic_correlations.csv", index=False)
+    print("\n=== Check 1: kinematic coupling ===", flush=True)
+    if check1_csv.exists():
+        print(f"  Reusing {check1_csv.name} (skip MI loop)", flush=True)
+        df1 = pd.read_csv(check1_csv)
+        amb_curves, front_pearson = _ambiguity_and_front_sanity()
+    else:
+
+        def run_check1_streaming(train_ids):
+            rows = []
+            pooled = {k: [] for k in ("vi", "vj", "vk", "umag", "div", "div_alt", "vort", "strain", "T")}
+            amb_curves = {}
+            for sid in train_ids:
+                print(f"  check1 {sid}", flush=True)
+                traj = load_traj(smap[sid])
+                nh3, phi = parse_sim_id(sid)
+                frames = FRAME_FIT[::2]
+                packs = [frame_pack(traj, fi, nh3 / 100.0, phi) for fi in frames]
+                vi = np.stack([p["vi"] for p in packs])
+                vj = np.stack([p["vj"] for p in packs])
+                vk = np.stack([p["vk"] for p in packs])
+                umag = np.stack([p["umag"] for p in packs])
+                T = np.stack([p["T"] for p in packs])
+                divs, diva, vorts, strains = [], [], [], []
+                for p in packs:
+                    d, da, vo, st = kinematic_fields(p["vi"], p["vj"], traj["x"], traj["y"])
+                    divs.append(d)
+                    diva.append(da)
+                    vorts.append(vo)
+                    strains.append(st)
+                div = np.stack(divs)
+                div_alt = np.stack(diva)
+                vort = np.stack(vorts)
+                strain = np.stack(strains)
+                for name, arr in [
+                    ("vi", vi),
+                    ("vj", vj),
+                    ("vk", vk),
+                    ("umag", umag),
+                    ("div_preferred", div),
+                    ("div_alt", div_alt),
+                    ("vort", vort),
+                    ("strain", strain),
+                ]:
+                    c = corr_block(arr, T, seed=stable_seed(sid, "corr"))
+                    rows.append({"scope": "within_condition", "sim_id": sid, "feature": name, **c})
+                for k, arr in [
+                    ("vi", vi),
+                    ("vj", vj),
+                    ("vk", vk),
+                    ("umag", umag),
+                    ("div", div),
+                    ("div_alt", div_alt),
+                    ("vort", vort),
+                    ("strain", strain),
+                    ("T", T),
+                ]:
+                    pooled[k].append(arr.ravel()[::80])
+                if (nh3 in (0, 40) and abs(phi - 1.0) < 0.06) or (
+                    nh3 == 80 and abs(phi - 1.05) < 1e-6
+                ):
+                    um = umag.ravel()
+                    tt = T.ravel()
+                    bins = np.linspace(0, float(np.quantile(um, 0.99)), 16)
+                    inds = np.digitize(um, bins) - 1
+                    centers, means = [], []
+                    for b in range(len(bins) - 1):
+                        m = inds == b
+                        if m.sum() < 50:
+                            continue
+                        centers.append(0.5 * (bins[b] + bins[b + 1]))
+                        means.append(float(tt[m].mean()))
+                    amb_curves[sid] = (np.array(centers), np.array(means), nh3)
+                del traj, packs, vi, vj, vk, umag, T, div, div_alt, vort, strain
+            Tp = np.concatenate(pooled["T"])
+            for name in ("vi", "vj", "vk", "umag", "div", "div_alt", "vort", "strain"):
+                c = corr_block(np.concatenate(pooled[name]), Tp, seed=1)
+                rows.append({"scope": "pooled_train", "sim_id": "ALL_TRAIN", "feature": name, **c})
+            return pd.DataFrame(rows), amb_curves
+
+        df1, amb_curves = run_check1_streaming(splits["train"])
+        df1.to_csv(check1_csv, index=False)
+        _, front_pearson = _ambiguity_and_front_sanity()
     print(df1[df1.scope == "pooled_train"][["feature", "pearson", "spearman", "mutual_info"]], flush=True)
+    if front_pearson is not None:
+        print(f"  front sanity Pearson(|div|, |∇T|) on 0NH3_1 = {front_pearson:.4f}", flush=True)
 
-    # ========== Prepare frame banks (one traj at a time) ==========
+    # ========== Frame banks (one load per trajectory) ==========
     print("\nExtracting frame banks...", flush=True)
-    train_frames = extract_frame_bank(splits["train"], FRAME_MAIN, smap)
-    seen_frames = extract_frame_bank(splits["train"], FRAME_SEEN, smap)
-    val_frames = extract_frame_bank(splits["val"], FRAME_MAIN, smap)
-    interp_frames = extract_frame_bank(splits["test_interp"], FRAME_MAIN, smap)
-    extrap_frames = extract_frame_bank(splits["test_extrap"], FRAME_MAIN, smap)
+
+    def extract_dual(sim_ids, frames_a, frames_b):
+        bank_a, bank_b = [], []
+        for sid in sim_ids:
+            print(f"  load {sid}", flush=True)
+            traj = load_traj(smap[sid])
+            nh3, phi = parse_sim_id(sid)
+            nT = traj["numerical"].shape[0]
+            for fi in frames_a:
+                if int(fi) < nT:
+                    bank_a.append(frame_pack(traj, int(fi), nh3 / 100.0, phi))
+            for fi in frames_b:
+                if int(fi) < nT:
+                    bank_b.append(frame_pack(traj, int(fi), nh3 / 100.0, phi))
+            del traj
+        return bank_a, bank_b
+
+    train_frames, seen_frames = extract_dual(splits["train"], FRAME_FIT, FRAME_SEEN)
+    val_frames = extract_frame_bank(splits["val"], FRAME_EVAL, smap)
+    interp_frames = extract_frame_bank(splits["test_interp"], FRAME_EVAL, smap)
+    extrap_frames = extract_frame_bank(splits["test_extrap"], FRAME_EVAL, smap)
     print(
-        f"Frames: train={len(train_frames)} seen={len(seen_frames)} "
+        f"Frames: train_fit={len(train_frames)} seen={len(seen_frames)} "
         f"val={len(val_frames)} interp={len(interp_frames)} extrap={len(extrap_frames)}",
         flush=True,
     )
 
-    # Condition mean fields on train
-    cond_means = []
-    cond_ops = []
-    all_train_T_for_global = []
+    cond_means, cond_ops, all_train_T = [], [], []
     by_sid: dict[str, list] = {}
     for fr in train_frames:
         by_sid.setdefault(fr["sim_id"], []).append(fr["T"])
@@ -260,59 +340,158 @@ def main() -> None:
         cond_means.append(stack.mean(axis=0))
         nh3, phi = parse_sim_id(sid)
         cond_ops.append((nh3 / 100.0, phi))
-        all_train_T_for_global.extend([stack[i] for i in range(0, len(stack), 2)])
+        all_train_T.extend(list(stack[::2]))
 
     print("Fitting mean predictors...", flush=True)
-    global_mean = GlobalTrainMeanPredictor.fit(all_train_T_for_global)
-    param_mean = ParamConditionedMeanPredictor.fit(cond_means, cond_ops, ridge_alpha=1e-2)
+    global_mean = GlobalTrainMeanPredictor.fit(all_train_T)
+    param_mean = ParamConditionedMeanPredictor.fit(cond_means, cond_ops, ridge_alpha="auto")
+    print(
+        f"  ParamMean selected basis={param_mean.selected_basis} "
+        f"α={param_mean.selected_ridge_alpha:g} LOCO RMSE={param_mean.loco_rmse_K:.2f} K",
+        flush=True,
+    )
 
-    print("Fitting local regressors...", flush=True)
-    # subsample frames for fitting
+    print("Fitting local regressors (2D & 3D velocity)...", flush=True)
     fit_idx = rng.choice(len(train_frames), size=min(300, len(train_frames)), replace=False)
     fit_frames = [train_frames[i] for i in fit_idx]
-    local_unc = LocalVelocityTemperatureRegressor.fit(
-        fit_frames, conditioned=False, max_pixels=60_000, seed=SEED
+    local_unc_3 = LocalVelocityTemperatureRegressor.fit(
+        fit_frames, conditioned=False, max_pixels=60_000, seed=SEED, include_vk=True
     )
-    local_cond = LocalVelocityTemperatureRegressor.fit(
-        fit_frames, conditioned=True, max_pixels=60_000, seed=SEED + 1
+    local_cond_3 = LocalVelocityTemperatureRegressor.fit(
+        fit_frames, conditioned=True, max_pixels=60_000, seed=SEED + 1, include_vk=True
+    )
+    local_cond_2 = LocalVelocityTemperatureRegressor.fit(
+        fit_frames, conditioned=True, max_pixels=60_000, seed=SEED + 3, include_vk=False
     )
 
-    print("Fitting Gappy POD (R=32/64)...", flush=True)
-    # Select R on val with random_5pct temperature_free
-    pod_candidates = {}
-    for R in (32, 64):
-        pod = GappyPODReconstructor.fit(
-            train_frames,
-            R=R,
-            ridge_lambda=1e-2,
-            use_param_mean=False,
-            max_train_frames=350,
-            seed=SEED,
-        )
-        errs = []
-        for fr in val_frames[::4]:
-            mask = build_layout_mask("random_5pct", seed=SEED + fr["frame"])
-            pred = pod.reconstruct(fr["vi"], fr["vj"], fr["vk"], vel_mask=mask, nh3=fr["nh3"], phi=fr["phi"])
-            errs.append(np.sqrt(np.mean((pred - fr["T"]) ** 2)))
-        pod_candidates[R] = (pod, float(np.mean(errs)))
-        print(f"  R={R} val RMSE={pod_candidates[R][1]:.2f}", flush=True)
-    best_R = min(pod_candidates, key=lambda r: pod_candidates[r][1])
-    print(f"Selected R={best_R}", flush=True)
-    pod_unc = pod_candidates[best_R][0]
-    pod_cond = GappyPODReconstructor.fit(
+    print("Fitting Gappy POD on ALL train-fit frames (2-comp & 3-comp)...", flush=True)
+    pod_base_3 = GappyPODReconstructor.fit(
         train_frames,
-        R=best_R,
-        ridge_lambda=1e-2,
+        R=32,
+        ridge_lambda=1e-3,
+        w_T=20.0,
+        use_param_mean=False,
+        max_train_frames=None,
+        n_velocity_components=3,
+        seed=SEED,
+    )
+    pod_base_2 = GappyPODReconstructor.fit(
+        train_frames,
+        R=32,
+        ridge_lambda=1e-3,
+        w_T=20.0,
+        use_param_mean=False,
+        max_train_frames=None,
+        n_velocity_components=2,
+        seed=SEED + 5,
+    )
+    pod_cond_base = GappyPODReconstructor.fit(
+        train_frames,
+        R=32,
+        ridge_lambda=1e-3,
+        w_T=20.0,
         use_param_mean=True,
         param_mean_predictor=param_mean,
-        max_train_frames=350,
+        max_train_frames=None,
+        n_velocity_components=3,
         seed=SEED + 2,
     )
 
-    # ========== Checks 2–4 evaluations ==========
-    metric_rows = []
+    # Select λ, w_T on val (conditioned POD, random_5pct + K=4 assisted)
+    print("Selecting λ, w_T on val...", flush=True)
+    best = None
+    for lam in (1e-4, 1e-3, 1e-2):
+        for wT in (5.0, 20.0, 50.0):
+            pod_try = pod_cond_base.with_hyperparams(ridge_lambda=lam, w_T=wT)
+            errs = []
+            for fr in val_frames[::4]:
+                vel_mask = build_layout_mask(
+                    "random_5pct", seed=mask_seed(fr["sim_id"], fr["frame"], "vel")
+                )
+                t_mask = temperature_anchor_mask(
+                    4, seed=mask_seed(fr["sim_id"], fr["frame"], "temp"), nested=True
+                )
+                pred = pod_try.reconstruct(
+                    fr["vi"],
+                    fr["vj"],
+                    fr["vk"],
+                    vel_mask=vel_mask,
+                    T_obs=fr["T"],
+                    T_mask=t_mask,
+                    nh3=fr["nh3"],
+                    phi=fr["phi"],
+                    use_temperature_block=True,
+                )
+                errs.append(np.sqrt(np.mean((pred - fr["T"]) ** 2)))
+            score = float(np.mean(errs))
+            print(f"  λ={lam:g} w_T={wT:g} val RMSE={score:.2f}", flush=True)
+            if best is None or score < best[0]:
+                best = (score, lam, wT)
+    assert best is not None
+    _, best_lam, best_wT = best
+    print(f"Selected λ={best_lam:g}, w_T={best_wT:g}", flush=True)
 
-    def add_rows(results, method, task_mode, layout, K=0):
+    pod_unc = pod_base_3.with_hyperparams(ridge_lambda=best_lam, w_T=best_wT)
+    pod_unc_2 = pod_base_2.with_hyperparams(ridge_lambda=best_lam, w_T=best_wT)
+    pod_cond = pod_cond_base.with_hyperparams(ridge_lambda=best_lam, w_T=best_wT)
+
+    # Also try R=64 conditioned briefly on val temp-free
+    print("Confirming R on val (temp-free 5%)...", flush=True)
+    pod64 = GappyPODReconstructor.fit(
+        train_frames,
+        R=64,
+        ridge_lambda=best_lam,
+        w_T=best_wT,
+        use_param_mean=True,
+        param_mean_predictor=param_mean,
+        max_train_frames=None,
+        n_velocity_components=3,
+        seed=SEED + 7,
+    )
+    def _val_tf_rmse(pod):
+        errs = []
+        for fr in val_frames[::4]:
+            mask = build_layout_mask("random_5pct", seed=mask_seed(fr["sim_id"], fr["frame"], "vel"))
+            pred = pod.reconstruct(
+                fr["vi"], fr["vj"], fr["vk"], vel_mask=mask, nh3=fr["nh3"], phi=fr["phi"]
+            )
+            errs.append(np.sqrt(np.mean((pred - fr["T"]) ** 2)))
+        return float(np.mean(errs))
+
+    r32 = _val_tf_rmse(pod_cond)
+    r64 = _val_tf_rmse(pod64)
+    print(f"  R=32 val RMSE={r32:.2f}  R=64 val RMSE={r64:.2f}", flush=True)
+    best_R = 32
+    if r64 < r32:
+        best_R = 64
+        pod_cond = pod64
+        # rebuild unconditioned at R=64 for fairness
+        pod_unc = GappyPODReconstructor.fit(
+            train_frames,
+            R=64,
+            ridge_lambda=best_lam,
+            w_T=best_wT,
+            use_param_mean=False,
+            max_train_frames=None,
+            n_velocity_components=3,
+            seed=SEED,
+        )
+        pod_unc_2 = GappyPODReconstructor.fit(
+            train_frames,
+            R=64,
+            ridge_lambda=best_lam,
+            w_T=best_wT,
+            use_param_mean=False,
+            max_train_frames=None,
+            n_velocity_components=2,
+            seed=SEED + 5,
+        )
+    print(f"Selected R={best_R}", flush=True)
+
+    # ========== Evaluations ==========
+    metric_rows: list[dict[str, Any]] = []
+
+    def add_rows(results, method, task_mode, layout, K=0, n_vel_comp=3):
         for r in results:
             d = {k: v for k, v in r.items() if k != "_spatial_bias_map"}
             d.update(
@@ -321,6 +500,7 @@ def main() -> None:
                     "task_mode": task_mode,
                     "layout": layout,
                     "K_temp_anchors": K,
+                    "n_velocity_components": n_vel_comp,
                 }
             )
             metric_rows.append(d)
@@ -332,43 +512,55 @@ def main() -> None:
         ("test_extrap", extrap_frames),
     ]
 
-    # --- Check 2: mean predictors ---
     print("\n=== Check 2: mean predictors ===", flush=True)
     for split_name, frames in eval_sets:
         res_g, res_p = [], []
-        # one prediction per condition (same for all frames) but score each frame
         for fr in frames:
-            pred_g = global_mean.predict()
-            pred_p = param_mean.predict(fr["nh3"], fr["phi"])
-            res_g.append(eval_prediction(pred_g, fr["T"], fr["sim_id"], split_name, sigma_T))
-            res_p.append(eval_prediction(pred_p, fr["T"], fr["sim_id"], split_name, sigma_T))
+            res_g.append(eval_prediction(global_mean.predict(), fr["T"], fr["sim_id"], split_name, sigma_T))
+            res_p.append(
+                eval_prediction(param_mean.predict(fr["nh3"], fr["phi"]), fr["T"], fr["sim_id"], split_name, sigma_T)
+            )
         add_rows(res_g, "GlobalTrainMean", "temperature_free", "none", 0)
         add_rows(res_p, "ParamConditionedMean", "temperature_free", "none", 0)
 
-    # --- Check 3: local regressors (full-grid velocity oracle — upper bound on local map) ---
+    # ParamMean + Anchor Offset K sweep
+    print("\n=== ParamMean + Anchor Offset ===", flush=True)
+    for K in (0, 1, 4, 9, 16, 32):
+        for split_name, frames in eval_sets:
+            res = []
+            for fr in frames:
+                t_mask = temperature_anchor_mask(
+                    K, seed=mask_seed(fr["sim_id"], fr["frame"], "temp"), nested=True
+                )
+                T0 = param_mean.predict(fr["nh3"], fr["phi"])
+                if K > 0:
+                    pred, _ = apply_anchor_offset(T0, fr["T"], t_mask, tau=1.0)
+                else:
+                    pred = T0
+                res.append(eval_prediction(pred, fr["T"], fr["sim_id"], split_name, sigma_T))
+            add_rows(res, "ParamMean_AnchorOffset", "temperature_assisted", "none", K)
+        print(f"  done K={K}", flush=True)
+
     print("\n=== Check 3: local regressors ===", flush=True)
     for split_name, frames in eval_sets:
-        res_u, res_c = [], []
-        for fr in frames[::1]:
-            pred_u = local_unc.predict_field(
+        res_u, res_c3, res_c2 = [], [], []
+        for fr in frames:
+            pred_u = local_unc_3.predict_field(
                 fr["vi"], fr["vj"], fr["vk"], fr["umag"], fr["x2d"], fr["y2d"]
             )
-            pred_c = local_cond.predict_field(
-                fr["vi"],
-                fr["vj"],
-                fr["vk"],
-                fr["umag"],
-                fr["x2d"],
-                fr["y2d"],
-                nh3=fr["nh3"],
-                phi=fr["phi"],
+            pred_c3 = local_cond_3.predict_field(
+                fr["vi"], fr["vj"], fr["vk"], fr["umag"], fr["x2d"], fr["y2d"], nh3=fr["nh3"], phi=fr["phi"]
+            )
+            pred_c2 = local_cond_2.predict_field(
+                fr["vi"], fr["vj"], fr["vk"], fr["umag"], fr["x2d"], fr["y2d"], nh3=fr["nh3"], phi=fr["phi"]
             )
             res_u.append(eval_prediction(pred_u, fr["T"], fr["sim_id"], split_name, sigma_T))
-            res_c.append(eval_prediction(pred_c, fr["T"], fr["sim_id"], split_name, sigma_T))
-        add_rows(res_u, "LocalHGB_Unconditioned", "temperature_free", "full_grid_velocity", 0)
-        add_rows(res_c, "LocalHGB_Conditioned", "temperature_free", "full_grid_velocity", 0)
+            res_c3.append(eval_prediction(pred_c3, fr["T"], fr["sim_id"], split_name, sigma_T))
+            res_c2.append(eval_prediction(pred_c2, fr["T"], fr["sim_id"], split_name, sigma_T))
+        add_rows(res_u, "LocalHGB_Unconditioned", "temperature_free", "full_grid_velocity", 0, 3)
+        add_rows(res_c3, "LocalHGB_Conditioned", "temperature_free", "full_grid_velocity", 0, 3)
+        add_rows(res_c2, "LocalHGB_Conditioned_2comp", "temperature_free", "full_grid_velocity", 0, 2)
 
-    # --- Check 4a: sparsity sweep temperature_free ---
     print("\n=== Check 4a: Gappy POD sparsity sweep ===", flush=True)
     sparsity_layouts = [
         "random_1pct",
@@ -381,16 +573,18 @@ def main() -> None:
         "radial_line_mid",
     ]
     for layout in sparsity_layouts:
-        for method_name, pod in [
-            ("GappyPOD_Unconditioned", pod_unc),
-            ("GappyPOD_Conditioned", pod_cond),
+        for method_name, pod, nvc in [
+            ("GappyPOD_Unconditioned", pod_unc, 3),
+            ("GappyPOD_Unconditioned_2comp", pod_unc_2, 2),
+            ("GappyPOD_Conditioned", pod_cond, 3),
         ]:
             for split_name, frames in eval_sets:
-                # subsample frames for expensive layouts
                 use = frames if layout.startswith("random") else frames[::2]
                 res = []
                 for fr in use:
-                    mask = build_layout_mask(layout, seed=SEED + fr["frame"] + hash(fr["sim_id"]) % 1000)
+                    mask = build_layout_mask(
+                        layout, seed=mask_seed(fr["sim_id"], fr["frame"], layout)
+                    )
                     pred = pod.reconstruct(
                         fr["vi"],
                         fr["vj"],
@@ -400,94 +594,158 @@ def main() -> None:
                         phi=fr["phi"],
                     )
                     res.append(eval_prediction(pred, fr["T"], fr["sim_id"], split_name, sigma_T))
-                add_rows(res, method_name, "temperature_free", layout, 0)
+                add_rows(res, method_name, "temperature_free", layout, 0, nvc)
         print(f"  done {layout}", flush=True)
 
-    # --- Check 4b: temperature-assisted K sweep at random_5pct velocity ---
-    print("\n=== Check 4b: temperature-assisted K sweep ===", flush=True)
+    # Oracle POD temperature projection floor (full-T, Check 4a companion)
+    print("\n=== Oracle POD T projection floor ===", flush=True)
+    for method_name, pod, nvc in [
+        ("OraclePOD_Unconditioned", pod_unc, 3),
+        ("OraclePOD_Conditioned", pod_cond, 3),
+    ]:
+        for split_name, frames in eval_sets:
+            res = []
+            for fr in frames:
+                pred = pod.project_oracle_T(fr["T"], nh3=fr["nh3"], phi=fr["phi"])
+                res.append(eval_prediction(pred, fr["T"], fr["sim_id"], split_name, sigma_T))
+            add_rows(res, method_name, "temperature_free", "oracle_full_T", 0, nvc)
+        print(f"  done {method_name}", flush=True)
+
+    print("\n=== Check 4b: temperature-assisted (weighted T-block + AnchorOffset) ===", flush=True)
     for K in (0, 1, 4, 9, 16, 32):
-        for method_name, pod in [
-            ("GappyPOD_Unconditioned", pod_unc),
-            ("GappyPOD_Conditioned", pod_cond),
+        for method_name, pod, mode, nvc in [
+            ("GappyPOD_Conditioned", pod_cond, "weighted_T_block", 3),
+            ("GappyPOD_Unconditioned", pod_unc, "weighted_T_block", 3),
+            ("GappyPOD_Conditioned_AnchorOffset", pod_cond, "anchor_offset", 3),
+            ("GappyPOD_Unconditioned_AnchorOffset", pod_unc, "anchor_offset", 3),
         ]:
             for split_name, frames in eval_sets:
                 res = []
-                for fr in frames[::2]:
+                for fr in frames:  # same frames + same mask seed as Check 4a @ random_5pct
                     vel_mask = build_layout_mask(
-                        "random_5pct", seed=SEED + fr["frame"] + hash(fr["sim_id"]) % 1000
+                        "random_5pct",
+                        seed=mask_seed(fr["sim_id"], fr["frame"], "random_5pct"),
                     )
-                    if K > 0:
-                        t_mask = temperature_anchor_mask(
-                            K, seed=SEED + 17 + fr["frame"], exclude=~vel_mask
+                    t_mask = temperature_anchor_mask(
+                        K, seed=mask_seed(fr["sim_id"], fr["frame"], "temp"), nested=True
+                    )
+                    if mode == "anchor_offset":
+                        pred = pod.reconstruct(
+                            fr["vi"],
+                            fr["vj"],
+                            fr["vk"],
+                            vel_mask=vel_mask,
+                            T_obs=fr["T"] if K > 0 else None,
+                            T_mask=t_mask if K > 0 else None,
+                            nh3=fr["nh3"],
+                            phi=fr["phi"],
+                            use_temperature_block=False,
+                            anchor_offset=(K > 0),
                         )
                     else:
-                        t_mask = np.zeros_like(vel_mask)
-                    pred = pod.reconstruct(
-                        fr["vi"],
-                        fr["vj"],
-                        fr["vk"],
-                        vel_mask=vel_mask,
-                        T_obs=fr["T"] if K > 0 else None,
-                        T_mask=t_mask if K > 0 else None,
-                        nh3=fr["nh3"],
-                        phi=fr["phi"],
-                    )
+                        pred = pod.reconstruct(
+                            fr["vi"],
+                            fr["vj"],
+                            fr["vk"],
+                            vel_mask=vel_mask,
+                            T_obs=fr["T"] if K > 0 else None,
+                            T_mask=t_mask if K > 0 else None,
+                            nh3=fr["nh3"],
+                            phi=fr["phi"],
+                            use_temperature_block=(K > 0),
+                            anchor_offset=False,
+                        )
                     res.append(eval_prediction(pred, fr["T"], fr["sim_id"], split_name, sigma_T))
-                add_rows(res, method_name, "temperature_assisted", "random_5pct", K)
+                add_rows(res, method_name, "temperature_assisted", "random_5pct", K, nvc)
         print(f"  done K={K}", flush=True)
 
     df_metrics = pd.DataFrame(metric_rows)
     df_metrics.to_csv(TABLES / "month1_check2_3_4_per_condition_metrics.csv", index=False)
 
-    # Split summary (separate task modes)
+    # Per-condition summary (every sim_id visible)
+    cols = [c for c in SUMMARY_METRICS if c in df_metrics.columns]
+    group_keys = [
+        "task_mode",
+        "method",
+        "layout",
+        "K_temp_anchors",
+        "n_velocity_components",
+        "split",
+        "sim_id",
+    ]
+    df_per_cond = df_metrics.groupby(group_keys, as_index=False)[cols].mean()
+    df_per_cond.to_csv(TABLES / "month1_per_condition_summary.csv", index=False)
+
     summary_rows = []
     for task_mode in ("temperature_free", "temperature_assisted"):
         sub = df_metrics[df_metrics.task_mode == task_mode]
         if sub.empty:
             continue
-        g = (
-            sub.groupby(["task_mode", "method", "layout", "K_temp_anchors", "split"], as_index=False)[
-                ["rmse_K", "mae_K", "mean_signed_error_K", "high_iou", "high_rmse_K", "mean_level_abs_error_K", "p95_abs_error_K", "r2"]
-            ]
-            .mean()
-        )
+        g = sub.groupby(
+            ["task_mode", "method", "layout", "K_temp_anchors", "n_velocity_components", "split"],
+            as_index=False,
+        )[cols].mean()
         summary_rows.append(g)
     df_sum = pd.concat(summary_rows, ignore_index=True)
     df_sum.to_csv(TABLES / "month1_feasibility_split_summary.csv", index=False)
-    print("\n=== Split summary (key methods @ random_5pct / none) ===", flush=True)
+
+    print("\n=== Key summary (temp-free / assisted) ===", flush=True)
     show = df_sum[
-        ((df_sum.layout.isin(["none", "full_grid_velocity", "random_5pct"])) & (df_sum.task_mode == "temperature_free"))
-        | ((df_sum.task_mode == "temperature_assisted") & (df_sum.K_temp_anchors.isin([0, 4, 16])))
+        (
+            (df_sum.layout.isin(["none", "full_grid_velocity", "random_5pct"]))
+            & (df_sum.task_mode == "temperature_free")
+            & (df_sum.n_velocity_components == 3)
+        )
+        | (
+            (df_sum.task_mode == "temperature_assisted")
+            & (df_sum.K_temp_anchors.isin([0, 4, 16, 32]))
+            & (df_sum.method.str.contains("AnchorOffset|ParamMean|GappyPOD_Conditioned$"))
+        )
     ]
-    print(show.to_string(index=False), flush=True)
+    cols_show = [
+        "task_mode",
+        "method",
+        "layout",
+        "K_temp_anchors",
+        "split",
+        "rmse_K",
+        "high_rmse_K",
+        "jet_rmse_K",
+        "mean_signed_error_K",
+        "centered_rmse_K",
+        "high_iou",
+        "top25pct_iou",
+    ]
+    print(show[cols_show].to_string(index=False), flush=True)
 
-    # ========== Figures ==========
     print("\nGenerating figures...", flush=True)
-    _make_figures(
-        smap,
-        df1,
-        amb_curves,
-        df_sum,
-        pod_unc,
-        pod_cond,
-    )
+    _make_figures(smap, df1, amb_curves, df_sum, pod_unc, pod_cond)
 
-    # Save selected R
     (TABLES / "month1_feasibility_meta.json").write_text(
-        json.dumps({"best_pod_R": best_R, "sigma_T": sigma_T, "n_train_frames": len(train_frames)}, indent=2)
+        json.dumps(
+            {
+                "best_pod_R": best_R,
+                "best_ridge_lambda": best_lam,
+                "best_w_T": best_wT,
+                "param_mean_basis": param_mean.selected_basis,
+                "param_mean_ridge_alpha": param_mean.selected_ridge_alpha,
+                "param_mean_loco_rmse_K": param_mean.loco_rmse_K,
+                "front_div_gradT_pearson": front_pearson,
+                "sigma_T": sigma_T,
+                "n_train_fit_frames": len(train_frames),
+                "n_seen_frames": len(seen_frames),
+                "frame_fit": FRAME_FIT.tolist(),
+                "frame_seen": FRAME_SEEN.tolist(),
+                "frame_eval": FRAME_EVAL.tolist(),
+            },
+            indent=2,
+        )
         + "\n"
     )
     print("Done.", flush=True)
 
 
-def _make_figures(
-    smap: dict[str, Path],
-    df1: pd.DataFrame,
-    amb_curves: dict,
-    df_sum: pd.DataFrame,
-    pod_unc: GappyPODReconstructor,
-    pod_cond: GappyPODReconstructor,
-):
+def _make_figures(smap, df1, amb_curves, df_sum, pod_unc, pod_cond):
     # fig07
     sid0 = "0NH3_1.h5"
     traj0 = load_traj(smap[sid0])
@@ -495,14 +753,16 @@ def _make_figures(
     div, _, vort, _ = kinematic_fields(fr0["vi"], fr0["vj"], traj0["x"], traj0["y"])
     del traj0
     fig, axes = plt.subplots(2, 3, figsize=(12, 7.5))
-    ims = [
-        (axes[0, 0], fr0["T"], "T [K]", "inferno"),
-        (axes[0, 1], fr0["umag"], r"$|\mathbf{u}|$ [m/s]", "viridis"),
-        (axes[0, 2], div, r"$\nabla\cdot u$ (preferred)", "RdBu_r"),
-        (axes[1, 0], vort, r"$|\omega_z|$", "magma"),
+    # Symmetric RdBu for divergence about zero
+    div_lim = float(np.nanpercentile(np.abs(div), 99))
+    panels = [
+        (axes[0, 0], fr0["T"], "T [K]", "inferno", None, None),
+        (axes[0, 1], fr0["umag"], r"$|\mathbf{u}|$ [m/s]", "viridis", None, None),
+        (axes[0, 2], div, r"$\nabla\cdot u$ (preferred)", "RdBu_r", -div_lim, div_lim),
+        (axes[1, 0], vort, r"$|\omega_z|$", "magma", None, None),
     ]
-    for ax, data, title, cmap in ims:
-        im = ax.imshow(data, origin="lower", cmap=cmap, aspect="equal")
+    for ax, data, title, cmap, vmin, vmax in panels:
+        im = ax.imshow(data, origin="lower", cmap=cmap, aspect="equal", vmin=vmin, vmax=vmax)
         ax.set_title(title)
         fig.colorbar(im, ax=ax, fraction=0.046)
     ax = axes[1, 1]
@@ -531,56 +791,117 @@ def _make_figures(
     fig.savefig(FIGS / "fig07_kinematic_coupling_and_ambiguity.png", dpi=160, bbox_inches="tight")
     plt.close(fig)
 
-    # fig08 transfer comparison
+    # fig08 — 2x2 panels
     methods_fig8 = [
-        "GlobalTrainMean",
-        "ParamConditionedMean",
-        "LocalHGB_Unconditioned",
-        "LocalHGB_Conditioned",
-        "GappyPOD_Unconditioned",
-        "GappyPOD_Conditioned",
+        ("GlobalTrainMean", "none", "temperature_free", 3),
+        ("ParamConditionedMean", "none", "temperature_free", 3),
+        ("LocalHGB_Unconditioned", "full_grid_velocity", "temperature_free", 3),
+        ("LocalHGB_Conditioned", "full_grid_velocity", "temperature_free", 3),
+        ("GappyPOD_Unconditioned", "random_5pct", "temperature_free", 3),
+        ("GappyPOD_Conditioned", "random_5pct", "temperature_free", 3),
     ]
     splits_order = ["seen_train_eval", "val", "test_interp", "test_extrap"]
-    fig, axes = plt.subplots(1, 3, figsize=(13.5, 4.2))
-    metrics_ax = [
-        ("rmse_K", "RMSE [K]"),
-        ("mean_signed_error_K", "Mean signed bias [K]"),
-        ("high_iou", "High-T IoU"),
-    ]
-    for ax, (met, title) in zip(axes, metrics_ax):
-        for method in methods_fig8:
-            ys = []
-            for sp in splits_order:
-                if method.startswith("GappyPOD"):
-                    sub = df_sum[
-                        (df_sum.method == method)
-                        & (df_sum.layout == "random_5pct")
-                        & (df_sum.task_mode == "temperature_free")
-                        & (df_sum.split == sp)
-                    ]
-                elif method.startswith("Local"):
-                    sub = df_sum[
-                        (df_sum.method == method)
-                        & (df_sum.layout == "full_grid_velocity")
-                        & (df_sum.split == sp)
-                    ]
-                else:
-                    sub = df_sum[
-                        (df_sum.method == method) & (df_sum.layout == "none") & (df_sum.split == sp)
-                    ]
-                ys.append(float(sub[met].mean()) if len(sub) else np.nan)
-            ax.plot(splits_order, ys, marker="o", label=method.replace("_", "\n"), lw=1.5)
-        ax.set_title(title)
-        ax.tick_params(axis="x", rotation=25)
-        ax.grid(True, alpha=0.3)
-    axes[0].legend(fontsize=6, loc="best")
-    fig.suptitle("Unconditioned vs conditioned transfer (temp-free; Gappy@5%)", y=1.02)
+    fig, axes = plt.subplots(2, 2, figsize=(12.5, 8.5))
+
+    def _ys(method, layout, mode, nvc, met):
+        out = []
+        for sp in splits_order:
+            sub = df_sum[
+                (df_sum.method == method)
+                & (df_sum.layout == layout)
+                & (df_sum.task_mode == mode)
+                & (df_sum.n_velocity_components == nvc)
+                & (df_sum.split == sp)
+                & (df_sum.K_temp_anchors == 0)
+            ]
+            out.append(float(sub[met].mean()) if len(sub) else np.nan)
+        return out
+
+    # (1) Full-field RMSE
+    ax = axes[0, 0]
+    for method, layout, mode, nvc in methods_fig8:
+        ax.plot(splits_order, _ys(method, layout, mode, nvc, "rmse_K"), marker="o", label=method, lw=1.4)
+    ax.set_title("(1) Full-field RMSE [K]")
+    ax.tick_params(axis="x", rotation=20)
+    ax.grid(True, alpha=0.3)
+    ax.legend(fontsize=5.5, loc="best")
+
+    # (2) High-T RMSE & Jet RMSE (conditioned vs unconditioned Gappy + Local)
+    ax = axes[0, 1]
+    for method, layout, mode, nvc, met, ls in [
+        ("LocalHGB_Conditioned", "full_grid_velocity", "temperature_free", 3, "high_rmse_K", "-"),
+        ("LocalHGB_Conditioned", "full_grid_velocity", "temperature_free", 3, "jet_rmse_K", "--"),
+        ("GappyPOD_Conditioned", "random_5pct", "temperature_free", 3, "high_rmse_K", "-"),
+        ("GappyPOD_Conditioned", "random_5pct", "temperature_free", 3, "jet_rmse_K", "--"),
+        ("GappyPOD_Unconditioned", "random_5pct", "temperature_free", 3, "high_rmse_K", ":"),
+        ("ParamConditionedMean", "none", "temperature_free", 3, "high_rmse_K", "-."),
+    ]:
+        label = f"{method.split('_')[0]}/{met.replace('_K','')}"
+        ax.plot(splits_order, _ys(method, layout, mode, nvc, met), ls=ls, marker="o", label=label, lw=1.3)
+    ax.set_title("(2) High-T RMSE vs Jet/Front RMSE [K]")
+    ax.tick_params(axis="x", rotation=20)
+    ax.grid(True, alpha=0.3)
+    ax.legend(fontsize=5.5, loc="best")
+
+    # (3) Bias vs centered pattern RMSE
+    ax = axes[1, 0]
+    for method, layout, mode, nvc in methods_fig8:
+        ax.plot(
+            splits_order,
+            _ys(method, layout, mode, nvc, "mean_signed_error_K"),
+            marker="o",
+            ls="-",
+            label=f"{method} bias",
+            lw=1.15,
+        )
+        ax.plot(
+            splits_order,
+            _ys(method, layout, mode, nvc, "centered_rmse_K"),
+            marker="s",
+            ls="--",
+            label=f"{method} ctrRMSE",
+            lw=1.0,
+            alpha=0.85,
+        )
+    ax.axhline(0, color="k", lw=0.8)
+    ax.set_title("(3) Mean signed bias vs centered pattern RMSE [K]")
+    ax.tick_params(axis="x", rotation=20)
+    ax.grid(True, alpha=0.3)
+    ax.legend(fontsize=4.5, loc="best", ncol=2)
+
+    # (4) High-T IoU and relative top-25% core IoU
+    ax2 = axes[1, 1]
+    for method, layout, mode, nvc in methods_fig8:
+        ax2.plot(
+            splits_order,
+            _ys(method, layout, mode, nvc, "high_iou"),
+            marker="o",
+            ls="-",
+            label=f"{method} highIoU",
+            lw=1.2,
+        )
+        ax2.plot(
+            splits_order,
+            _ys(method, layout, mode, nvc, "top25pct_iou"),
+            marker="^",
+            ls="--",
+            label=f"{method} top25",
+            lw=1.0,
+            alpha=0.85,
+        )
+    ax2.set_title("(4) High-T IoU ($T\\geq2100$K) & top-25% core IoU")
+    ax2.tick_params(axis="x", rotation=20)
+    ax2.grid(True, alpha=0.3)
+    ax2.set_ylim(-0.05, 1.05)
+    ax2.legend(fontsize=4.5, loc="best", ncol=2)
+
+    fig.suptitle("Unconditioned vs conditioned transfer (corrected MAP Gappy @5%)", y=1.01)
     fig.tight_layout()
     fig.savefig(FIGS / "fig08_unconditioned_vs_conditioned_transfer.png", dpi=160, bbox_inches="tight")
     plt.close(fig)
 
-    # fig09 sparsity + K curves
-    fig, axes = plt.subplots(1, 2, figsize=(12, 4.5))
+    # fig09
+    fig, axes = plt.subplots(1, 2, figsize=(12.5, 4.8))
     cover = {
         "random_1pct": 1,
         "random_2pct": 2,
@@ -598,6 +919,7 @@ def _make_figures(
                     & (df_sum.layout == layout)
                     & (df_sum.split == split)
                     & (df_sum.task_mode == "temperature_free")
+                    & (df_sum.n_velocity_components == 3)
                 ]
                 if len(sub):
                     xs.append(pct)
@@ -605,13 +927,18 @@ def _make_figures(
             ax.plot(xs, ys, ls=ls, marker="o", label=f"{split}/{method.split('_')[1][:4]}")
     ax.set_xlabel("Velocity coverage [%]")
     ax.set_ylabel("RMSE [K]")
-    ax.set_title("(a) Temperature-free sparsity sweep")
+    ax.set_title("(a) Temperature-free sparsity (corrected)")
     ax.grid(True, alpha=0.3)
     ax.legend(fontsize=6)
 
     ax = axes[1]
     for split in ("val", "test_interp", "test_extrap"):
-        for method, ls in [("GappyPOD_Unconditioned", "-"), ("GappyPOD_Conditioned", "--")]:
+        for method, ls, met in [
+            ("GappyPOD_Conditioned_AnchorOffset", "-", "rmse_K"),
+            ("GappyPOD_Conditioned_AnchorOffset", "--", "abs_bias_K"),
+            ("GappyPOD_Conditioned_AnchorOffset", ":", "high_rmse_K"),
+            ("ParamMean_AnchorOffset", "-.", "rmse_K"),
+        ]:
             xs, ys = [], []
             for K in (0, 1, 4, 9, 16, 32):
                 sub = df_sum[
@@ -620,20 +947,21 @@ def _make_figures(
                     & (df_sum.K_temp_anchors == K)
                     & (df_sum.split == split)
                 ]
-                if len(sub):
+                if len(sub) and met in sub.columns:
                     xs.append(K)
-                    ys.append(float(sub.rmse_K.mean()))
-            ax.plot(xs, ys, ls=ls, marker="o", label=f"{split}/{method.split('_')[1][:4]}")
-    ax.set_xlabel("K temperature anchors")
-    ax.set_ylabel("RMSE [K]")
-    ax.set_title("(b) Temperature-assisted @ vel 5%")
+                    ys.append(float(sub[met].mean()))
+            short = "Gappy+AO" if "Gappy" in method else "Param+AO"
+            ax.plot(xs, ys, ls=ls, marker="o", label=f"{split}/{short}/{met}", lw=1.2)
+    ax.set_xlabel("K nested temperature anchors")
+    ax.set_ylabel("RMSE / |bias| / High-T RMSE [K]")
+    ax.set_title("(b) Anchor-calibrated K sweep")
     ax.grid(True, alpha=0.3)
-    ax.legend(fontsize=6)
+    ax.legend(fontsize=5)
     fig.tight_layout()
     fig.savefig(FIGS / "fig09_sparsity_and_temp_assisted_curves.png", dpi=160, bbox_inches="tight")
     plt.close(fig)
 
-    # fig10 qualitative
+    # fig10
     examples = [
         ("test_interp", "60NH3_0.95.h5", 1000),
         ("test_extrap", "20NH3_0.75.h5", 1000),
@@ -644,8 +972,10 @@ def _make_figures(
         traj = load_traj(smap[sid])
         fr = frame_pack(traj, fi, nh3 / 100.0, phi)
         del traj
-        vel_mask = build_layout_mask("random_5pct", seed=SEED)
-        t_mask = temperature_anchor_mask(4, seed=SEED + 99)
+        vel_mask = build_layout_mask(
+            "random_5pct", seed=mask_seed(sid, fi, "random_5pct")
+        )
+        t_mask = temperature_anchor_mask(4, seed=mask_seed(sid, fi, "temp"), nested=True)
         pred_unc = pod_unc.reconstruct(
             fr["vi"], fr["vj"], fr["vk"], vel_mask=vel_mask, nh3=fr["nh3"], phi=fr["phi"]
         )
@@ -661,25 +991,32 @@ def _make_figures(
             T_mask=t_mask,
             nh3=fr["nh3"],
             phi=fr["phi"],
+            use_temperature_block=False,
+            anchor_offset=True,
         )
+        t_vmin = float(fr["T"].min())
+        t_vmax = float(fr["T"].max())
         panels = [
-            (fr["T"], "True T"),
-            (pred_unc, "Gappy uncond"),
-            (pred_cond, "Gappy cond"),
-            (pred_asst, "Cond + K=4 T"),
-            (pred_cond - fr["T"], "Cond error"),
+            (fr["T"], "True T", False),
+            (pred_unc, "Gappy uncond", False),
+            (pred_cond, "Gappy cond (TF)", False),
+            (pred_asst, "Cond + K=4 AO", False),
+            (pred_asst - fr["T"], "AO error", True),
         ]
-        for c, (data, title) in enumerate(panels):
+        for c, (data, title, is_err) in enumerate(panels):
             ax = axes[r, c]
-            cmap = "RdBu_r" if "error" in title.lower() else "inferno"
-            if "error" in title.lower():
+            if is_err:
                 lim = float(np.nanpercentile(np.abs(data), 98))
-                im = ax.imshow(data, origin="lower", cmap=cmap, vmin=-lim, vmax=lim, aspect="equal")
+                im = ax.imshow(
+                    data, origin="lower", cmap="RdBu_r", vmin=-lim, vmax=lim, aspect="equal"
+                )
             else:
-                im = ax.imshow(data, origin="lower", cmap=cmap, aspect="equal")
+                im = ax.imshow(
+                    data, origin="lower", cmap="inferno", vmin=t_vmin, vmax=t_vmax, aspect="equal"
+                )
             ax.set_title(f"{sid}\n{title}" if c == 0 else title, fontsize=8)
             fig.colorbar(im, ax=ax, fraction=0.046)
-    fig.suptitle("Qualitative reconstructions — interp vs extrap (vel 5%)", y=1.01)
+    fig.suptitle("Qualitative reconstructions — interp vs extrap (vel 5%, corrected)", y=1.01)
     fig.tight_layout()
     fig.savefig(FIGS / "fig10_qualitative_reconstructions_interp_extrap.png", dpi=160, bbox_inches="tight")
     plt.close(fig)

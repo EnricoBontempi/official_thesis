@@ -7,15 +7,22 @@ observed sites.
 
 from __future__ import annotations
 
+import zlib
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Literal, Sequence
+from typing import Literal
 
 import numpy as np
 import yaml
 
 ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_LAYOUTS_PATH = ROOT / "configs" / "masks" / "observation_layouts.yaml"
+
+
+def stable_seed(*parts: object) -> int:
+    """Process-independent 32-bit seed from stringifiable parts (zlib.crc32)."""
+    payload = "|".join(str(p) for p in parts).encode("utf-8")
+    return int(zlib.crc32(payload) & 0xFFFFFFFF)
 
 TaskMode = Literal["temperature_free", "temperature_assisted"]
 
@@ -149,6 +156,26 @@ def build_layout_mask(
     raise KeyError(f"Unknown layout_name={layout_name!r}")
 
 
+def nested_temperature_anchor_permutation(
+    *,
+    seed: int,
+    height: int = 128,
+    width: int = 128,
+    max_k: int | None = None,
+) -> np.ndarray:
+    """Fixed random permutation of grid sites for nested K-anchor sweeps.
+
+    Taking ``perm[:K]`` for increasing ``K`` guarantees
+    ``K=1 ⊂ K=4 ⊂ K=9 ⊂ …`` for a fixed ``seed``.
+    """
+    n = height * width
+    rng = np.random.default_rng(seed)
+    perm = rng.permutation(n)
+    if max_k is not None:
+        return perm[: max(int(max_k), 0)]
+    return perm
+
+
 def temperature_anchor_mask(
     k: int,
     *,
@@ -156,22 +183,35 @@ def temperature_anchor_mask(
     height: int = 128,
     width: int = 128,
     exclude: np.ndarray | None = None,
+    nested: bool = True,
+    max_k: int = 32,
 ) -> np.ndarray:
-    """Place ``k`` sparse temperature sensors (True = T observed)."""
+    """Place ``k`` sparse temperature sensors (True = T observed).
+
+    By default anchors are sampled independently on the full grid (``exclude``
+    is ignored unless ``nested=False`` and ``exclude`` is provided for legacy
+    callers). With ``nested=True``, sites come from a fixed permutation so
+    larger ``K`` strictly contain smaller ``K``.
+    """
     if k < 0:
         raise ValueError("k must be >= 0")
     if k == 0:
         return _full_false(height, width)
     n = height * width
-    rng = np.random.default_rng(seed)
-    candidates = np.arange(n)
-    if exclude is not None:
-        # Prefer anchors outside excluded (unobserved velocity) region if possible
-        free = ~exclude.ravel()
-        if free.sum() >= k:
-            candidates = np.flatnonzero(free)
-    idx = rng.choice(candidates, size=min(k, candidates.size), replace=False)
     mask = _full_false(height, width)
+    if nested:
+        perm = nested_temperature_anchor_permutation(
+            seed=seed, height=height, width=width, max_k=max(max_k, k)
+        )
+        idx = perm[: min(k, perm.size)]
+    else:
+        rng = np.random.default_rng(seed)
+        candidates = np.arange(n)
+        if exclude is not None:
+            free = ~exclude.ravel()
+            if int(free.sum()) >= k:
+                candidates = np.flatnonzero(free)
+        idx = rng.choice(candidates, size=min(k, candidates.size), replace=False)
     mask.ravel()[idx] = True
     return mask
 
@@ -256,8 +296,12 @@ def build_observation_tokens(
     if task_mode == "temperature_assisted":
         if n_temperature_anchors <= 0:
             raise ValueError("temperature_assisted requires n_temperature_anchors > 0")
+        # Nested independent T anchors (not restricted to velocity sites)
         t_mask = temperature_anchor_mask(
-            n_temperature_anchors, seed=seed + 17, exclude=~vel_mask
+            n_temperature_anchors,
+            seed=stable_seed(seed, "temp_anchors"),
+            nested=True,
+            max_k=32,
         )
     elif task_mode != "temperature_free":
         raise ValueError(f"Unknown task_mode={task_mode!r}")

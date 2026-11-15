@@ -19,6 +19,8 @@ import yaml
 from matplotlib.patches import Polygon
 from scipy.spatial import ConvexHull
 
+from combustion_recon.data.masks import stable_seed
+
 ROOT = Path(__file__).resolve().parents[1]
 SPLITS_PATH = ROOT / "configs" / "splits" / "splits_interp_extrap.yaml"
 RAW_NUM = ROOT / "data" / "raw" / "combustion" / "hf_dataset" / "numerical"
@@ -110,7 +112,7 @@ def update_stats(st: dict[str, Any], arr: np.ndarray, max_samples_per_update: in
         st["min"] = min(st["min"], float(x.min()))
         st["max"] = max(st["max"], float(x.max()))
     # subsample for quantiles
-    rng = np.random.default_rng((hash((float(flat[0]), int(flat.size))) & 0xFFFFFFFF))
+    rng = np.random.default_rng(stable_seed(int(flat.size), round(float(flat[0]), 4)))
     if flat.size > max_samples_per_update:
         samp = rng.choice(flat, size=max_samples_per_update, replace=False)
     else:

@@ -129,9 +129,9 @@ Ecco quindi le **3 Opzioni di Architettura Neurale** (chiare, ordinate per compl
 
 ---
 
-### 5.2 I 4 Piccoli Ritocchi Tecnici da fare al Mese 1 (prima di mandare tutto ai supervisor)
-Prima di congelare definitivamente il pacchetto per i supervisor, faremo fare a Cursor un aggiornamento veloce (**Step 1.5-fix**, ~5 minuti di calcolo) per blindare il Mese 1 contro qualsiasi critica:
-1. **Fissare il seed deterministico (`zlib.crc32` / `sha256` invece di `hash(sim_id)`)** e ancore $K$ annidate (`nested`).
-2. **Rifare il check `GappyPOD` + aggiungere la baseline `Offset-Calibrated` ($\hat{T}_0 + \hat{b}$ da $K$ ancore):** con regolarizzazione scalata e pesi bilanciati $\frac{1}{M_u}$ vs $\frac{1}{K}$, così la figura `fig09b` mostra il vero effetto delle $K$ ancore senza l'artefatto di `ridge_lambda = 0.01`.
-3. **Aggiungere nella tabella la scomposizione $\text{RMSE} \rightarrow \text{Bias} + \text{Centered-RMSE}$** e il confronto **2 componenti ($v_i, v_j$) vs 3 componenti ($v_i, v_j, v_k$)**.
-4. **Aggiornare `05_literature_and_glu_notes.md` e `06_supervisor_review_brief.md`** con la descrizione matematica esatta di GLU (dal PDF) e con le **3 Opzioni di Architettura Neurale** qui sopra.
+### 5.2 I 4 Piccoli Ritocchi Tecnici da fare al Mese 1 (AGGIORNAMENTO: COMPLETATI E VERIFICATI!)
+Tutti e 4 i ritocchi tecnici individuati grazie al confronto con Fable e Sol sono stati **implementati, eseguiti e verificati (25/25 pytest passati)** in `04_feasibility_check_report.md`, `05_literature_and_glu_notes.md`, `06_supervisor_review_brief.md` e nelle figure `fig07`–`fig10`:
+1. **Seed deterministico (`zlib.crc32`)** e ancore $K$ annidate (`nested`: $1 \subset 4 \subset 9 \subset 16 \subset 32$).
+2. **Fix del `GappyPOD` MAP + baseline `Anchor Offset` ($\hat{T}_0 + \hat{b}$ da $K$ ancore):** con regolarizzazione scalata sulle varianze modali $\sigma_r^2$ e pesi bilanciati $\frac{1}{M_u}$ vs $\frac{w_T}{K}$. Ora `fig09b` dimostra chiaramente che $K=4\text{--}32$ termocoppie **abbattono il Bias in estrapolazione** (da $86\text{ K}$ a $15\text{ K}$ per `GappyPOD+AO` e da $+89\text{ K}$ a $+0.7\text{ K}$ per `ParamMean+AO`), ma **lasciano invariato l'errore sulla forma della fiamma** (`High-T RMSE` $\approx 204\text{ K}$, `Jet RMSE` $\approx 370\text{ K}$, `IoU` $\approx 0.16\text{--}0.22$).
+3. **Scomposizione completa delle metriche in `fig08` e nelle tabelle:** `Full RMSE`, `High-T RMSE` ($\ge 2100\text{ K}$), `Jet/Front RMSE` ($< 1800\text{ K}$), `Bias`, `Centered-RMSE`, `High-T IoU`, `Top-25% Core IoU`, più il confronto **2 componenti ($v_i, v_j$) vs 3 componenti ($v_i, v_j, v_k$)**.
+4. **Aggiornati `05_literature_and_glu_notes.md` e `06_supervisor_review_brief.md`** con le equazioni esatte di GLU (`arXiv:2603.26023`), tutti i numeri corretti post-fix e le **3 Architetture Neurali Candidate (`GLU-Adapted`, `GLU-Residual`, `GLU-Assimilator`)**.

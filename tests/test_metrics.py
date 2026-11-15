@@ -46,6 +46,28 @@ def test_high_temperature_iou_and_conditional_rmse():
     # Jet region T<1800 is empty here → conditional RMSE is NaN by design
     assert np.isnan(out["jet_rmse_K"])
     assert out["frac_omega_high_true"] == pytest.approx(100 / (32 * 32))
+    assert "top25pct_iou" in out
+    assert "non_high_rmse_K" in out
+    assert np.isfinite(out["non_high_rmse_K"])
+
+
+def test_empty_high_masks_iou_is_one():
+    true = np.full((16, 16), 1500.0)
+    pred = np.full((16, 16), 1600.0)
+    out = high_temperature_region_errors(pred, true, t_high=2100.0)
+    assert out["high_iou"] == 1.0
+    assert out["high_dice"] == 1.0
+
+
+def test_centered_rmse_decomposes_bias():
+    true = np.ones((20, 20)) * 2000.0
+    pred = true + 10.0
+    from combustion_recon.evaluation.metrics import evaluate_sample
+
+    out = evaluate_sample(pred, true, train_sigma_T=300.0, sim_id="x", split="val")
+    assert abs(out["mean_signed_error_K"] - 10.0) < 1e-12
+    assert abs(out["centered_rmse_K"]) < 1e-10
+    assert abs(out["rmse_K"] - 10.0) < 1e-12
 
 
 def test_temperature_level_errors():
