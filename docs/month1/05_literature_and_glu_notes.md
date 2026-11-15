@@ -10,7 +10,7 @@
 
 This note synthesizes the three core scientific references cited in the thesis proposal and connects their methodologies directly to the empirical findings from our Month 1 audit and corrected feasibility study (Steps 1.2–1.5):
 
-1. **GLU (Deng Lab, MIT):** Wang, L., Chen, J., Tricard, N., Chen, Z., & Deng, S. *GLU: Global-Local-Uncertainty Fusion for Scalable Spatiotemporal Reconstruction and Forecasting.* `arXiv:2603.26023` (2026).
+1. **GLU (Deng Lab, MIT):** Wang, Linzheng, Chen, Jason, Tricard, Nicolas, Chen, Zituo, & Deng, Sili. *GLU: Global-Local-Uncertainty Fusion for Scalable Spatiotemporal Reconstruction and Forecasting.* `arXiv:2603.26023` (2026).
 2. **RealPDEBench:** Hu, P., Feng, H., Liu, H., et al. *RealPDEBench: A Benchmark for Complex Physical Systems with Real-World Data.* `arXiv:2601.01829` / ICLR 2026 Oral (2026).
 3. **RF-PINNs:** Yadav, V., Casel, M., & Ghani, A. *RF-PINNs: Reactive flow physics-informed neural networks for field reconstruction of laminar and turbulent flames using sparse data.* *Journal of Computational Physics*, 524, 113698 (2025).
 
