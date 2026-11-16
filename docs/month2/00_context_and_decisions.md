@@ -23,7 +23,8 @@ Ricognizione precedente del remoto `main` a `6fd0f15` (con diario semplificato p
 | Protocollo frame + contratto pilota | YAML Step 2.1 | Default operativi; ora consumati da `Month2ReconDataset`. |
 | Statistiche fit-only Mese 2 | `data/manifests/train_norm_stats_month2_fit.json` | **Calcolate** su 20×38 frame `train_fit`. Storico Mese 1 intatto. |
 | Pipeline dati Month-2 | moduli `month2_*`, report `01_pipeline_validation.md` | **Verificata in locale** (batch reale, isolation, gate TEST). |
-| Modelli / training / baseline Mese 2 | — | Non avviati (Step 2.3+). |
+| Baseline Mese 2 (Step 2.3) | `month2_baselines_v1`, report `02_baseline_validation.md` | **Eseguite in locale CPU** su TRAIN-fit/seen/VAL; neurali non avviati. |
+| Modelli / training neurali Mese 2 | — | Non avviati (Step 2.4+); in attesa revisione indipendente dei risultati 2.3. |
 | GPU/allocazione Engaging | — | Host previsto; **non verificati**. Tetto 24 GPU-ore = proposta di ceiling, non allocazione disponibile. |
 
 ## 3. Lettura scientifica dei risultati corretti

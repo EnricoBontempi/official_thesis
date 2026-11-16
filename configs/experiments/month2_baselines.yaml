@@ -1,0 +1,90 @@
+# Month-2 baseline experiment contract (Step 2.3)
+# Written BEFORE search scores are computed.
+# Experiment ID: month2_baselines_v1
+# Date: 2026-11-16
+
+experiment_id: month2_baselines_v1
+protocol_id: month2_frame_protocol_v1
+pilot_id: month2_pilot_v1
+base_commit: 82fcd3411d8e32b3d3213f7f17967120674e4c88
+
+data:
+  fit_role: train_fit          # 760 frames
+  diagnostic_role: seen_train_eval  # 220
+  selection_role: val_eval     # 123
+  velocity: planar_2C          # channels 11/12 only; no vk / 3D speed
+  site_fraction_primary: 0.05
+  target: Temperature_raw_K
+  normalizer: data/manifests/train_norm_stats_month2_fit.json
+  mask_seed: 20261116
+  mask_replicas: [0, 1, 2]
+  layout_id: random_sparse_primary
+
+methods:
+  GlobalTrainMean:
+    sensors: 0
+    p: false
+  ParamConditionedMean:
+    sensors: 0
+    p: true
+    ridge_alpha: auto
+    loco: train_conditions_only
+  GappyPOD:
+    R: 32
+    n_velocity_components: 2
+    p_modes: [false, true]
+    note_R64: not run automatically; only if reviewers later request after oracle gap review
+  LocalHGB_dense_diagnostic:
+    include: true
+    sparse_comparable: false
+    include_vk: false
+    p_modes: [false, true]
+    max_pixels: 80000
+  OraclePOD:
+    uses_full_T: true
+    deployable: false
+
+# Historical Month-1 search (conditioned POD, K=4 assisted): λ ∈ {1e-4,1e-3,1e-2},
+# w_T ∈ {5,20,50}; selected λ=0.01 (upper edge), w_T=5 (lower edge).
+# Month-2 extends one order beyond those edges; caps at 9 combos per problem.
+
+hyperparameter_search:
+  registered_before_scores: true
+  selection_metric: mean_over_replicas_of_mean_condition_full_field_RMSE_on_VAL
+  aggregation_order: [frame, condition, split_VAL, then_mean_over_mask_replicas]
+  temperature_free:
+    # w_T unused at K=0; search λ only. Shared grid for p_off and p_on.
+    K: 0
+    ridge_lambda: [1.0e-4, 1.0e-3, 1.0e-2, 1.0e-1, 1.0]
+    w_T_fixed_unused: 5.0
+    n_combinations: 5
+    includes_historical_lambda: 0.01
+    extends_beyond_historical_upper_edge_0.01: true
+  temperature_assisted_primary:
+    K: 9
+    # 3×3 = 9 combos; includes (λ=0.01, w_T=5); extends λ→0.1 and w_T→0.5
+    ridge_lambda: [1.0e-3, 1.0e-2, 1.0e-1]
+    w_T: [0.5, 5.0, 50.0]
+    n_combinations: 9
+    includes_historical_pair: {ridge_lambda: 0.01, w_T: 5.0}
+  budget_note: same λ/w_T grids for p_off and p_on; no iterative grid expansion after scores
+
+evaluation:
+  K_values: [0, 9, 32]
+  nested_anchors: true
+  assisted_variants:
+    - ParamMean_plus_AO
+    - GappyPOD_plus_AO          # free reconstruct then AO, τ=1
+    - GappyPOD_Tblock           # joint MAP with T observations
+  AO_tau: 1.0
+  roles: [train_fit, seen_train_eval, val_eval]
+  metrics: [RMSE_K, MAE_K, NRMSE_fit_only, signed_bias, abs_bias, centered_RMSE, regional, level]
+  no_test_payloads: true
+  no_month1_overwrite: true
+
+io:
+  prefetch_per_trajectory: true
+  max_cached_frames: 2048
+  note: >
+    Prefer ShardStore.prefetch(sim_id, frames) once per condition; avoid one
+    ~2GB Arrow decode per frame or per hyperparameter trial.

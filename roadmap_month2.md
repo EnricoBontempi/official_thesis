@@ -110,7 +110,7 @@ Il risultato minimo del Mese 2 è una pipeline riproducibile, baseline qualifica
 
 ### Step 2.3 — Qualificare baseline e diagnostici sul protocollo comune
 
-- **Stato:** `[ ] Da verificare/eseguire`; **classe:** I + E.
+- **Stato:** `[x] Eseguito e verificato in locale (CPU)`; **classe:** I + E.
 - **Problema:** quale miglioramento conta davvero rispetto a predire una media o fare una ricostruzione modale già corretta?
 - **Motivazione/dipendenze:** 2.2; i numeri storici 3C/full-grid non possono essere trasferiti automaticamente alla configurazione primaria 2C sparse con nuovi frame/statistiche.
 - **Attività concrete:**
@@ -119,9 +119,9 @@ Il risultato minimo del Mese 2 è una pipeline riproducibile, baseline qualifica
   3. Il tuning storico di λ/w_T tocca i bordi ed è stato effettuato a K=4. Fare una piccola estensione su VAL separatamente per temperature-free e assisted primario K=9: R iniziale 32; al massimo 9 combinazioni λ/w_T per task, includendo il riferimento storico e un ordine di grandezza oltre il bordo rilevante. R=64 soltanto se il gap oracle/VALIDAZIONE lo giustifica entro il budget. Riportare tutto il costo di selezione.
   4. Oracle POD usa la T completa unicamente per distinguere rappresentazione e stima; non entra nella classifica deployable. LocalHGB resta diagnostico dense; se si vuole confrontarlo sparse, definire prima una versione che usi esclusivamente gli stessi dati osservati, senza patch nascoste.
   5. Valutare train-fit, seen e VAL con manifest comune; i risultati storici TEST restano riferimento documentale, non guida al tuning.
-- **Output/file:** futuro `scripts/06_run_month2_baselines.py`; `configs/experiments/month2_baselines.yaml`; tabelle `results/tables/month2_baseline_{per_frame,per_condition,search}.csv`, meta di fit e `docs/month2/02_baseline_validation.md`. Non sovrascrivere i CSV Mese 1.
-- **Verifiche/completamento:** AO lascia invariato Centered-RMSE per ogni frame; K=0 assisted coincide con free; nessun iperparametro scelto sui test; risultati coerenti sul sottoinsieme legacy prima del cambio protocollo oppure differenze spiegate quantitativamente. Verificare forma e condizionamento della proiezione Oracle senza chiamarla limite universale.
-- **Passaggio:** almeno GlobalMean/ParamMean/GappyPOD confrontabili con i futuri input e costo noto; anche un esito negativo resta un riferimento valido.
+- **Output/file:** `scripts/06_run_month2_baselines.py`; `configs/experiments/month2_baselines.yaml`; tabelle `results/tables/month2_baseline_{per_frame,per_condition,summary,search}.csv`; `results/meta/month2_baseline_run_manifest.json`; `docs/month2/02_baseline_validation.md`. CSV Mese 1 non toccati.
+- **Verifiche/completamento:** AO Centered-RMSE invariante; K=0 T-block flag = free sullo stesso modello; nessun iperparametro su TEST; Oracle etichettato non-deployable; isolation adapter/parity storica OK; HGB dense in tabella separata. R=64 non eseguito (nessuna necessità automatica).
+- **Passaggio:** baseline confrontabili con costo noto; **stop per revisione indipendente** prima di Step 2.4.
 
 ### Step 2.4 — Primo neurale: diagnostico da velocità densa single-frame
 
@@ -240,7 +240,7 @@ Non replicare tre seed per ogni riga di ricerca iperparametrica. Ripetere i fina
 
 - [x] 2.1 — Protocollo pilota e default operativi versionati; autorizzazione Enrico registrata; limite proposal e assenza ratifica supervisori espliciti; fold geometricamente verificati (lock scientifico fold ancora aperto). Non implica GPU verificate né stats fit-only già calcolate.
 - [x] 2.2 — Pipeline Month-2 reale verificata in locale (fit-only, isolation, collate, gate TEST) + protezioni API (membership, provenance, aggregazione, prefetch). Engaging/GPU ancora non verificati; picco RAM legato al decode Arrow.
-- [ ] 2.3 — Baseline qualificate sulle osservazioni primarie, tabelle/costi riproducibili.
+- [x] 2.3 — Baseline CPU sul protocollo Mese 2 (GlobalMean/ParamMean/GappyPOD 2C ±AO/T-block, Oracle, HGB dense diagnostico); search preregistrata; report `02_baseline_validation.md`. R=64 non eseguito. Stop per revisione indipendente prima del 2.4.
 - [ ] 2.4 — Primo neurale denso valido e confronto seen/VAL; optional temporale deciso separatamente.
 - [ ] 2.5 — Audit GLU concluso e adattamento scelto o rinviato con motivazione.
 - [ ] 2.6 — Primo neurale sparse e comparatori matched; confronto GLU presente oppure esplicitamente ancora aperto.

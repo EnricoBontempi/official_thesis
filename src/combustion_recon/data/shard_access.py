@@ -80,6 +80,7 @@ class ShardStore:
             "cache_hits": 0,
             "cache_misses": 0,
             "frames_materialized": 0,
+            "t_coord_pads": 0,
         }
 
     def shard_path(self, sim_id: str) -> Path:
@@ -109,6 +110,20 @@ class ShardStore:
         x = np.frombuffer(row["x"], dtype=np.float64).reshape(int(row["x_shape"])).copy()
         y = np.frombuffer(row["y"], dtype=np.float64).reshape(int(row["y_shape"])).copy()
         t = np.frombuffer(row["t"], dtype=np.float64).reshape(int(row["t_shape"])).copy()
+        # Local data defect: 40NH3_1.2.h5 has shape_t=2001 numerical frames but
+        # t_shape=2000 (missing last timestamp). Pad by linear extrapolation so
+        # protocol index 2000 remains usable; document in Month-2 reports.
+        if t.size < shape[0]:
+            pad = []
+            for i in range(t.size, shape[0]):
+                if t.size >= 2:
+                    pad.append(float(t[-1] + (t[-1] - t[-2]) * (i - t.size + 1)))
+                elif t.size == 1:
+                    pad.append(float(t[-1]))
+                else:
+                    pad.append(float("nan"))
+            t = np.concatenate([t, np.asarray(pad, dtype=np.float64)])
+            self.stats["t_coord_pads"] = self.stats.get("t_coord_pads", 0) + len(pad)
         self._coords_cache[sim_id] = (x, y, t)
         self.stats["shard_decodes"] += 1
 

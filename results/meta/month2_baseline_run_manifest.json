@@ -1,0 +1,65 @@
+{
+  "experiment_id": "month2_baselines_v1",
+  "smoke": false,
+  "wall_time_s": 1918.333102941513,
+  "peak_rss_mb": 10440.7734375,
+  "store_stats": {
+    "shard_decodes": 23,
+    "cache_hits": 1103,
+    "cache_misses": 1103,
+    "frames_materialized": 1103,
+    "t_coord_pads": 1
+  },
+  "n_train_fit": 760,
+  "n_seen": 220,
+  "n_val": 123,
+  "selected": {
+    "free_p_off_lambda": 0.001,
+    "free_p_on_lambda": 0.01,
+    "tblock_p_off": {
+      "ridge_lambda": 0.001,
+      "w_T": 0.5
+    },
+    "tblock_p_on": {
+      "ridge_lambda": 0.01,
+      "w_T": 0.5
+    },
+    "param_mean": {
+      "basis": "piecewise_phi1",
+      "ridge_alpha": 0.01,
+      "loco_rmse_K": 71.96259270478093
+    }
+  },
+  "fit_times_s": {
+    "means": 1.7011091709136963,
+    "pod": 9.340945959091187
+  },
+  "hashes": {
+    "baselines_yaml": "6efa357ec8d110c4d01e8387b6976f05fcbb82a9d27e574456c7337fff5cec03",
+    "frame_protocol": "398336d939e6135466eb40590944446b16704e4317731d0c712f6f7341f5b85d",
+    "norm_stats": "678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e",
+    "splits": "acb87bf95852e7849f88a270af8cbd211ad999d0039c35885232b7bc2a99e7b9"
+  },
+  "invariant_checks": {
+    "same_velocity_mask_K0_K9": true,
+    "K0_tblock_matches_free_maxabs": 0.0,
+    "AO_centered_rmse_free": 80.54356426622638,
+    "AO_centered_rmse_ao": 80.54356426622638,
+    "AO_centered_rmse_absdiff": 0.0,
+    "hidden_velocity_mutation_maxabs": 0.0,
+    "observed_only_containers": true,
+    "off_anchor_T_not_in_model_inputs": true,
+    "vk_placeholder_zero": true,
+    "same_velocity_mask_ok": true,
+    "adapter_vs_historical_maxabs": 0.0,
+    "adapter_vs_historical_ok": true
+  },
+  "pod_vs_normalizer_scales": {
+    "pod_scale_T": 331.73782983147095,
+    "pod_scale_vi": 5.673608242065474,
+    "pod_scale_vj": 11.909608084386177,
+    "month2_sigma_T": 331.7378431423074,
+    "note": "POD uses its own fit-only train_fit std for state scaling; Month-2 normalizer is separate and used for NRMSE / neural path."
+  },
+  "hgb_included": true
+}

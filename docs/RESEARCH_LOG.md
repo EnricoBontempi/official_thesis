@@ -91,3 +91,15 @@ Questo file è il diario del progetto di tesi in `official_thesis` (ricostruzion
 - **Contesto:** revisione ChatGPT su `1fc150f`; pipeline reale già OK, ma tre usi impropri dell’API da chiudere.
 - **Correzioni:** (1) `build_index` rifiuta sim_id fuori dallo split del ruolo prima di ogni I/O; (2) normalizer/compute verificano frame indices, split hash e `protocol_scientific_sha256` (stats numeriche invariate, meta provenance patch); (3) aggregazione rifiuta config/ruoli misti (`train_fit`≠`seen`); (4) documentato/misurato `prefetch` = 1 decode vs N miss.
 - **Verifiche:** 55 pytest; validate-only PASS. Nessun 2.3 / training.
+
+---
+
+## 2026-11-16 — Step 2.3: baseline Month-2 su protocollo comune
+
+- **Contesto:** base `82fcd34`; solo Step 2.3; fitting CPU autorizzato; nessun TEST/freeze/cluster/neurale.
+- **Eseguito:** `configs/experiments/month2_baselines.yaml` preregistrato; adapter isolation `month2_baseline_adapters.py`; runner `scripts/06_run_month2_baselines.py` (smoke + full). Fit su 760 TRAIN-fit; eval seen 220 + VAL 123; maschere 0/1/2; 2C 5%; GlobalMean, ParamMean (LOCO `piecewise_phi1`, α=0.01), GappyPOD R=32 p off/on free/AO/T-block, OraclePOD, LocalHGB dense diagnostico.
+- **Search:** free λ∈{1e-4…1}; assisted 3×3 a K=9. Selezionati: free p_off λ=0.001, p_on λ=0.01; T-block p_off (0.001, 0.5), p_on (0.01, 0.5). R=64 non lanciato.
+- **Numeri guida VAL (RMSE K):** GlobalMean 139.7; ParamMean 88.0; Gappy free p_on 70.6; T-block p_on K=9 67.5 / K=32 63.4; Oracle ~35. Stima ≫ rappresentazione.
+- **Controlli:** AO Centered-RMSE invariante; K=0 T-block flag = free; maschere K condivise; adapter≡API storica; contenitori observed-only. Fix locale: pad `t` su `40NH3_1.2.h5` (t_shape=2000 vs shape_t=2001).
+- **Costi:** ~32 min wall; peak RSS ~10.4 GiB; 23 shard decode. Pytest mirati 35 passed.
+- **Stop:** nessuna Step 2.4 / U-Net / GLU; revisione indipendente prima dei neurali.
