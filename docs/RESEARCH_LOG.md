@@ -75,3 +75,11 @@ Questo file è il diario del progetto di tesi in `official_thesis` (ricostruzion
 - **Protocollo:** split 20/3/3/4 invariato; `train_fit` 38 frame/condizione (`0…1480` step 40); `seen_train_eval` 11 frame (`1600…2000` step 40), disgiunti; VAL/TEST 41 frame step 50; input primario 2C single-frame @5%; K primario 9 con sweep annidato; selezione su VAL; TEST solo dopo freeze; 3C/finestra/testa residua non attivate.
 - **Fold:** `20NH3_0.85.h5` risulta sul bordo dell’inviluppo convesso residuo → non usabile come estrapolazione geometrica; `80NH3_1.2.h5` è fuori. Proposta non locked: `40NH3_0.85.h5` + `80NH3_1.2.h5`.
 - **Limiti:** nessuna pipeline/modello/training; stats fit-only Mese 2 non calcolate; Engaging previsto ma GPU/allocazione non verificate; 24 GPU-ore = tetto proposto, non allocazione. Dettagli e hash nel registro.
+
+---
+
+## 2026-11-16 — Step 2.2: pipeline dati Month-2 verificata in locale
+
+- **Implementato:** percorso isolato `Month2ReconDataset` + `ShardStore` (decode Arrow per shard, cache compatta di frame T/vi/vj/vk); ruoli `train_fit`/`seen`/`val` e gate TEST; sample `{model_inputs, targets, metadata}`; collate con padding mask; normalizzatore fit-only fold-capable; evaluator in K.
+- **Artefatti:** `data/manifests/train_norm_stats_month2_fit.json` (760 frame TRAIN-fit; Mese 1 `train_norm_stats.json` intatto), `month2_frames.json`, `month2_observations.json`; report `docs/month2/01_pipeline_validation.md`; script `scripts/05_validate_month2_pipeline.py`.
+- **Verifiche:** 43 pytest OK; batch reale CPU confrontato allo shard; isolamento free/assisted/p_off/2C; TEST denied senza freeze. Picco RSS locale ~6.5 GiB (decode Arrow + workers); cache compatta residua piccola. Engaging/GPU non verificati. Nessun training né baseline fitting.

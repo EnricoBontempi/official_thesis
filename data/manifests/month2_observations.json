@@ -1,0 +1,249 @@
+{
+  "manifest_id": "month2_observations_v1",
+  "created_utc": "2026-11-16T17:07:53.257831+00:00",
+  "protocol_id": "month2_frame_protocol_v1",
+  "pilot_id": "month2_pilot_v1",
+  "mask_seed_default": 20261116,
+  "layout_id_primary": "random_sparse_primary",
+  "site_fraction_primary": 0.05,
+  "coverage_fractions": [
+    0.01,
+    0.05,
+    0.2
+  ],
+  "nested_K": [
+    0,
+    1,
+    4,
+    9,
+    16,
+    32
+  ],
+  "mask_replica_ids": [
+    0,
+    1,
+    2
+  ],
+  "seed_tuple_fields": [
+    "mask_seed",
+    "sim_id",
+    "frame_index",
+    "layout_id",
+    "replica_id"
+  ],
+  "training_mask_seed_fields": [
+    "train_mask",
+    "train_mask_seed",
+    "epoch",
+    "sim_id",
+    "frame_index",
+    "layout_id"
+  ],
+  "token_scheme": "co_located_velocity_vectors_plus_optional_T_anchors",
+  "depends_on_target_T": false,
+  "verified_examples": [
+    {
+      "sim_id": "0NH3_1.h5",
+      "frame_index": 0,
+      "layout_id": "random_sparse_primary",
+      "site_fraction": 0.01,
+      "replica_id": 0,
+      "mask_seed": 20261116,
+      "velocity_mask_seed": 2803282561,
+      "anchor_perm_seed": 3228882080,
+      "n_velocity_sites": 164,
+      "velocity_mask_hash": "884b5ab1680992b33051056e50c7f096bee045371f456302f1db22f628cefd88",
+      "temperature_mask_hash_by_K": {
+        "0": "4fe7b59af6de3b665b67788cc2f99892ab827efae3a467342b3bb4e3bc8e5bfe",
+        "1": "d47d55699172c1c33c72d0ad1af4ddc01d1f1e0defed4a422c70937d2832b203",
+        "4": "cf0f22eddb17ee42174b46bfbe74b78ed49645c0a5977bd0b984b20102fefe60",
+        "9": "032464e383542257320c6efd4c56221f4bb1f21a3de3f10d16e629e1e98b7928",
+        "16": "c72dc72871c728ca6a2ec013ce511cce6c376fa3ee1c084b2df135c55b3807e8",
+        "32": "5ef2ac9f32da2751cbb99adb3c468dba96a41beee8f65049e55e2985995b148f"
+      },
+      "nested_K_ok": true,
+      "same_velocity_mask_for_all_K": true
+    },
+    {
+      "sim_id": "0NH3_1.h5",
+      "frame_index": 0,
+      "layout_id": "random_sparse_primary",
+      "site_fraction": 0.01,
+      "replica_id": 1,
+      "mask_seed": 20261116,
+      "velocity_mask_seed": 3490808343,
+      "anchor_perm_seed": 3916774063,
+      "n_velocity_sites": 164,
+      "velocity_mask_hash": "b2753ed82455c9bfbec994ea61374bc5c0155d73157c8b857a74a6688fa0167c",
+      "temperature_mask_hash_by_K": {
+        "0": "4fe7b59af6de3b665b67788cc2f99892ab827efae3a467342b3bb4e3bc8e5bfe",
+        "1": "914bbb515130a6e864c85d68c9f8f7a297bc5ea9f60743f08330bedac12f605d",
+        "4": "19e1011de68c986ade07bb831de654ba68d128fbf1b8ddb81ca41a24376e3e70",
+        "9": "8bf662611fa58e5120ced1b0348c03d00080d11d1df3dadb856153a851943511",
+        "16": "92572302a1f764a03c15ae55d1b328a575bd225db8f7e0159ad79ce1e08e2333",
+        "32": "20dd250cfa488f407bd9762ff55f6de73775949ddd71e8f9651bb304a0419b48"
+      },
+      "nested_K_ok": true,
+      "same_velocity_mask_for_all_K": true
+    },
+    {
+      "sim_id": "0NH3_1.h5",
+      "frame_index": 0,
+      "layout_id": "random_sparse_primary",
+      "site_fraction": 0.01,
+      "replica_id": 2,
+      "mask_seed": 20261116,
+      "velocity_mask_seed": 1226363821,
+      "anchor_perm_seed": 613658071,
+      "n_velocity_sites": 164,
+      "velocity_mask_hash": "c199e8388a6343aa0280351971de2ed08873e5e1dcf410c8152983af56d6ed9d",
+      "temperature_mask_hash_by_K": {
+        "0": "4fe7b59af6de3b665b67788cc2f99892ab827efae3a467342b3bb4e3bc8e5bfe",
+        "1": "bc05f64f568613d094b2a90a953f2afee6f3b04f955eeaa44dbe68760bc185e5",
+        "4": "4c9f8638bbb03159c2b3dc25b8d2b7dbaa743e87bd63fcd325f6d8f86c99b5f2",
+        "9": "b0c031885b4f6b40b5251553246aca42daab3a2a3976071b294837fcb8ef537f",
+        "16": "846515e6ee49245d7f1897b9a25e5499e42abfef15f55603a6a401bbc30e26e5",
+        "32": "a67bcf849d01d18e34568f30caff261de53697d775ae2840a7e03743e95abe1c"
+      },
+      "nested_K_ok": true,
+      "same_velocity_mask_for_all_K": true
+    },
+    {
+      "sim_id": "0NH3_1.h5",
+      "frame_index": 0,
+      "layout_id": "random_sparse_primary",
+      "site_fraction": 0.05,
+      "replica_id": 0,
+      "mask_seed": 20261116,
+      "velocity_mask_seed": 2803282561,
+      "anchor_perm_seed": 3228882080,
+      "n_velocity_sites": 819,
+      "velocity_mask_hash": "07e18608f80ead887f89ebdb9a82d58650057a725e7ed387bdfb846d0402a359",
+      "temperature_mask_hash_by_K": {
+        "0": "4fe7b59af6de3b665b67788cc2f99892ab827efae3a467342b3bb4e3bc8e5bfe",
+        "1": "d47d55699172c1c33c72d0ad1af4ddc01d1f1e0defed4a422c70937d2832b203",
+        "4": "cf0f22eddb17ee42174b46bfbe74b78ed49645c0a5977bd0b984b20102fefe60",
+        "9": "032464e383542257320c6efd4c56221f4bb1f21a3de3f10d16e629e1e98b7928",
+        "16": "c72dc72871c728ca6a2ec013ce511cce6c376fa3ee1c084b2df135c55b3807e8",
+        "32": "5ef2ac9f32da2751cbb99adb3c468dba96a41beee8f65049e55e2985995b148f"
+      },
+      "nested_K_ok": true,
+      "same_velocity_mask_for_all_K": true
+    },
+    {
+      "sim_id": "0NH3_1.h5",
+      "frame_index": 0,
+      "layout_id": "random_sparse_primary",
+      "site_fraction": 0.05,
+      "replica_id": 1,
+      "mask_seed": 20261116,
+      "velocity_mask_seed": 3490808343,
+      "anchor_perm_seed": 3916774063,
+      "n_velocity_sites": 819,
+      "velocity_mask_hash": "0876f5ed4e9879dc42e4c65cbe8b66bb0b0fdbbaad751db81e7b4a037038b283",
+      "temperature_mask_hash_by_K": {
+        "0": "4fe7b59af6de3b665b67788cc2f99892ab827efae3a467342b3bb4e3bc8e5bfe",
+        "1": "914bbb515130a6e864c85d68c9f8f7a297bc5ea9f60743f08330bedac12f605d",
+        "4": "19e1011de68c986ade07bb831de654ba68d128fbf1b8ddb81ca41a24376e3e70",
+        "9": "8bf662611fa58e5120ced1b0348c03d00080d11d1df3dadb856153a851943511",
+        "16": "92572302a1f764a03c15ae55d1b328a575bd225db8f7e0159ad79ce1e08e2333",
+        "32": "20dd250cfa488f407bd9762ff55f6de73775949ddd71e8f9651bb304a0419b48"
+      },
+      "nested_K_ok": true,
+      "same_velocity_mask_for_all_K": true
+    },
+    {
+      "sim_id": "0NH3_1.h5",
+      "frame_index": 0,
+      "layout_id": "random_sparse_primary",
+      "site_fraction": 0.05,
+      "replica_id": 2,
+      "mask_seed": 20261116,
+      "velocity_mask_seed": 1226363821,
+      "anchor_perm_seed": 613658071,
+      "n_velocity_sites": 819,
+      "velocity_mask_hash": "77e21c829ff612b21b04c9a0d6544787bb385ea108cd39c315ccc3d5bff7cb37",
+      "temperature_mask_hash_by_K": {
+        "0": "4fe7b59af6de3b665b67788cc2f99892ab827efae3a467342b3bb4e3bc8e5bfe",
+        "1": "bc05f64f568613d094b2a90a953f2afee6f3b04f955eeaa44dbe68760bc185e5",
+        "4": "4c9f8638bbb03159c2b3dc25b8d2b7dbaa743e87bd63fcd325f6d8f86c99b5f2",
+        "9": "b0c031885b4f6b40b5251553246aca42daab3a2a3976071b294837fcb8ef537f",
+        "16": "846515e6ee49245d7f1897b9a25e5499e42abfef15f55603a6a401bbc30e26e5",
+        "32": "a67bcf849d01d18e34568f30caff261de53697d775ae2840a7e03743e95abe1c"
+      },
+      "nested_K_ok": true,
+      "same_velocity_mask_for_all_K": true
+    },
+    {
+      "sim_id": "0NH3_1.h5",
+      "frame_index": 0,
+      "layout_id": "random_sparse_primary",
+      "site_fraction": 0.2,
+      "replica_id": 0,
+      "mask_seed": 20261116,
+      "velocity_mask_seed": 2803282561,
+      "anchor_perm_seed": 3228882080,
+      "n_velocity_sites": 3277,
+      "velocity_mask_hash": "d3af29ac82b67fb417d6044ddfa6310d1e4a62d0bd5ccec96393050100b3b9d7",
+      "temperature_mask_hash_by_K": {
+        "0": "4fe7b59af6de3b665b67788cc2f99892ab827efae3a467342b3bb4e3bc8e5bfe",
+        "1": "d47d55699172c1c33c72d0ad1af4ddc01d1f1e0defed4a422c70937d2832b203",
+        "4": "cf0f22eddb17ee42174b46bfbe74b78ed49645c0a5977bd0b984b20102fefe60",
+        "9": "032464e383542257320c6efd4c56221f4bb1f21a3de3f10d16e629e1e98b7928",
+        "16": "c72dc72871c728ca6a2ec013ce511cce6c376fa3ee1c084b2df135c55b3807e8",
+        "32": "5ef2ac9f32da2751cbb99adb3c468dba96a41beee8f65049e55e2985995b148f"
+      },
+      "nested_K_ok": true,
+      "same_velocity_mask_for_all_K": true
+    },
+    {
+      "sim_id": "0NH3_1.h5",
+      "frame_index": 0,
+      "layout_id": "random_sparse_primary",
+      "site_fraction": 0.2,
+      "replica_id": 1,
+      "mask_seed": 20261116,
+      "velocity_mask_seed": 3490808343,
+      "anchor_perm_seed": 3916774063,
+      "n_velocity_sites": 3277,
+      "velocity_mask_hash": "1ec4926be8dc352cdd214dca65e8ce6d5163bd54c45c380ec534336d1488d22a",
+      "temperature_mask_hash_by_K": {
+        "0": "4fe7b59af6de3b665b67788cc2f99892ab827efae3a467342b3bb4e3bc8e5bfe",
+        "1": "914bbb515130a6e864c85d68c9f8f7a297bc5ea9f60743f08330bedac12f605d",
+        "4": "19e1011de68c986ade07bb831de654ba68d128fbf1b8ddb81ca41a24376e3e70",
+        "9": "8bf662611fa58e5120ced1b0348c03d00080d11d1df3dadb856153a851943511",
+        "16": "92572302a1f764a03c15ae55d1b328a575bd225db8f7e0159ad79ce1e08e2333",
+        "32": "20dd250cfa488f407bd9762ff55f6de73775949ddd71e8f9651bb304a0419b48"
+      },
+      "nested_K_ok": true,
+      "same_velocity_mask_for_all_K": true
+    },
+    {
+      "sim_id": "0NH3_1.h5",
+      "frame_index": 0,
+      "layout_id": "random_sparse_primary",
+      "site_fraction": 0.2,
+      "replica_id": 2,
+      "mask_seed": 20261116,
+      "velocity_mask_seed": 1226363821,
+      "anchor_perm_seed": 613658071,
+      "n_velocity_sites": 3277,
+      "velocity_mask_hash": "acc9c73c60857b232764aaedc9d91cf05f31a6cfe9f9662529925f793175a99e",
+      "temperature_mask_hash_by_K": {
+        "0": "4fe7b59af6de3b665b67788cc2f99892ab827efae3a467342b3bb4e3bc8e5bfe",
+        "1": "bc05f64f568613d094b2a90a953f2afee6f3b04f955eeaa44dbe68760bc185e5",
+        "4": "4c9f8638bbb03159c2b3dc25b8d2b7dbaa743e87bd63fcd325f6d8f86c99b5f2",
+        "9": "b0c031885b4f6b40b5251553246aca42daab3a2a3976071b294837fcb8ef537f",
+        "16": "846515e6ee49245d7f1897b9a25e5499e42abfef15f55603a6a401bbc30e26e5",
+        "32": "a67bcf849d01d18e34568f30caff261de53697d775ae2840a7e03743e95abe1c"
+      },
+      "nested_K_ok": true,
+      "same_velocity_mask_for_all_K": true
+    }
+  ],
+  "notes": [
+    "Masks are regenerated from the numeric seeds above; full grids are not stored.",
+    "Evaluation masks are independent of dataset order, worker id, and model choice.",
+    "Training masks use a separate epoch-scoped seed path."
+  ]
+}

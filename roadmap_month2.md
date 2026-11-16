@@ -93,18 +93,20 @@ Il risultato minimo del Mese 2 è una pipeline riproducibile, baseline qualifica
 
 ### Step 2.2 — Rendere la pipeline adatta al training e alla verifica del leakage
 
-- **Stato:** `[ ] Da implementare`; **classe:** I.
-- **Problema:** il loader attuale indicizza l'intera sequenza, conserva tutte le traiettorie in `_cache`, restituisce T target e velocità dense nello stesso sample, usa seed `seed+idx` e non applica da solo il normalizzatore. La sua esistenza non garantisce un training sicuro o fattibile in RAM.
-- **Motivazione/dipendenze:** prima di attribuire un errore al modello eliminare differenze nei dati, uso dei frame seen e passaggi involontari dei target. Dipende dal contratto 2.1; non richiede scegliere GLU.
-- **Attività concrete:**
-  1. Verificare inventario, allocazione GPU e spazio su Engaging, indicato come host previsto nel diario aggiornato. Usare gli shard esistenti tramite percorso configurabile; se il cluster non li contiene, concordare il trasferimento selettivo e misurarne il costo, senza download automatico. Implementare accesso lazy/cache limitata o cache compatta dei soli frame/canali necessari; evitare copie di ~59 GB per worker. Una cache dei 760 frame T+2C float32 pesa circa 150 MB prima di metadata/input aggiuntivi: misurare il reale picco di estrazione, non assumere lettura Arrow a costo nullo.
-  2. Aggiungere selezione esplicita dei frame, split seen diagnostico e generazione delle statistiche fit-only separate dallo storico; rendere normalizzatore e fold parametrizzabili invece di assumere sempre 20 condizioni.
-  3. Separare `model_inputs`, `targets` e `metadata`. Costruire input densi e sparse dallo stesso sample/maschera. La funzione di inferenza riceve solo input ammessi, mai il sample completo.
-  4. Persistire frame manifest e observation manifest; implementare collate per token a lunghezza variabile con padding mask e test di round-trip coordinate/valore. Parametri p rimossi davvero nel ramo unconditioned.
-  5. Valutatore condiviso con metriche in K per frame/condizione; maschere diagnostiche possono usare T vera solo nel valutatore. Nessun test eseguito automaticamente durante tuning.
-- **Output/file:** modifiche a `src/combustion_recon/data/{dataset,normalizer,masks}.py`; nuovo collate se necessario; `data/manifests/month2_{frames,observations}.json`, `train_norm_stats_month2_fit.json`; futuri `tests/test_month2_pipeline.py`, `tests/test_model_input_isolation.py`, `scripts/05_validate_month2_pipeline.py`; `docs/month2/01_pipeline_validation.md`.
-- **Verifiche/completamento:** pytest esistenti più test che (a) cambiano T target mantenendo gli input temperature-free e verificano predizione invariata, (b) modificano T fuori dalle ancore e velocità fuori maschera senza cambiare gli input assisted/sparse, (c) rifiutano frame/fold proibiti e stats incoerenti, (d) mantengono maschere identiche a dataset riordinato/worker diversi, (e) provano normalizzazione e denormalizzazione. Un batch reale su CPU e profiling RAM/I/O sull'host; non solo fixture sintetiche.
-- **Passaggio:** pipeline deterministica, costo misurato e interfaccia senza target nel forward; altrimenti bloccare training e correggere qui.
+- **Stato:** `[x] Implementato e verificato su dati reali locali (2026-11-16)`; **classe:** I.
+- **Cosa è chiuso qui:** percorso Month-2 isolato (`Month2ReconDataset` + `ShardStore` compact LRU), frame roles, stats fit-only, manifest, collate, evaluator Kelvin, gate TEST, test di isolamento + batch reale CPU.
+- **Cosa resta pendente / non spuntato:** Engaging GPU/allocazione non verificati; picco RSS locale dominato dal decode Arrow (~2 GiB/shard, ~6.5 GiB osservati con DataLoader workers); fold non fitted; U-Net/GLU ancora assenti (probe ≠ validazione forward modelli).
+- **Problema:** il loader Month-1 indicizza/carica in modo non adatto al training sicuro. Il percorso Month-2 lo sostituisce per il lavoro successivo senza alterare gli artefatti storici.
+- **Motivazione/dipendenze:** contratto 2.1; non richiede scegliere GLU.
+- **Attività concrete (eseguite):**
+  1. Shard locali verificati (30 arrow, ~59 GiB) sul workspace WSL; Engaging non verificato. `ShardStore` decodifica un shard alla volta e tiene solo frame compatti (T/vi/vj/vk).
+  2. Ruoli `train_fit` / `seen_train_eval` / `val_eval` (+ indici TEST gated); `train_norm_stats_month2_fit.json` su soli 760 frame fit; normalizzatore fold-capable (n condizioni non fissato a 20).
+  3. Sample `{model_inputs, targets, metadata}`; free/assisted; p_off senza op_params; 2C senza vk; dense pack zero+mask.
+  4. Manifest frame/osservazioni; collate con validity mask; seed maschera indipendenti da ordine/worker.
+  5. `month2_evaluator` con denorm in K, aggregazione frame→condizione→split, off-anchor; `top25pct_iou` esclusa dalla selezione.
+- **Output/file:** moduli `src/combustion_recon/data/month2_*.py`, `shard_access.py`, `collate.py`, `freeze.py`; `evaluation/month2_evaluator.py`; manifest/stats; `tests/test_month2_pipeline.py`, `tests/test_model_input_isolation.py`; `scripts/05_validate_month2_pipeline.py`; `docs/month2/01_pipeline_validation.md`.
+- **Verifiche:** 43 pytest passati; batch reale confrontato allo shard; stats indipendenti OK; TEST denied senza freeze. Dettagli numerici nel report.
+- **Passaggio:** pipeline utilizzabile per Step 2.3 sulle risorse locali; prima di run su Engaging ripetere check host/GPU.
 
 ### Step 2.3 — Qualificare baseline e diagnostici sul protocollo comune
 
@@ -237,7 +239,7 @@ Non replicare tre seed per ogni riga di ricerca iperparametrica. Ripetere i fina
 ## Checklist di completamento della fase
 
 - [x] 2.1 — Protocollo pilota e default operativi versionati; autorizzazione Enrico registrata; limite proposal e assenza ratifica supervisori espliciti; fold geometricamente verificati (lock scientifico fold ancora aperto). Non implica GPU verificate né stats fit-only già calcolate.
-- [ ] 2.2 — Pipeline reale verificata, fit-only per frame/fold, input isolation e memoria controllata.
+- [x] 2.2 — Pipeline Month-2 reale verificata in locale (fit-only, isolation, collate, gate TEST). Engaging/GPU ancora non verificati; picco RAM legato al decode Arrow.
 - [ ] 2.3 — Baseline qualificate sulle osservazioni primarie, tabelle/costi riproducibili.
 - [ ] 2.4 — Primo neurale denso valido e confronto seen/VAL; optional temporale deciso separatamente.
 - [ ] 2.5 — Audit GLU concluso e adattamento scelto o rinviato con motivazione.

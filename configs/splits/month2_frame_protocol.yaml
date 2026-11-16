@@ -13,7 +13,7 @@
 
 protocol_id: month2_frame_protocol_v1
 protocol_date: '2026-11-16'
-status: operational_default_for_pipeline_work
+status: implemented_by_month2_dataset_2026-11-16
 
 # Reference split of entire operating conditions (unchanged).
 operating_condition_split:
@@ -124,13 +124,13 @@ constraints:
       Month-1 artifact fitted on all TRAIN frames (including future seen indices).
       Keep as historical reference only; do not treat as Month-2 fit-only stats.
   month2_fit_only_normalizer:
-    planned_path: data/manifests/train_norm_stats_month2_fit.json
-    status: not_computed
+    path: data/manifests/train_norm_stats_month2_fit.json
+    status: computed_step_2_2
     fit_frames: train_fit
     fit_conditions: train_split_sim_ids_only
     note: >
-      To be produced in Step 2.2 from train_fit frames only. This protocol does
-      not compute or claim those statistics.
+      Produced in Step 2.2 from train_fit frames only. Month-1
+      train_norm_stats.json remains the historical all-frame artifact.
 
 # Rules for preprocessing objects that depend on condition membership.
 fit_only_rules:

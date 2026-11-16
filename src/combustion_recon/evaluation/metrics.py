@@ -234,7 +234,11 @@ def evaluate_per_condition(
     if df.empty:
         return df
     group_cols = ["split", "sim_id"]
-    num_cols = [c for c in df.columns if c not in group_cols and np.issubdtype(df[c].dtype, np.number)]
+    num_cols = [
+        c
+        for c in df.columns
+        if c not in group_cols and pd.api.types.is_numeric_dtype(df[c])
+    ]
     return df.groupby(group_cols, as_index=False)[num_cols].mean()
 
 
@@ -245,6 +249,6 @@ def summarize_by_split(per_condition_df: pd.DataFrame) -> pd.DataFrame:
     num_cols = [
         c
         for c in per_condition_df.columns
-        if c not in ("split", "sim_id") and np.issubdtype(per_condition_df[c].dtype, np.number)
+        if c not in ("split", "sim_id") and pd.api.types.is_numeric_dtype(per_condition_df[c])
     ]
     return per_condition_df.groupby("split", as_index=False)[num_cols].mean()

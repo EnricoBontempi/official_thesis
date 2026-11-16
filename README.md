@@ -20,7 +20,7 @@ This repository contains the codebase, experimental configurations, data audit p
 - `external/GLU_Reconstruction/`: **Untouched upstream reference implementation** of **GLU** (`arXiv:2603.26023`, [cosmos2w/GLU_Reconstruction](https://github.com/cosmos2w/GLU_Reconstruction)) provided by the Deng Lab authors. Kept strictly unmodified as the laboratory reference baseline; all thesis-specific adaptations live in `src/combustion_recon/`.
 - `configs/`: Locked operating-condition splits (`splits_interp_extrap.yaml`), evaluation protocol, and observation layouts.
 - `docs/month1/` & `overleaf_month1_report/`: Month 1 audit reports, baseline feasibility study, and LaTeX progress report.
-- `docs/month2/` & `roadmap_month2.md`: Verified transition context, decision register, and operational Month-2 plan. Step 2.1 protocol configs live under `configs/splits/` and `configs/experiments/`; pipeline and experiment outputs from Step 2.2 onward are not yet implemented.
+- `docs/month2/` & `roadmap_month2.md`: Decision register and Month-2 plan. Step 2.1 protocol configs and Step 2.2 data pipeline (`Month2ReconDataset`, fit-only stats, manifests) are in place; neural training and Month-2 baseline runs start at Step 2.3+.
 - `scripts/` & `tests/`: Reproducible execution scripts and automated `pytest` guardrails.
 
 ### Key Scientific Constraints

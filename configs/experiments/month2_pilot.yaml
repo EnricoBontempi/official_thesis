@@ -14,7 +14,10 @@
 experiment_id: month2_pilot_v1
 experiment_date: '2026-11-16'
 status: operational_default_contract
-implementation_status: not_supported_by_runners_yet
+implementation_status: data_pipeline_supported_month2_dataset_2026-11-16
+note_implementation: >
+  Supported by Month2ReconDataset / ShardStore / collate / evaluator.
+  No baseline runner, trainer, U-Net, or GLU adapter yet (Steps 2.3+).
 
 references:
   operating_condition_split:
@@ -251,8 +254,10 @@ resources:
   proposed_cap_status: ceiling_to_reassess_after_profiling
   not_an_available_allocation: true
 
-artifacts_planned_not_yet_created:
-  - data/manifests/month2_frames.json
-  - data/manifests/month2_observations.json
-  - data/manifests/train_norm_stats_month2_fit.json
-  - configs/experiments/month2_selection_freeze.json
+artifacts:
+  created_in_step_2_2:
+    - data/manifests/month2_frames.json
+    - data/manifests/month2_observations.json
+    - data/manifests/train_norm_stats_month2_fit.json
+  planned_later:
+    - configs/experiments/month2_selection_freeze.json

@@ -1,0 +1,249 @@
+{
+  "date": "2026-11-16 12:05:52 -0500",
+  "base_commit": "5bce7142d7dbaf9e5ea6bc1e3c8dffe75e066ce9",
+  "env": {
+    "cpu_count": 16,
+    "raw_exists": true,
+    "n_shards": 30,
+    "peak_rss_mb": 6482.734375,
+    "mem_available_gb": null,
+    "disk_free_gb": null
+  },
+  "artifacts": [
+    "data/manifests/train_norm_stats_month2_fit.json",
+    "data/manifests/month2_frames.json",
+    "data/manifests/month2_observations.json",
+    "docs/month2/01_pipeline_validation.md"
+  ],
+  "frame_counts": {
+    "train_fit": {
+      "n_samples": 760,
+      "n_conditions": 20,
+      "n_frames_per_condition": 38,
+      "split": "train",
+      "payload_access": "allowed"
+    },
+    "seen_train_eval": {
+      "n_samples": 220,
+      "n_conditions": 20,
+      "n_frames_per_condition": 11,
+      "split": "train",
+      "payload_access": "allowed"
+    },
+    "val_eval": {
+      "n_samples": 123,
+      "n_conditions": 3,
+      "n_frames_per_condition": 41,
+      "split": "val",
+      "payload_access": "allowed"
+    },
+    "test_interp_eval": {
+      "n_samples": 123,
+      "n_conditions": 3,
+      "n_frames_per_condition": 41,
+      "split": "test_interp",
+      "payload_access": "requires_selection_freeze"
+    },
+    "test_extrap_eval": {
+      "n_samples": 164,
+      "n_conditions": 4,
+      "n_frames_per_condition": 41,
+      "split": "test_extrap",
+      "payload_access": "requires_selection_freeze"
+    }
+  },
+  "stats_meta": {
+    "split": "train",
+    "frame_role": "train_fit",
+    "protocol_id": "month2_frame_protocol_v1",
+    "protocol_path": "configs/splits/month2_frame_protocol.yaml",
+    "protocol_sha256": "e9d9dbcb74314d1a5031df04bddbd62d86e67668c63871429cf382671331a12c",
+    "splits_path": "configs/splits/splits_interp_extrap.yaml",
+    "splits_sha256": "acb87bf95852e7849f88a270af8cbd211ad999d0039c35885232b7bc2a99e7b9",
+    "n_conditions": 20,
+    "sim_ids": [
+      "0NH3_0.85.h5",
+      "0NH3_0.9.h5",
+      "0NH3_1.h5",
+      "0NH3_1.1.h5",
+      "0NH3_1.15.h5",
+      "0NH3_1.2.h5",
+      "0NH3_1.25.h5",
+      "20NH3_0.85.h5",
+      "20NH3_0.9.h5",
+      "20NH3_1.05.h5",
+      "20NH3_1.2.h5",
+      "20NH3_1.25.h5",
+      "40NH3_0.85.h5",
+      "40NH3_1.h5",
+      "40NH3_1.1.h5",
+      "40NH3_1.2.h5",
+      "80NH3_0.9.h5",
+      "80NH3_1.05.h5",
+      "80NH3_1.15.h5",
+      "80NH3_1.2.h5"
+    ],
+    "n_frames_per_condition": 38,
+    "frame_indices": [
+      0,
+      40,
+      80,
+      120,
+      160,
+      200,
+      240,
+      280,
+      320,
+      360,
+      400,
+      440,
+      480,
+      520,
+      560,
+      600,
+      640,
+      680,
+      720,
+      760,
+      800,
+      840,
+      880,
+      920,
+      960,
+      1000,
+      1040,
+      1080,
+      1120,
+      1160,
+      1200,
+      1240,
+      1280,
+      1320,
+      1360,
+      1400,
+      1440,
+      1480
+    ],
+    "n_frames_total": 760,
+    "channels": {
+      "Temperature": 10,
+      "Velocity_i": 11,
+      "Velocity_j": 12
+    },
+    "includes_seen_frames": false,
+    "clipping": false,
+    "method": "welford_online_mean_var_unclipped",
+    "source_kind": "month2_train_fit_only",
+    "parameter_name_mapping": {
+      "nh3_fraction": "nh3_fraction",
+      "phi": "equivalence_ratio",
+      "equivalence_ratio": "equivalence_ratio"
+    },
+    "wall_time_s": 231.50687217712402,
+    "peak_rss_mb_during_fit_approx": 6488.37890625,
+    "rss_mb_before_fit": 598.0,
+    "host": {
+      "cwd": "/home/enric/projects/official_thesis",
+      "raw_dir": "/home/enric/projects/official_thesis/data/raw/combustion/hf_dataset/numerical",
+      "raw_exists": true,
+      "n_shards": 30,
+      "engaging_verified": false,
+      "note": "Local WSL/host used for pipeline validation; Engaging GPU/alloc not verified."
+    }
+  },
+  "stats_fields": {
+    "Temperature": {
+      "n_voxels_total": 12451840,
+      "mean": 2039.5086606614589,
+      "std": 331.7378431423074,
+      "min": -160.89723205566406,
+      "max": 2965.300048828125
+    },
+    "Velocity_i": {
+      "n_voxels_total": 12451840,
+      "mean": -0.059971279319043884,
+      "std": 5.673608459887564,
+      "min": -32.32015609741211,
+      "max": 37.631431579589844
+    },
+    "Velocity_j": {
+      "n_voxels_total": 12451840,
+      "mean": 4.272026277961735,
+      "std": 11.909608552613038,
+      "min": -49.0911865234375,
+      "max": 55.948055267333984
+    }
+  },
+  "month1_stats_preserved": true,
+  "month1_stats_sha256": "37bf7e8579812930d37e816d1689b89a3a91666e56af66d24b08fd958cfa9b76",
+  "independent_check": {
+    "subset_sim_ids": [
+      "0NH3_0.85.h5",
+      "0NH3_0.9.h5"
+    ],
+    "subset_frames": [
+      0,
+      40,
+      80
+    ],
+    "direct_mean": 2086.034566507364,
+    "direct_std_ddof1": 224.93031348678412,
+    "stream_mean": 2086.0345665073646,
+    "stream_std": 224.9303134867841,
+    "mean_abs_diff": 4.547473508864641e-13,
+    "std_abs_diff": 2.842170943040401e-14
+  },
+  "real_batch": {
+    "sample0_sim_id": "0NH3_0.85.h5",
+    "sample0_frame": 0,
+    "n_train_fit": 760,
+    "coord_match_raw": true,
+    "temperature_match_raw": true,
+    "velocity_sites_match_raw": true,
+    "denorm_roundtrip_ok": true,
+    "batch_keys": [
+      "K",
+      "anchor_coords",
+      "anchor_site_index",
+      "anchor_valid",
+      "anchor_values",
+      "dense_channel_names",
+      "dense_values",
+      "mask_temperature",
+      "mask_velocity",
+      "query_coords",
+      "scalar_coords",
+      "scalar_valid",
+      "scalar_values",
+      "scalar_var_ids",
+      "site_fraction",
+      "task_mode",
+      "velocity_coords",
+      "velocity_site_index",
+      "velocity_valid",
+      "velocity_values"
+    ],
+    "batch_velocity_valid_shape": [
+      2,
+      819
+    ],
+    "dataloader_workers": 2,
+    "dataloader_batch_wall_s": 16.364479780197144,
+    "rss_mb_before_loader": 6482.734375,
+    "rss_mb_after_loader": 6482.734375,
+    "store_stats": {
+      "shard_decodes": 1,
+      "cache_hits": 1,
+      "cache_misses": 1,
+      "frames_materialized": 1
+    },
+    "compact_cache_frames": 1,
+    "compact_cache_bytes_est": 262144,
+    "test_access_denied_without_freeze": true,
+    "evaluator_rmse_mean_predictor": 242.66588055932934,
+    "selection_table_rows": 1,
+    "p_off_has_op_params": false,
+    "vk_in_model_inputs": false
+  },
+  "status": "PASS"
+}

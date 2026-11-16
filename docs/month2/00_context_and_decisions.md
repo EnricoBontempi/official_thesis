@@ -2,7 +2,7 @@
 
 **Data aggiornamento Step 2.1:** 2026-11-16, America/New_York (UTC−05:00)  
 **Ambito:** esclusivamente `EnricoBontempi/official_thesis`; nessuna attività HONF.  
-**Stato:** protocollo pilota versionato (`month2_frame_protocol_v1`, `month2_pilot_v1`) concretizzato come default operativo; **nessuna ratifica tecnica documentata dei supervisori**; pipeline/modelli/run **non** avviati.  
+**Stato:** protocollo pilota versionato (`month2_frame_protocol_v1`, `month2_pilot_v1`); **Step 2.2 pipeline implementata e verificata su shard locali**; **nessuna ratifica tecnica documentata dei supervisori**; nessun training/baseline Mese 2 ancora eseguito; Engaging/GPU non verificati.  
 **Piano operativo:** [roadmap_month2.md](../../roadmap_month2.md).  
 **Autorizzazione operativa Enrico:** conversazione del 16 novembre 2026 (approvazione roadmap e avvio lavoro). Distinta da qualsiasi approvazione dei supervisori.
 
@@ -20,9 +20,10 @@ Ricognizione precedente del remoto `main` a `6fd0f15` (con diario semplificato p
 |---|---|---|
 | Audit 30 condizioni, split 20/3/3/4, baseline corrette, report LaTeX, codice GLU intatto | artefatti Mese 1 / `external/` | Completati tecnicamente; sign-off supervisori dello Step 1.6 ancora aperto. |
 | Roadmap Mese 2 | `roadmap_month2.md`, commit `ef4b708` | Preparata; **autorizzata operativamente da Enrico** (16 nov 2026); non equivale a ratifica supervisori. |
-| Protocollo frame + contratto pilota | `configs/splits/month2_frame_protocol.yaml`, `configs/experiments/month2_pilot.yaml` | **Concretizzati in Step 2.1** come default operativi. Nessun runner li implementa ancora. |
-| Statistiche fit-only Mese 2 | percorso pianificato `train_norm_stats_month2_fit.json` | **Non calcolate.** Lo storico `train_norm_stats.json` resta solo riferimento Mese 1. |
-| Pipeline / modelli / training | — | Non avviati (Step 2.2+). |
+| Protocollo frame + contratto pilota | YAML Step 2.1 | Default operativi; ora consumati da `Month2ReconDataset`. |
+| Statistiche fit-only Mese 2 | `data/manifests/train_norm_stats_month2_fit.json` | **Calcolate** su 20×38 frame `train_fit`. Storico Mese 1 intatto. |
+| Pipeline dati Month-2 | moduli `month2_*`, report `01_pipeline_validation.md` | **Verificata in locale** (batch reale, isolation, gate TEST). |
+| Modelli / training / baseline Mese 2 | — | Non avviati (Step 2.3+). |
 | GPU/allocazione Engaging | — | Host previsto; **non verificati**. Tetto 24 GPU-ore = proposta di ceiling, non allocazione disponibile. |
 
 ## 3. Lettura scientifica dei risultati corretti
@@ -130,8 +131,8 @@ Hash di riferimento (non autoreferenziali):
 
 ## 9. Cosa non è chiuso (utile al prossimo step)
 
-**Non bloccanti per Step 2.2 (pipeline):** D1 provenienza; ratifica supervisori; lock finale dei fold; D4 meccanismo esatto; D7/3C/testa residua; GPU Engaging; tetto 24 h.
+**Chiuso per Step 2.2:** frame fit vs seen; stats fit-only; isolation input; gate TEST; collate; batch reale locale.
 
-**Da rispettare come contratto mentre si implementa 2.2:** frame fit vs seen; input isolation; stats fit-only ancora da calcolare; niente uso TEST in selezione; niente 3C/finestra/testa come se fossero attive.
+**Non bloccanti per Step 2.3 locale:** D1 provenienza; ratifica supervisori; lock fold; D4/D7/3C/testa; Engaging (si può partire in locale).
 
-**Necessarie prima dei run scientifici (2.3+):** registrare/verificare host e budget (D8); chiudere o esplicitare i default ancora “senza ratifica” che i run assumono; audit GLU prima di un confronto GLU (2.5).
+**Prima di run scientifici su cluster / confronti costosi:** verificare host/GPU e budget (D8); audit GLU prima del confronto GLU (2.5); gestire il picco RAM del decode Arrow (prefetch selettivo / meno worker).
