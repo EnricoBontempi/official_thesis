@@ -1,38 +1,29 @@
 # Mese 2 — Contesto verificato e registro delle decisioni
 
-**Data:** 2026-11-16, America/New_York (UTC−05:00)  
+**Data aggiornamento Step 2.1:** 2026-11-16, America/New_York (UTC−05:00)  
 **Ambito:** esclusivamente `EnricoBontempi/official_thesis`; nessuna attività HONF.  
-**Stato:** ricognizione documentale e proposta operativa; nessuna approvazione o esecuzione del Mese 2 attestata da questo documento.  
-**Piano operativo:** [roadmap_month2.md](../../roadmap_month2.md).
+**Stato:** protocollo pilota versionato (`month2_frame_protocol_v1`, `month2_pilot_v1`) concretizzato come default operativo; **nessuna ratifica tecnica documentata dei supervisori**; pipeline/modelli/run **non** avviati.  
+**Piano operativo:** [roadmap_month2.md](../../roadmap_month2.md).  
+**Autorizzazione operativa Enrico:** conversazione del 16 novembre 2026 (approvazione roadmap e avvio lavoro). Distinta da qualsiasi approvazione dei supervisori.
 
 ## 1. Provenienza e limite sul documento inviato
 
-Ricognizione del remoto `main` a `6fd0f15eecc267f45e68f151fb298e607dd4322f`:
+Ricognizione precedente del remoto `main` a `6fd0f15` (con diario semplificato preservato da `a2cebb1`); roadmap pubblicata in `ef4b708`.
 
-Prima della pubblicazione è arrivato il commit concorrente `a2cebb179712d3bf0160d3fe674b26af45d9fae9`, che semplifica il solo diario. È stato letto e preservato integralmente come nuova base; le note retrospettive dettagliate citate sotto sono state ispezionate nella versione precedente e restano nella cronologia. La nuova versione indica Engaging come host previsto dei training: questo aggiorna la destinazione pianificata, senza attestare GPU/allocazione già disponibili.
-
-- Letti [diario](../RESEARCH_LOG.md), [proposal Markdown](../proposal.md), [roadmap Mese 1](../../roadmap_month1.md), tutti i sette report in `docs/month1/`, [analisi_agents.md](../../analisi_agents.md), configurazioni, implementazioni e test pertinenti, metadati e CSV aggregati del Mese 1, sorgenti del report LaTeX e parti pertinenti della release GLU.
-- Nell'albero remoto non risultano `AGENTS.md`, una roadmap Mese 2 o una roadmap generale separata dal piano semestrale del proposal. Esiste un solo branch remoto, `main`; la cronologia ispezionata usa commit diretti. Valgono le istruzioni della sessione e il vincolo del README di conservare intatto `external/GLU_Reconstruction/`.
-- `documents_thesis` è la repository separata [EnricoBontempi/documents_thesis](https://github.com/EnricoBontempi/documents_thesis). A `17dd8468ce567a8b2d87ea34b355a8cb692757f0`, `main.tex` è intitolato **Month 1 Progress Report & Baseline Feasibility Study**, non thesis proposal. `main.tex` e `references.bib` coincidono esattamente con le copie in `official_thesis/overleaf_month1_report/`. Non ci sono `\\input` o `\\include` di altri sorgenti; sono referenziate dieci figure e la bibliografia `references.bib`, letta anch'essa.
-- La cronologia completa disponibile di `documents_thesis` contiene tre commit del **15 novembre**, dall'iniziale `c5b7017` al finale `17dd846`; l'albero iniziale contiene già il report. Non vi si trova una versione LaTeX identificabile come il proposal inviato il **13 novembre**.
-- L'invio del proposal il 13 novembre è riferito dall'utente e annotato nel diario; `docs/proposal.md` è presente dal commit iniziale `75c5db2` dello stesso giorno. Questo è il riferimento di scopo disponibile. **Non è verificata l'identità fra quel Markdown e l'allegato effettivamente inviato.** Non sono attestabili differenze testuali con un LaTeX inviato assente dalle due repository ispezionate.
-- È stato controllato anche il contenuto iniziale del precedente `thesis_proposal.tex` disponibile fra i documenti personali: è una bozza del 6/7 novembre con più applicazioni candidate, non una copia identificabile del proposal ufficiale del 13 novembre. Non viene usato per stabilire lo scopo attuale.
-
-La roadmap usa quindi il proposal Markdown per lo scopo, il report LaTeX del 15 novembre come **aggiornamento proposto**, e codice/config/CSV come evidenza tecnica. Recuperare e identificare l'allegato realmente inviato è una voce aperta di provenienza, non un motivo per inventare approvazioni o impedire la preparazione della roadmap. Non è stato modificato alcun proposal o report LaTeX.
+- Letti diario, proposal Markdown, roadmap Mese 1, report Mese 1, configurazioni e codice pertinenti.
+- `documents_thesis/main.tex` è il report del Mese 1 del 15 novembre, non il proposal inviato il 13 novembre. **Non è verificata l'identità fra `docs/proposal.md` e l'allegato inviato.**
+- **Step 2.1:** nessuna nuova ricerca estesa dell'allegato; il limite di provenienza resta dichiarato e **non bloccante** per il protocollo pilota. Scopo operativo da `docs/proposal.md`. Nessun proposal modificato.
 
 ## 2. Cosa è completato e cosa rimane aperto
 
-| Elemento | Evidenza ispezionata | Stato e limite |
+| Elemento | Evidenza | Stato e limite |
 |---|---|---|
-| Audit di 30 condizioni LES, 2001 frame, 128×128 | `02_data_audit_report.md`, manifest `full30_audit_summary.json`, inventario | Completato e registrato nel Mese 1; raw da ~58.6 GB esclusi da Git. Disponibilità e checksum sul futuro host di training da riverificare, senza riscaricare automaticamente. |
-| Split 20/3/3/4 per condizione | YAML, script 03 e test | Definito tecnicamente; non equivale ad approvazione dei supervisori. Gli attuali test verificano intervalli/frontiere, non l'intero inviluppo convesso. |
-| Normalizzazione | `train_norm_stats.json`, script 03 | Solo condizioni TRAIN, ma su tutti i loro 2001 frame, inclusi quelli della diagnostica seen. Serve una versione limitata a `train_fit` per una diagnostica temporale indipendente. Nessuna evidenza di normalizzazione su condizioni VAL/TEST. |
-| Baseline corrette | commit `4fdbcb1`, script 04, `baselines.py`, CSV e meta | Eseguite nel Mese 1; POD selezionata **R=32**, non R=64. Ricontrollo documentale dei CSV effettuato; esperimenti non rieseguiti in questa attività. |
-| Test software | `tests/`, diario | Il diario riporta 27 test passati dopo le correzioni. Questo non sostituisce un nuovo controllo sull'ambiente che eseguirà il Mese 2. |
-| Accordo scientifico | diario 13 e 16 novembre | Riscontro preliminare positivo della professoressa riferito dall'utente, con cautela sulla temperatura istantanea; nessuna approvazione tecnica specifica documentata. Il diario riferisce risposta di Jason con il codice GLU, non un'approvazione della suite sperimentale. |
-| Step 1.6 | roadmap e brief | Letteratura e materiali preparati; la componente “Supervisor Sign-Off” è **aperta** anche se lo step porta una spunta di completamento. |
-| Codice GLU | import `ebaae9d`, albero `external/` | Acquisito e ispezionato; nessun adattamento neurale di tesi o training del Mese 2 presente. |
-| Risorse | report e diario | CPU-only sul precedente WSL; Engaging previsto nel diario aggiornato, nessuna GPU/allocazione sul cluster verificata qui. |
+| Audit 30 condizioni, split 20/3/3/4, baseline corrette, report LaTeX, codice GLU intatto | artefatti Mese 1 / `external/` | Completati tecnicamente; sign-off supervisori dello Step 1.6 ancora aperto. |
+| Roadmap Mese 2 | `roadmap_month2.md`, commit `ef4b708` | Preparata; **autorizzata operativamente da Enrico** (16 nov 2026); non equivale a ratifica supervisori. |
+| Protocollo frame + contratto pilota | `configs/splits/month2_frame_protocol.yaml`, `configs/experiments/month2_pilot.yaml` | **Concretizzati in Step 2.1** come default operativi. Nessun runner li implementa ancora. |
+| Statistiche fit-only Mese 2 | percorso pianificato `train_norm_stats_month2_fit.json` | **Non calcolate.** Lo storico `train_norm_stats.json` resta solo riferimento Mese 1. |
+| Pipeline / modelli / training | — | Non avviati (Step 2.2+). |
+| GPU/allocazione Engaging | — | Host previsto; **non verificati**. Tetto 24 GPU-ore = proposta di ceiling, non allocazione disponibile. |
 
 ## 3. Lettura scientifica dei risultati corretti
 
@@ -47,42 +38,100 @@ La tabella seguente è stata controllata contro `results/tables/month1_feasibili
 | Stesso + T-block, K=32 | 130.2 | +34.8 | 36.1 | 119.3 |
 | GappyPOD unconditioned + T-block, K=32 | 125.5 | +5.7 | 17.6 | 123.5 |
 
-- La base POD a R=32 rappresenta T meglio di quanto il suo stimatore ricavi dalla velocità: `OraclePOD_Conditioned` ha Centered-RMSE ~74.6 K in estrapolazione, rispetto a ~138.5 K di GappyPOD conditioned. L'oracle legge T completa: è un diagnostico della **specifica base lineare**, non un modello ammissibile o un limite fisico universale.
-- AO è un offset uniforme: lascia invariato l'errore centrato per costruzione. A K=1 può peggiorare RMSE; bias firmato medio vicino a zero non implica piccolo errore di livello per ogni frame. Il T-block può modificare anche la forma e a K=32 la migliora: non è corretto affermare che tutte le baseline lineari correggano soltanto il livello.
-- LocalHGB legge patch 3×3 di **velocità densa**, mentre GappyPOD legge osservazioni sparse. Il loro confronto storico non isola l'architettura a parità di informazione.
-- La sovrapposizione di velocità simili a temperature diverse suggerisce ambiguità, ma non prova non identificabilità della mappa dal **campo completo** di velocità. Un singolo modello denso che fallisce non prova un limite irreducibile.
-- La difficoltà varia anche fra condizioni TRAIN, specialmente con φ: il divario fra medie di split non misura da solo una penalità di extrapolazione.
-- `top25pct_iou` attuale usa P75(T vera) anche per sogliare la predizione: non è invariante agli offset. Il diario la accantona; non usarla come metrica di forma nella nuova selezione.
+- Gap GappyPOD vs OraclePOD: problema di **stima** dalla velocità sulla base lineare R=32, non prova di limite fisico universale.
+- AO lascia invariato Centered-RMSE; T-block a K=32 può migliorare anche la forma.
+- LocalHGB storico è diagnostico denso; non confrontarlo come se usasse le stesse osservazioni sparse.
+- `top25pct_iou` esistente **non** è metrica di forma invariante al bias: esclusa dalla selezione del pilota.
 
-Il report LaTeX successivo prevale sulle conclusioni datate ancora presenti in `05_literature_and_glu_notes.md`, `06_supervisor_review_brief.md` e `analisi_agents.md` (numeri precedenti, R=64, “bias risolto”, “POD incapace di deformare”). Questi file rimangono evidenze storiche; la roadmap non ne assume le raccomandazioni come decisioni.
+Il report LaTeX del 15 novembre prevale sulle conclusioni datate in sintesi più vecchie (`05_literature_and_glu_notes.md`, `06_supervisor_review_brief.md`, `analisi_agents.md`).
 
 ## 4. Differenze fra proposta iniziale, aggiornamento LaTeX e codice
 
-| Tema | Proposal Markdown | Report LaTeX / codice successivo | Trattamento nel Mese 2 |
+| Tema | Proposal Markdown | Report LaTeX / codice successivo | Trattamento nel protocollo pilota v1 |
 |---|---|---|---|
-| Primo modello | Deterministico, scelto con il laboratorio | Report propone U-Net densa prima di GLU | Diagnostico denso limitato, da concordare; non “ceiling” fisico. |
-| Tempo | Ricostruzione istantanea | Report propone 3 frame causali o simmetrici | Single-frame primario; finestra causale opzionale come **input più ricco**, futuro solo offline separato. |
-| Condizionamento | Confronto centrale; studio completo nel Mese 3 | Report propone FiLM e residuo attorno a ParamMean già all'inizio | Toggle minimo per confronto pilota; nessun residuo condizionato nascosto nel ramo unconditioned. Studio esteso nel Mese 3. |
-| GLU | Approccio informante | Codice acquisito il 16 novembre | Audit delle interfacce e adattamento minimo; non occorre reimplementare da una descrizione del paper. |
-| Incertezza/importanza | Non necessarie al primo modello | Report propone Beta condizionata e assimilazione | Prima MSE deterministica e distanza geometrica uniforme; optional separati solo dopo un risultato che li richieda. Identificare esplicitamente l'ablation rispetto alla release. |
-| Test fra condizioni | Campagna completa nel Mese 4 | Risultati esplorativi già letti nel Mese 1 | Selezione su VAL e fold TRAIN; un pilot congelato se concordato, campagna estesa rinviata. I test storici non sono più “mai visti”. |
+| Primo modello | Deterministico, scelto col laboratorio | U-Net densa prima di GLU | Matrice: diagnostico denso → sparse U-Net / GLU minimale; scelta architetturale ancora aperta ai supervisori (D4). |
+| Tempo | Istantanea | 3 frame | **Single-frame primario**; finestra causale **non attivata**. |
+| Condizionamento | Confronto centrale | FiLM / residuo ParamMean | Confronto **p off/on** richiesto; meccanismo candidato FiLM, non ratificato. |
+| GLU | Approccio informante | Codice acquisito | Audit/adattamento in Step 2.5; non implementato qui. |
+| Ancore / assimilazione | Fallback esplicito | Modulo residuo | Primario K=9 + sweep annidato; AO prima; testa appresa **non attivata**. |
+| Test | Campagna Mese 4 | Già esaminati in Mese 1 | Selezione solo VAL; TEST solo dopo freeze. |
 
-Nel codice GLU rilasciato `build_pos_value_proj` usa Linear **con bias** + RMSNorm, e `SpatiallyAwareCLSFusion` una fusione gated. `channel_to_encode` esiste già; l'argomento `U` dell'encoder non è usato. Il wrapper Stage 0 salta il propagatore, ma il suo `forward` riceve anche `G_full`: l'adattamento deve dimostrare che T target non entra nelle predizioni. Il mixer dei sensori è un TransformerEncoder, quindi non si può assumere costo solo O(NS) dai cross-attention; il decoder materializza distanze query×sensori con `cdist`. Questi sono motivi concreti per audit, test e profiling prima di aumentare token o copertura.
+## 5. Autorizzazione, default operativi e registro D1–D9
 
-## 5. Decisioni da registrare prima delle rispettive attività
+### 5.1 Autorizzazione operativa (Enrico)
 
-Nessuna riga seguente è approvata al momento della stesura. Chi esegue compila data, decisore, fonte verificabile e conseguenza sui run; un semplice commit di codice non vale come approvazione scientifica.
+| Campo | Valore |
+|---|---|
+| Decisore | Enrico Bontempi |
+| Data | 2026-11-16 |
+| Fonte | Conversazione operativa (orientamento + mandato Step 2.1) |
+| Contenuto | Approvazione della roadmap Mese 2 e autorizzazione ad avviare il lavoro, a partire dalla concretizzazione del protocollo |
+| Non implica | Ratifica tecnica dei supervisori; disponibilità GPU; calcolo già avvenuto delle stats fit-only; implementazione pipeline |
 
-| ID | Decisione | Proposta iniziale e conseguenza | Responsabile / stato |
-|---|---|---|---|
-| D1 | Identità del proposal del 13 novembre | Identificare commit/percorso o copia dell'allegato; fino ad allora scopo da `docs/proposal.md`, limite dichiarato | Enrico; aperta |
-| D2 | Split, metriche e uso dei test già esaminati | Conservare 20/3/3/4; selezione solo su VAL/fold TRAIN; nessuna rivendicazione di test intatto | Supervisori + Enrico; aperta |
-| D3 | Osservazioni primarie | 2C co-locate (11,12), singolo frame, 5% iniziale; 3C separata, nessuna velocità 3D derivata da vk nascosto | Supervisori + Enrico; aperta |
-| D4 | Primo modello e riferimento GLU | U-Net compatta densa, poi stessa rete mascherata e GLU deterministico minimale; scegliere una sola modalità di condizionamento iniziale | Supervisori + Enrico; aperta |
-| D5 | Target e ancore T | T LES grezza in K come primaria per continuità, outlier segnalati; ancore ideali sincronizzate, non termocoppie reali già validate | Supervisori + Enrico; aperta |
-| D6 | Temperatura assistita | Primario K=9, sweep K=0/1/4/9/16/32 su stesso backbone; prima AO, poi eventuale correzione spaziale | Supervisori + Enrico; aperta |
-| D7 | Finestra temporale | Solo opzionale, causale [t−2,t−1,t] con target T(t), Δt reale 0.25 ms; decidere se il guadagno vale l'input aggiuntivo | Supervisori + Enrico; aperta |
-| D8 | Risorse e budget | Engaging come host previsto; verificare allocazione e profilare; tetto iniziale proposto 24 GPU-ore per pilot complessivo, senza assumere risorse già assegnate | Enrico + referente risorse; aperta |
-| D9 | Gestione dei frame seen e fold interni | Nuove statistiche fit-only versionate, dati di training comuni fra modelli; fold norm/POD/ParamMean ricalcolati senza condizione esclusa | Enrico, con ratifica del protocollo D2; aperta |
+### 5.2 Assenza di ratifica supervisori
 
-Le attività infrastrutturali della roadmap si possono preparare senza scegliere un'architettura nuova; i run scientifici dipendono dalla registrazione delle decisioni applicabili. Questo task ha autorizzato solo preparazione della documentazione e commit/push, non l'avvio di quei lavori.
+Non risulta, nei documenti della repository, un’approvazione tecnica specifica di Deng Lab / supervisori su protocollo 2C, primo modello, uso dei test già esaminati, ancore ideali, budget o fold. Il riscontro preliminare della professoressa sul piano generale (diario 13 nov) e la condivisione del codice GLU da Jason **non** costituiscono tale ratifica. Le righe D2–D8 restano **senza ratifica supervisori documentata**.
+
+### 5.3 Registro D1–D9 (aggiornato Step 2.1)
+
+Legenda stato: **default operativo** = usato per preparare protocollo/pipeline; **verifica tecnica pendente** = da misurare/implementare; **estensione rinviata** = fuori dal minimo attivo; **limite dichiarato** = aperto ma non bloccante per 2.1/2.2 infrastrutturale; **scelta scientifica aperta** = non chiusa silenziosamente.
+
+| ID | Decisione | Impostazione registrata il 2026-11-16 | Classificazione | Responsabile / note |
+|---|---|---|---|---|
+| D1 | Identità proposal 13 nov | Scopo da `docs/proposal.md`; identità con allegato inviato **non verificata**; nessuna nuova ricerca estesa in 2.1 | Limite dichiarato; non bloccante | Enrico; aperta come provenienza |
+| D2 | Split, metriche, test | Conservati 20/3/3/4; selezione = media per condizione della RMSE full-field su VAL; TEST esclusi dalla selezione; freeze richiesto per eval test | Default operativo Enrico; **senza ratifica supervisori** | Supervisori + Enrico |
+| D3 | Osservazioni primarie | Single-frame; velocità 2C ch. 11/12; sparse primario 5% siti (~819); controlli eval 1/5/20%; 3C **non attivata** | Default operativo; 3C = estensione rinviata | Supervisori + Enrico |
+| D4 | Primo modello / GLU | Matrice ridotta: U-Net densa diagnostica → U-Net mascherata + GLU deterministico minimale; condizionamento on/off (candidato FiLM) | Default operativo di piano; architettura/adattamento **scelta scientifica aperta** fino a 2.4–2.5 | Supervisori + Enrico |
+| D5 | Target e ancore T | Target T ch.10 grezza in K; ancore ideali sincronizzate; outlier da segnalare; nessun clipping silenzioso | Default operativo; **senza ratifica supervisori** | Supervisori + Enrico |
+| D6 | Temperatura assistita | Primario K=9; sweep annidato 0/1/4/9/16/32; prima AO; testa residua appresa **non attivata** | Default operativo; testa = estensione con gate | Supervisori + Enrico |
+| D7 | Finestra temporale | Non attivata nel pilota primario | Estensione rinviata (gate D7) | Supervisori + Enrico |
+| D8 | Risorse e budget | Host previsto Engaging; GPU/allocazione **non verificate**; tetto iniziale proposto **24 GPU-ore** = ceiling da rivalutare col profiling, **non** allocazione disponibile | Default di planning + verifica tecnica pendente | Enrico + referente risorse |
+| D9 | Frame seen e fold | `train_fit` vs `seen_train_eval` disgiunti; future stats fit-only solo su `train_fit`; fold interni con refit obbligatorio; candidati geometrici proposti sotto | Default operativo protocollo; stats **non ancora calcolate**; fold **non locked** | Enrico; ratifica D2 ancora aperta |
+
+## 6. Verifica geometrica dei fold pseudo-extrap (solo metadata TRAIN)
+
+Spazio dei parametri: `(nh3_fraction, φ)` parsato dagli `sim_id` TRAIN in `splits_interp_extrap.yaml`.  
+Criterio: il punto escluso deve stare **fuori** dall’inviluppo convesso delle 19 condizioni rimanenti. Controllare solo min/max per asse **non basta** (tutti i candidati restano dentro il bounding box asse-allineato del TRAIN residuo).
+
+| Candidato | `(nh3, φ)` | vs hull rimanente | Estrapolazione geometrica? | Esito |
+|---|---|---|---|---|
+| `20NH3_0.85.h5` (esempio roadmap) | (0.20, 0.85) | **on_boundary** (spigolo fra `0NH3_0.85` e `40NH3_0.85`) | No | **Scartato** come fold di estrapolazione geometrica |
+| `80NH3_1.2.h5` (esempio roadmap) | (0.80, 1.20) | **outside** | Sì | **Valido** come candidato |
+| `40NH3_0.85.h5` (alternativa proposta) | (0.40, 0.85) | **outside** | Sì | Proposta come sostituto lean di `20NH3_0.85` |
+
+Altri TRAIN risultati `outside` in leave-one-out (metadata only): `0NH3_0.85`, `0NH3_1.25`, `20NH3_1.25`, `40NH3_0.85`, `80NH3_0.9`, `80NH3_1.2`.
+
+**Coppia proposta (non locked):** fold A = `40NH3_0.85.h5`; fold B = `80NH3_1.2.h5`.  
+La scelta definitiva resta una **scelta scientifica aperta** se si vuole un criterio diverso (es. massimizzare distanza, privilegiare angolo CH4, ecc.); **non blocca** il protocollo primario VAL/seen né lo Step 2.2.  
+Nessun fitting/training/valutazione prestazioni eseguito sui fold in questo step. Per ogni fold futuro: rifittare normalizer, POD e prior escludendo la condizione trattenuta.
+
+## 7. Contratto concretizzato (file)
+
+| File | ID | Ruolo |
+|---|---|---|
+| [configs/splits/month2_frame_protocol.yaml](../../configs/splits/month2_frame_protocol.yaml) | `month2_frame_protocol_v1` | Indici frame fit/seen/eval; regole fit-only; split 20/3/3/4 solo referenziato |
+| [configs/experiments/month2_pilot.yaml](../../configs/experiments/month2_pilot.yaml) | `month2_pilot_v1` | Input 2C, sparsità, K, seed, selezione VAL, matrice ridotta, estensioni off |
+
+Hash di riferimento (non autoreferenziali):
+
+- `configs/splits/splits_interp_extrap.yaml` → `acb87bf95852e7849f88a270af8cbd211ad999d0039c35885232b7bc2a99e7b9`
+- `configs/splits/evaluation_protocol.yaml` → `85a5a2437ec6c2257a01931987907ef7129b9858a2546c9cb33bac8fc99a2950`
+- `configs/masks/observation_layouts.yaml` → `a0344e87d5a98cd1203cc0e9b258aa0859e80659e2817877602328973fd1bbb1`
+- `data/manifests/train_norm_stats.json` (storico Mese 1) → `37bf7e8579812930d37e816d1689b89a3a91666e56af66d24b08fd958cfa9b76`
+
+## 8. Controlli eseguiti in Step 2.1
+
+- Parsing YAML dei due nuovi file: OK (`yaml.safe_load`).
+- `train_fit`: 38 indici `0,40,…,1480`; `seen_train_eval`: 11 indici `1600,…,2000`; intersezione vuota; gap 120.
+- VAL/TEST schedule: 41 indici `0,50,…,2000`.
+- `sim_id` del protocollo coincidono col file split referenziato (nessuna riscrittura membership).
+- Canali 10/11/12, K nested, gruppi matrice e flag estensioni off: coerenti fra registro e `month2_pilot.yaml`.
+- Nessun file afferma che `train_norm_stats_month2_fit.json` esista già.
+
+## 9. Cosa non è chiuso (utile al prossimo step)
+
+**Non bloccanti per Step 2.2 (pipeline):** D1 provenienza; ratifica supervisori; lock finale dei fold; D4 meccanismo esatto; D7/3C/testa residua; GPU Engaging; tetto 24 h.
+
+**Da rispettare come contratto mentre si implementa 2.2:** frame fit vs seen; input isolation; stats fit-only ancora da calcolare; niente uso TEST in selezione; niente 3C/finestra/testa come se fossero attive.
+
+**Necessarie prima dei run scientifici (2.3+):** registrare/verificare host e budget (D8); chiudere o esplicitare i default ancora “senza ratifica” che i run assumono; audit GLU prima di un confronto GLU (2.5).

@@ -1,0 +1,258 @@
+# Month 2 pilot experiment contract (Step 2.1)
+# Experiment ID: month2_pilot_v1
+# Locked as operational default: 2026-11-16 (America/New_York)
+#
+# Defines the reduced comparison matrix and selection rules for the Month-2
+# pilot. This is a CONTRACT for future scripts/runners — no trainer, baseline
+# runner, or evaluator currently implements this file.
+#
+# Supervisor technical ratification is NOT implied by this file.
+# Enrico operational authorization (2026-11-16 conversation) allows preparing
+# and later executing work under these defaults; open scientific items remain
+# tracked in docs/month2/00_context_and_decisions.md.
+
+experiment_id: month2_pilot_v1
+experiment_date: '2026-11-16'
+status: operational_default_contract
+implementation_status: not_supported_by_runners_yet
+
+references:
+  operating_condition_split:
+    path: configs/splits/splits_interp_extrap.yaml
+    sha256: acb87bf95852e7849f88a270af8cbd211ad999d0039c35885232b7bc2a99e7b9
+  frame_protocol:
+    path: configs/splits/month2_frame_protocol.yaml
+    protocol_id: month2_frame_protocol_v1
+  observation_layouts_historical:
+    path: configs/masks/observation_layouts.yaml
+    sha256: a0344e87d5a98cd1203cc0e9b258aa0859e80659e2817877602328973fd1bbb1
+    note: Layout catalog from Month 1; Month-2 primary settings are restated below.
+  evaluation_protocol_historical:
+    path: configs/splits/evaluation_protocol.yaml
+    sha256: 85a5a2437ec6c2257a01931987907ef7129b9858a2546c9cb33bac8fc99a2950
+  decisions_register: docs/month2/00_context_and_decisions.md
+
+# ---------------------------------------------------------------------------
+# Primary observation / target contract
+# ---------------------------------------------------------------------------
+inputs:
+  temporal_mode: single_frame
+  velocity_components: planar_2C
+  channels:
+    temperature_target: 10
+    velocity_i: 11
+    velocity_j: 12
+    velocity_k_not_in_primary: 13
+  velocity_representation: co_located_vector_sites   # each site yields (vi, vj)
+  coordinates: deterministic_xy_meters
+  operating_parameters:
+    names: [nh3_fraction, phi]
+    nh3_fraction_range: [0.0, 1.0]
+    forbidden_as_predictive_shortcuts: [sim_id, condition_index, absolute_timestamp, split_label]
+  forbidden_implicit_fields: [OH, OH_star, species, density, heat_release]
+  notes:
+    - Channel 14 exported speed is not a trusted primary input.
+    - In 2C mode, only the planar norm from channels 11/12 may be derived; vk must not enter via 3D speed or hidden features.
+
+target:
+  field: Temperature
+  channel: 10
+  units: K
+  representation: raw_LES_grid_128x128
+  available_for_supervised_loss_and_evaluation: true
+  absent_from_temperature_free_inputs: true
+
+tasks:
+  temperature_free:
+    description: sparse/dense velocity (+ optional p) → full T; no T values in model inputs
+  temperature_assisted:
+    description: same velocity package + only K declared T anchors → full T
+    K_equals_0_must_match_temperature_free: true
+
+# ---------------------------------------------------------------------------
+# Sparse coverage and anchors
+# ---------------------------------------------------------------------------
+sparsity:
+  primary:
+    site_fraction: 0.05
+    n_sites_approx: 819          # round(0.05 * 128 * 128)
+    n_velocity_scalars_approx: 1638  # 819 sites * 2 components
+  coverage_controls:
+    fractions: [0.01, 0.05, 0.20]
+    n_sites_approx: [164, 819, 3277]
+    training_policy:
+      start_at_primary_5pct: true
+      multi_coverage_sampling: optional_single_preregistered_strategy
+      note: >
+        Distinguish coverage densities seen during training from evaluation at
+        held densities. Do not silently train only at 5% and claim 1%/20%
+        training exposure.
+    evaluation_policy:
+      evaluate_fixed_masks_at: [0.01, 0.05, 0.20]
+      same_observation_package_across_methods: true
+
+temperature_anchors:
+  primary_K: 9
+  nested_sweep_K: [0, 1, 4, 9, 16, 32]
+  nesting_rule: '1 ⊂ 4 ⊂ 9 ⊂ 16 ⊂ 32 from one shared permutation'
+  same_velocity_mask_for_K0_and_Kgt0: true
+  anchors_are_ideal_pointwise_synced_LES_T: true
+  not_yet_real_thermocouple_noise_model: true
+  evaluate_errors_off_anchor_and_at_anchors_separately: true
+
+conditioning:
+  primary_comparison: [p_off, p_on]
+  p_on_features: [nh3_fraction, phi]
+  unconditional_means_no_p_anywhere: true
+  initial_conditioning_mechanism_candidate: FiLM
+  note: Mechanism choice remains an open scientific item (D4); pilot requires an on/off comparison, not every mechanism.
+
+# ---------------------------------------------------------------------------
+# Masks and seeds
+# ---------------------------------------------------------------------------
+masks:
+  evaluation_masks:
+    shared_across_methods: true
+    independent_of_dataset_order_workers_and_model: true
+    generation: stable_seed_over_tuple
+    seed_tuple_fields: [mask_seed, sim_id, frame_index, layout_id, replica_id]
+    must_not_depend_on_target_T: true
+  training_masks:
+    random_layout_variation_with_reproducible_rng_per_epoch: true
+
+seeds:
+  model_seeds_screening: [0]
+  model_seeds_finalists_if_budget: [0, 1, 2]
+  mask_replica_ids_proposed: [0, 1, 2]
+  note: Model seeds and mask replicas are distinct axes; correlated frames are not independent replicates.
+
+# ---------------------------------------------------------------------------
+# Selection, metrics, cost
+# ---------------------------------------------------------------------------
+selection:
+  split: val
+  frame_set: val_eval
+  primary_metric: mean_over_conditions_of_full_field_RMSE_K
+  aggregation_order: frame_then_condition_then_split
+  tie_break: lower_reported_cost
+  also_report: [worst_condition_RMSE, seed_variation, regional_degradation]
+  forbidden_for_selection: [test_interp, test_extrap]
+  top25pct_iou_existing:
+    use_as_offset_invariant_shape_metric: false
+    reason: Thresholds prediction with P75 of true T; not offset-invariant.
+
+metrics_per_frame:
+  required:
+    - RMSE_K
+    - MAE_K
+    - NRMSE_using_fit_only_sigma_T
+    - signed_bias_K
+    - abs_bias_K
+    - centered_RMSE_K
+  identity_note: >
+    RMSE^2 = bias^2 + Centered-RMSE^2 holds per frame before averaging; do not
+    apply it to squares of table means.
+  regional_fixed_thresholds_K:
+    Omega_high: 2100.0
+    Omega_peak: 2200.0
+    Omega_jet_below: 1800.0
+  regional_reports: [regional_RMSE, IoU_Dice, region_extent_true_vs_pred]
+  empty_true_region: report_undefined_RMSE_with_zero_count_never_as_0K
+  cost_fields_required_in_run_cards:
+    - hardware
+    - fit_or_search_walltime
+    - peak_RAM_GB
+    - peak_VRAM_GB
+    - optimizer_updates_or_examples_seen
+    - parameter_count
+    - latency_batch1_full_field
+
+test_access:
+  selection_forbidden: true
+  evaluation_requires: month2_selection_freeze.json
+  historical_month1_test_numbers: documentary_reference_only
+
+# ---------------------------------------------------------------------------
+# Reduced comparison matrix (NOT a full Cartesian product)
+# ---------------------------------------------------------------------------
+comparison_matrix:
+  references:
+    models: [GlobalMean, ParamMean]
+    controlled_inputs: zero_sensors_p_off_or_on_as_declared
+  dense_diagnostic:
+    models: [LocalHGB_dense, UNet_compact_p_off_on]
+    controlled_inputs: full_grid_vi_vj_single_frame
+    ranking: outside_sparse_leaderboard
+  sparse_primary:
+    models: [GappyPOD, masked_UNet, GLU_minimal_deterministic]
+    controlled_inputs: planar_2C_at_5pct_K0_p_off_on
+  assisted_primary:
+    models: [best_neural_plus_AO, ParamMean_plus_AO, GappyPOD_plus_AO, GappyPOD_plus_Tblock]
+    controlled_inputs: same_5pct_velocity_p_from_VAL_K9
+  sweeps_without_new_family:
+    - finalist_free_plus_AO_and_baselines_over_nested_K
+    - K0_coverage_controls_at_1_5_20_pct
+  gated_extensions_not_activated:
+    velocity_3C:
+      activated: false
+      requires: explicit_gate_after_primary_2C_evidence
+    causal_3frame_window:
+      activated: false
+      window: [t-2, t-1, t]
+      target: T(t)
+      dt_seconds: 0.00025
+      requires: D7_and_result_driven_gate
+    learned_anchor_residual_head:
+      activated: false
+      requires: residual_structural_gap_after_AO_and_D6_gate
+
+# ---------------------------------------------------------------------------
+# Pseudo-extrapolation folds (development only; not new tests)
+# ---------------------------------------------------------------------------
+internal_pseudo_extrap_folds:
+  status: candidates_proposed_not_locked
+  max_folds: 2
+  geometry_rule: held_out_point_outside_convex_hull_of_remaining_TRAIN_in_nh3_phi
+  must_refit_per_fold: [normalizer, POD, ParamMean_or_priors, other_fit_objects]
+  no_performance_fitting_in_step_2_1: true
+  roadmap_examples_checked:
+    - sim_id: 20NH3_0.85.h5
+      convex_hull_status: on_boundary
+      valid_geometric_extrapolation: false
+      note: Lies on the edge between 0NH3_0.85 and 40NH3_0.85; not outside the remaining hull.
+    - sim_id: 80NH3_1.2.h5
+      convex_hull_status: outside
+      valid_geometric_extrapolation: true
+  proposed_pair:
+    fold_A:
+      held_out: 40NH3_0.85.h5
+      nh3_fraction: 0.40
+      phi: 0.85
+      convex_hull_status: outside
+      rationale: Lean frontier replacement for invalid 20NH3_0.85 roadmap example.
+    fold_B:
+      held_out: 80NH3_1.2.h5
+      nh3_fraction: 0.80
+      phi: 1.20
+      convex_hull_status: outside
+      rationale: Roadmap rich/high-NH3 example; outside remaining TRAIN hull.
+  scientific_lock: pending
+  note: >
+    Proposed only. Final fold choice may wait on a scientific decision; the
+    primary VAL/seen protocol does not depend on locking these folds.
+
+# ---------------------------------------------------------------------------
+# Resources (defaults, not verified allocations)
+# ---------------------------------------------------------------------------
+resources:
+  planned_host: Engaging
+  gpu_allocation_verified: false
+  proposed_pilot_gpu_hour_cap: 24
+  proposed_cap_status: ceiling_to_reassess_after_profiling
+  not_an_available_allocation: true
+
+artifacts_planned_not_yet_created:
+  - data/manifests/month2_frames.json
+  - data/manifests/month2_observations.json
+  - data/manifests/train_norm_stats_month2_fit.json
+  - configs/experiments/month2_selection_freeze.json

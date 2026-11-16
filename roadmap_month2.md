@@ -3,7 +3,7 @@
 **Progetto:** Neural Reconstruction of Hidden Temperature Fields from Sparse Observations in Turbulent Combustion  
 **Autore:** Enrico Bontempi — MSc Thesis, Deng Lab, MIT  
 **Preparata:** 2026-11-16, America/New_York (UTC−05:00)  
-**Stato:** **PROPOSTA OPERATIVA — non ancora approvata né eseguita.** Tutti gli step di implementazione/esperimento sotto sono aperti.  
+**Stato:** **autorizzata operativamente da Enrico** (conversazione 2026-11-16) come piano di lavoro; **Step 2.1 concretizzato** (protocollo frame + contratto pilota versionati). Gli step 2.2–2.9 restano aperti. **Nessuna ratifica tecnica documentata dei supervisori.** GPU/allocazione Engaging e stats fit-only non ancora verificati/calcolati.  
 **Fonti:** [proposal disponibile](docs/proposal.md), [Mese 1](roadmap_month1.md), [diario](docs/RESEARCH_LOG.md), [report LaTeX aggiornato](overleaf_month1_report/main.tex), [contesto verificato e decisioni](docs/month2/00_context_and_decisions.md).
 
 > **Limite di provenienza:** `documents_thesis/main.tex` è il report del Mese 1 del 15 novembre, identico alla copia sopra, non il proposal inviato il 13 novembre. Non ci sono altri sorgenti inclusi tramite `input/include`; è stata letta la bibliografia. L'identità fra `docs/proposal.md` e l'allegato inviato non è verificata. La ricognizione e le differenze accertabili sono nel [registro](docs/month2/00_context_and_decisions.md#1-provenienza-e-limite-sul-documento-inviato). Non modificare il proposal inviato per adeguarlo al piano.
@@ -77,17 +77,19 @@ Il risultato minimo del Mese 2 è una pipeline riproducibile, baseline qualifica
 
 ### Step 2.1 — Congelare domanda, protocollo e decisioni
 
-- **Stato:** `[ ] Proposto`; **classe:** I + S.
+- **Stato:** `[x] Concretizzato come default operativo (2026-11-16)`; **classe:** I + S.
+- **Cosa è stato chiuso qui:** protocollo frame versionato, contratto pilota versionato, registro D1–D9 aggiornato con autorizzazione Enrico vs assenza di ratifica supervisori, verifica geometrica dei fold, controlli YAML/conteggi.
+- **Cosa resta esplicitamente pendente (non spuntato come “approvato dai supervisori”):** ratifica tecnica Deng Lab; D1 provenienza allegato; lock scientifico finale dei fold; verifica GPU/allocazione Engaging; rivalutazione del tetto 24 GPU-ore dopo profiling; calcolo stats fit-only (Step 2.2).
 - **Problema:** quali risultati sono affidabili e quali scelte restano ipotesi? Senza questo passaggio gli agenti possono implementare tre architetture “raccomandate” come se fossero approvate.
-- **Motivazione/dipendenze:** chiudere la parte decisionale aperta dello Step 1.6. Riferimenti e discrepanze sono già raccolti nel registro; non occorre ricominciare l'audit del dataset.
-- **Attività concrete:**
-  1. Registrare D1–D9 con i supervisori/Enrico, distinguendo vincoli accettati, default provvisori e attività rinviate. Risolvere l'identità del proposal quando disponibile; annotare eventuali differenze senza riscrivere l'originale.
-  2. Tradurre il contratto sopra in una configurazione pilota versionata: frame, subset, input 2C, K, p on/off, maschere, metriche, seeds e regola di selezione.
-  3. Definire al massimo due fold di bordo interni a TRAIN per un controllo pseudo-extrap: ad esempio escludere `20NH3_0.85.h5` e, in un fold separato, `80NH3_1.2.h5`. Verificare l'effettiva posizione fuori dall'inviluppo residuo. Sono sviluppo interno, non nuovi test. Nessuna ricerca estesa su questi fold nel pilot.
-  4. Approvare il budget dopo il profiling: proposta di tetto iniziale **24 GPU-ore complessive**, frazione per run e ricerca dichiarata; se insufficiente ridurre la suite o rinviare estensioni, non abbassare solo la qualità del concorrente.
-- **Output attesi:** aggiornamento di `docs/month2/00_context_and_decisions.md`; futuro `configs/experiments/month2_pilot.yaml` e `configs/splits/month2_frame_protocol.yaml` con ID/hash; entry nel diario.
-- **Verifiche/completamento:** nessun “approved” privo di fonte; ogni contrasto con la proposta esplicitato; budget e matrice primaria finiti. Il piano può restare proposto mentre si prepara infrastruttura, ma i run non precedono le decisioni pertinenti.
-- **Passaggio:** protocollo tecnico sufficiente per 2.2; ratifica delle decisioni applicabili prima di 2.3–2.8 sperimentali.
+- **Motivazione/dipendenze:** chiudere la parte decisionale operativa aperta dello Step 1.6 lato protocollo. Riferimenti e discrepanze sono già raccolti nel registro; non occorre ricominciare l'audit del dataset.
+- **Attività concrete (eseguite in 2.1):**
+  1. Registrati D1–D9 distinguendo autorizzazione Enrico, default operativi, verifiche tecniche pendenti ed estensioni rinviate; conservata l’assenza di ratifica supervisori documentata. Provenienza proposal lasciata come limite dichiarato, non bloccante.
+  2. Creati `configs/splits/month2_frame_protocol.yaml` (`month2_frame_protocol_v1`) e `configs/experiments/month2_pilot.yaml` (`month2_pilot_v1`).
+  3. Verificati gli esempi fold: `20NH3_0.85.h5` è **on_boundary** (non estrapolazione geometrica); `80NH3_1.2.h5` è **outside**. Proposta alternativa lean `40NH3_0.85.h5` + `80NH3_1.2.h5` (non locked). Nessun fitting sui fold.
+  4. Budget: tetto **24 GPU-ore** registrato come ceiling proposto da rivalutare col profiling; Engaging host previsto; GPU/allocazione non verificate.
+- **Output:** `docs/month2/00_context_and_decisions.md` aggiornato; YAML sopra; entry nel diario.
+- **Verifiche/completamento:** parsing YAML OK; conteggi frame e disgiunzione fit/seen OK; nessun claim di normalizzazione Mese 2 già calcolata; nessun “approved supervisori” inventato.
+- **Passaggio:** protocollo tecnico sufficiente per 2.2; i run scientifici 2.3–2.8 restano subordinati a risorse verificate e alle decisioni applicabili ancora aperte.
 
 ### Step 2.2 — Rendere la pipeline adatta al training e alla verifica del leakage
 
@@ -234,7 +236,7 @@ Non replicare tre seed per ogni riga di ricerca iperparametrica. Ripetere i fina
 
 ## Checklist di completamento della fase
 
-- [ ] 2.1 — Protocollo e decisioni applicabili registrati, provenienza del proposal chiarita o limite esplicito mantenuto.
+- [x] 2.1 — Protocollo pilota e default operativi versionati; autorizzazione Enrico registrata; limite proposal e assenza ratifica supervisori espliciti; fold geometricamente verificati (lock scientifico fold ancora aperto). Non implica GPU verificate né stats fit-only già calcolate.
 - [ ] 2.2 — Pipeline reale verificata, fit-only per frame/fold, input isolation e memoria controllata.
 - [ ] 2.3 — Baseline qualificate sulle osservazioni primarie, tabelle/costi riproducibili.
 - [ ] 2.4 — Primo neurale denso valido e confronto seen/VAL; optional temporale deciso separatamente.

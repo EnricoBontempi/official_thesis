@@ -1,0 +1,157 @@
+# Month 2 frame protocol (Step 2.1)
+# Protocol ID: month2_frame_protocol_v1
+# Locked: 2026-11-16 (America/New_York)
+#
+# This file defines which time indices are used for fit / seen diagnostics /
+# evaluation. It does NOT change the operating-condition split.
+# Frame indices are zero-based and inclusive of the listed endpoints.
+# Slice notation start:stop:step uses a Python-exclusive stop (last kept index
+# is the greatest i = start + k*step with i < stop).
+#
+# Status: protocol contract for future Month-2 runners. No runner currently
+# implements this file; Month-2 fit-only normalizers are NOT computed yet.
+
+protocol_id: month2_frame_protocol_v1
+protocol_date: '2026-11-16'
+status: operational_default_for_pipeline_work
+
+# Reference split of entire operating conditions (unchanged).
+operating_condition_split:
+  path: configs/splits/splits_interp_extrap.yaml
+  sha256: acb87bf95852e7849f88a270af8cbd211ad999d0039c35885232b7bc2a99e7b9
+  partition_rule: entire_operating_condition_withholding
+  n_conditions:
+    train: 20
+    val: 3
+    test_interp: 3
+    test_extrap: 4
+  note: >
+    Do not rewrite sim_id membership. Month-2 work reuses this locked split.
+
+trajectory:
+  n_frames_per_condition: 2001   # indices 0 .. 2000 inclusive
+  dt_seconds: 0.00025            # 4000 Hz
+  indexing: zero_based_inclusive_listed_endpoints
+
+# Primary common frame tranche for Month 2.
+frames:
+  train_fit:
+    role: fitting_and_supervised_training
+    applies_to_splits: [train]
+    slice: '0:1481:40'           # 0, 40, ..., 1480
+    start: 0
+    stop_exclusive: 1481
+    step: 40
+    first_index: 0
+    last_index: 1480
+    n_per_condition: 38
+    n_total_train_conditions: 760   # 20 * 38
+    description: >
+      Sole frame subset used to fit Month-2 normalizers, POD, ParamMean/priors,
+      and to train models in the primary pilot. Distinct from seen_train_eval.
+
+  seen_train_eval:
+    role: temporal_diagnostics_on_same_trajectory
+    applies_to_splits: [train]
+    slice: '1600:2001:40'        # 1600, 1640, ..., 2000
+    start: 1600
+    stop_exclusive: 2001
+    step: 40
+    first_index: 1600
+    last_index: 2000
+    n_per_condition: 11
+    n_total_train_conditions: 220  # 20 * 11
+    gap_after_last_fit_frames: 120  # 1600 - 1480
+    description: >
+      Later block of the SAME trajectory per TRAIN condition. Used only for
+      temporal generalization diagnostics. Never mixed into fit-only statistics
+      for the primary protocol. Subsampling does not imply independence.
+
+  val_eval:
+    role: model_and_hyperparameter_selection
+    applies_to_splits: [val]
+    slice: '0:2001:50'           # 0, 50, ..., 2000
+    start: 0
+    stop_exclusive: 2001
+    step: 50
+    first_index: 0
+    last_index: 2000
+    n_per_condition: 41
+    n_total_val_conditions: 123    # 3 * 41
+    description: >
+      Validation frames for checkpoint / tuning selection. Selection metric is
+      defined in configs/experiments/month2_pilot.yaml.
+
+  test_interp_eval:
+    role: frozen_evaluation_only
+    applies_to_splits: [test_interp]
+    slice: '0:2001:50'
+    start: 0
+    stop_exclusive: 2001
+    step: 50
+    first_index: 0
+    last_index: 2000
+    n_per_condition: 41
+    n_total_test_interp_conditions: 123  # 3 * 41
+    access: requires_month2_selection_freeze
+    description: >
+      Future TEST_INTERP evaluation uses this frame schedule. Forbidden for
+      selection / tuning. Accessible only after a selection freeze artifact.
+
+  test_extrap_eval:
+    role: frozen_evaluation_only
+    applies_to_splits: [test_extrap]
+    slice: '0:2001:50'
+    start: 0
+    stop_exclusive: 2001
+    step: 50
+    first_index: 0
+    last_index: 2000
+    n_per_condition: 41
+    n_total_test_extrap_conditions: 164  # 4 * 41
+    access: requires_month2_selection_freeze
+    description: >
+      Future TEST_EXTRAP evaluation uses this frame schedule. Forbidden for
+      selection / tuning. Accessible only after a selection freeze artifact.
+
+constraints:
+  train_fit_and_seen_disjoint: true
+  no_overlap_verified: true
+  historical_month1_normalizer:
+    path: data/manifests/train_norm_stats.json
+    sha256: 37bf7e8579812930d37e816d1689b89a3a91666e56af66d24b08fd958cfa9b76
+    note: >
+      Month-1 artifact fitted on all TRAIN frames (including future seen indices).
+      Keep as historical reference only; do not treat as Month-2 fit-only stats.
+  month2_fit_only_normalizer:
+    planned_path: data/manifests/train_norm_stats_month2_fit.json
+    status: not_computed
+    fit_frames: train_fit
+    fit_conditions: train_split_sim_ids_only
+    note: >
+      To be produced in Step 2.2 from train_fit frames only. This protocol does
+      not compute or claim those statistics.
+
+# Rules for preprocessing objects that depend on condition membership.
+fit_only_rules:
+  primary_protocol:
+    normalizer: fit on train_fit frames of all 20 TRAIN conditions
+    pod_modes: fit on train_fit frames of all 20 TRAIN conditions
+    param_mean_prior: fit on train_fit frames of all 20 TRAIN conditions
+    forbidden: >
+      Using seen_train_eval, VAL, or TEST frames/conditions for fitting these
+      objects under the primary protocol.
+  internal_pseudo_extrap_folds:
+    status: proposed_candidates_only
+    rule: >
+      For each fold that holds out one TRAIN condition, refit normalizer, POD,
+      ParamMean/priors, and any learned preprocessing on the remaining TRAIN
+      conditions' train_fit frames only. The global 20-condition Month-2
+      normalizer is NOT fit-only for that fold.
+    geometry_check: convex_hull_in_nh3_phi_space
+    performance_eval_in_step_2_1: false
+
+notes:
+  - Subsampling does not make frames statistically independent.
+  - Increasing frame density requires a new protocol version and rematched retraining.
+  - This file is a contract for subsequent pipeline work, not an implemented loader.

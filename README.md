@@ -4,7 +4,8 @@
 **Host Group:** Deng Lab, Massachusetts Institute of Technology (MIT)  
 **Thesis Proposal:** [docs/proposal.md](docs/proposal.md)  
 **Month 1 Roadmap:** [roadmap_month1.md](roadmap_month1.md)  
-**Month 2 Roadmap:** [roadmap_month2.md](roadmap_month2.md) — proposed; approval and execution tracked separately  
+**Month 2 Roadmap:** [roadmap_month2.md](roadmap_month2.md) — operationally authorized by Enrico (2026-11-16); Step 2.1 protocol concretized; supervisor technical ratification tracked separately  
+**Month 2 Protocol:** [configs/splits/month2_frame_protocol.yaml](configs/splits/month2_frame_protocol.yaml), [configs/experiments/month2_pilot.yaml](configs/experiments/month2_pilot.yaml)  
 **Research Log:** [docs/RESEARCH_LOG.md](docs/RESEARCH_LOG.md)  
 **Current Evidence & Open Decisions:** [docs/month2/00_context_and_decisions.md](docs/month2/00_context_and_decisions.md)
 
@@ -19,7 +20,7 @@ This repository contains the codebase, experimental configurations, data audit p
 - `external/GLU_Reconstruction/`: **Untouched upstream reference implementation** of **GLU** (`arXiv:2603.26023`, [cosmos2w/GLU_Reconstruction](https://github.com/cosmos2w/GLU_Reconstruction)) provided by the Deng Lab authors. Kept strictly unmodified as the laboratory reference baseline; all thesis-specific adaptations live in `src/combustion_recon/`.
 - `configs/`: Locked operating-condition splits (`splits_interp_extrap.yaml`), evaluation protocol, and observation layouts.
 - `docs/month1/` & `overleaf_month1_report/`: Month 1 audit reports, baseline feasibility study, and LaTeX progress report.
-- `docs/month2/` & `roadmap_month2.md`: Verified transition context, open supervisor decisions, and the proposed operational plan; future experiment outputs are not yet implemented.
+- `docs/month2/` & `roadmap_month2.md`: Verified transition context, decision register, and operational Month-2 plan. Step 2.1 protocol configs live under `configs/splits/` and `configs/experiments/`; pipeline and experiment outputs from Step 2.2 onward are not yet implemented.
 - `scripts/` & `tests/`: Reproducible execution scripts and automated `pytest` guardrails.
 
 ### Key Scientific Constraints
