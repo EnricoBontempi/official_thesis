@@ -1,108 +1,172 @@
 # Month 2 — Pipeline validation (Step 2.2)
 
-**Date:** 2026-11-16 (America/New_York)  
-**Host:** local WSL workspace. Engaging GPU/allocation **not verified**.  
-**Base commit before this step:** `5bce7142d7dbaf9e5ea6bc1e3c8dffe75e066ce9`
+**Date:** 2026-11-16 12:33:27 -0500
+**Host:** local workspace (WSL). Engaging GPU/allocation **not verified**.
+**Commit base expected:** `5bce7142d7dbaf9e5ea6bc1e3c8dffe75e066ce9`
 
-## How to use
+## Environment
+- CPU count: 16
+- RAM available (from /proc or free): None GiB
+- Disk free on workspace: None GiB
+- Raw shards: `/home/enric/projects/official_thesis/data/raw/combustion/hf_dataset/numerical` exists=True, n=30
+- Peak RSS observed during this script (MB): 6482.6
 
-```bash
-# Rebuild manifests + fit-only stats and validate (CPU, uses local shards)
-python scripts/05_validate_month2_pipeline.py --write-artifacts
-
-# Or validate against already written artifacts
-python scripts/05_validate_month2_pipeline.py --validate-only
-
-# Unit tests
-python -m pytest tests/ -q
-```
-
-Minimal programmatic usage:
-
-```python
-from combustion_recon.data.month2_dataset import Month2ReconDataset
-from combustion_recon.data.month2_normalizer import Month2FitOnlyNormalizer
-from combustion_recon.data.collate import collate_month2_batch
-from torch.utils.data import DataLoader
-
-norm = Month2FitOnlyNormalizer("data/manifests/train_norm_stats_month2_fit.json")
-ds = Month2ReconDataset("train_fit", task_mode="temperature_free", K=0, p_conditioning=False, normalizer=norm)
-loader = DataLoader(ds, batch_size=2, collate_fn=lambda xs: collate_month2_batch(xs))
-batch = next(iter(loader))  # batch["model_inputs"], batch["targets"], batch["metadata"]
-```
-
-Pass **only** `batch["model_inputs"]` into future models. TEST roles require a selection freeze (`allow_test_payloads=True` + valid freeze JSON).
-
-## Environment (measured)
-
-| Quantity | Value |
-|---|---|
-| CPUs | 16 |
-| RAM available | ~24 GiB (`MemAvailable`) |
-| Disk free on workspace | ~819–879 GiB |
-| Raw shards | `data/raw/combustion/hf_dataset/numerical`, 30× `.arrow`, ~59 GiB |
-| Engaging / GPU | **not verified** |
-
-## Artifacts
-
-- `data/manifests/train_norm_stats_month2_fit.json` — fit-only on 20×38 `train_fit` frames
-- `data/manifests/month2_frames.json` — role recipes + counts (TEST indices metadata-only)
-- `data/manifests/month2_observations.json` — numeric mask seeds + verified hashes
-- `data/manifests/month2_pipeline_validation_summary.json` — machine-readable PASS summary
-- Month-1 `data/manifests/train_norm_stats.json` **unchanged** (sha256 `37bf7e8579812930d37e816d1689b89a3a91666e56af66d24b08fd958cfa9b76`)
+## Artifacts written
+- `data/manifests/train_norm_stats_month2_fit.json`
+- `data/manifests/month2_frames.json`
+- `data/manifests/month2_observations.json`
+- `docs/month2/01_pipeline_validation.md`
 
 ## Frame counts
+```json
+{
+  "train_fit": {
+    "n_samples": 760,
+    "n_conditions": 20,
+    "n_frames_per_condition": 38,
+    "split": "train",
+    "payload_access": "allowed"
+  },
+  "seen_train_eval": {
+    "n_samples": 220,
+    "n_conditions": 20,
+    "n_frames_per_condition": 11,
+    "split": "train",
+    "payload_access": "allowed"
+  },
+  "val_eval": {
+    "n_samples": 123,
+    "n_conditions": 3,
+    "n_frames_per_condition": 41,
+    "split": "val",
+    "payload_access": "allowed"
+  },
+  "test_interp_eval": {
+    "n_samples": 123,
+    "n_conditions": 3,
+    "n_frames_per_condition": 41,
+    "split": "test_interp",
+    "payload_access": "requires_selection_freeze"
+  },
+  "test_extrap_eval": {
+    "n_samples": 164,
+    "n_conditions": 4,
+    "n_frames_per_condition": 41,
+    "split": "test_extrap",
+    "payload_access": "requires_selection_freeze"
+  }
+}
+```
 
-| Role | Conditions | Frames/cond | Samples | Payload |
-|---|---:|---:|---:|---|
-| train_fit | 20 | 38 | 760 | allowed |
-| seen_train_eval | 20 | 11 | 220 | allowed (diagnostics) |
-| val_eval | 3 | 41 | 123 | allowed |
-| test_interp_eval | 3 | 41 | 123 | freeze required |
-| test_extrap_eval | 4 | 41 | 164 | freeze required |
+## Fit-only stats
+- Path: `data/manifests/train_norm_stats_month2_fit.json`
+- Conditions: 20
+- Frames/condition: 38
+- Temperature mean/std (K): 2039.508661 / 331.737843
+- Month-1 stats file preserved: True
+- Independent subset mean/std abs diff: 4.547e-13 / 2.842e-14
 
-`train_fit` ∩ `seen_train_eval` = ∅; gap 1480 → 1600 = 120 frames.
+## Real-data batch check
+```json
+{
+  "sample0_sim_id": "0NH3_0.85.h5",
+  "sample0_frame": 0,
+  "n_train_fit": 760,
+  "coord_match_raw": true,
+  "temperature_match_raw": true,
+  "velocity_sites_match_raw": true,
+  "denorm_roundtrip_ok": true,
+  "batch_keys": [
+    "K",
+    "anchor_coords",
+    "anchor_site_index",
+    "anchor_valid",
+    "anchor_values",
+    "dense_channel_names",
+    "dense_values",
+    "mask_temperature",
+    "mask_velocity",
+    "query_coords",
+    "scalar_coords",
+    "scalar_valid",
+    "scalar_values",
+    "scalar_var_ids",
+    "site_fraction",
+    "task_mode",
+    "velocity_coords",
+    "velocity_site_index",
+    "velocity_valid",
+    "velocity_values"
+  ],
+  "batch_velocity_valid_shape": [
+    2,
+    819
+  ],
+  "dataloader_workers": 2,
+  "dataloader_batch_wall_s": 16.587583541870117,
+  "rss_mb_before_loader": 6482.5546875,
+  "rss_mb_after_loader": 6482.5546875,
+  "store_stats": {
+    "shard_decodes": 1,
+    "cache_hits": 1,
+    "cache_misses": 1,
+    "frames_materialized": 1
+  },
+  "compact_cache_frames": 1,
+  "compact_cache_bytes_est": 262144,
+  "test_access_denied_without_freeze": true,
+  "evaluator_rmse_mean_predictor": 242.66588055932934,
+  "selection_table_rows": 1,
+  "p_off_has_op_params": false,
+  "vk_in_model_inputs": false
+}
+```
 
-## Fit-only statistics
-
-- Temperature mean/std (K): **2039.508661 / 331.737843** (unclipped)
-- Velocity_i / Velocity_j included; vk not used as 2C input
-- Independent subset recomputation abs diff mean/std: ~1e-13 / ~1e-14
-- Fold-capable: normalizer accepts reduced `sim_ids` (synthetic test); no fold fitting performed
-
-## Real-data checks (PASS)
-
-- Sample0 `0NH3_0.85.h5` frame 0: coordinates, T, and observed velocity sites match the Arrow shard
-- Denormalization round-trip OK
-- DataLoader `batch_size=2`, `num_workers=2`, collate validity masks OK (~16 s first batch including worker start/decode)
-- `p_off` omits `op_params`; no `velocity_k` in `model_inputs`
-- TEST payload access denied without freeze
-- Evaluator smoke (constant mean predictor) + frame→condition→split aggregation OK
-- Isolation tests (free T change, assisted off-anchor T, hidden velocity, vk, p_off): PASS
-
-## Memory / I/O
-
-| Layer | Observation |
-|---|---|
-| Arrow decode | ~2.1 GiB peak per full numerical blob (tracemalloc earlier probe) |
-| Compact LRU cache | only extracted frames (4×128×128 float32 ≈ 256 KiB/frame); after validation ~1 frame cached |
-| Script peak RSS | ~**6483 MiB** during validation with DataLoader workers (host-level; includes decode + worker copies) |
-| Persistent extras | **none** — no 59 GiB conversion written |
-
-Implementation keeps at most one shard decode transiently and discards the full array after compact extract. Host RAM must still tolerate ~2 GiB decode spikes (more with multiple workers).
-
-## Tests executed
-
-- Full suite: **43 passed** (`pytest tests/ -q`)
-- Includes Month-1 regression tests + new Month-2 pipeline/isolation tests
-- No skipped real-data tests once stats artifacts exist
+## Memory / I/O notes
+- Arrow full-trajectory decode peaks near ~2.1 GiB per shard (float32 numerical blob).
+- Month-2 store keeps only compact T+vi+vj(+vk) frames in an LRU cache; full arrays are discarded after extract.
+- Compact cache estimate after validation: 262144 bytes (1 frames).
+- No persistent heavy conversion of the 59 GiB dataset was created.
 
 ## Limits / not claimed
+- Engaging access/GPU allocation not verified in this step.
+- No baseline/POD/ParamMean fitting, no neural training.
+- U-Net/GLU forward isolation still to be repeated when models exist (probe only).
+- Pseudo-extrap folds not fitted; fold lock still open.
 
-- Engaging access, GPU allocation, and the 24 GPU-hour ceiling remain unverified/unallocated
-- No baseline/POD/ParamMean refit, no neural training
-- `InputIsolationProbe` is **not** a U-Net/GLU forward validation
-- Pseudo-extrap folds not fitted; scientific fold lock still open
-- Month-1 `CombustionReconDataset` left in place for historical scripts; new work should use the Month-2 path
+## Overall status (primary path, 2026-11-16 initial Step 2.2): **PASS**
 
-## Overall status: **PASS (local Step 2.2)**
+---
+
+## Corrective API guards (post-`1fc150f`, before Step 2.3)
+
+These harden **misuse of the API**; they are not a new reconstruction result. The primary real-data path above remains the evidence for batch correctness.
+
+### 1. Role membership (`build_index`)
+- Custom `sim_ids` must be a unique subset of the role’s operating-condition split (TRAIN subsets allowed for folds).
+- TEST IDs on `train_fit` / `seen_train_eval` now raise `RoleMembershipError` **before** any shard I/O.
+- Covered by `tests/test_month2_api_guards.py`.
+
+### 2. Fit-only stats provenance
+- Production `Month2FitOnlyNormalizer` verifies: full TRAIN set (unless fold `expected_sim_ids`), exact `train_fit` frame indices, `splits_sha256`, finite/positive field std, and **`protocol_scientific_sha256`** (binds `protocol_id` + split ref + frames; ignores descriptive YAML churn).
+- Full-file `protocol_sha256` may differ after status-only YAML edits; that mismatch alone does **not** invalidate numbers. Existing field statistics were **not** recomputed; meta was patched with the scientific fingerprint.
+- `compute_month2_fit_stats` validates TRAIN membership and canonical frames before reads; non-canonical frames require explicit `provenance_mode='debug_subset'` (rejected by production normalizer unless `allow_noncanonical_frame_indices=True`).
+
+### 3. Aggregation homogeneity
+- `aggregate_frame_then_condition_then_split` refuses mixed `role` / method / p / K / coverage / seeds when those keys are present (`MixedConfigurationError`).
+- Call **once per configuration**. `train_fit` and `seen_train_eval` are not fused via shared `split=train`.
+- Mean order: frame → `(split, sim_id)` → split; selection helper is eligible only for `val_eval`.
+- Month-1 `evaluate_per_condition` unchanged for direct callers.
+
+### 4. Prefetch I/O (small control, not a full scan)
+| Path | `shard_decodes` for 5 frames of one TRAIN traj |
+|---|---|
+| `prefetch` then `get_frame` | **1** |
+| Naive `get_frame` loop with `max_cached_frames=1` (3 frames) | **3** |
+
+Runner implication for Step 2.3: warm with `prefetch(sim_id, needed_frames)` and set `max_cached_frames` ≥ frames/trajectory needed (e.g. ≥38 for `train_fit`) to avoid re-decoding.
+
+### Suite after guards
+- **55 passed** (`pytest tests/`)
+- `--validate-only` **PASS** (no heavy stats recompute)
+

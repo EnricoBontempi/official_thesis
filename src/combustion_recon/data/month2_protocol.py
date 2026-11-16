@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import hashlib
+import json
 from pathlib import Path
-from typing import Any, Iterable, Literal
+from typing import Any, Iterable, Literal, Sequence
 
 import yaml
 
@@ -25,6 +26,10 @@ FrameRole = Literal[
 ]
 
 TEST_ROLES: frozenset[FrameRole] = frozenset({"test_interp_eval", "test_extrap_eval"})
+
+
+class RoleMembershipError(ValueError):
+    """Raised when sim_ids are incompatible with a frame role's operating-condition split."""
 
 
 def sha256_file(path: Path) -> str:
@@ -62,6 +67,23 @@ def load_frame_protocol(path: str | Path | None = None) -> dict[str, Any]:
     return cfg
 
 
+def scientific_protocol_fingerprint(protocol: dict[str, Any]) -> str:
+    """Hash of scientifically binding protocol fields only.
+
+    Excludes status/notes so descriptive YAML edits do not silently invalidate
+    fit-only stats. Binding fields: protocol_id, operating_condition_split ref,
+    and the frames block.
+    """
+    payload = {
+        "protocol_id": protocol.get("protocol_id"),
+        "operating_condition_split": protocol.get("operating_condition_split"),
+        "frames": protocol.get("frames"),
+        "trajectory": protocol.get("trajectory"),
+    }
+    raw = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(raw).hexdigest()
+
+
 def frames_for_role(protocol: dict[str, Any], role: FrameRole) -> list[int]:
     spec = protocol["frames"][role]
     frames = expand_frame_slice(spec["start"], spec["stop_exclusive"], spec["step"])
@@ -84,6 +106,57 @@ def split_name_for_role(role: FrameRole) -> str:
     }[role]
 
 
+def validate_sim_ids_for_role(
+    role: FrameRole,
+    sim_ids: Sequence[str],
+    *,
+    splits: dict[str, list[str]] | None = None,
+    splits_path: str | Path | None = None,
+) -> list[str]:
+    """Ensure sim_ids are a unique subset of the role's operating-condition split.
+
+    No payload I/O. Raises RoleMembershipError on unknown, foreign-split, or
+    duplicate IDs. TRAIN subsets are allowed for future folds.
+    """
+    splits = splits if splits is not None else load_splits(splits_path)
+    split = split_name_for_role(role)
+    allowed = list(splits[split])
+    allowed_set = set(allowed)
+    ids = list(sim_ids)
+    if not ids:
+        raise RoleMembershipError(f"Role {role}: empty sim_ids")
+    seen: set[str] = set()
+    dups: list[str] = []
+    unknown: list[str] = []
+    for sid in ids:
+        if sid in seen:
+            dups.append(sid)
+        seen.add(sid)
+        if sid not in allowed_set:
+            unknown.append(sid)
+    if dups:
+        raise RoleMembershipError(
+            f"Role {role}: duplicate sim_ids not allowed: {sorted(set(dups))}"
+        )
+    if unknown:
+        # Classify whether they belong to another split (vs totally unknown)
+        elsewhere = {}
+        all_known = {s for xs in splits.values() for s in xs}
+        for sid in unknown:
+            if sid not in all_known:
+                elsewhere[sid] = "unknown"
+            else:
+                for sn, xs in splits.items():
+                    if sid in xs:
+                        elsewhere[sid] = sn
+                        break
+        raise RoleMembershipError(
+            f"Role {role} requires sim_ids ⊆ {split} split; "
+            f"incompatible={elsewhere}"
+        )
+    return ids
+
+
 def build_index(
     role: FrameRole,
     *,
@@ -93,13 +166,17 @@ def build_index(
 ) -> list[dict[str, Any]]:
     """Build a list of sample identity dicts for a frame role.
 
-    Does not read field payloads. Test roles are indexable for manifests but
-    payload access is gated elsewhere.
+    Does not read field payloads. Custom ``sim_ids`` must be a unique subset of
+    the role's split (TRAIN subsets allowed for folds). Test roles are
+    indexable for manifests but payload access is gated elsewhere.
     """
     protocol = protocol if protocol is not None else load_frame_protocol()
     splits = load_splits(splits_path)
     split = split_name_for_role(role)
-    ids = list(sim_ids) if sim_ids is not None else list(splits[split])
+    if sim_ids is None:
+        ids = list(splits[split])
+    else:
+        ids = validate_sim_ids_for_role(role, list(sim_ids), splits=splits)
     frames = frames_for_role(protocol, role)
     out: list[dict[str, Any]] = []
     for sid in ids:

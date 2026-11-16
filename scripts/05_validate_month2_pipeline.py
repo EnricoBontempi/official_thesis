@@ -78,11 +78,9 @@ def write_stats() -> dict[str, Any]:
         sim_ids=train_ids,
         frame_indices=frames,
         store=store,
-        protocol_id=protocol["protocol_id"],
-        protocol_path=str(FRAME_PROTOCOL.relative_to(ROOT)),
-        protocol_sha256=sha256_file(FRAME_PROTOCOL),
-        splits_path=str(SPLITS.relative_to(ROOT)),
-        splits_sha256=sha256_file(SPLITS),
+        protocol_path=FRAME_PROTOCOL,
+        splits_path=SPLITS,
+        provenance_mode="production",
     )
     stats["meta"]["wall_time_s"] = time.time() - t0
     stats["meta"]["peak_rss_mb_during_fit_approx"] = rss_mb()
@@ -124,11 +122,7 @@ def independent_stats_check(stats: dict[str, Any], n_conditions: int = 2, n_fram
         sim_ids=sim_ids,
         frame_indices=frames,
         store=ShardStore(raw_dir=RAW, max_cached_frames=128),
-        protocol_id=stats["meta"]["protocol_id"],
-        protocol_path=stats["meta"]["protocol_path"],
-        protocol_sha256=stats["meta"]["protocol_sha256"],
-        splits_path=stats["meta"]["splits_path"],
-        splits_sha256=stats["meta"]["splits_sha256"],
+        provenance_mode="debug_subset",  # explicit non-canonical frame subset for I/O check only
     )
     return {
         "subset_sim_ids": sim_ids,

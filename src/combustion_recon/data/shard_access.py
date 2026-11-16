@@ -5,6 +5,20 @@ Full numerical trajectories are ~2 GB float32 each. This module:
 - decodes at most one shard at a time when materializing frames;
 - retains only requested channels/frames in a compact float32 cache;
 - never keeps a durable full-trajectory dict like the Month-1 loader.
+
+I/O contract for runners (Step 2.3+)
+------------------------------------
+``get_frame(sim_id, frame)`` on a cache miss decodes the **entire** Arrow
+numerical blob once for that call. Repeated ``get_frame`` for many frames of
+the same trajectory without warming the cache therefore costs one decode per
+miss (not per unique shard overall).
+
+**Supported efficient path:** call ``prefetch(sim_id, frame_indices)`` so all
+requested frames of that trajectory are extracted in **one** decode, then use
+``get_frame`` (cache hits). Size ``max_cached_frames`` to hold at least one
+trajectory's needed frames (e.g. 38 for ``train_fit``) if you want subsequent
+random access without re-decoding. Counters: ``stats['shard_decodes']``,
+``cache_hits``, ``cache_misses``, ``frames_materialized``.
 """
 
 from __future__ import annotations
@@ -141,7 +155,11 @@ class ShardStore:
             return frame
 
     def prefetch(self, sim_id: str, frame_indices: Iterable[int]) -> None:
-        """Decode a shard once and cache many frames (used for fit-stats / compact warm-up)."""
+        """Decode a shard **once** and cache many frames (supported multi-frame path).
+
+        Prefer this over a loop of ``get_frame`` on cold cache when several
+        frames of the same ``sim_id`` are needed (fit stats, epoch warm-up).
+        """
         frames = sorted({int(f) for f in frame_indices})
         with self._lock:
             missing = [f for f in frames if (sim_id, f) not in self._frame_cache]

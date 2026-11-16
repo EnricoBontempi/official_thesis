@@ -93,8 +93,8 @@ Il risultato minimo del Mese 2 è una pipeline riproducibile, baseline qualifica
 
 ### Step 2.2 — Rendere la pipeline adatta al training e alla verifica del leakage
 
-- **Stato:** `[x] Implementato e verificato su dati reali locali (2026-11-16)`; **classe:** I.
-- **Cosa è chiuso qui:** percorso Month-2 isolato (`Month2ReconDataset` + `ShardStore` compact LRU), frame roles, stats fit-only, manifest, collate, evaluator Kelvin, gate TEST, test di isolamento + batch reale CPU.
+- **Stato:** `[x] Implementato, verificato su dati reali locali, e correttivo API completato (2026-11-16)`; **classe:** I.
+- **Cosa è chiuso qui:** percorso Month-2 isolato (`Month2ReconDataset` + `ShardStore` compact LRU), frame roles, stats fit-only, manifest, collate, evaluator Kelvin, gate TEST, test di isolamento + batch reale CPU; **poi** membership ruoli, provenance stats (scientific hash), aggregazione omogenea, prefetch I/O documentato.
 - **Cosa resta pendente / non spuntato:** Engaging GPU/allocazione non verificati; picco RSS locale dominato dal decode Arrow (~2 GiB/shard, ~6.5 GiB osservati con DataLoader workers); fold non fitted; U-Net/GLU ancora assenti (probe ≠ validazione forward modelli).
 - **Problema:** il loader Month-1 indicizza/carica in modo non adatto al training sicuro. Il percorso Month-2 lo sostituisce per il lavoro successivo senza alterare gli artefatti storici.
 - **Motivazione/dipendenze:** contratto 2.1; non richiede scegliere GLU.
@@ -239,7 +239,7 @@ Non replicare tre seed per ogni riga di ricerca iperparametrica. Ripetere i fina
 ## Checklist di completamento della fase
 
 - [x] 2.1 — Protocollo pilota e default operativi versionati; autorizzazione Enrico registrata; limite proposal e assenza ratifica supervisori espliciti; fold geometricamente verificati (lock scientifico fold ancora aperto). Non implica GPU verificate né stats fit-only già calcolate.
-- [x] 2.2 — Pipeline Month-2 reale verificata in locale (fit-only, isolation, collate, gate TEST). Engaging/GPU ancora non verificati; picco RAM legato al decode Arrow.
+- [x] 2.2 — Pipeline Month-2 reale verificata in locale (fit-only, isolation, collate, gate TEST) + protezioni API (membership, provenance, aggregazione, prefetch). Engaging/GPU ancora non verificati; picco RAM legato al decode Arrow.
 - [ ] 2.3 — Baseline qualificate sulle osservazioni primarie, tabelle/costi riproducibili.
 - [ ] 2.4 — Primo neurale denso valido e confronto seen/VAL; optional temporale deciso separatamente.
 - [ ] 2.5 — Audit GLU concluso e adattamento scelto o rinviato con motivazione.

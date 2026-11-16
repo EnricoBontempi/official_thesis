@@ -121,31 +121,45 @@ def test_fold_capable_stats_reject_wrong_provenance(tmp_path: Path):
         sim_ids=ids,
         frame_indices=[0, 40],
         store=store,
-        protocol_id="month2_frame_protocol_v1",
-        protocol_path="configs/splits/month2_frame_protocol.yaml",
-        protocol_sha256="x",
-        splits_path="configs/splits/splits_interp_extrap.yaml",
-        splits_sha256="y",
+        provenance_mode="debug_subset",
     )
     assert stats["meta"]["n_conditions"] == 2  # not forced to 20
+    assert stats["meta"]["source_kind"] == "month2_debug_subset"
     validate_stats_reject_incompatible(stats, expected_sim_ids=ids)
     with pytest.raises(ValueError):
         validate_stats_reject_incompatible(stats, expected_sim_ids=ids + ["40NH3_1.h5"])
 
     path = tmp_path / "stats.json"
     path.write_text(json.dumps(stats))
-    # Loader should accept n!=20
+    # Production path rejects debug_subset; explicit allow for fixtures
+    with pytest.raises(ValueError, match="debug_subset"):
+        Month2FitOnlyNormalizer(
+            path, expected_sim_ids=ids, require_protocol_id="month2_frame_protocol_v1"
+        )
     norm = Month2FitOnlyNormalizer(
-        path, expected_sim_ids=ids, require_protocol_id="month2_frame_protocol_v1"
+        path,
+        expected_sim_ids=ids,
+        require_protocol_id="month2_frame_protocol_v1",
+        allow_noncanonical_frame_indices=True,
     )
     z = norm.normalize_field("Temperature", np.array([stats["fields"]["Temperature"]["mean"]]))
     assert abs(float(z.reshape(-1)[0])) < 1e-6
     # Reject wrong expected set
     with pytest.raises(ValueError):
-        Month2FitOnlyNormalizer(path, expected_sim_ids=[ids[0]])
+        Month2FitOnlyNormalizer(
+            path, expected_sim_ids=[ids[0]], allow_noncanonical_frame_indices=True
+        )
 
 
 def test_norm_denorm_synthetic(tmp_path: Path):
+    from combustion_recon.data.month2_protocol import (
+        scientific_protocol_fingerprint,
+        load_frame_protocol,
+        sha256_file,
+        DEFAULT_SPLITS,
+    )
+
+    protocol = load_frame_protocol()
     stats = {
         "meta": {
             "split": "train",
@@ -154,7 +168,11 @@ def test_norm_denorm_synthetic(tmp_path: Path):
             "includes_seen_frames": False,
             "n_conditions": 1,
             "sim_ids": ["0NH3_0.85.h5"],
-            "source_kind": "month2_train_fit_only",
+            "frame_indices": [0],
+            "n_frames_per_condition": 1,
+            "source_kind": "month2_debug_subset",
+            "protocol_scientific_sha256": scientific_protocol_fingerprint(protocol),
+            "splits_sha256": sha256_file(DEFAULT_SPLITS),
         },
         "fields": {
             "Temperature": {"mean": 2000.0, "std": 100.0, "n_voxels_total": 10, "min": 0, "max": 1},
@@ -168,7 +186,11 @@ def test_norm_denorm_synthetic(tmp_path: Path):
     }
     path = tmp_path / "s.json"
     path.write_text(json.dumps(stats))
-    norm = Month2FitOnlyNormalizer(path, expected_sim_ids=["0NH3_0.85.h5"])
+    norm = Month2FitOnlyNormalizer(
+        path,
+        expected_sim_ids=["0NH3_0.85.h5"],
+        allow_noncanonical_frame_indices=True,
+    )
     arr = np.array([2100.0, 1900.0])
     z = norm.normalize_field("Temperature", arr)
     back = norm.denormalize_field("Temperature", z)

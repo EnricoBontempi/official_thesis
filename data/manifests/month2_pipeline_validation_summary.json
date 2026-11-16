@@ -1,11 +1,11 @@
 {
-  "date": "2026-11-16 12:05:52 -0500",
+  "date": "2026-11-16 12:33:27 -0500",
   "base_commit": "5bce7142d7dbaf9e5ea6bc1e3c8dffe75e066ce9",
   "env": {
     "cpu_count": 16,
     "raw_exists": true,
     "n_shards": 30,
-    "peak_rss_mb": 6482.734375,
+    "peak_rss_mb": 6482.5546875,
     "mem_available_gb": null,
     "disk_free_gb": null
   },
@@ -149,7 +149,11 @@
       "n_shards": 30,
       "engaging_verified": false,
       "note": "Local WSL/host used for pipeline validation; Engaging GPU/alloc not verified."
-    }
+    },
+    "protocol_scientific_sha256": "e21f7f245c8273f3da4cad1f2cddaed54613e366bb947685b1d2d3969b189eab",
+    "protocol_hash_policy": "protocol_scientific_sha256 binds frames+split ref+protocol_id; protocol_sha256 is the full YAML file hash at original compute time",
+    "protocol_sha256_at_compute": "e9d9dbcb74314d1a5031df04bddbd62d86e67668c63871429cf382671331a12c",
+    "protocol_sha256_current_file": "398336d939e6135466eb40590944446b16704e4317731d0c712f6f7341f5b85d"
   },
   "stats_fields": {
     "Temperature": {
@@ -228,9 +232,9 @@
       819
     ],
     "dataloader_workers": 2,
-    "dataloader_batch_wall_s": 16.364479780197144,
-    "rss_mb_before_loader": 6482.734375,
-    "rss_mb_after_loader": 6482.734375,
+    "dataloader_batch_wall_s": 16.587583541870117,
+    "rss_mb_before_loader": 6482.5546875,
+    "rss_mb_after_loader": 6482.5546875,
     "store_stats": {
       "shard_decodes": 1,
       "cache_hits": 1,

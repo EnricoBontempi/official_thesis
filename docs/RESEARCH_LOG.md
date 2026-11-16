@@ -83,3 +83,11 @@ Questo file è il diario del progetto di tesi in `official_thesis` (ricostruzion
 - **Implementato:** percorso isolato `Month2ReconDataset` + `ShardStore` (decode Arrow per shard, cache compatta di frame T/vi/vj/vk); ruoli `train_fit`/`seen`/`val` e gate TEST; sample `{model_inputs, targets, metadata}`; collate con padding mask; normalizzatore fit-only fold-capable; evaluator in K.
 - **Artefatti:** `data/manifests/train_norm_stats_month2_fit.json` (760 frame TRAIN-fit; Mese 1 `train_norm_stats.json` intatto), `month2_frames.json`, `month2_observations.json`; report `docs/month2/01_pipeline_validation.md`; script `scripts/05_validate_month2_pipeline.py`.
 - **Verifiche:** 43 pytest OK; batch reale CPU confrontato allo shard; isolamento free/assisted/p_off/2C; TEST denied senza freeze. Picco RSS locale ~6.5 GiB (decode Arrow + workers); cache compatta residua piccola. Engaging/GPU non verificati. Nessun training né baseline fitting.
+
+---
+
+## 2026-11-16 — Step 2.2 correttivo: protezioni API prima del 2.3
+
+- **Contesto:** revisione ChatGPT su `1fc150f`; pipeline reale già OK, ma tre usi impropri dell’API da chiudere.
+- **Correzioni:** (1) `build_index` rifiuta sim_id fuori dallo split del ruolo prima di ogni I/O; (2) normalizer/compute verificano frame indices, split hash e `protocol_scientific_sha256` (stats numeriche invariate, meta provenance patch); (3) aggregazione rifiuta config/ruoli misti (`train_fit`≠`seen`); (4) documentato/misurato `prefetch` = 1 decode vs N miss.
+- **Verifiche:** 55 pytest; validate-only PASS. Nessun 2.3 / training.
