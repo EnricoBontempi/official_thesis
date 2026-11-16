@@ -4,6 +4,8 @@
 **Author:** Enrico Bontempi (MSc Thesis — Deng Lab, MIT)  
 **Reference Proposal:** [docs/proposal.md](docs/proposal.md)
 
+**Transition note (2026-11-16):** The Month 1 artifacts and corrected baseline runs are available. The supervisor sign-off component of Step 1.6 remains open; completion marks below do not establish technical approval. The latest evidence, known discrepancies in older summaries, and proposed next steps are tracked in [the Month 2 context](docs/month2/00_context_and_decisions.md) and [roadmap_month2.md](roadmap_month2.md).
+
 ---
 
 ## Purpose of Month 1

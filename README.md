@@ -3,7 +3,10 @@
 **Author:** Enrico Bontempi  
 **Host Group:** Deng Lab, Massachusetts Institute of Technology (MIT)  
 **Thesis Proposal:** [docs/proposal.md](docs/proposal.md)  
-**Month 1 Roadmap:** [roadmap_month1.md](roadmap_month1.md)
+**Month 1 Roadmap:** [roadmap_month1.md](roadmap_month1.md)  
+**Month 2 Roadmap:** [roadmap_month2.md](roadmap_month2.md) — proposed; approval and execution tracked separately  
+**Research Log:** [docs/RESEARCH_LOG.md](docs/RESEARCH_LOG.md)  
+**Current Evidence & Open Decisions:** [docs/month2/00_context_and_decisions.md](docs/month2/00_context_and_decisions.md)
 
 ## Overview
 
@@ -16,6 +19,7 @@ This repository contains the codebase, experimental configurations, data audit p
 - `external/GLU_Reconstruction/`: **Untouched upstream reference implementation** of **GLU** (`arXiv:2603.26023`, [cosmos2w/GLU_Reconstruction](https://github.com/cosmos2w/GLU_Reconstruction)) provided by the Deng Lab authors. Kept strictly unmodified as the laboratory reference baseline; all thesis-specific adaptations live in `src/combustion_recon/`.
 - `configs/`: Locked operating-condition splits (`splits_interp_extrap.yaml`), evaluation protocol, and observation layouts.
 - `docs/month1/` & `overleaf_month1_report/`: Month 1 audit reports, baseline feasibility study, and LaTeX progress report.
+- `docs/month2/` & `roadmap_month2.md`: Verified transition context, open supervisor decisions, and the proposed operational plan; future experiment outputs are not yet implemented.
 - `scripts/` & `tests/`: Reproducible execution scripts and automated `pytest` guardrails.
 
 ### Key Scientific Constraints
