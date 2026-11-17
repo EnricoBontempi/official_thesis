@@ -1028,3 +1028,79 @@ def manifest_fingerprint_blob(manifest: dict[str, Any]) -> str:
     }
     raw = json.dumps(payload, sort_keys=True).encode()
     return hashlib.sha256(raw).hexdigest()
+
+
+_CACHE_PAYLOAD_NAMES = (
+    "geometry.npz",
+    "manifest.json",
+    "train_fit/vi_norm.npy",
+    "train_fit/vj_norm.npy",
+    "train_fit/target_T_norm.npy",
+    "train_fit/target_T_K.npy",
+    "train_fit/p_norm.npy",
+    "train_fit/frames.json",
+    "seen_train_eval/vi_norm.npy",
+    "seen_train_eval/vj_norm.npy",
+    "seen_train_eval/target_T_norm.npy",
+    "seen_train_eval/target_T_K.npy",
+    "seen_train_eval/p_norm.npy",
+    "seen_train_eval/frames.json",
+    "val_eval/vi_norm.npy",
+    "val_eval/vj_norm.npy",
+    "val_eval/target_T_norm.npy",
+    "val_eval/target_T_K.npy",
+    "val_eval/p_norm.npy",
+    "val_eval/frames.json",
+)
+
+
+def compute_cache_payload_hashes(
+    cache_root: str | Path | None = None,
+) -> dict[str, Any]:
+    """SHA256 of each cache payload file (for post-transfer verification)."""
+    root = Path(cache_root) if cache_root is not None else DEFAULT_CACHE_ROOT
+    files: dict[str, str] = {}
+    missing: list[str] = []
+    for rel in _CACHE_PAYLOAD_NAMES:
+        path = root / rel
+        if not path.is_file():
+            missing.append(rel)
+            continue
+        files[rel] = sha256_file(path)
+    if missing:
+        raise FileNotFoundError(
+            f"cache payload files missing under {root}: {missing}"
+        )
+    blob = json.dumps(files, sort_keys=True, separators=(",", ":")).encode()
+    return {
+        "cache_root": str(root),
+        "files": files,
+        "aggregate_sha256": hashlib.sha256(blob).hexdigest(),
+        "n_files": len(files),
+    }
+
+
+def verify_cache_payload_hashes(
+    expected: dict[str, Any],
+    *,
+    cache_root: str | Path | None = None,
+) -> dict[str, Any]:
+    """Recompute payload hashes and compare to an expected manifest."""
+    actual = compute_cache_payload_hashes(cache_root)
+    exp_files = expected.get("files") or {}
+    mismatches = sorted(
+        k
+        for k in sorted(set(exp_files) | set(actual["files"]))
+        if exp_files.get(k) != actual["files"].get(k)
+    )
+    ok = (
+        not mismatches
+        and expected.get("aggregate_sha256") == actual["aggregate_sha256"]
+    )
+    return {
+        "ok": ok,
+        "mismatches": mismatches,
+        "expected_aggregate_sha256": expected.get("aggregate_sha256"),
+        "actual_aggregate_sha256": actual["aggregate_sha256"],
+        "actual": actual,
+    }

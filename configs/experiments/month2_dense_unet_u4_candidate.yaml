@@ -1,13 +1,23 @@
-# Candidate U4 run contract for dense U-Net (Step 2.4).
-# Prepared after STOP B profiling. Does NOT authorize execution by itself.
-# Budget approval and an explicit CLI authorization flag are required to start.
+# U4 Engaging scientific run contract (dense U-Net, Step 2.4).
+# Decision: Enrico, 2026-11-17 — first training on Engaging, max 1000 epochs,
+# VAL selection + early stop on plateau. Does NOT invent supervisor ratification.
+# Requires CLI --authorize-scientific-u4 to execute.
 
-experiment_id: month2_dense_unet_u4_candidate_v1
+experiment_id: month2_dense_unet_u4_engaging_v1
 paired_experiment: month2_dense_unet_v1
-status: candidate_prepared_not_authorized
-scientific_training_authorized: false
-budget_definitively_approved: false
+status: authorized_engaging_single_run_pon_seed0
+scientific_training_authorized: true
+budget_definitively_approved: true
 u4_executed: false
+
+decision:
+  by: Enrico
+  date: "2026-11-17"
+  summary: >
+    First U-Net training on Engaging; initial max 1000 epochs; checkpoint on
+    VAL/DEV; early stop on plateau. Replaces CPU/200 candidate. Does not adopt
+    Opus WSD branching. Continuation past 1000 only by later explicit decision.
+  supervisor_ratification: not_claimed
 
 inherits_scientific_contract:
   path: configs/experiments/month2_dense_unet.yaml
@@ -22,18 +32,27 @@ training_candidate:
   task_mode: temperature_free
   K: 0
   site_fraction: 1.0
-  p_conditioning: true   # p_on
+  p_conditioning: true   # p_on only; no other seed/model authorized
   seed: 0
-  device: cpu
+  device: cuda
   precision: fp32
+  allow_tf32: false
   batch_size: 8
-  n_epochs: 200
+  n_epochs: 1000
   lr: 1.0e-3
   weight_decay: 1.0e-4
-  warmup_fraction_of_updates: 0.05
-  cosine_eta_min: 1.0e-5
+  warmup_updates: 950
+  schedule_kind: warmup_then_reduce_on_plateau
+  plateau:
+    mode: min
+    factor: 0.5
+    patience_evals: 5
+    threshold_rel: 0.001
+    min_lr: 1.0e-5
+    metric: val_mean_condition_rmse_K
   grad_clip_norm: 1.0
   eval_every_epochs: 10
+  eval_roles: [train_fit, seen_train_eval, val_eval]
   wall_time_cap_hours: 6.0
   wall_time_cap_configurable: true
   allow_automatic_lr_fallback_3e4: false
@@ -43,12 +62,29 @@ training_candidate:
     role: val_eval
     metric: mean_over_conditions_of_full_field_RMSE_K
     tie_break: first_minimum
-  also_evaluate: [seen_train_eval]
-  early_stopping_performance: false
+    also_keep: last
+  also_evaluate: [seen_train_eval, train_fit]
+  early_stopping:
+    enabled: true
+    min_epochs: 200
+    patience_evals: 15
+    rel_improvement: 0.001
+    reset_patience_on_lr_reduce: true
+    metric: val_mean_condition_rmse_K
+    note: operational_convention_not_physical_certification
+  checkpoint:
+    boundary: epoch_complete_only
+    kinds: [dense_unet_epoch_complete_v2, dense_unet_epoch_partial_v2]
+    partial_overwrite_last: false
+    save_optimizer_scheduler_rng_history: true
+  resume_policy:
+    boundary: epoch_complete_only
+    reject_incompatible_data_arch_science: true
+    allow_n_epochs_extension: explicit_flag_only
 
 artifacts:
   results_root: results/month2_dense_unet
-  run_id_pattern: u4_pon_seed0_<timestamp_or_label>
+  run_id_pattern: u4_pon_seed0_engaging_<label>
   checkpoints_gitignored: true
   refuse_overwrite_existing_run_dir: true
 
@@ -57,6 +93,7 @@ command_template: >
   --authorize-scientific-u4
   --config configs/experiments/month2_dense_unet_u4_candidate.yaml
   --dense-config configs/experiments/month2_dense_unet.yaml
-  --run-id u4_pon_seed0_v1
+  --run-id u4_pon_seed0_engaging_v1
   --cache-root data/processed/month2_dense_unet_cache
+  --device cuda
   --wall-hours 6

@@ -5,12 +5,15 @@ from combustion_recon.training.dense_cache import (
     assert_dense_scientific_contract,
     build_dense_cache,
     collate_dense_batch,
+    compute_cache_payload_hashes,
     refresh_dense_cache_manifest_metadata,
     validate_dense_cache_manifest,
+    verify_cache_payload_hashes,
 )
 from combustion_recon.training.epoch_loop import (
     EpochDenseTrainer,
     EpochTrainConfig,
+    assert_u4_candidate_contract,
     select_best_val,
     should_evaluate_epoch,
 )
@@ -27,6 +30,9 @@ __all__ = [
     "TrainConfig",
     "EpochDenseTrainer",
     "EpochTrainConfig",
+    "assert_u4_candidate_contract",
+    "compute_cache_payload_hashes",
+    "verify_cache_payload_hashes",
     "select_best_val",
     "should_evaluate_epoch",
 ]

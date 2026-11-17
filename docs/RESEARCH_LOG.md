@@ -183,3 +183,12 @@ Questo file è il diario del progetto di tesi in `official_thesis` (ricostruzion
 - **Software/storage:** nessun checkout `official_thesis` sul cluster; env PyTorch trovato solo `~/envs/honf` (progetto separato); POOL/SCRATCH utente 0/1024 GiB; HOME ~69/200 GiB. Smoke CUDA pendente (serve allocazione).
 - **Report:** [engaging_resource_preflight.md](month2/engaging_resource_preflight.md).
 - **Stop:** nessun training locale/cluster; nessun `sbatch`/`salloc`/`srun`.
+
+---
+
+## 2026-11-17 — Decisione Enrico: U4 Engaging (prep + un run p_on seed 0)
+
+- **Decisione operativa Enrico:** primo training U-Net su Engaging; max iniziale **1000** epoche; best su VAL; early stop su plateau; se a 1000 ancora migliora → questione aperta. Sostituisce candidato CPU/200; **non** adotta WSD Opus. Nessuna ratifica supervisori inventata. Solo p_on seed 0.
+- **Pre-run chiuso:** checkpoint complete vs partial; interrupt non incrementa epoche; `last.pt` non sovrascritto da stato parziale; resume rifiuta incompatibilità; YAML consumato/rifiutato; config effettiva+provenienza; hash payload cache; metriche per-frame; resume solo a confine d’epoca (test continuo vs resume). Schedule: warmup 950 + ReduceLROnPlateau; early stop 200/15/0.1% con reset su LR drop.
+- **HONF (sola lettura):** launcher dbg4b in `hetmf-runs/launcher-ops/debug-step4b/`; B2 AMF usa `mit_amf_advanced_gpu` + `mit_normal_gpu`. Nessuna modifica a env/job HONF; env tesi dedicato `~/envs/official_thesis`.
+- **Prossimo in questo incarico:** commit prep → checkout/cache Engaging → smoke/profiling GPU → gate 4.5 h → un training se passa.

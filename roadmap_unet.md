@@ -2,7 +2,7 @@
 
 **Progetto:** esclusivamente `EnricoBontempi/official_thesis`, MIT/Deng Lab.  
 **Preparata:** 2026-11-17, America/New_York.  
-**Stato:** piano operativo richiesto da Enrico dopo discussione della proposta Opus. Su `mission/dense-unet`, **U0–U3 eseguiti fino a STOP B** (correzioni U1–U2, profiling, GappyPOD denso); **U4 e training scientifico neurale non avviati**. Ratifica tecnica dei supervisori non documentata.  
+**Stato:** piano operativo richiesto da Enrico dopo discussione della proposta Opus. Su `mission/dense-unet`, **U0–U3 eseguiti fino a STOP B**; **decisione Enrico 2026-11-17** autorizza preparazione Engaging + smoke/profiling GPU + **un** training scientifico p_on seed 0 (max iniziale 1000 epoche, VAL selection, early stop). Sostituisce il candidato CPU/200; non adotta WSD Opus. Ratifica supervisori **non** documentata/non inventata.  
 **Piano principale:** [roadmap_month2.md](roadmap_month2.md), dettaglio dello **Step 2.4**, non roadmap concorrente del Mese 2.  
 **Missione precedente:** [roadmap_missione.md](roadmap_missione.md); consolidamento completato sul branch dedicato, integrazione in main ancora pendente alla ricognizione.  
 **Esecutore:** Cursor IDE, un incarico delimitato alla volta, con restituzione dei risultati a Enrico/ChatGPT.
@@ -85,13 +85,12 @@ Misurare parametri/MAC se disponibili; le stime Opus (~4,9M per b=32) non sono n
 ### 3.4 Training: default e ciò che va fissato dopo profiling
 
 - MSE su T normalizzata, uniforme su tutti i pixel e batch. Valutazione in K con inversione delle stats fit-only.
-- AdamW, lr=1e-3, weight_decay=1e-4; warmup sul 5% degli aggiornamenti, poi cosine fino a lr=1e-5. Gradient clipping norma 1; registrare norma prima del clipping e frequenza del suo intervento.
-- fp32; batch candidato 8; shuffle riproducibile; num_workers=0 sulla cache compatta.
-- Budget candidato 200 epoche, **non run già autorizzato**. Fissare epoche, batch, larghezza e dispositivo dopo profiling, prima dei risultati scientifici. Contare aggiornamenti ed esempi effettivi.
-- Una sola alternativa lr=3e-4 se il piccolo pilot mostra instabilità sulla loss TRAIN; registrare anche il tentativo fallito. Nessuna ricerca aperta.
-- Valutazioni ogni 10 epoche e all'ultima se non multipla di 10; checkpoint migliore = minima media per condizione della RMSE full-field su VAL, a parità scegliere il primo. Salvare anche ultimo.
-- Nessun early stopping prestazionale iniziale. Stop operativo per non finiti, risorse insufficienti o limite di costo raggiunto, con esito esplicito.
-- Primo screening p_on seed 0; p_off seed 0 dopo esame del primo run. Seed 1/2 fase successiva delimitata. Un solo seed resta preliminare, anche con miglioramenti grandi.
+- AdamW, lr=1e-3, weight_decay=1e-4; **warmup lineare 950 aggiornamenti**, poi **ReduceLROnPlateau** su RMSE macro-condizione VAL (factor 0.5, patience 5 eval, threshold rel 0.001, min_lr 1e-5). **Niente cosine** legato al massimo di epoche. Gradient clipping norma 1.
+- fp32 senza TF32 per il primo confronto; batch 8; shuffle riproducibile; num_workers=0 sulla cache compatta.
+- **Budget iniziale autorizzato Enrico:** massimo **1000** epoche su Engaging (1 GPU non preemptable AMF se accessibile). Continuazione oltre 1000 solo con decisione successiva. Nessun fallback automatico lr=3e-4.
+- Valutazioni VAL/seen/**TRAIN** ogni 10 epoche e all'ultima; selezione solo VAL (primo minimo RMSE macro-condizione); conservare anche last. Seen/TRAIN non selezionano.
+- Early stop operativo: non prima di 200 epoche; 15 eval VAL consecutive senza miglioramento relativo 0,1%; reset pazienza se il LR scende; best assoluto conservato anche sotto soglia 0,1%. Convenzione operativa, non certificazione fisica.
+- Autorizzato soltanto **p_on seed 0**. p_off / altri seed fuori da questo incarico.
 
 ## 4. Step numerati e punti di arresto
 
@@ -247,7 +246,7 @@ Tutti gli step sono inizialmente **[ ] non eseguiti**. Codice presente non equiv
 - [x] U1 — Contratto denso e cache verificati. (760/220/123; payload gitignored; stub `data/manifests/month2_dense_unet_cache_manifest.json`; validazione rafforzata post-STOP A)
 - [x] U2 — Implementazione/test/overfit consegnati. **STOP A.** + correzioni isolamento/grad/YAML; Step 2.4 **non** dichiarato completo
 - [x] U3 — Profiling e GappyPOD denso; budget proposto. **STOP B.** (U4 non avviato)
-- [ ] U4 — Primo training p_on seed 0 eseguito. *(runner/epoch loop preparato e testato; training scientifico non avviato)*
+- [ ] U4 — Primo training p_on seed 0 eseguito. *(autorizzato Engaging 2026-11-17; correzioni resume/config pre-run; training da avviare dopo smoke/profiling e gate 4.5 h)*
 - [ ] U5 — Controllo istantanee e interpretazione. **STOP C.**
 - [ ] U6 — p_off/seed eseguiti oppure rinvii registrati.
 - [ ] U7 — Report finale e scelta del prossimo incarico.
