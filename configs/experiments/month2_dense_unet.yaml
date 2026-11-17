@@ -1,0 +1,124 @@
+# Month-2 dense U-Net diagnostic contract (Step 2.4, U0–U7).
+# Distinct from the historical sparse 5% baseline contract.
+# experiment_id: month2_dense_unet_v1
+#
+# This file does NOT authorize scientific full training. Budget/device/b width
+# for U4 are fixed only after U3 profiling (STOP B). U0–U2 use this contract
+# for implementation, cache, tests, and tiny overfit only.
+
+experiment_id: month2_dense_unet_v1
+experiment_date: '2026-11-17'
+status: dense_diagnostic_contract
+implementation_gate: stop_A_after_u2
+scientific_training_authorized: false
+
+references:
+  frame_protocol:
+    path: configs/splits/month2_frame_protocol.yaml
+    protocol_id: month2_frame_protocol_v1
+  operating_condition_split:
+    path: configs/splits/splits_interp_extrap.yaml
+  fit_only_stats:
+    path: data/manifests/train_norm_stats_month2_fit.json
+  model:
+    path: configs/models/unet_small.yaml
+  historical_sparse_contract_untouched:
+    path: configs/experiments/month2_baselines.yaml
+    note: Sparse 5% baselines remain a separate experiment_id; do not mutate that YAML for dense runs.
+  roadmap: roadmap_unet.md
+
+inputs:
+  temporal_mode: single_frame
+  task_mode: temperature_free
+  K: 0
+  site_fraction: 1.0
+  velocity_components: planar_2C
+  channels_physical:
+    temperature_target: 10
+    velocity_i: 11
+    velocity_j: 12
+  model_input_channels:
+    order: [vi_norm, vj_norm, x_scaled, y_scaled, nh3_norm, phi_norm]
+    count: 6
+  coordinates:
+    source: sample_metadata_xy
+    transform: affine_to_minus1_1_from_shared_grid_extrema
+    verify_identity_across_roles: true
+  operating_parameters:
+    names: [nh3_fraction, phi]
+    encoding: constant_maps_from_fit_only_normalized_scalars
+  mask:
+    dense_all_true: required
+    not_an_input_channel: true
+  forbidden_in_model_inputs:
+    - temperature
+    - temperature_normalized
+    - velocity_k
+    - species
+    - heat_release
+    - sim_id
+    - frame_index
+    - time
+    - split
+    - ParamMean_prior
+
+targets:
+  field: Temperature
+  supervision: temperature_normalized_fit_only
+  evaluation_units: K
+  absent_from_inputs: true
+
+split_roles:
+  train_fit: {n_frames_expected: 760, use: gradients_and_fitting}
+  seen_train_eval: {n_frames_expected: 220, use: diagnostic_never_selection}
+  val_eval: {n_frames_expected: 123, use: declared_selection_only_after_u3}
+  test_roles: forbidden_in_this_mission
+
+cache:
+  builder: combustion_recon.training.dense_cache
+  default_root: data/processed/month2_dense_unet_cache
+  gitignored: true
+  store_minimum: velocity_maps_plus_shared_geometry_plus_scalar_p_plus_target
+  verify_against_dataset: true
+
+conditioning:
+  primary: p_on
+  p_off: zero_p_channels_same_architecture_same_global_stats
+  mechanism: concatenation_only
+
+training_defaults_candidates:
+  loss: mse_on_normalized_T_uniform_pixels
+  optimizer: AdamW
+  lr: 1.0e-3
+  weight_decay: 1.0e-4
+  warmup_fraction_of_updates: 0.05
+  cosine_eta_min: 1.0e-5
+  grad_clip_norm: 1.0
+  precision: fp32
+  batch_size_candidate: 8
+  num_workers: 0
+  epoch_budget_candidate: 200
+  note: >
+    Candidates only. Fix width/batch/device/epochs after U3 profiling before
+    any scientific run. Alternate lr=3e-4 only if tiny pilot shows TRAIN loss
+    instability; record failed attempt.
+
+overfit_diagnostic_u2:
+  n_frames: 8
+  conditions_span: 2_to_4
+  max_updates: 500
+  wall_time_cap_minutes: 30
+  seed: 0
+  role: train_fit_only
+
+selection_after_scientific_runs:
+  split_role: val_eval
+  metric: mean_over_conditions_of_full_field_RMSE_K
+  tie_break: first_minimum
+  forbidden_for_u0_u2: true
+
+resources:
+  device_preference: cpu_ok_if_feasible
+  gpu_verified: false
+  cluster_access: forbidden_this_mission
+  test_payload_access: forbidden

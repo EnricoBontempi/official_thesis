@@ -1,0 +1,252 @@
+{
+  "base_channels": 32,
+  "checkpoint": "results/month2_dense_unet/u2_overfit/overfit_last.pt",
+  "conditions": [
+    "0NH3_1.25.h5",
+    "0NH3_1.h5",
+    "20NH3_1.05.h5",
+    "20NH3_1.2.h5"
+  ],
+  "device": "cpu",
+  "elapsed_s": 230.55695289599953,
+  "final": {
+    "mse_norm": 0.001623427146114409,
+    "rmse_K": 13.366306898831496
+  },
+  "frames": [
+    {
+      "cache_index": 84,
+      "duplicate_of": null,
+      "equivalence_ratio": 1.0,
+      "field_time_association_verified": true,
+      "frame_index": 320,
+      "grid": [
+        128,
+        128
+      ],
+      "has_original_time_coordinate": true,
+      "mask_all_true": true,
+      "nh3_fraction": 0.0,
+      "nh3_norm": -0.9644133613489144,
+      "phi": 1.0,
+      "phi_norm": -0.4032182088805312,
+      "role": "train_fit",
+      "sim_id": "0NH3_1.h5",
+      "split": "train",
+      "time_coordinate_original": 3.58,
+      "time_validated": true,
+      "timeline_regular": true
+    },
+    {
+      "cache_index": 102,
+      "duplicate_of": null,
+      "equivalence_ratio": 1.0,
+      "field_time_association_verified": true,
+      "frame_index": 1040,
+      "grid": [
+        128,
+        128
+      ],
+      "has_original_time_coordinate": true,
+      "mask_all_true": true,
+      "nh3_fraction": 0.0,
+      "nh3_norm": -0.9644133613489144,
+      "phi": 1.0,
+      "phi_norm": -0.4032182088805312,
+      "role": "train_fit",
+      "sim_id": "0NH3_1.h5",
+      "split": "train",
+      "time_coordinate_original": 3.76,
+      "time_validated": true,
+      "timeline_regular": true
+    },
+    {
+      "cache_index": 228,
+      "duplicate_of": null,
+      "equivalence_ratio": 1.25,
+      "field_time_association_verified": true,
+      "frame_index": 0,
+      "grid": [
+        128,
+        128
+      ],
+      "has_original_time_coordinate": true,
+      "mask_all_true": true,
+      "nh3_fraction": 0.0,
+      "nh3_norm": -0.9644133613489144,
+      "phi": 1.25,
+      "phi_norm": 1.3499044384261298,
+      "role": "train_fit",
+      "sim_id": "0NH3_1.25.h5",
+      "split": "train",
+      "time_coordinate_original": 3.5,
+      "time_validated": true,
+      "timeline_regular": true
+    },
+    {
+      "cache_index": 249,
+      "duplicate_of": null,
+      "equivalence_ratio": 1.25,
+      "field_time_association_verified": true,
+      "frame_index": 840,
+      "grid": [
+        128,
+        128
+      ],
+      "has_original_time_coordinate": true,
+      "mask_all_true": true,
+      "nh3_fraction": 0.0,
+      "nh3_norm": -0.9644133613489144,
+      "phi": 1.25,
+      "phi_norm": 1.3499044384261298,
+      "role": "train_fit",
+      "sim_id": "0NH3_1.25.h5",
+      "split": "train",
+      "time_coordinate_original": 3.71,
+      "time_validated": true,
+      "timeline_regular": true
+    },
+    {
+      "cache_index": 347,
+      "duplicate_of": null,
+      "equivalence_ratio": 1.05,
+      "field_time_association_verified": true,
+      "frame_index": 200,
+      "grid": [
+        128,
+        128
+      ],
+      "has_original_time_coordinate": true,
+      "mask_all_true": true,
+      "nh3_fraction": 0.2,
+      "nh3_norm": -0.299300698349663,
+      "phi": 1.05,
+      "phi_norm": -0.05259367941919871,
+      "role": "train_fit",
+      "sim_id": "20NH3_1.05.h5",
+      "split": "train",
+      "time_coordinate_original": 1.55,
+      "time_validated": true,
+      "timeline_regular": true
+    },
+    {
+      "cache_index": 356,
+      "duplicate_of": null,
+      "equivalence_ratio": 1.05,
+      "field_time_association_verified": true,
+      "frame_index": 560,
+      "grid": [
+        128,
+        128
+      ],
+      "has_original_time_coordinate": true,
+      "mask_all_true": true,
+      "nh3_fraction": 0.2,
+      "nh3_norm": -0.299300698349663,
+      "phi": 1.05,
+      "phi_norm": -0.05259367941919871,
+      "role": "train_fit",
+      "sim_id": "20NH3_1.05.h5",
+      "split": "train",
+      "time_coordinate_original": 1.64,
+      "time_validated": true,
+      "timeline_regular": true
+    },
+    {
+      "cache_index": 393,
+      "duplicate_of": null,
+      "equivalence_ratio": 1.2,
+      "field_time_association_verified": true,
+      "frame_index": 520,
+      "grid": [
+        128,
+        128
+      ],
+      "has_original_time_coordinate": true,
+      "mask_all_true": true,
+      "nh3_fraction": 0.2,
+      "nh3_norm": -0.299300698349663,
+      "phi": 1.2,
+      "phi_norm": 0.9992799089647972,
+      "role": "train_fit",
+      "sim_id": "20NH3_1.2.h5",
+      "split": "train",
+      "time_coordinate_original": 1.63,
+      "time_validated": true,
+      "timeline_regular": true
+    },
+    {
+      "cache_index": 398,
+      "duplicate_of": null,
+      "equivalence_ratio": 1.2,
+      "field_time_association_verified": true,
+      "frame_index": 720,
+      "grid": [
+        128,
+        128
+      ],
+      "has_original_time_coordinate": true,
+      "mask_all_true": true,
+      "nh3_fraction": 0.2,
+      "nh3_norm": -0.299300698349663,
+      "phi": 1.2,
+      "phi_norm": 0.9992799089647972,
+      "role": "train_fit",
+      "sim_id": "20NH3_1.2.h5",
+      "split": "train",
+      "time_coordinate_original": 1.68,
+      "time_validated": true,
+      "timeline_regular": true
+    }
+  ],
+  "indices": [
+    84,
+    102,
+    228,
+    249,
+    347,
+    356,
+    393,
+    398
+  ],
+  "initial": {
+    "mse_norm": 0.9085226655006409,
+    "rmse_K": 316.20075169812554
+  },
+  "learning_demonstrated": true,
+  "n_params": 4902753,
+  "param_mean_same_subset": {
+    "basis": "piecewise_phi1",
+    "n_conditions_fit": 4,
+    "param_mean_rmse_K_mean": 106.42207107377999,
+    "param_mean_rmse_K_per_frame": [
+      31.260913740567382,
+      33.19018033102186,
+      159.3451291350361,
+      188.28893540931494,
+      60.665709342336314,
+      58.99886740726843,
+      182.95465377311166,
+      136.67217945158325
+    ],
+    "ridge_alpha": 0.01
+  },
+  "peak_rss_GB": 1.5782356262207031,
+  "phase": "U2_overfit_diagnostic",
+  "reload_max_abs_pred_diff": 0.0,
+  "samples_seen": 4000,
+  "scientific_training": false,
+  "status": "ok",
+  "stopped_reason": "max_updates",
+  "train_result": {
+    "clip_events": 105,
+    "clip_frequency": 0.21,
+    "elapsed_s": 230.5565162970006,
+    "first_loss": 0.9085226058959961,
+    "last_loss": 0.0016237752279266715,
+    "samples_seen": 4000,
+    "stopped_reason": "max_updates",
+    "updates": 500
+  },
+  "updates": 500
+}

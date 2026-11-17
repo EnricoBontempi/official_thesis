@@ -2,7 +2,7 @@
 
 **Data aggiornamento Step 2.1:** 2026-11-16, America/New_York (UTC−05:00)  
 **Ambito:** esclusivamente `EnricoBontempi/official_thesis`; nessuna attività HONF.  
-**Stato aggiornato 2026-11-17:** protocollo, pipeline e baseline 2.1–2.3 eseguiti; consolidamento completato sul branch `mission/baseline-consolidation` a `3cf7bf0`, non ancora integrato alla ricognizione. **Piano U-Net 2.4 pubblicato, non implementato né eseguito**; nessuna ratifica tecnica documentata dei supervisori; Engaging/GPU non verificati.  
+**Stato aggiornato 2026-11-17:** protocollo, pipeline e baseline 2.1–2.3 eseguiti; consolidamento su `3cf7bf0` integrato nel branch di lavoro `mission/dense-unet` (non ancora in main). **U0–U2 del piano U-Net eseguiti fino a STOP A** (cache/test/overfit); U3+ e training scientifico non avviati; Step 2.4 non completo. Nessuna ratifica tecnica documentata dei supervisori; Engaging/GPU non verificati.  
 **Piano operativo:** [roadmap_month2.md](../../roadmap_month2.md).  
 **Autorizzazione operativa Enrico:** conversazione del 16 novembre 2026 (approvazione roadmap e avvio lavoro). Distinta da qualsiasi approvazione dei supervisori.
 
@@ -25,7 +25,7 @@ Ricognizione precedente del remoto `main` a `6fd0f15` (con diario semplificato p
 | Pipeline dati Month-2 | moduli `month2_*`, report `01_pipeline_validation.md` | **Verificata in locale** (batch reale, isolation, gate TEST). |
 | Baseline Mese 2 (Step 2.3) | `month2_baselines_v1`, report `02_baseline_validation.md` | Eseguite in locale CPU; storico in `results/tables/`. |
 | Consolidamento post-revisione | `consolidation_v1`, report `mission_baseline_consolidation_report.md` | **Completata**: isolation/YAML/timeline corretti; replica identica entro tolleranza; in attesa Enrico/ChatGPT. |
-| Modelli / training neurali Mese 2 | — | Non avviati (Step 2.4+). |
+| Modelli / training neurali Mese 2 | U0–U2 denso su `mission/dense-unet` | STOP A; training scientifico/U3+ non avviati. |
 | GPU/allocazione Engaging | — | Host previsto; **non verificati**. Tetto 24 GPU-ore = proposta di ceiling, non allocazione disponibile. |
 
 ## 3. Lettura scientifica dei risultati corretti
@@ -150,4 +150,4 @@ Questo aggiornamento prevale sugli stati pendenti storici delle sezioni 5–9 pe
 - **Consolidamento:** dipendenza remota `3cf7bf0`, ancora fuori main alla preparazione; conserva replica e storia dei risultati. Non lavorare sui neurali da main senza includere quel codice aggiornato.
 - **D7:** single-frame; associazione campo-tempo non verificata su tutto `40NH3_1.2`. Finestre temporali fuori missione.
 - **Confronti densi:** ParamMean e GappyPOD R=32 con medesima velocità completa; controllo di scambio istantanee. Nessuna modifica dei comparatori storici sparse e nessun TEST.
-- **Stato:** solo pianificazione/push documentale; U0–U7 non eseguiti. La nuova specifica U-Net è stata revisionata da Opus e discussa con ChatGPT, non revisionata da Astra in questa fase.
+- **Stato (STOP A):** U0–U2 eseguiti su `mission/dense-unet` — vedi [03_dense_velocity_diagnostic.md](03_dense_velocity_diagnostic.md). U3–U7 non eseguiti. Specifica U-Net revisionata da Opus e discussa con ChatGPT; non revisionata da Astra in questa fase.

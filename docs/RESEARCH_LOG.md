@@ -144,3 +144,12 @@ Questo file è il diario del progetto di tesi in `official_thesis` (ricostruzion
 - **Confronti:** ParamMean e GappyPOD denso matched; scambio deterministico delle velocità fra istantanee della stessa condizione per verificare l'uso dell'allineamento istantaneo. Nessuna inferenza automatica di limite fisico o robustezza da un singolo seed.
 - **Precisazioni rispetto alla proposta Opus:** testa inizializzata con piccoli pesi non nulli per consentire gradienti fin dal primo backward; niente soglia universale “tutte le tre VAL”; niente estensioni automatiche di capacità/frame; distanze fra indici distinte da tempi verificati; lambda denso riselezionato senza dichiarare invalido a priori quello sparse.
 - **Workflow:** implementazione/test/overfit → STOP A; profiling + riferimento denso → STOP B; training p_on e interpretazione → STOP C; p_off/repliche con incarico delimitato. Il prossimo prompt a Cursor definirà l'ambito attivo. Pubblicare questo piano non dichiara alcuno di questi step completato.
+
+---
+
+## 2026-11-17 — U0–U2 Dense U-Net (STOP A) su `mission/dense-unet`
+
+- **Eseguito:** branch dedicato con consolidamento `3cf7bf0` + roadmap `adabacc`; config densa distinta; cache 760/220/123 (~277 MiB) da raw locali; DenseUNet b=32 (**4 902 753** param); test `tests/test_unet_dense.py` 11 passed; overfit 8 frame TRAIN (4 condizioni), 500 update CPU, MSE_norm 0.909→0.00162, RMSE_K 316→13.4; checkpoint fuori Git.
+- **Report:** [03_dense_velocity_diagnostic.md](month2/03_dense_velocity_diagnostic.md).
+- **Non eseguito / non dichiarato:** U3+, profiling completo, GappyPOD denso, training scientifico, selezione VAL, GLU/masked/T-sensor/tempo, Step 2.4 completo.
+- **Stop A:** attendere esame Enrico/ChatGPT.

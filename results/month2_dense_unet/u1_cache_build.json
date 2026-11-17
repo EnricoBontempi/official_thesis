@@ -1,0 +1,335 @@
+{
+  "bytes_total": 289774422,
+  "cache_root": "/home/enric/projects/official_thesis/data/processed/month2_dense_unet_cache",
+  "counts": {
+    "seen_train_eval": 220,
+    "train_fit": 760,
+    "val_eval": 123
+  },
+  "elapsed_s": 492.83140660199933,
+  "git_commit": "0209e738e609ef9d7d5064397f6328f9a173e3a4",
+  "manifest": {
+    "K": 0,
+    "build_wall_s": 492.6162736460001,
+    "bytes_total": 289774422,
+    "cache_id": "month2_dense_unet_cache_v1",
+    "channel_order": [
+      "vi_norm",
+      "vj_norm",
+      "x_scaled",
+      "y_scaled",
+      "nh3_norm",
+      "phi_norm"
+    ],
+    "counts": {
+      "seen_train_eval": 220,
+      "train_fit": 760,
+      "val_eval": 123
+    },
+    "created_unix": 1794938365.7590585,
+    "dense_config_path": "configs/experiments/month2_dense_unet.yaml",
+    "dtype": "float32",
+    "experiment_id": "month2_dense_unet_v1",
+    "fingerprints": {
+      "dense_config_sha256": "a61ed367fa31dfa2d6df087c844da632c550abdf91d30a576e8e836168100f04",
+      "frame_protocol_scientific_sha256": "e21f7f245c8273f3da4cad1f2cddaed54613e366bb947685b1d2d3969b189eab",
+      "model_config_sha256": "ac9dca5a1125ee2018d143055779ac39920b8787f42fd62200a8bb3902e07bf1",
+      "splits_sha256": "acb87bf95852e7849f88a270af8cbd211ad999d0039c35885232b7bc2a99e7b9",
+      "stats_sha256": "678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e"
+    },
+    "geometry_sha256": "97e2e9df79c87a3fbf019fa1d9ac270aafe42319f83425afb5f3fb3be8f36ce7",
+    "git_commit": "0209e738e609ef9d7d5064397f6328f9a173e3a4",
+    "grid": [
+      128,
+      128
+    ],
+    "moments_train_fit": {
+      "note": "Normalized TRAIN mean of T should be near 0 under fit-only z-score; exact float32 equality is not required.",
+      "stats_Temperature_mean": 2039.5086606614589,
+      "stats_Temperature_std": 331.7378431423074,
+      "train_fit_T_norm_mean": 0.0,
+      "train_fit_T_norm_std": 1.0,
+      "train_fit_vi_norm_mean": -7.842716476247347e-10,
+      "train_fit_vi_norm_std": 1.0
+    },
+    "roles": {
+      "seen_train_eval": {
+        "bytes": {
+          "frames_json": 123767,
+          "p_norm": 1888,
+          "target_T_K": 14418048,
+          "target_T_norm": 14418048,
+          "vi_norm": 14418048,
+          "vj_norm": 14418048
+        },
+        "n_frames": 220,
+        "verify_checks": [
+          {
+            "cache_index": 0,
+            "ok": true
+          },
+          {
+            "cache_index": 110,
+            "ok": true
+          },
+          {
+            "cache_index": 219,
+            "ok": true
+          }
+        ]
+      },
+      "train_fit": {
+        "bytes": {
+          "frames_json": 422660,
+          "p_norm": 6208,
+          "target_T_K": 49807488,
+          "target_T_norm": 49807488,
+          "vi_norm": 49807488,
+          "vj_norm": 49807488
+        },
+        "n_frames": 760,
+        "verify_checks": [
+          {
+            "cache_index": 0,
+            "ok": true
+          },
+          {
+            "cache_index": 380,
+            "ok": true
+          },
+          {
+            "cache_index": 759,
+            "ok": true
+          }
+        ]
+      },
+      "val_eval": {
+        "bytes": {
+          "frames_json": 68139,
+          "p_norm": 1112,
+          "target_T_K": 8061056,
+          "target_T_norm": 8061056,
+          "vi_norm": 8061056,
+          "vj_norm": 8061056
+        },
+        "n_frames": 123,
+        "verify_checks": [
+          {
+            "cache_index": 0,
+            "ok": true
+          },
+          {
+            "cache_index": 61,
+            "ok": true
+          },
+          {
+            "cache_index": 122,
+            "ok": true
+          }
+        ]
+      }
+    },
+    "shard_provenance": {
+      "0NH3_0.85.h5": {
+        "filename": "data-00000-of-00030.arrow",
+        "path": "data/raw/combustion/hf_dataset/numerical/data-00000-of-00030.arrow",
+        "sha256": "850cba25412b66de1e1af074152573706df220d9a0e2b37d05cbbbcb08622adf",
+        "sha256_source": "remote_file_inventory.lfs",
+        "size_bytes": 2098221120,
+        "size_verified_local": true
+      },
+      "0NH3_0.9.h5": {
+        "filename": "data-00001-of-00030.arrow",
+        "path": "data/raw/combustion/hf_dataset/numerical/data-00001-of-00030.arrow",
+        "sha256": "164bd9de67e275f9982e4a89b9e24436bc20d9b59bf4f46a055a6be7c7c94a3a",
+        "sha256_source": "remote_file_inventory.lfs",
+        "size_bytes": 2098221120,
+        "size_verified_local": true
+      },
+      "0NH3_1.05.h5": {
+        "filename": "data-00002-of-00030.arrow",
+        "path": "data/raw/combustion/hf_dataset/numerical/data-00002-of-00030.arrow",
+        "sha256": "ba504096c67a638d3630b7af46b945f71a9da384ba3aa6c01a23c65ab9c2f90a",
+        "sha256_source": "remote_file_inventory.lfs",
+        "size_bytes": 2098221120,
+        "size_verified_local": true
+      },
+      "0NH3_1.1.h5": {
+        "filename": "data-00003-of-00030.arrow",
+        "path": "data/raw/combustion/hf_dataset/numerical/data-00003-of-00030.arrow",
+        "sha256": "3b7cf1b8436199fa11111c8a372b95da8331d274ece028c2cd651e7066836965",
+        "sha256_source": "remote_file_inventory.lfs",
+        "size_bytes": 2098221120,
+        "size_verified_local": true
+      },
+      "0NH3_1.15.h5": {
+        "filename": "data-00004-of-00030.arrow",
+        "path": "data/raw/combustion/hf_dataset/numerical/data-00004-of-00030.arrow",
+        "sha256": "0515af19677e731688569fb0d297bac5864c28e207880ab1130918b15b4b4e38",
+        "sha256_source": "remote_file_inventory.lfs",
+        "size_bytes": 2098221120,
+        "size_verified_local": true
+      },
+      "0NH3_1.2.h5": {
+        "filename": "data-00005-of-00030.arrow",
+        "path": "data/raw/combustion/hf_dataset/numerical/data-00005-of-00030.arrow",
+        "sha256": "4d73784cd1dca920f5593451869b86409cd79b3ebb694403a0544ccc26e5ab49",
+        "sha256_source": "remote_file_inventory.lfs",
+        "size_bytes": 2098221120,
+        "size_verified_local": true
+      },
+      "0NH3_1.25.h5": {
+        "filename": "data-00006-of-00030.arrow",
+        "path": "data/raw/combustion/hf_dataset/numerical/data-00006-of-00030.arrow",
+        "sha256": "2877522a0ccfe3a8f1d95933f6b5b1760f2448288c8310ac2bf91ff5f3487b7b",
+        "sha256_source": "remote_file_inventory.lfs",
+        "size_bytes": 2098221120,
+        "size_verified_local": true
+      },
+      "0NH3_1.h5": {
+        "filename": "data-00008-of-00030.arrow",
+        "path": "data/raw/combustion/hf_dataset/numerical/data-00008-of-00030.arrow",
+        "sha256": "df315dfb5ba75fbc559b8f64db890c50060dfe575e6c0856e1120e8af060ed89",
+        "sha256_source": "remote_file_inventory.lfs",
+        "size_bytes": 2098221120,
+        "size_verified_local": true
+      },
+      "20NH3_0.85.h5": {
+        "filename": "data-00010-of-00030.arrow",
+        "path": "data/raw/combustion/hf_dataset/numerical/data-00010-of-00030.arrow",
+        "sha256": "464ebca974fd371357da3677306470d4af65189556457785ad348b6cbf35d867",
+        "sha256_source": "remote_file_inventory.lfs",
+        "size_bytes": 2098221120,
+        "size_verified_local": true
+      },
+      "20NH3_0.9.h5": {
+        "filename": "data-00011-of-00030.arrow",
+        "path": "data/raw/combustion/hf_dataset/numerical/data-00011-of-00030.arrow",
+        "sha256": "4d616a77c753f07ae05262b2cb5094caebbae0c3261ea17ae8976fe9f591a462",
+        "sha256_source": "remote_file_inventory.lfs",
+        "size_bytes": 2098221120,
+        "size_verified_local": true
+      },
+      "20NH3_1.05.h5": {
+        "filename": "data-00012-of-00030.arrow",
+        "path": "data/raw/combustion/hf_dataset/numerical/data-00012-of-00030.arrow",
+        "sha256": "baceffab2b949c304f27192bf30029516d63f0d5c1e3e718efa6e3409ae4021f",
+        "sha256_source": "remote_file_inventory.lfs",
+        "size_bytes": 2098221120,
+        "size_verified_local": true
+      },
+      "20NH3_1.1.h5": {
+        "filename": "data-00013-of-00030.arrow",
+        "path": "data/raw/combustion/hf_dataset/numerical/data-00013-of-00030.arrow",
+        "sha256": "b8e6961642e4b7c92ff2727d96fa0531ce9077bd2d6fb836cd26941cfa8de266",
+        "sha256_source": "remote_file_inventory.lfs",
+        "size_bytes": 2098221120,
+        "size_verified_local": true
+      },
+      "20NH3_1.2.h5": {
+        "filename": "data-00014-of-00030.arrow",
+        "path": "data/raw/combustion/hf_dataset/numerical/data-00014-of-00030.arrow",
+        "sha256": "f2730adbfe0c27707f841dc1865d53401646853f5429d2ddc40c95413a3f8ae9",
+        "sha256_source": "remote_file_inventory.lfs",
+        "size_bytes": 2098221120,
+        "size_verified_local": true
+      },
+      "20NH3_1.25.h5": {
+        "filename": "data-00015-of-00030.arrow",
+        "path": "data/raw/combustion/hf_dataset/numerical/data-00015-of-00030.arrow",
+        "sha256": "fe7fb53da405cc7db61bf043c31399e8b474ca40ed5880f42ffb8e457edc725b",
+        "sha256_source": "remote_file_inventory.lfs",
+        "size_bytes": 2098221120,
+        "size_verified_local": true
+      },
+      "40NH3_0.85.h5": {
+        "filename": "data-00018-of-00030.arrow",
+        "path": "data/raw/combustion/hf_dataset/numerical/data-00018-of-00030.arrow",
+        "sha256": "c217bf8752173bd2ddc4d7129b0416d22a3cf2464d774e8876b5db335f93776e",
+        "sha256_source": "remote_file_inventory.lfs",
+        "size_bytes": 2098221120,
+        "size_verified_local": true
+      },
+      "40NH3_0.9.h5": {
+        "filename": "data-00019-of-00030.arrow",
+        "path": "data/raw/combustion/hf_dataset/numerical/data-00019-of-00030.arrow",
+        "sha256": "22a99f3d5c507edd326d0125c2f2f4c28d90e4bf6ae43b9c1f03cfa79a3ef8b0",
+        "sha256_source": "remote_file_inventory.lfs",
+        "size_bytes": 2098221120,
+        "size_verified_local": true
+      },
+      "40NH3_1.1.h5": {
+        "filename": "data-00020-of-00030.arrow",
+        "path": "data/raw/combustion/hf_dataset/numerical/data-00020-of-00030.arrow",
+        "sha256": "f5bb9ad3abbcb3d6ddc593720ffa298439dc1f481285a866256270cac1ca2ea6",
+        "sha256_source": "remote_file_inventory.lfs",
+        "size_bytes": 2098221120,
+        "size_verified_local": true
+      },
+      "40NH3_1.2.h5": {
+        "filename": "data-00022-of-00030.arrow",
+        "path": "data/raw/combustion/hf_dataset/numerical/data-00022-of-00030.arrow",
+        "sha256": "3d908c0dc2913dc658fd227c5750d99a7f4c4293ae29a634cd96d02129e4dbdb",
+        "sha256_source": "remote_file_inventory.lfs",
+        "size_bytes": 2098221056,
+        "size_verified_local": true
+      },
+      "40NH3_1.h5": {
+        "filename": "data-00023-of-00030.arrow",
+        "path": "data/raw/combustion/hf_dataset/numerical/data-00023-of-00030.arrow",
+        "sha256": "335fff3637ad85424120abd62e0333b8ccfc2e22a3f8534163a8e48250e02670",
+        "sha256_source": "remote_file_inventory.lfs",
+        "size_bytes": 2098221120,
+        "size_verified_local": true
+      },
+      "80NH3_0.9.h5": {
+        "filename": "data-00025-of-00030.arrow",
+        "path": "data/raw/combustion/hf_dataset/numerical/data-00025-of-00030.arrow",
+        "sha256": "719b4a0f5058fe96d3dfff4476a50bd5f713e69cdbd18f03aef59b1cc812eb80",
+        "sha256_source": "remote_file_inventory.lfs",
+        "size_bytes": 2098221120,
+        "size_verified_local": true
+      },
+      "80NH3_1.05.h5": {
+        "filename": "data-00026-of-00030.arrow",
+        "path": "data/raw/combustion/hf_dataset/numerical/data-00026-of-00030.arrow",
+        "sha256": "569a668c920506510f8c86ca68998df31bd2ab8329f63babf451ee23c6601aa5",
+        "sha256_source": "remote_file_inventory.lfs",
+        "size_bytes": 2098221112,
+        "size_verified_local": true
+      },
+      "80NH3_1.15.h5": {
+        "filename": "data-00027-of-00030.arrow",
+        "path": "data/raw/combustion/hf_dataset/numerical/data-00027-of-00030.arrow",
+        "sha256": "61905b2dbff835d5af2450fafbe74105bf1fe6602812b30c5152417449b22bb7",
+        "sha256_source": "remote_file_inventory.lfs",
+        "size_bytes": 2098221096,
+        "size_verified_local": true
+      },
+      "80NH3_1.2.h5": {
+        "filename": "data-00028-of-00030.arrow",
+        "path": "data/raw/combustion/hf_dataset/numerical/data-00028-of-00030.arrow",
+        "sha256": "7dcdb14b9aa9d8c3862d44339785858600fcea43df15f634b3872ea6c38f6ea7",
+        "sha256_source": "remote_file_inventory.lfs",
+        "size_bytes": 2098221088,
+        "size_verified_local": true
+      }
+    },
+    "site_fraction": 1.0,
+    "stats_path": "data/manifests/train_norm_stats_month2_fit.json",
+    "task_mode": "temperature_free",
+    "temporal_policy": "single_frame; preserve temporal quality flags; field_time_association unverified on anomalous shard \u2014 do not invent times",
+    "test_payloads": "none"
+  },
+  "moments_train_fit": {
+    "note": "Normalized TRAIN mean of T should be near 0 under fit-only z-score; exact float32 equality is not required.",
+    "stats_Temperature_mean": 2039.5086606614589,
+    "stats_Temperature_std": 331.7378431423074,
+    "train_fit_T_norm_mean": 0.0,
+    "train_fit_T_norm_std": 1.0,
+    "train_fit_vi_norm_mean": -7.842716476247347e-10,
+    "train_fit_vi_norm_std": 1.0
+  },
+  "peak_rss_GB": 6.5280303955078125,
+  "status": "ok"
+}

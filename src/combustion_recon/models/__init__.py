@@ -1,4 +1,4 @@
-"""Model baselines and (later) neural reconstructors."""
+"""Model baselines and neural reconstructors."""
 
 from combustion_recon.models.baselines import (
     GappyPODReconstructor,
@@ -7,6 +7,7 @@ from combustion_recon.models.baselines import (
     ParamConditionedMeanPredictor,
     apply_anchor_offset,
 )
+from combustion_recon.models.unet import DenseUNet, build_dense_unet_from_config
 
 __all__ = [
     "GappyPODReconstructor",
@@ -14,4 +15,6 @@ __all__ = [
     "LocalVelocityTemperatureRegressor",
     "ParamConditionedMeanPredictor",
     "apply_anchor_offset",
+    "DenseUNet",
+    "build_dense_unet_from_config",
 ]

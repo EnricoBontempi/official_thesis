@@ -2,7 +2,7 @@
 
 **Progetto:** esclusivamente `EnricoBontempi/official_thesis`, MIT/Deng Lab.  
 **Preparata:** 2026-11-17, America/New_York.  
-**Stato:** piano operativo richiesto da Enrico dopo discussione della proposta Opus; **nessuna implementazione, pilot o esecuzione scientifica svolta in questa attività**. Ratifica tecnica dei supervisori non documentata.  
+**Stato:** piano operativo richiesto da Enrico dopo discussione della proposta Opus. Su `mission/dense-unet`, **U0–U2 eseguiti fino a STOP A** (implementazione, cache, test, overfit diagnostico); **U3+ e training scientifico non avviati**. Ratifica tecnica dei supervisori non documentata.  
 **Piano principale:** [roadmap_month2.md](roadmap_month2.md), dettaglio dello **Step 2.4**, non roadmap concorrente del Mese 2.  
 **Missione precedente:** [roadmap_missione.md](roadmap_missione.md); consolidamento completato sul branch dedicato, integrazione in main ancora pendente alla ricognizione.  
 **Esecutore:** Cursor IDE, un incarico delimitato alla volta, con restituzione dei risultati a Enrico/ChatGPT.
@@ -243,9 +243,9 @@ Tutti gli step sono inizialmente **[ ] non eseguiti**. Codice presente non equiv
 
 ## 6. Checklist iniziale
 
-- [ ] U0 — Checkout con roadmap e consolidamento aggiornato.
-- [ ] U1 — Contratto denso e cache verificati.
-- [ ] U2 — Implementazione/test/overfit consegnati. **STOP A.**
+- [x] U0 — Checkout con roadmap e consolidamento aggiornato. (branch `mission/dense-unet`; evidenza in `docs/month2/03_dense_velocity_diagnostic.md`)
+- [x] U1 — Contratto denso e cache verificati. (760/220/123; payload gitignored; stub `data/manifests/month2_dense_unet_cache_manifest.json`)
+- [x] U2 — Implementazione/test/overfit consegnati. **STOP A.** (11 test; overfit 8 frame TRAIN; Step 2.4 **non** dichiarato completo)
 - [ ] U3 — Profiling e GappyPOD denso; budget fissato. **STOP B.**
 - [ ] U4 — Primo training p_on seed 0 eseguito.
 - [ ] U5 — Controllo istantanee e interpretazione. **STOP C.**

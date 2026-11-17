@@ -1,0 +1,63 @@
+# Compact dense U-Net for Month-2 Step 2.4 (temperature-free dense diagnostic).
+# Consumed by combustion_recon.models.unet.DenseUNet / build_dense_unet_from_config.
+# Values not listed here are refused by the builder (no silent defaults for architecture).
+
+model_id: unet_small_v1
+architecture: dense_unet_concat_p
+task: temperature_free_dense_velocity_to_T
+
+input:
+  channels: 6
+  channel_order:
+    - vi_norm
+    - vj_norm
+    - x_scaled
+    - y_scaled
+    - nh3_norm
+    - phi_norm
+  spatial: [128, 128]
+  conditioning: channel_concatenation_only
+  forbidden:
+    - FiLM
+    - ParamMean_prior_in_forward
+    - temperature_in_input
+    - velocity_k
+    - mask_as_constant_channel
+
+output:
+  channels: 1
+  representation: temperature_normalized_fit_only
+  head: conv1x1_linear
+
+encoder:
+  base_channels: 32   # candidate b; profiling may switch to 16 before scientific runs
+  stage_multipliers: [1, 2, 4, 8]   # 128:b, 64:2b, 32:4b, 16:8b
+  bottleneck_multiplier: 8          # 8:8b after fourth max-pool
+
+block:
+  convs_per_block: 2
+  kernel_size: 3
+  padding: 1
+  norm: group_norm
+  groups: 8
+  activation: silu
+  bias: true
+
+decoder:
+  n_upsamples: 4
+  upsample: bilinear
+  align_corners: false
+  skip: concatenate
+  out_multipliers: [8, 4, 2, 1]  # after each up+block: 8b,4b,2b,b at 16,32,64,128
+
+init:
+  body: kaiming_normal_fan_out_relu_compatible
+  head_weight_std: 1.0e-3
+  head_bias: 0.0
+  note: >
+    Head weights are small but not all-zero so the first backward can carry
+    gradients into earlier blocks while the initial output stays near the fit mean.
+
+regularization_initial:
+  dropout: 0.0
+  augmentation: none
