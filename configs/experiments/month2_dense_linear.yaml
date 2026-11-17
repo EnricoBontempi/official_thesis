@@ -1,0 +1,53 @@
+# Month-2 dense linear reference (Step 2.4 U3) — GappyPOD free at 100% coverage.
+# Distinct from historical sparse 5% baselines (month2_baselines.yaml).
+# Does not authorize neural scientific training (U4).
+
+experiment_id: month2_dense_linear_v1
+experiment_date: '2026-11-17'
+status: dense_linear_reference_contract
+paired_with: month2_dense_unet_v1
+scientific_neural_training_authorized: false
+
+references:
+  frame_protocol:
+    path: configs/splits/month2_frame_protocol.yaml
+    protocol_id: month2_frame_protocol_v1
+  operating_condition_split:
+    path: configs/splits/splits_interp_extrap.yaml
+  fit_only_stats:
+    path: data/manifests/train_norm_stats_month2_fit.json
+  dense_cache:
+    path: data/processed/month2_dense_unet_cache
+  historical_sparse_contract_untouched:
+    path: configs/experiments/month2_baselines.yaml
+  roadmap: roadmap_unet.md
+
+inputs:
+  temporal_mode: single_frame
+  task_mode: temperature_free
+  K: 0
+  site_fraction: 1.0
+  velocity_components: planar_2C
+  mask_policy: single_dense_all_true_no_replica_triplication
+
+gappy_pod:
+  R: 32
+  n_velocity_components: 2
+  w_T_fixed_unused: 5.0
+  ridge_lambda_grid: [1.0e-4, 1.0e-3, 1.0e-2, 1.0e-1, 1.0]
+  p_conditioning: [false, true]
+  seed: 0
+
+selection:
+  split_role: val_eval
+  metric: mean_over_conditions_of_full_field_RMSE_K
+  tie_break: first_minimum
+  forbidden: [test_interp_eval, test_extrap_eval, seen_train_eval]
+
+baselines_matched:
+  ParamMean: fit_on_full_train_fit_condition_means
+  GlobalMean: fit_on_full_train_fit_frames
+  note: Not the 8-frame overfit ParamMean.
+
+artifacts:
+  results_root: results/month2_dense_linear

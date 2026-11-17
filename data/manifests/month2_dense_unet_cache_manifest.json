@@ -1,8 +1,7 @@
 {
-  "build_wall_s": 492.6162736460001,
-  "built_from_commit": "0209e738e609ef9d7d5064397f6328f9a173e3a4",
   "bytes_total": 289774422,
   "cache_id": "month2_dense_unet_cache_v1",
+  "cache_schema_version": 2,
   "channel_order": [
     "vi_norm",
     "vj_norm",
@@ -16,22 +15,34 @@
     "train_fit": 760,
     "val_eval": 123
   },
-  "dtype": "float32",
-  "experiment_id": "month2_dense_unet_v1",
-  "fingerprints": {
-    "dense_config_sha256": "a61ed367fa31dfa2d6df087c844da632c550abdf91d30a576e8e836168100f04",
+  "data_fingerprints": {
+    "K": 0,
+    "channel_order": [
+      "vi_norm",
+      "vj_norm",
+      "x_scaled",
+      "y_scaled",
+      "nh3_norm",
+      "phi_norm"
+    ],
     "frame_protocol_scientific_sha256": "e21f7f245c8273f3da4cad1f2cddaed54613e366bb947685b1d2d3969b189eab",
-    "model_config_sha256": "ac9dca5a1125ee2018d143055779ac39920b8787f42fd62200a8bb3902e07bf1",
+    "geometry_sha256": "97e2e9df79c87a3fbf019fa1d9ac270aafe42319f83425afb5f3fb3be8f36ce7",
+    "site_fraction": 1.0,
     "splits_sha256": "acb87bf95852e7849f88a270af8cbd211ad999d0039c35885232b7bc2a99e7b9",
-    "stats_sha256": "678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e"
+    "stats_sha256": "678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e",
+    "task_mode": "temperature_free",
+    "temporal_mode": "single_frame",
+    "velocity_components": "planar_2C"
   },
-  "geometry_sha256": "97e2e9df79c87a3fbf019fa1d9ac270aafe42319f83425afb5f3fb3be8f36ce7",
+  "experiment_id": "month2_dense_unet_v1",
   "gitignored_payload": true,
-  "grid": [
-    128,
-    128
-  ],
   "local_payload_root": "data/processed/month2_dense_unet_cache",
+  "metadata_refreshed_commit": "3643ce51b31162a4140256cdcb8599abe49cbda8",
+  "model_fingerprints": {
+    "dense_config_sha256": "988babff88f233d0d6e421c8eac09070a9ffae10781a1d7f791260fd5d5e2c33",
+    "model_config_sha256": "ac9dca5a1125ee2018d143055779ac39920b8787f42fd62200a8bb3902e07bf1",
+    "note": "Informational only; not required to match for data-cache reuse"
+  },
   "moments_train_fit": {
     "note": "Normalized TRAIN mean of T should be near 0 under fit-only z-score; exact float32 equality is not required.",
     "stats_Temperature_mean": 2039.5086606614589,
@@ -41,33 +52,5 @@
     "train_fit_vi_norm_mean": -7.842716476247347e-10,
     "train_fit_vi_norm_std": 1.0
   },
-  "n_shards_provenance": 23,
-  "sha256_source": "remote_file_inventory.lfs + local size verify",
-  "shard_ids": [
-    "0NH3_0.85.h5",
-    "0NH3_0.9.h5",
-    "0NH3_1.05.h5",
-    "0NH3_1.1.h5",
-    "0NH3_1.15.h5",
-    "0NH3_1.2.h5",
-    "0NH3_1.25.h5",
-    "0NH3_1.h5",
-    "20NH3_0.85.h5",
-    "20NH3_0.9.h5",
-    "20NH3_1.05.h5",
-    "20NH3_1.1.h5",
-    "20NH3_1.2.h5",
-    "20NH3_1.25.h5",
-    "40NH3_0.85.h5",
-    "40NH3_0.9.h5",
-    "40NH3_1.1.h5",
-    "40NH3_1.2.h5",
-    "40NH3_1.h5",
-    "80NH3_0.9.h5",
-    "80NH3_1.05.h5",
-    "80NH3_1.15.h5",
-    "80NH3_1.2.h5"
-  ],
-  "temporal_policy": "single_frame; preserve temporal quality flags; field_time_association unverified on anomalous shard \u2014 do not invent times",
-  "test_payloads": "none"
+  "shard_sha256_policy": "inventory_lfs_sha256_plus_local_size_verify; NOT locally recomputed \u2014 do not claim local content verification"
 }

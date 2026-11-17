@@ -18,6 +18,7 @@ from combustion_recon.data.month2_dataset import Month2ReconDataset
 from combustion_recon.data.month2_normalizer import Month2FitOnlyNormalizer
 from combustion_recon.data.month2_protocol import (
     FrameRole,
+    build_index,
     load_frame_protocol,
     load_yaml,
     scientific_protocol_fingerprint,
@@ -29,6 +30,7 @@ ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_DENSE_CFG = ROOT / "configs" / "experiments" / "month2_dense_unet.yaml"
 DEFAULT_STATS = ROOT / "data" / "manifests" / "train_norm_stats_month2_fit.json"
 DEFAULT_CACHE_ROOT = ROOT / "data" / "processed" / "month2_dense_unet_cache"
+DEFAULT_SPLITS = ROOT / "configs" / "splits" / "splits_interp_extrap.yaml"
 
 CHANNEL_ORDER = (
     "vi_norm",
@@ -40,10 +42,147 @@ CHANNEL_ORDER = (
 )
 CACHEABLE_ROLES: tuple[FrameRole, ...] = ("train_fit", "seen_train_eval", "val_eval")
 FORBIDDEN_ROLES = frozenset({"test_interp_eval", "test_extrap_eval"})
+REQUIRED_ROLE_FILES = (
+    "vi_norm.npy",
+    "vj_norm.npy",
+    "target_T_norm.npy",
+    "target_T_K.npy",
+    "p_norm.npy",
+    "frames.json",
+)
+
+
+def expected_counts() -> dict[str, int]:
+    return {"train_fit": 760, "seen_train_eval": 220, "val_eval": 123}
 
 
 class DenseCacheError(ValueError):
     """Raised when dense cache construction or reuse fails a contract check."""
+
+
+class DenseContractError(ValueError):
+    """Raised when the dense experiment YAML violates the scientific contract."""
+
+
+def assert_dense_scientific_contract(cfg: dict[str, Any]) -> dict[str, Any]:
+    """Consume / refuse dense experiment YAML fields before I/O.
+
+    Returns a normalized contract dict used by builders and runners.
+    """
+    if not isinstance(cfg, dict):
+        raise DenseContractError("dense config must be a mapping")
+    eid = cfg.get("experiment_id")
+    if eid != "month2_dense_unet_v1":
+        raise DenseContractError(f"unexpected experiment_id={eid!r}")
+
+    inputs = cfg.get("inputs") or {}
+    if inputs.get("temporal_mode") != "single_frame":
+        raise DenseContractError("temporal_mode must be single_frame")
+    if inputs.get("task_mode") != "temperature_free":
+        raise DenseContractError("task_mode must be temperature_free")
+    if int(inputs.get("K", -1)) != 0:
+        raise DenseContractError("K must be 0")
+    if float(inputs.get("site_fraction", -1)) != 1.0:
+        raise DenseContractError("site_fraction must be 1.0")
+    if inputs.get("velocity_components") != "planar_2C":
+        raise DenseContractError("velocity_components must be planar_2C")
+
+    ch = inputs.get("model_input_channels") or {}
+    order = list(ch.get("order") or [])
+    if order != list(CHANNEL_ORDER):
+        raise DenseContractError(f"channel order must be {list(CHANNEL_ORDER)}, got {order}")
+    if int(ch.get("count", -1)) != 6:
+        raise DenseContractError("model_input_channels.count must be 6")
+
+    refs = cfg.get("references") or {}
+    stats_rel = (refs.get("fit_only_stats") or {}).get(
+        "path", "data/manifests/train_norm_stats_month2_fit.json"
+    )
+    proto_rel = (refs.get("frame_protocol") or {}).get(
+        "path", "configs/splits/month2_frame_protocol.yaml"
+    )
+    splits_rel = (refs.get("operating_condition_split") or {}).get(
+        "path", "configs/splits/splits_interp_extrap.yaml"
+    )
+    stats_path = ROOT / stats_rel
+    proto_path = ROOT / proto_rel
+    splits_path = ROOT / splits_rel
+    for p, label in (
+        (stats_path, "fit_only_stats"),
+        (proto_path, "frame_protocol"),
+        (splits_path, "operating_condition_split"),
+    ):
+        if not p.exists():
+            raise DenseContractError(f"missing {label} at {p}")
+
+    protocol = load_frame_protocol(proto_path)
+    if protocol.get("protocol_id") != "month2_frame_protocol_v1":
+        raise DenseContractError("protocol_id must be month2_frame_protocol_v1")
+    if (refs.get("frame_protocol") or {}).get("protocol_id") not in (
+        None,
+        "month2_frame_protocol_v1",
+    ):
+        raise DenseContractError("references.frame_protocol.protocol_id mismatch")
+
+    roles = cfg.get("split_roles") or {}
+    for role, n_exp in expected_counts().items():
+        got = (roles.get(role) or {}).get("n_frames_expected")
+        if got is not None and int(got) != n_exp:
+            raise DenseContractError(f"{role} n_frames_expected={got} != {n_exp}")
+    if roles.get("test_roles") not in (None, "forbidden_in_this_mission"):
+        raise DenseContractError("test_roles must remain forbidden in this mission")
+
+    targets = cfg.get("targets") or {}
+    if targets.get("absent_from_inputs") is not True:
+        raise DenseContractError("targets.absent_from_inputs must be true")
+
+    return {
+        "experiment_id": eid,
+        "task_mode": "temperature_free",
+        "K": 0,
+        "site_fraction": 1.0,
+        "temporal_mode": "single_frame",
+        "velocity_components": "planar_2C",
+        "channel_order": list(CHANNEL_ORDER),
+        "stats_path": stats_path,
+        "protocol_path": proto_path,
+        "splits_path": splits_path,
+        "protocol_scientific_sha256": scientific_protocol_fingerprint(protocol),
+        "stats_sha256": sha256_file(stats_path),
+        "splits_sha256": sha256_file(splits_path),
+    }
+
+
+def dense_fields_to_input_tensor(
+    *,
+    vi_norm: np.ndarray,
+    vj_norm: np.ndarray,
+    x_scaled: np.ndarray,
+    y_scaled: np.ndarray,
+    nh3_norm: float,
+    phi_norm: float,
+    p_conditioning: bool = True,
+    # Explicitly ignored forbidden fields (isolation / mutation tests).
+    temperature: np.ndarray | None = None,
+    temperature_normalized: np.ndarray | None = None,
+    velocity_k: np.ndarray | None = None,
+    metadata: dict[str, Any] | None = None,
+) -> np.ndarray:
+    """Build the 6-channel model tensor from allowed fields only.
+
+    Forbidden arguments may be supplied for mutation tests; they must not affect
+    the returned tensor. There is no vk cache channel in the dense U-Net path.
+    """
+    _ = temperature, temperature_normalized, velocity_k, metadata
+    return build_dense_input_tensor(
+        vi_norm=vi_norm,
+        vj_norm=vj_norm,
+        x_scaled=x_scaled,
+        y_scaled=y_scaled,
+        nh3_norm=nh3_norm,
+        phi_norm=phi_norm,
+        p_conditioning=p_conditioning,
+    )
 
 
 def _git_head() -> str | None:
@@ -153,10 +292,6 @@ def _bytes_on_disk(path: Path) -> int:
     return total
 
 
-def expected_counts() -> dict[str, int]:
-    return {"train_fit": 760, "seen_train_eval": 220, "val_eval": 123}
-
-
 @dataclass
 class DenseCachePaths:
     root: Path
@@ -184,14 +319,17 @@ def build_dense_cache(
     """Materialize dense U-Net tensors from Month2ReconDataset (no TEST payloads)."""
     cfg_path = Path(dense_cfg_path) if dense_cfg_path else DEFAULT_DENSE_CFG
     dense_cfg = load_yaml(cfg_path)
-    if dense_cfg.get("experiment_id") != "month2_dense_unet_v1":
-        raise DenseCacheError("unexpected experiment_id in dense config")
+    contract = assert_dense_scientific_contract(dense_cfg)
 
     root = Path(cache_root) if cache_root is not None else DEFAULT_CACHE_ROOT
     paths = DenseCachePaths.from_root(root)
     if paths.manifest.exists() and not overwrite:
         manifest = json.loads(paths.manifest.read_text())
-        validate_dense_cache_manifest(manifest, cache_root=root)
+        validate_dense_cache_manifest(
+            manifest,
+            cache_root=root,
+            require_roles=tuple(roles),
+        )
         return manifest
 
     if root.exists() and overwrite:
@@ -213,9 +351,9 @@ def build_dense_cache(
         if role not in CACHEABLE_ROLES:
             raise DenseCacheError(f"unsupported role {role!r}")
 
-    stats_p = Path(stats_path) if stats_path else DEFAULT_STATS
+    stats_p = Path(stats_path) if stats_path is not None else Path(contract["stats_path"])
     normalizer = Month2FitOnlyNormalizer(stats_p)
-    protocol = load_frame_protocol()
+    protocol = load_frame_protocol(contract["protocol_path"])
     # Prefer keeping one condition (~38 frames) resident to avoid Arrow thrashing.
     store = store or ShardStore(
         raw_dir=raw_dir, max_cached_frames=max(max_cached_frames, 48)
@@ -437,8 +575,28 @@ def build_dense_cache(
         ),
     }
 
+    data_fps = {
+        "stats_sha256": contract["stats_sha256"],
+        "frame_protocol_scientific_sha256": contract["protocol_scientific_sha256"],
+        "splits_sha256": contract["splits_sha256"],
+        "geometry_sha256": _file_sha256(paths.geometry),
+        "channel_order": list(CHANNEL_ORDER),
+        "task_mode": "temperature_free",
+        "K": 0,
+        "site_fraction": 1.0,
+        "temporal_mode": "single_frame",
+        "velocity_components": "planar_2C",
+    }
+    # Training/model knobs are recorded separately so width/budget edits do not
+    # invalidate the scientific data cache fingerprint.
+    model_fps = {
+        "dense_config_sha256": _file_sha256(cfg_path),
+        "model_config_sha256": _file_sha256(ROOT / "configs/models/unet_small.yaml"),
+        "note": "Informational only; not required to match for data-cache reuse",
+    }
     manifest = {
         "cache_id": "month2_dense_unet_cache_v1",
+        "cache_schema_version": 2,
         "experiment_id": dense_cfg["experiment_id"],
         "created_unix": time.time(),
         "build_wall_s": float(time.perf_counter() - t0),
@@ -449,20 +607,30 @@ def build_dense_cache(
         "task_mode": "temperature_free",
         "K": 0,
         "site_fraction": 1.0,
+        "temporal_mode": "single_frame",
+        "velocity_components": "planar_2C",
         "roles": {r: role_summaries[r] for r in roles},
         "counts": {r: role_summaries[r]["n_frames"] for r in roles},
         "bytes_total": _bytes_on_disk(root),
-        "geometry_sha256": _file_sha256(paths.geometry),
+        "geometry_sha256": data_fps["geometry_sha256"],
+        "data_fingerprints": data_fps,
+        # Backward-compatible alias: data-only (no model width/budget).
         "fingerprints": {
-            "dense_config_sha256": _file_sha256(cfg_path),
-            "stats_sha256": _file_sha256(stats_p),
-            "frame_protocol_scientific_sha256": scientific_protocol_fingerprint(protocol),
-            "splits_sha256": sha256_file(ROOT / "configs/splits/splits_interp_extrap.yaml"),
-            "model_config_sha256": _file_sha256(ROOT / "configs/models/unet_small.yaml"),
+            "stats_sha256": data_fps["stats_sha256"],
+            "frame_protocol_scientific_sha256": data_fps[
+                "frame_protocol_scientific_sha256"
+            ],
+            "splits_sha256": data_fps["splits_sha256"],
+            "geometry_sha256": data_fps["geometry_sha256"],
         },
+        "model_fingerprints": model_fps,
         "stats_path": str(stats_p.relative_to(ROOT)),
         "dense_config_path": str(cfg_path.relative_to(ROOT)),
         "shard_provenance": shard_provenance,
+        "shard_sha256_policy": (
+            "inventory_lfs_sha256_plus_local_size_verify; "
+            "NOT locally recomputed — do not claim local content verification"
+        ),
         "moments_train_fit": moments,
         "temporal_policy": (
             "single_frame; preserve temporal quality flags; "
@@ -471,40 +639,237 @@ def build_dense_cache(
         "test_payloads": "none",
     }
     _write_json(paths.manifest, manifest)
-    validate_dense_cache_manifest(manifest, cache_root=root)
+    validate_dense_cache_manifest(
+        manifest, cache_root=root, require_roles=tuple(roles)
+    )
     return manifest
+
+
+def _data_fingerprints(manifest: dict[str, Any]) -> dict[str, Any]:
+    if "data_fingerprints" in manifest:
+        return dict(manifest["data_fingerprints"])
+    fps = dict(manifest.get("fingerprints") or {})
+    # Legacy manifests mixed model hashes into fingerprints; ignore those for reuse.
+    return {
+        "stats_sha256": fps.get("stats_sha256"),
+        "frame_protocol_scientific_sha256": fps.get("frame_protocol_scientific_sha256"),
+        "splits_sha256": fps.get("splits_sha256"),
+        "geometry_sha256": manifest.get("geometry_sha256") or fps.get("geometry_sha256"),
+        "channel_order": list(manifest.get("channel_order") or CHANNEL_ORDER),
+        "task_mode": manifest.get("task_mode", "temperature_free"),
+        "K": int(manifest.get("K", 0)),
+        "site_fraction": float(manifest.get("site_fraction", 1.0)),
+        "temporal_mode": manifest.get("temporal_mode", "single_frame"),
+        "velocity_components": manifest.get("velocity_components", "planar_2C"),
+    }
 
 
 def validate_dense_cache_manifest(
     manifest: dict[str, Any],
     *,
     cache_root: str | Path,
+    require_roles: Sequence[str] | None = None,
+    check_payload_shapes: bool = True,
+    check_frame_identities: bool = True,
 ) -> None:
     root = Path(cache_root)
     if manifest.get("cache_id") != "month2_dense_unet_cache_v1":
         raise DenseCacheError("unknown cache_id")
     if manifest.get("test_payloads") not in (None, "none"):
         raise DenseCacheError("cache claims TEST payloads")
-    for role, n_exp in expected_counts().items():
-        if role not in manifest.get("counts", {}):
-            continue
-        if int(manifest["counts"][role]) != n_exp:
-            raise DenseCacheError(f"{role} count mismatch")
+    if manifest.get("task_mode", "temperature_free") != "temperature_free":
+        raise DenseCacheError("cache task_mode must be temperature_free")
+    if int(manifest.get("K", 0)) != 0:
+        raise DenseCacheError("cache K must be 0")
+    if float(manifest.get("site_fraction", 1.0)) != 1.0:
+        raise DenseCacheError("cache site_fraction must be 1.0")
+    if list(manifest.get("channel_order") or []) != list(CHANNEL_ORDER):
+        raise DenseCacheError("cache channel_order mismatch")
+
+    roles_present = set(manifest.get("counts") or {})
+    forbidden = roles_present & FORBIDDEN_ROLES
+    if forbidden:
+        raise DenseCacheError(f"cache contains forbidden roles: {sorted(forbidden)}")
+    for role in roles_present:
+        if role not in CACHEABLE_ROLES:
+            raise DenseCacheError(f"unsupported role in cache: {role}")
+
+    req = list(require_roles) if require_roles is not None else sorted(roles_present)
+    for role in req:
+        if role not in roles_present:
+            raise DenseCacheError(f"required role {role!r} missing from cache")
+        n_exp = expected_counts().get(role)
+        n_got = int(manifest["counts"][role])
+        if n_exp is not None and n_got != n_exp:
+            raise DenseCacheError(f"{role} count mismatch: got {n_got}, expected {n_exp}")
         rd = _role_dir(root, role)
-        for name in ("vi_norm.npy", "vj_norm.npy", "target_T_norm.npy", "p_norm.npy", "frames.json"):
+        for name in REQUIRED_ROLE_FILES:
             if not (rd / name).exists():
                 raise DenseCacheError(f"missing {rd / name}")
+
     geom = root / "geometry.npz"
     if not geom.exists():
         raise DenseCacheError("missing geometry.npz")
-    # Fingerprint reuse: stats and scientific protocol must still match disk.
-    fps = manifest.get("fingerprints", {})
-    stats_path = ROOT / manifest.get("stats_path", "data/manifests/train_norm_stats_month2_fit.json")
-    if fps.get("stats_sha256") and fps["stats_sha256"] != _file_sha256(stats_path):
+    geom_sha = _file_sha256(geom)
+    data_fps = _data_fingerprints(manifest)
+    if data_fps.get("geometry_sha256") and data_fps["geometry_sha256"] != geom_sha:
+        raise DenseCacheError("geometry fingerprint mismatch on reuse")
+
+    stats_path = ROOT / manifest.get(
+        "stats_path", "data/manifests/train_norm_stats_month2_fit.json"
+    )
+    if not stats_path.exists():
+        raise DenseCacheError(f"missing stats at {stats_path}")
+    if data_fps.get("stats_sha256") != _file_sha256(stats_path):
         raise DenseCacheError("stats fingerprint mismatch on reuse")
     protocol = load_frame_protocol()
-    if fps.get("frame_protocol_scientific_sha256") != scientific_protocol_fingerprint(protocol):
+    if data_fps.get("frame_protocol_scientific_sha256") != scientific_protocol_fingerprint(
+        protocol
+    ):
         raise DenseCacheError("protocol scientific fingerprint mismatch on reuse")
+    splits_path = DEFAULT_SPLITS
+    if data_fps.get("splits_sha256") and data_fps["splits_sha256"] != sha256_file(
+        splits_path
+    ):
+        raise DenseCacheError("splits fingerprint mismatch on reuse")
+
+    # Explicit: inventory SHA is not a local content hash.
+    if manifest.get("shard_provenance"):
+        for sid, meta in manifest["shard_provenance"].items():
+            src = meta.get("sha256_source")
+            if src and "inventory" in str(src) and meta.get("locally_rehashed"):
+                raise DenseCacheError(
+                    f"{sid}: contradictory sha256_source vs locally_rehashed"
+                )
+
+    if check_payload_shapes or check_frame_identities:
+        for role in req:
+            rd = _role_dir(root, role)
+            frames = json.loads((rd / "frames.json").read_text())
+            n = int(manifest["counts"][role])
+            if len(frames) != n:
+                raise DenseCacheError(f"{role}: frames.json length {len(frames)} != {n}")
+            if check_payload_shapes:
+                for name, expect_ndim, expect_tail in (
+                    ("vi_norm.npy", 3, (128, 128)),
+                    ("vj_norm.npy", 3, (128, 128)),
+                    ("target_T_norm.npy", 3, (128, 128)),
+                    ("target_T_K.npy", 3, (128, 128)),
+                    ("p_norm.npy", 2, (2,)),
+                ):
+                    arr = np.load(rd / name, mmap_mode="r")
+                    if arr.dtype != np.float32:
+                        raise DenseCacheError(f"{role}/{name}: dtype {arr.dtype} != float32")
+                    if arr.ndim != expect_ndim or arr.shape[0] != n:
+                        raise DenseCacheError(
+                            f"{role}/{name}: shape {arr.shape} incompatible with n={n}"
+                        )
+                    if tuple(arr.shape[1:]) != expect_tail:
+                        raise DenseCacheError(
+                            f"{role}/{name}: trailing shape {arr.shape[1:]} != {expect_tail}"
+                        )
+            if check_frame_identities:
+                expected = build_index(role)  # type: ignore[arg-type]
+                if len(expected) != n:
+                    raise DenseCacheError(
+                        f"{role}: protocol index length {len(expected)} != cache {n}"
+                    )
+                for i, (row, exp) in enumerate(zip(frames, expected)):
+                    if int(row.get("cache_index", i)) != i:
+                        raise DenseCacheError(f"{role}[{i}]: cache_index mismatch")
+                    if str(row["sim_id"]) != str(exp["sim_id"]):
+                        raise DenseCacheError(
+                            f"{role}[{i}]: sim_id {row['sim_id']!r} != {exp['sim_id']!r}"
+                        )
+                    if int(row["frame_index"]) != int(exp["frame_index"]):
+                        raise DenseCacheError(
+                            f"{role}[{i}]: frame_index {row['frame_index']} != {exp['frame_index']}"
+                        )
+                    if str(row.get("role", role)) != role:
+                        raise DenseCacheError(f"{role}[{i}]: role field mismatch")
+
+
+def refresh_dense_cache_manifest_metadata(
+    cache_root: str | Path | None = None,
+    *,
+    dense_cfg_path: str | Path | None = None,
+) -> dict[str, Any]:
+    """Upgrade manifest metadata without rebuilding tensor payloads."""
+    root = Path(cache_root) if cache_root is not None else DEFAULT_CACHE_ROOT
+    paths = DenseCachePaths.from_root(root)
+    if not paths.manifest.exists():
+        raise FileNotFoundError(paths.manifest)
+    manifest = json.loads(paths.manifest.read_text())
+    cfg_path = Path(dense_cfg_path) if dense_cfg_path else DEFAULT_DENSE_CFG
+    contract = assert_dense_scientific_contract(load_yaml(cfg_path))
+
+    # Validate existing payloads first; abort before rewriting metadata on failure.
+    validate_dense_cache_manifest(
+        manifest,
+        cache_root=root,
+        require_roles=tuple(manifest.get("counts") or {}),
+    )
+
+    data_fps = {
+        "stats_sha256": contract["stats_sha256"],
+        "frame_protocol_scientific_sha256": contract["protocol_scientific_sha256"],
+        "splits_sha256": contract["splits_sha256"],
+        "geometry_sha256": _file_sha256(paths.geometry),
+        "channel_order": list(CHANNEL_ORDER),
+        "task_mode": "temperature_free",
+        "K": 0,
+        "site_fraction": 1.0,
+        "temporal_mode": "single_frame",
+        "velocity_components": "planar_2C",
+    }
+    model_fps = {
+        "dense_config_sha256": _file_sha256(cfg_path),
+        "model_config_sha256": _file_sha256(ROOT / "configs/models/unet_small.yaml"),
+        "note": "Informational only; not required to match for data-cache reuse",
+    }
+    # Clarify shard hash provenance on legacy entries.
+    for meta in (manifest.get("shard_provenance") or {}).values():
+        if meta.get("sha256_source") is None and meta.get("sha256"):
+            meta["sha256_source"] = "remote_file_inventory.lfs"
+        meta["locally_rehashed"] = False
+
+    manifest.update(
+        {
+            "cache_schema_version": 2,
+            "channel_order": list(CHANNEL_ORDER),
+            "dtype": "float32",
+            "grid": [128, 128],
+            "task_mode": "temperature_free",
+            "K": 0,
+            "site_fraction": 1.0,
+            "temporal_mode": "single_frame",
+            "velocity_components": "planar_2C",
+            "geometry_sha256": data_fps["geometry_sha256"],
+            "data_fingerprints": data_fps,
+            "fingerprints": {
+                "stats_sha256": data_fps["stats_sha256"],
+                "frame_protocol_scientific_sha256": data_fps[
+                    "frame_protocol_scientific_sha256"
+                ],
+                "splits_sha256": data_fps["splits_sha256"],
+                "geometry_sha256": data_fps["geometry_sha256"],
+            },
+            "model_fingerprints": model_fps,
+            "shard_sha256_policy": (
+                "inventory_lfs_sha256_plus_local_size_verify; "
+                "NOT locally recomputed — do not claim local content verification"
+            ),
+            "metadata_refreshed_unix": time.time(),
+            "metadata_refreshed_commit": _git_head(),
+        }
+    )
+    _write_json(paths.manifest, manifest)
+    validate_dense_cache_manifest(
+        manifest,
+        cache_root=root,
+        require_roles=tuple(manifest.get("counts") or {}),
+    )
+    return manifest
 
 
 class DenseUNetCacheDataset(Dataset):
@@ -527,7 +892,11 @@ class DenseUNetCacheDataset(Dataset):
         if not self.paths.manifest.exists():
             raise FileNotFoundError(f"Missing dense cache manifest at {self.paths.manifest}")
         self.manifest = json.loads(self.paths.manifest.read_text())
-        validate_dense_cache_manifest(self.manifest, cache_root=self.root)
+        validate_dense_cache_manifest(
+            self.manifest,
+            cache_root=self.root,
+            require_roles=(role,),
+        )
 
         rd = _role_dir(self.root, role)
         self.vi = np.load(rd / "vi_norm.npy", mmap_mode="r")

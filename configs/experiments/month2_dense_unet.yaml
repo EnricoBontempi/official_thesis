@@ -9,7 +9,7 @@
 experiment_id: month2_dense_unet_v1
 experiment_date: '2026-11-17'
 status: dense_diagnostic_contract
-implementation_gate: stop_A_after_u2
+implementation_gate: stop_B_after_u3
 scientific_training_authorized: false
 
 references:

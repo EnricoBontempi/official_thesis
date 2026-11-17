@@ -196,12 +196,29 @@ class DenseUNetTrainer:
                 last_loss = float(loss.detach().cpu())
                 break
             loss.backward()
-            grad_norm = float(
-                torch.nn.utils.clip_grad_norm_(
-                    self.model.parameters(), self.cfg.grad_clip_norm
-                )
-            )
+            # Finite loss does not imply finite gradients — refuse before step.
+            bad_grad = False
+            for p in self.model.parameters():
+                if p.grad is not None and not torch.isfinite(p.grad).all():
+                    bad_grad = True
+                    break
+            if bad_grad:
+                stopped_reason = "non_finite_gradients"
+                last_loss = float(loss.detach().cpu())
+                break
+            total_sq = 0.0
+            for p in self.model.parameters():
+                if p.grad is not None:
+                    total_sq += float(p.grad.detach().float().pow(2).sum().cpu())
+            grad_norm = float(total_sq**0.5)
+            if not math.isfinite(grad_norm):
+                stopped_reason = "non_finite_grad_norm"
+                last_loss = float(loss.detach().cpu())
+                break
             self.grad_norm_pre_clip.append(grad_norm)
+            torch.nn.utils.clip_grad_norm_(
+                self.model.parameters(), self.cfg.grad_clip_norm
+            )
             if grad_norm > self.cfg.grad_clip_norm:
                 self.clip_events += 1
             self.optimizer.step()

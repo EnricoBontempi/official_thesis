@@ -27,11 +27,14 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from combustion_recon.data.month2_normalizer import Month2FitOnlyNormalizer
+from combustion_recon.data.month2_protocol import load_yaml, sha256_file
 from combustion_recon.models.baselines import ParamConditionedMeanPredictor
 from combustion_recon.models.unet import build_dense_unet_from_config
 from combustion_recon.training.dense_cache import (
     DEFAULT_CACHE_ROOT,
+    DEFAULT_DENSE_CFG,
     DenseUNetCacheDataset,
+    assert_dense_scientific_contract,
     build_dense_cache,
     subset_indices_for_overfit,
 )
@@ -262,6 +265,176 @@ def cmd_overfit(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_profile(args: argparse.Namespace) -> int:
+    """U3 cost profiling: 1–2 TRAIN epochs + timed eval; VAL metrics not used for choices."""
+    if args.scientific:
+        raise SystemExit("Scientific U4 training is not authorized in profiling")
+    dense_cfg = load_yaml(args.dense_config)
+    contract = assert_dense_scientific_contract(dense_cfg)
+    cache_root = Path(args.cache_root)
+    if not (cache_root / "manifest.json").exists():
+        raise SystemExit(f"Missing dense cache at {cache_root}")
+
+    device = args.device
+    if device == "auto":
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+    set_seed(args.seed)
+    # Fresh weights — never load overfit checkpoint.
+    model = build_dense_unet_from_config(
+        init_seed=args.seed, base_channels=args.base_channels
+    )
+    n_params = model.count_parameters()
+    train_ds = DenseUNetCacheDataset(
+        "train_fit", cache_root=cache_root, p_conditioning=not args.p_off
+    )
+    val_ds = DenseUNetCacheDataset(
+        "val_eval", cache_root=cache_root, p_conditioning=not args.p_off
+    )
+    train_loader = make_loader(
+        train_ds, batch_size=args.batch_size, shuffle=True, seed=args.seed
+    )
+    val_loader = make_loader(
+        val_ds, batch_size=args.batch_size, shuffle=False, seed=args.seed
+    )
+    updates_per_epoch = int(np.ceil(len(train_ds) / max(1, args.batch_size)))
+    max_updates = int(args.epochs * updates_per_epoch)
+    cfg = TrainConfig(
+        lr=args.lr,
+        weight_decay=args.weight_decay,
+        max_updates=max_updates,
+        batch_size=args.batch_size,
+        seed=args.seed,
+        device=device,
+        wall_time_cap_s=args.wall_minutes * 60.0,
+    )
+    normalizer = Month2FitOnlyNormalizer()
+    trainer = DenseUNetTrainer(model, cfg=cfg, normalizer=normalizer)
+
+    effective = {
+        "phase": "U3_profiling",
+        "scientific_training": False,
+        "u4_authorized": False,
+        "dense_contract": contract,
+        "dense_config_path": str(Path(args.dense_config)),
+        "dense_config_sha256": sha256_file(Path(args.dense_config)),
+        "overrides": {
+            "base_channels": args.base_channels,
+            "batch_size": args.batch_size,
+            "epochs": args.epochs,
+            "lr": args.lr,
+            "weight_decay": args.weight_decay,
+            "seed": args.seed,
+            "device": device,
+            "p_off": bool(args.p_off),
+            "wall_minutes": args.wall_minutes,
+        },
+        "n_params": n_params,
+        "n_train": len(train_ds),
+        "n_val": len(val_ds),
+        "updates_per_epoch": updates_per_epoch,
+        "max_updates": max_updates,
+        "torch_threads": int(torch.get_num_threads()),
+        "note_val_metrics": (
+            "VAL timing only; metrics recorded for cost accounting, "
+            "NOT used to choose width/lr/budget"
+        ),
+    }
+    out_dir = Path(args.out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    write_json(out_dir / "effective_config.json", effective)
+
+    rss0 = _rss_gb()
+    t0 = time.perf_counter()
+    train_result = trainer.train_updates(
+        train_loader, max_updates=max_updates, log_every=max(1, updates_per_epoch // 2)
+    )
+    t_train = time.perf_counter() - t0
+    rss1 = _rss_gb()
+
+    t1 = time.perf_counter()
+    # Timed eval for cost only — do not use scores for architecture/lr decisions.
+    eval_out = trainer.evaluate_loader(
+        val_loader,
+        role="val_eval",
+        method="DenseUNet_profile",
+        variant="p_off" if args.p_off else "p_on",
+        model_seed=args.seed,
+    )
+    t_eval = time.perf_counter() - t1
+    rss2 = _rss_gb()
+
+    # Projection helpers (cost only).
+    sec_per_update = t_train / max(1, train_result["updates"])
+    projected = {
+        "sec_per_update": sec_per_update,
+        "sec_per_train_epoch": sec_per_update * updates_per_epoch,
+        "sec_per_val_eval_pass": t_eval,
+        "candidate_E_max_200_train_only_h": (sec_per_update * updates_per_epoch * 200) / 3600.0,
+        "candidate_E_max_200_with_eval_every_10_h": (
+            sec_per_update * updates_per_epoch * 200 + t_eval * (200 // 10 + 1)
+        )
+        / 3600.0,
+    }
+    # Stability signal on TRAIN loss only (not VAL).
+    hist = trainer.history
+    train_stability = {
+        "first_loss": train_result.get("first_loss"),
+        "last_loss": train_result.get("last_loss"),
+        "finite_throughout": all(
+            np.isfinite(h["loss"]) and np.isfinite(h["grad_norm_pre_clip"]) for h in hist
+        ),
+        "clip_frequency": train_result.get("clip_frequency"),
+        "stopped_reason": train_result.get("stopped_reason"),
+    }
+    # Budget proposal (recorded; U4 not launched).
+    propose_b = args.base_channels
+    propose_batch = args.batch_size
+    propose_device = device
+    # Keep b=32/batch=8 unless concrete resource pressure.
+    wall_hours_200 = projected["candidate_E_max_200_with_eval_every_10_h"]
+    if wall_hours_200 > 48 and propose_b == 32:
+        # Only suggest narrowing if projected cost is extreme on this host.
+        alt_note = "Consider b=16 if wall budget < projected; not applied automatically"
+    else:
+        alt_note = "Retain b=32, batch=8 on measured CPU profile unless GPU becomes available"
+
+    proposal = {
+        "base_channels": propose_b,
+        "batch_size": propose_batch,
+        "device": propose_device,
+        "E_max": 200,
+        "wall_time_cap_h": max(24.0, wall_hours_200 * 1.25),
+        "lr": args.lr,
+        "eval_every_epochs": 10,
+        "rationale": alt_note,
+        "val_metrics_used_for_choice": False,
+    }
+
+    # Extract VAL RMSE only as a logged number, flagged non-decisive.
+    sel = eval_out["aggregation"]["selection_mean_condition_rmse"]
+    val_rmse = None
+    if sel is not None and not getattr(sel, "empty", True):
+        val_rmse = float(sel["mean_condition_rmse_K"].iloc[0])
+
+    summary = {
+        "status": "ok",
+        "effective_config": effective,
+        "train_result": train_result,
+        "train_wall_s": t_train,
+        "eval_wall_s": t_eval,
+        "peak_rss_GB": max(rss0, rss1, rss2),
+        "projected": projected,
+        "train_stability": train_stability,
+        "budget_proposal_for_u4": proposal,
+        "val_mean_condition_rmse_K_logged_not_for_selection": val_rmse,
+        "overfit_weights_reused": False,
+    }
+    write_json(out_dir / "profile_summary.json", summary)
+    # Do not persist profiling weights as a scientific checkpoint.
+    print(json.dumps(summary, indent=2, default=str))
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description=__doc__)
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -294,6 +467,26 @@ def build_parser() -> argparse.ArgumentParser:
         help="Refused: scientific training not part of U2",
     )
     o.set_defaults(func=cmd_overfit)
+
+    pr = sub.add_parser("profile", help="U3 cost profiling (1–2 TRAIN epochs); not U4")
+    pr.add_argument("--cache-root", type=Path, default=DEFAULT_CACHE_ROOT)
+    pr.add_argument("--dense-config", type=Path, default=DEFAULT_DENSE_CFG)
+    pr.add_argument(
+        "--out-dir",
+        type=Path,
+        default=ROOT / "results" / "month2_dense_unet" / "u3_profile",
+    )
+    pr.add_argument("--epochs", type=float, default=2.0)
+    pr.add_argument("--batch-size", type=int, default=8)
+    pr.add_argument("--base-channels", type=int, default=32)
+    pr.add_argument("--lr", type=float, default=1e-3)
+    pr.add_argument("--weight-decay", type=float, default=1e-4)
+    pr.add_argument("--seed", type=int, default=0)
+    pr.add_argument("--device", type=str, default="auto")
+    pr.add_argument("--p-off", action="store_true")
+    pr.add_argument("--wall-minutes", type=float, default=120.0)
+    pr.add_argument("--scientific", action="store_true")
+    pr.set_defaults(func=cmd_profile)
     return p
 
 
