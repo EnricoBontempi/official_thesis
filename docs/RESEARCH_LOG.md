@@ -173,3 +173,13 @@ Questo file è il diario del progetto di tesi in `official_thesis` (ricostruzion
 - **Verificato:** `tests/test_unet_epoch_trainer.py` (visite campione, eval/selezione/tie-break, checkpoint, wall/non-finite, rifiuto CLI senza auth).
 - **Non eseguito:** training scientifico completo; nessuna nuova eval VAL scientifica; budget non dichiarato approvato.
 - **Comando futuro:** vedi report `03_dense_velocity_diagnostic.md` sezione U4.
+
+---
+
+## 2026-11-17 — Preflight Engaging (sola lettura; U4 fermo)
+
+- **Mandato:** ricognizione risorse ORCD/Engaging per fattibilità `official_thesis`; nessun job, allocazione, trasferimento o modifica remota; U4 non lanciato; budget/architettura/config U4 non toccati.
+- **Osservato (~16:28–16:31 America/New_York):** SSH OK; account AMF GPU/CPU + `mit_general`; “4 normal + 4 preemptable” = MaxTRESPU `gres/gpu=4` su QoS `mit_amf_advanced_gpu` e `mit_preemptable` (non 8 GPU idle). Job personali: 2R+14PD tutti `dbg4b-*` su `mit_preemptable`/`mit_general`/QoS `normal` (1×H100) — occupazione HONF separata, non consuma i due cap da 4 AMF/preemptable-QoS. Zero job su `mit_amf_advanced_gpu`. Partition `mit_normal_gpu` MaxTime 6 h, PreemptMode OFF; preemptable fino a 2 d con REQUEUE.
+- **Software/storage:** nessun checkout `official_thesis` sul cluster; env PyTorch trovato solo `~/envs/honf` (progetto separato); POOL/SCRATCH utente 0/1024 GiB; HOME ~69/200 GiB. Smoke CUDA pendente (serve allocazione).
+- **Report:** [engaging_resource_preflight.md](month2/engaging_resource_preflight.md).
+- **Stop:** nessun training locale/cluster; nessun `sbatch`/`salloc`/`srun`.
