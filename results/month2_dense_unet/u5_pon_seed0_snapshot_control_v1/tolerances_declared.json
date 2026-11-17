@@ -1,0 +1,7 @@
+{
+  "aligned_replay_atol_K": 0.05,
+  "aligned_replay_rtol": 1e-05,
+  "declared_before_replay": true,
+  "u4_ref_seen_macro_K": 37.675490288478024,
+  "u4_ref_val_macro_K": 26.931456559998264
+}

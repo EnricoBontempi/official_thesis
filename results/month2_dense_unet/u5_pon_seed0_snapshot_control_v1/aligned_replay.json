@@ -1,0 +1,8 @@
+{
+  "seen_abs_diff_vs_u4": 0.0,
+  "seen_macro_rmse_K": 37.675490288478024,
+  "seen_ok": true,
+  "val_abs_diff_vs_u4": 0.0,
+  "val_macro_rmse_K": 26.931456559998264,
+  "val_ok": true
+}

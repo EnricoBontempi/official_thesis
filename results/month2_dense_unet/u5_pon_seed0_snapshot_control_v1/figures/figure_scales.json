@@ -1,0 +1,8 @@
+{
+  "T_vmax_K": 2780.7929041547495,
+  "T_vmin_K": 204.67625396485073,
+  "error_symmetric_limit_K": 1473.4288668328154,
+  "mean_abs_error_vmax_K": 511.7932300535133,
+  "note": "scales fixed from the three VAL frame-1000 panels before export",
+  "val_frame_index": 1000
+}

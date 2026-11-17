@@ -2,7 +2,7 @@
 
 **Progetto:** esclusivamente `EnricoBontempi/official_thesis`, MIT/Deng Lab.  
 **Preparata:** 2026-11-17, America/New_York.  
-**Stato:** piano operativo richiesto da Enrico dopo discussione della proposta Opus. Su `mission/dense-unet`, **U0–U3 eseguiti fino a STOP B**; **decisione Enrico 2026-11-17** autorizza preparazione Engaging + smoke/profiling GPU + **un** training scientifico p_on seed 0 (max iniziale 1000 epoche, VAL selection, early stop). Sostituisce il candidato CPU/200; non adotta WSD Opus. Ratifica supervisori **non** documentata/non inventata.  
+**Stato:** su `mission/dense-unet`, **U0–U5 eseguiti** (U4 Engaging p_on seed 0; U5 snapshot-swap su best@160). **STOP C** per discussione prima di U6. Ratifica supervisori **non** documentata/non inventata.  
 **Piano principale:** [roadmap_month2.md](roadmap_month2.md), dettaglio dello **Step 2.4**, non roadmap concorrente del Mese 2.  
 **Missione precedente:** [roadmap_missione.md](roadmap_missione.md); consolidamento completato sul branch dedicato, integrazione in main ancora pendente alla ricognizione.  
 **Esecutore:** Cursor IDE, un incarico delimitato alla volta, con restituzione dei risultati a Enrico/ChatGPT.
@@ -246,7 +246,7 @@ Tutti gli step sono inizialmente **[ ] non eseguiti**. Codice presente non equiv
 - [x] U1 — Contratto denso e cache verificati. (760/220/123; payload gitignored; stub `data/manifests/month2_dense_unet_cache_manifest.json`; validazione rafforzata post-STOP A)
 - [x] U2 — Implementazione/test/overfit consegnati. **STOP A.** + correzioni isolamento/grad/YAML; Step 2.4 **non** dichiarato completo
 - [x] U3 — Profiling e GappyPOD denso; budget proposto. **STOP B.** (U4 non avviato)
-- [x] U4 — Primo training p_on seed 0 eseguito su Engaging (job `29465586`, L40S, early stop ep. 730, best VAL 26.93 K @160). **STOP prima di U5.**
-- [ ] U5 — Controllo istantanee e interpretazione. **STOP C.**
+- [x] U4 — Primo training p_on seed 0 eseguito su Engaging (job `29465586`, L40S, early stop ep. 730, best VAL 26.93 K @160).
+- [x] U5 — Controllo istantanee (job `29471596`): aligned replay OK; VAL 26.93→96.55 K allo scambio. **STOP C.**
 - [ ] U6 — p_off/seed eseguiti oppure rinvii registrati.
 - [ ] U7 — Report finale e scelta del prossimo incarico.

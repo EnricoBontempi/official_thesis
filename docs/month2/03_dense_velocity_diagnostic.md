@@ -2,8 +2,8 @@
 
 **Project:** `EnricoBontempi/official_thesis` only (MIT/Deng Lab).  
 **Roadmap:** [roadmap_unet.md](../../roadmap_unet.md)  
-**Phases:** U0–U4 **executed** through Engaging p_on seed-0 (early stop). U5+ not started.  
-**Not claimed:** Step 2.4 complete (U5–U7 open); supervisor ratification; U5/p_off/other seeds; GLU.
+**Phases:** U0–U5 **executed** (U5 = snapshot-swap control on U4 best). U6–U7 not started.  
+**Not claimed:** Step 2.4 / mission complete; supervisor ratification; p_off/other seeds; GLU; sparse success.
 
 ## Status legend
 
@@ -130,17 +130,32 @@ Full curves, per-frame best/last, and scheduler counters: `auto_report.md`, `eva
 
 **Env delta vs local WSL:** Engaging `torch 2.8.0+cu128` (local `.venv` was `2.15.0+cu132`); dedicated `~/envs/official_thesis` (HONF env untouched).
 
+## U5 — Snapshot-swap control (executed)
+
+| Item | Value |
+|---|---|
+| Code SHA | `8549a9b900a038d41da7513831a90908c49b87aa` |
+| Job | `29471596` · AMF · `mit_normal_gpu` · **L40S** · `node3102` |
+| Checkpoint | U4 `best.pt` @160 · sha256 `6d456abc…a03634` |
+| Aligned replay | VAL/seen macros **exact match** to U4 (Δ=0; atol declared 0.05 K) |
+| VAL macro | aligned **26.93** → swapped **96.55** K (Δ **+69.6**) |
+| Seen macro | aligned **37.68** → swapped **150.30** K (Δ **+112.6**) |
+| Matched VAL | GappyPOD 70.46 · ParamMean 88.01 · GlobalMean 139.70 K |
+| Run dir | `results/month2_dense_unet/u5_pon_seed0_snapshot_control_v1/` |
+
+**Reading (see `interpretation.md`):** swap hurts; mostly structure (Centered-RMSE), with a much larger hit on `0NH3_1.05`. Evidence that instantaneous velocity–temperature alignment matters for this seed — **not** causality, ceiling, or sparse transfer. VAL remains selection-contaminated.
+
 ## Checklist
 
 - [x] U0–U2 (STOP A) + corrective A1–A4  
 - [x] U3 profiling + dense GappyPOD — **STOP B**  
-- [x] U4 pre-run corrections + Engaging decision  
-- [x] U4 scientific p_on Engaging run — **done; STOP before U5**  
-- [ ] U5–U7 pending  
+- [x] U4 Engaging p_on seed 0  
+- [x] U5 snapshot-swap control — **STOP C (discuss before U6)**  
+- [ ] U6–U7 pending  
 
 ## Explicit non-claims
 
-- Step 2.4 not complete (U5–U7 open).  
-- Single seed; no robustness claim; VAL used for selection.  
-- No U5/p_off/other seeds/GLU/sparse/T-sensors/TEST executed here.  
-- Budget not open for continuation: early-stopped before 1000 while not still improving under the 0.1% rule.
+- Step 2.4 / Month-2 not complete.  
+- Single seed; VAL used for U4 selection/scheduler/stop.  
+- No p_off/other seeds/GLU/sparse/T-sensors/TEST in this mandate.  
+- Swap result ≠ physical mechanism proof or information ceiling.

@@ -1,0 +1,7 @@
+{
+  "abs_diff": 0.0,
+  "gappy_val_macro_rmse_K": 70.46287221326743,
+  "note": "reconstructed with selected \u03bb=0.01; not a new search",
+  "ok_within_0_5K": true,
+  "u3_selected_val": 70.46287221326743
+}

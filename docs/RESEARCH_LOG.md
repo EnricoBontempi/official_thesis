@@ -202,3 +202,12 @@ Questo file è il diario del progetto di tesi in `official_thesis` (ricostruzion
 - **Confronto lineare matched (U3):** GappyPOD denso p_on VAL selezionato ≈70.5 K. Un solo seed; niente U5/p_off.
 - **Report:** `results/month2_dense_unet/u4_pon_seed0_engaging_v1/auto_report.md` + aggiornamento `03_dense_velocity_diagnostic.md`.
 - **STOP:** nessun U5, p_off, altri seed, GLU, sparse, sensori T o TEST.
+
+---
+
+## 2026-11-17 — U5 snapshot-swap (STOP C)
+
+- **Eseguito:** codice `8549a9b`; job Engaging `29471596` (L40S `node3102`); best U4 @160 verificato (sha `6d456abc…`); replay aligned VAL/seen **identici** a U4 (Δ=0, atol dichiarato 0.05 K).
+- **Risultato numerico:** VAL macro 26.93→96.55 K (Δ+69.6); seen 37.68→150.30 (Δ+112.6). Peggioramento soprattutto strutturale; `0NH3_1.05` molto più sensibile. Matched VAL: GappyPOD 70.46, ParamMean 88.01, GlobalMean 139.70.
+- **Artefatti:** `results/month2_dense_unet/u5_pon_seed0_snapshot_control_v1/` (pairing, tabelle, figure, `auto_report.md`, `interpretation.md`).
+- **Limiti:** VAL contaminata da selezione U4; un seed; niente causalità/ceiling/sparse. **STOP** prima di U6/p_off/altri seed.
