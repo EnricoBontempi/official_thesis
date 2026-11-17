@@ -2,7 +2,7 @@
 
 **Data aggiornamento Step 2.1:** 2026-11-16, America/New_York (UTC−05:00)  
 **Ambito:** esclusivamente `EnricoBontempi/official_thesis`; nessuna attività HONF.  
-**Stato:** protocollo pilota versionato (`month2_frame_protocol_v1`, `month2_pilot_v1`); **Step 2.2 pipeline implementata e verificata su shard locali**; **nessuna ratifica tecnica documentata dei supervisori**; nessun training/baseline Mese 2 ancora eseguito; Engaging/GPU non verificati.  
+**Stato aggiornato 2026-11-17:** protocollo, pipeline e baseline 2.1–2.3 eseguiti; consolidamento completato sul branch `mission/baseline-consolidation` a `3cf7bf0`, non ancora integrato alla ricognizione. **Piano U-Net 2.4 pubblicato, non implementato né eseguito**; nessuna ratifica tecnica documentata dei supervisori; Engaging/GPU non verificati.  
 **Piano operativo:** [roadmap_month2.md](../../roadmap_month2.md).  
 **Autorizzazione operativa Enrico:** conversazione del 16 novembre 2026 (approvazione roadmap e avvio lavoro). Distinta da qualsiasi approvazione dei supervisori.
 
@@ -137,3 +137,16 @@ Hash di riferimento (non autoreferenziali):
 **Non bloccanti per Step 2.3 locale:** D1 provenienza; ratifica supervisori; lock fold; D4/D7/3C/testa; Engaging (si può partire in locale).
 
 **Prima di run scientifici su cluster / confronti costosi:** verificare host/GPU e budget (D8); audit GLU prima del confronto GLU (2.5); gestire il picco RAM del decode Arrow (prefetch selettivo / meno worker).
+
+
+## 10. Aggiornamento operativo 2026-11-17 — Missione U-Net
+
+Questo aggiornamento prevale sugli stati pendenti storici delle sezioni 5–9 per il solo avanzamento qui descritto; non riscrive quanto fosse stato verificato il 16 novembre.
+
+- **D4:** dopo proposta Opus e discussione con Enrico, primo esperimento = U-Net densa single-frame, output T diretto, coordinate esplicite e concatenazione dei canali NH3/phi. p_on principale; p_off successivo; FiLM e mean prior rinviati. Dettaglio e criteri in [roadmap_unet.md](../../roadmap_unet.md). Piano operativo, non modello già implementato o ratifica supervisori.
+- **D8:** profiling prima di fissare larghezza, epoche e dispositivo; CPU ammessa se fattibile, GPU/Engaging da verificare; 24 GPU-ore restano proposta, non allocazione.
+- **D9:** stats fit-only già calcolate in 2.2, nessun refit richiesto dalla missione. Fold ancora non attivati.
+- **Consolidamento:** dipendenza remota `3cf7bf0`, ancora fuori main alla preparazione; conserva replica e storia dei risultati. Non lavorare sui neurali da main senza includere quel codice aggiornato.
+- **D7:** single-frame; associazione campo-tempo non verificata su tutto `40NH3_1.2`. Finestre temporali fuori missione.
+- **Confronti densi:** ParamMean e GappyPOD R=32 con medesima velocità completa; controllo di scambio istantanee. Nessuna modifica dei comparatori storici sparse e nessun TEST.
+- **Stato:** solo pianificazione/push documentale; U0–U7 non eseguiti. La nuova specifica U-Net è stata revisionata da Opus e discussa con ChatGPT, non revisionata da Astra in questa fase.

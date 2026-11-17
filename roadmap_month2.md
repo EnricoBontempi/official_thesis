@@ -3,7 +3,7 @@
 **Progetto:** Neural Reconstruction of Hidden Temperature Fields from Sparse Observations in Turbulent Combustion  
 **Autore:** Enrico Bontempi — MSc Thesis, Deng Lab, MIT  
 **Preparata:** 2026-11-16, America/New_York (UTC−05:00)  
-**Stato:** **autorizzata operativamente da Enrico** (conversazione 2026-11-16) come piano di lavoro; **Step 2.1 concretizzato** (protocollo frame + contratto pilota versionati). Gli step 2.2–2.9 restano aperti. **Nessuna ratifica tecnica documentata dei supervisori.** GPU/allocazione Engaging e stats fit-only non ancora verificati/calcolati.  
+**Stato aggiornato 2026-11-17:** piano autorizzato operativamente da Enrico; 2.1–2.3 eseguiti. Consolidamento tecnico completato sul branch `mission/baseline-consolidation` (`3cf7bf0`), non ancora integrato alla preparazione di questo aggiornamento. **Step 2.4 dettagliato in [roadmap_unet.md](roadmap_unet.md), non implementato né eseguito.** Stats fit-only calcolate in 2.2; GPU/allocazione Engaging non verificate; nessuna ratifica tecnica documentata dei supervisori.  
 **Fonti:** [proposal disponibile](docs/proposal.md), [Mese 1](roadmap_month1.md), [diario](docs/RESEARCH_LOG.md), [report LaTeX aggiornato](overleaf_month1_report/main.tex), [contesto verificato e decisioni](docs/month2/00_context_and_decisions.md).
 
 > **Limite di provenienza:** `documents_thesis/main.tex` è il report del Mese 1 del 15 novembre, identico alla copia sopra, non il proposal inviato il 13 novembre. Non ci sono altri sorgenti inclusi tramite `input/include`; è stata letta la bibliografia. L'identità fra `docs/proposal.md` e l'allegato inviato non è verificata. La ricognizione e le differenze accertabili sono nel [registro](docs/month2/00_context_and_decisions.md#1-provenienza-e-limite-sul-documento-inviato). Non modificare il proposal inviato per adeguarlo al piano.
@@ -125,17 +125,17 @@ Il risultato minimo del Mese 2 è una pipeline riproducibile, baseline qualifica
 
 ### Step 2.4 — Primo neurale: diagnostico da velocità densa single-frame
 
-- **Stato:** `[ ] Candidato da concordare e allenare`; **classe:** E + S.
+- **Stato:** `[ ] Piano dettagliato, non eseguito`; **classe:** E + S. [roadmap_unet.md](roadmap_unet.md) specifica contratto, U0–U7 e STOP A/B/C; è il riferimento operativo del solo Step 2.4.
 - **Problema:** una mappa non lineare spaziale usa la velocità meglio delle baseline, prima di complicare la rappresentazione sparse?
 - **Motivazione/dipendenze:** 2.3 e D4/D8. È lo “Step 0” del report LaTeX, reinterpretato come **baseline empirica ad alta copertura**, non prova di un information ceiling.
 - **Attività concrete:**
   1. U-Net compatta 2D a risoluzione 128×128: input vi/vj e coordinate coerenti, un output T normalizzato, loss MSE normalizzata. Dimensioni/livelli/parametri dichiarati dopo profiling; nessuna loss PDE, testa di varianza o saturazione fisica imposta all'output iniziale.
-  2. Un solo meccanismo p on/off: proposta FiLM. Tenere stessi dati, capacità comparabile, optimizer, query e criterio checkpoint. Il ramo senza p non sottrae ParamMean(p). Per isolare FiLM, iniziare con stessa parametrizzazione diretta di T; introdurre un mean prior sarebbe un'altra variante da giustificare.
+  2. Un solo meccanismo p on/off: **concatenazione di due canali costanti p**, come dettagliato nella roadmap U-Net dopo la proposta Opus del 17 novembre; coordinate x/y esplicite e output T diretto. Stessa rete con canali p a zero in p_off. FiLM e residuo su ParamMean restano varianti successive da motivare, non attive.
   3. Prima test forward/backward e overfit di pochi sample TRAIN; poi un seed di screening, non una campagna. Confrontare curve train/seen/VAL e mappe nelle regioni di getto/mixing, non solo RMSE media.
   4. Se il diagnostico resta scarso, escludere bug, mancata convergenza e capacità insufficiente con una sola verifica mirata. Non concludere “informazione fisicamente assente”.
-  5. **Solo dopo D7 e un motivo dai risultati:** confrontare 3 frame causali [t−2,t−1,t] con stessi target T(t), budget ed evaluation frame ammissibili. Sono frame raw consecutivi a 0.25 ms, non i frame fit distanti 40 indici. Escludere t<2 da entrambi i confronti e non oltrepassare separazioni temporali. Input aggiuntivi, non previsione futura. Nessuna finestra simmetrica nel confronto causale primario.
+  5. **Fuori dalla missione U-Net attuale:** eventuali finestre temporali richiedono una decisione D7 separata e associazioni campo-tempo effettivamente verificate. Su tutto `40NH3_1.2` l'associazione non è verificata: non dedurre una timeline fisica dagli indici né usare lì il precedente assunto uniforme 0.25 ms. Restare single-frame.
 - **Output/file:** futuri `src/combustion_recon/models/unet.py`, `training/trainer.py`, `scripts/07_train_reconstructor.py`, `configs/models/unet_small.yaml`; config dense p on/off; `docs/month2/03_dense_velocity_diagnostic.md`, run card e tabelle. Checkpoint fuori Git, con percorso persistente e hash nel run manifest.
-- **Verifiche/completamento:** overfit sanity riuscito, finite loss/gradienti, checkpoint riproducibile, input isolation passata, costo misurato, confronto VAL con ParamMean/LocalHGB dense. Nessuna soglia di “utilità fisica” inventata dopo aver guardato TEST; se serve una tolleranza ingegneristica, concordarla prima.
+- **Verifiche/completamento:** overfit sanity riuscito, finite loss/gradienti, checkpoint riproducibile, input isolation passata, costo misurato, confronto VAL con ParamMean e GappyPOD denso matched; LocalHGB denso diagnostico secondario; controllo con velocità di un'altra istantanea della stessa condizione. Nessuna soglia di “utilità fisica” inventata dopo aver guardato TEST; se serve una tolleranza ingegneristica, concordarla prima.
 - **Passaggio:** dense→sparse se il modello è tecnicamente valido. Se il guadagno è debole, documentare l'esito e dare priorità al confronto assisted; non promettere che GLU risolva il problema né cancellare il ramo free.
 
 ### Step 2.5 — Audit dell'interfaccia GLU e scelta dell'adattamento minimo
@@ -225,16 +225,18 @@ Non replicare tre seed per ogni riga di ricerca iperparametrica. Ripetere i fina
 - **Verifiche/completamento:** un altro agente può ricostruire ogni tabella da commit/config/dati identificati; checkpoint e risultati pesanti hanno riferimento persistente fuori Git; nessuna conclusione di impossibilità fisica da un modello fallito; novità metodologica non dichiarata per il solo uso di FiLM/maschere.
 - **Passaggio:** decisione registrata e una domanda successiva falsificabile. Se manca la ratifica scientifica, dichiarare “baseline/primo pilot completati, revisione aperta”, non “Mese 2 approvato”.
 
-## Missione attiva dopo la revisione delle baseline
+## Missioni circoscritte: consolidamento e primo neurale
 
-Opus e Astra hanno revisionato indipendentemente `822ed52` e concluso «pronti dopo correzioni circoscritte». Enrico ha autorizzato il consolidamento con Cursor IDE locale: [roadmap_missione.md](roadmap_missione.md) dettaglia correzioni, diagnosi raw, provenienza e una replica invariata delle baseline. La missione si ferma prima di qualsiasi lavoro neurale e non autorizza nuove griglie, R=64 o cambi scientifici. I risultati Step 2.3 rimangono storici: la preregistrazione cronologica non è attestabile dagli artefatti disponibili. Nessuna nuova esecuzione è stata svolta durante la preparazione del piano. Prima di 2.4 occorrono consegna e discussione con Enrico.
+[roadmap_missione.md](roadmap_missione.md) riguarda soltanto il consolidamento 2.2–2.3. La consegna è sul branch `mission/baseline-consolidation` a `3cf7bf0`: replica invariata, metadati temporali corretti e nessun neurale. Alla preparazione del piano U-Net non è ancora integrata in main; il suo codice aggiornato è una dipendenza, non va perso lavorando dal solo main.
+
+[roadmap_unet.md](roadmap_unet.md), richiesta da Enrico il 17 novembre dopo discussione della specifica Opus, dettaglia **soltanto 2.4**: implementazione/verifiche piccole → STOP A; profiling e GappyPOD denso → STOP B; primo training p_on e controllo delle istantanee → STOP C; p_off/seed delimitati e report. Non avvia GLU, sparse, assisted o TEST. Piano pubblicato non equivale a esperimenti eseguiti o ratifica supervisori.
 
 ## Istruzioni pratiche per gli agenti di coding
 
 1. Prima di ogni task leggere istruzioni correnti, `git status`, remoto aggiornato, diario, questa roadmap e decisioni applicabili. Non importare esperimenti o diario di `thesis-research`/HONF.
 2. Prendere un solo step o un sotto-obiettivo esplicito con criterio d'uscita. I percorsi futuri sopra sono proposti, non file già esistenti né autorizzazione a eseguire l'intera fase in autonomia.
 3. Prima della modifica cercare moduli/config esistenti e riusarli. Conservare `external/GLU_Reconstruction/` intatto. Code/config/test di tesi sotto `src/`, `configs/`, `scripts/`, `tests/`.
-4. Un run parte soltanto dopo smoke CPU, validazione protocollo, disponibilità GPU e tetto di costo registrato. Un pilot breve può profilare il costo prima del run completo; mai lanciare il default upstream da 100000 epoche.
+4. Un run parte soltanto dopo smoke CPU, validazione protocollo, dispositivo e tetto di costo verificati e registrati. CPU locale ammessa se fattibile; GPU/Engaging richiedono verifica effettiva quando usati. Un pilot breve può profilare il costo prima del run completo; mai lanciare il default upstream da 100000 epoche.
 5. Run manifest minimo: commit, config/hash, dataset/shard e frame ID/hash, normalizer/prior/POD hash, input ammessi, p/K/2C/3C/tempo, seed training e maschere, device/versioni, ottimizzazioni/query, criterio checkpoint, tempo/RAM/VRAM, output persistenti e stato esito.
 6. Non versionare raw, cache o checkpoint pesanti; versionare configurazioni, manifest, tabelle compatte e report. Non far riscrivere gli artefatti Mese 1 agli script Mese 2.
 7. Diario: distinguere ispezionato, implementato, eseguito, verificato, proposto e approvato. Spuntare lo step solo con tutti i suoi criteri; annotare esplicitamente optional non eseguiti e motivazione.
@@ -244,8 +246,8 @@ Opus e Astra hanno revisionato indipendentemente `822ed52` e concluso «pronti d
 
 - [x] 2.1 — Protocollo pilota e default operativi versionati; autorizzazione Enrico registrata; limite proposal e assenza ratifica supervisori espliciti; fold geometricamente verificati (lock scientifico fold ancora aperto). Non implica GPU verificate né stats fit-only già calcolate.
 - [x] 2.2 — Pipeline Month-2 reale verificata in locale (fit-only, isolation, collate, gate TEST) + protezioni API (membership, provenance, aggregazione, prefetch). Engaging/GPU ancora non verificati; picco RAM legato al decode Arrow.
-- [x] 2.3 — Baseline CPU sul protocollo Mese 2 (GlobalMean/ParamMean/GappyPOD 2C ±AO/T-block, Oracle, HGB dense diagnostico); search preregistrata; report `02_baseline_validation.md`. R=64 non eseguito. Stop per revisione indipendente prima del 2.4.
-- [ ] 2.4 — Primo neurale denso valido e confronto seen/VAL; optional temporale deciso separatamente.
+- [x] 2.3 — Baseline CPU sul protocollo Mese 2 (GlobalMean/ParamMean/GappyPOD 2C ±AO/T-block, Oracle, HGB dense diagnostico); ricerca versionata (preregistrazione cronologica storica non attestabile); report `02_baseline_validation.md`. R=64 non eseguito. Consolidamento e replica completati su `mission/baseline-consolidation` a `3cf7bf0`; integrazione ancora pendente alla ricognizione.
+- [ ] 2.4 — Piano [roadmap_unet.md](roadmap_unet.md) pubblicato, nessuna esecuzione: U-Net densa, riferimento GappyPOD denso e controllo istantanee; optional temporale fuori missione.
 - [ ] 2.5 — Audit GLU concluso e adattamento scelto o rinviato con motivazione.
 - [ ] 2.6 — Primo neurale sparse e comparatori matched; confronto GLU presente oppure esplicitamente ancora aperto.
 - [ ] 2.7 — Free/assisted confrontati, almeno AO e GappyPOD con stesse osservazioni; testa appresa non obbligatoria.
