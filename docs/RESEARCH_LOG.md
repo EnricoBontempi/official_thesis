@@ -114,3 +114,13 @@ Questo file è il diario del progetto di tesi in `official_thesis` (ricostruzion
 - **Ambito:** controlli d'isolamento effettivi, diagnosi del timestamp `40NH3_1.2`, tracciabilità codice/ambiente/dati, contratto YAML, aggregazione e confronto con il run storico. Il vecchio «preregistrato» è una dichiarazione non attestabile cronologicamente; la replica non ne riscrive la storia.
 - **Rinviati:** U-Net/GLU, R=64, nuove griglie/τ, esperimenti temporali e modifiche agli split. La futura consegna del codice sarà su branch/PR senza merge automatico.
 - **Stato:** piano preparato da ChatGPT/Codex e autorizzato per l'esecuzione futura; in questa attività nessuna modifica di codice, nessun rerun, nessun training.
+
+---
+
+## 2026-11-16 — Missione consolidamento baseline eseguita (COMPLETATA, in attesa revisione)
+
+- **Esecuzione:** branch `mission/baseline-consolidation`; freeze codice `2c800ce` poi replica `consolidation_v1`.
+- **Dati:** SHA shard `40NH3_1.2` = inventario remoto; pad generico rimosso; frame 2000 = duplicato di 1999; tempo non validato oltre `t_len`.
+- **Replica vs `822ed52`:** metriche per-frame max abs diff = 0; selezioni identiche; classificazione `identical_or_within_tolerance`.
+- **Report:** [mission_baseline_consolidation_report.md](month2/mission_baseline_consolidation_report.md). Storico `results/tables/` intatto.
+- **Stop:** nessun U-Net/GLU/Step 2.4; attendere Enrico/ChatGPT. Corregge anche la lettura troppo forte di «preregistrato» sul run storico (non attestabile cronologicamente).

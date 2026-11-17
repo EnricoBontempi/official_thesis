@@ -3,8 +3,8 @@
 **Progetto:** esclusivamente `EnricoBontempi/official_thesis`, tesi MIT/Deng Lab.  
 **Base scientifica revisionata:** `822ed52c07eded37bba4f79af0f2177da4aa36eb`.  
 **Data di preparazione:** 2026-11-16, America/New_York.  
-**Stato:** missione autorizzata da Enrico, **non ancora eseguita**.  
-**Esecutore previsto:** Cursor IDE nel PC/WSL locale con gli shard esistenti.  
+**Stato:** missione **eseguita** su branch `mission/baseline-consolidation` — esito **COMPLETATA, IN ATTESA DI REVISIONE** (report `docs/month2/mission_baseline_consolidation_report.md`).  
+**Esecutore:** Cursor IDE nel PC/WSL locale con gli shard esistenti.  
 **Piano principale:** [roadmap_month2.md](roadmap_month2.md), consolidamento Step 2.2–2.3. Questo documento ne dettaglia soltanto la chiusura tecnica; non autorizza Step 2.4–2.9.
 
 ## Obiettivo e limite finale
@@ -199,11 +199,11 @@ Messaggio finale dell'agent:
 
 ## Checklist della missione (compilazione dell'esecutore)
 
-- [ ] M0 — ambiente e branch sicuri.
-- [ ] M1 — diagnosi raw e politica temporale documentata.
-- [ ] M2 — invarianti effettivi e test.
-- [ ] M3 — contratto/aggregazione/output corretti.
-- [ ] M4 — codice/config committati prima del run, provenienza e confronto fissati.
-- [ ] M5 — replica invariata completa oppure blocco esplicito.
-- [ ] M6 — confronto completo e differenze spiegate.
-- [ ] M7 — report, diario, branch/PR; arresto prima dei neurali.
+- [x] M0 — ambiente e branch sicuri.
+- [x] M1 — diagnosi raw e politica temporale documentata.
+- [x] M2 — invarianti effettivi e test.
+- [x] M3 — contratto/aggregazione/output corretti.
+- [x] M4 — codice/config committati prima del run, provenienza e confronto fissati.
+- [x] M5 — replica invariata completa oppure blocco esplicito.
+- [x] M6 — confronto completo e differenze spiegate.
+- [x] M7 — report, diario, branch/PR; arresto prima dei neurali.

@@ -6,7 +6,7 @@
 **Month 1 Roadmap:** [roadmap_month1.md](roadmap_month1.md)  
 **Month 2 Roadmap:** [roadmap_month2.md](roadmap_month2.md) — operationally authorized by Enrico (2026-11-16); Step 2.1 protocol concretized; supervisor technical ratification tracked separately  
 **Month 2 Protocol:** [configs/splits/month2_frame_protocol.yaml](configs/splits/month2_frame_protocol.yaml), [configs/experiments/month2_pilot.yaml](configs/experiments/month2_pilot.yaml)  
-**Active Baseline Consolidation Mission:** [roadmap_missione.md](roadmap_missione.md) — Cursor IDE; stop before neural work  
+**Baseline Consolidation Mission:** [roadmap_missione.md](roadmap_missione.md) — executed; report [docs/month2/mission_baseline_consolidation_report.md](docs/month2/mission_baseline_consolidation_report.md); stop before neural work  
 **Research Log:** [docs/RESEARCH_LOG.md](docs/RESEARCH_LOG.md)  
 **Current Evidence & Open Decisions:** [docs/month2/00_context_and_decisions.md](docs/month2/00_context_and_decisions.md)
 

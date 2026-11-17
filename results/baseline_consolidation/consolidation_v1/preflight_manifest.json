@@ -1,0 +1,82 @@
+{
+  "run_id": "consolidation_v1",
+  "timestamp_utc": "2026-11-17T00:45:51.145990+00:00",
+  "smoke": false,
+  "git_head": "2c800cedd1cccc6935eb64c6af57fbdd6001aee8",
+  "git_status_porcelain": "",
+  "cfg_sha256": "6efa357ec8d110c4d01e8387b6976f05fcbb82a9d27e574456c7337fff5cec03",
+  "runner_sha256": "f5407bf488230c5e98686c888448506e0b4400c8c8739f671cb05b5e7e1fa30f",
+  "adapters_sha256": "20eecffd09d88131ef0f3333f06f4cd9136e8cf13f5fd5a209348861206e9f6b",
+  "baselines_py_sha256": "6db6878d4e62b8e1e4dd956a0db994bfe52ab094b04786b3d1259568566e7f36",
+  "shard_access_sha256": "cd2a14022b49d642b7b0c39bc14c0ae7295a8225ea5b070b220ffacfc965c72a",
+  "norm_stats_sha256": "678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e",
+  "python": "3.13.13 | packaged by Anaconda, Inc. | (main, Apr 14 2026, 06:19:41) [GCC 14.3.0]",
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+  "numpy": "2.5.4",
+  "executable": "/home/enric/projects/official_thesis/.venv/bin/python",
+  "OMP_NUM_THREADS": null,
+  "MKL_NUM_THREADS": null,
+  "OPENBLAS_NUM_THREADS": null,
+  "comparison_rule": {
+    "metric_atol_K": 1e-06,
+    "metric_rtol": 1e-08,
+    "ids_must_match_exactly": true,
+    "pairing_keys": [
+      "method",
+      "role",
+      "p_conditioning",
+      "K",
+      "site_fraction",
+      "variant",
+      "mask_replica_id",
+      "sim_id",
+      "frame_index",
+      "R",
+      "ridge_lambda",
+      "w_T",
+      "observation_hash"
+    ]
+  },
+  "contract": {
+    "site_fraction": 0.05,
+    "pod_R": 32,
+    "free_lams": [
+      0.0001,
+      0.001,
+      0.01,
+      0.1,
+      1.0
+    ],
+    "asst_lams": [
+      0.001,
+      0.01,
+      0.1
+    ],
+    "asst_wT": [
+      0.5,
+      5.0,
+      50.0
+    ],
+    "K_values": [
+      0,
+      9,
+      32
+    ],
+    "ao_tau": 1.0,
+    "replicas": [
+      0,
+      1,
+      2
+    ],
+    "layout_id": "random_sparse_primary",
+    "mask_seed": 20261116,
+    "stats_path": "/home/enric/projects/official_thesis/data/manifests/train_norm_stats_month2_fit.json",
+    "max_cached_frames": 2048,
+    "run_hgb": true,
+    "hgb_max_pixels": 80000,
+    "w_T_fixed_unused": 5.0
+  },
+  "raw_dir": "/home/enric/projects/official_thesis/data/raw/combustion/hf_dataset/numerical",
+  "out_dir": "/home/enric/projects/official_thesis/results/baseline_consolidation/consolidation_v1",
+  "historical_note": "Historical 822ed52 run remains the dated record with incomplete provenance; this replica does not retroactively attest preregistration."
+}

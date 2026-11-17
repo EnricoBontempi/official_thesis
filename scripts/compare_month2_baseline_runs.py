@@ -60,6 +60,9 @@ def _norm_key_frame(df: pd.DataFrame) -> pd.DataFrame:
     for c in PAIR_KEYS:
         if c not in out.columns:
             out[c] = np.nan
+    # Historical LocalHGB rows omitted R; consolidation tags R=0. Treat missing R as 0.
+    if "R" in out.columns:
+        out["R"] = pd.to_numeric(out["R"], errors="coerce").fillna(0)
     # normalize bool-like
     if out["p_conditioning"].dtype == object:
         out["p_conditioning"] = out["p_conditioning"].map(
@@ -71,17 +74,32 @@ def _norm_key_frame(df: pd.DataFrame) -> pd.DataFrame:
 def _key_series(df: pd.DataFrame) -> pd.Series:
     cols = [c for c in PAIR_KEYS if c in df.columns]
 
+    def norm(v: Any) -> str:
+        if v is None or (isinstance(v, float) and np.isnan(v)) or pd.isna(v):
+            return "NA"
+        if isinstance(v, (bool, np.bool_)):
+            return "1" if bool(v) else "0"
+        if isinstance(v, (int, np.integer)):
+            return str(int(v))
+        if isinstance(v, (float, np.floating)):
+            fv = float(v)
+            if np.isnan(fv):
+                return "NA"
+            # collapse 32.0 / 32
+            if abs(fv - round(fv)) < 1e-12:
+                return str(int(round(fv)))
+            return f"{fv:.12g}"
+        s = str(v)
+        if s.lower() == "nan":
+            return "NA"
+        if s.lower() == "true":
+            return "1"
+        if s.lower() == "false":
+            return "0"
+        return s
+
     def row_key(r):
-        parts = []
-        for c in cols:
-            v = r[c]
-            if pd.isna(v):
-                parts.append(f"{c}=NA")
-            elif isinstance(v, float):
-                parts.append(f"{c}={v:.12g}")
-            else:
-                parts.append(f"{c}={v}")
-        return "|".join(parts)
+        return "|".join(f"{c}={norm(r[c])}" for c in cols)
 
     return df.apply(row_key, axis=1)
 

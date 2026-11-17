@@ -227,7 +227,7 @@ Non replicare tre seed per ogni riga di ricerca iperparametrica. Ripetere i fina
 
 ## Missione attiva dopo la revisione delle baseline
 
-Opus e Astra hanno revisionato indipendentemente `822ed52` e concluso «pronti dopo correzioni circoscritte». Enrico ha autorizzato il consolidamento con Cursor IDE locale: [roadmap_missione.md](roadmap_missione.md) dettaglia correzioni, diagnosi raw, provenienza e una replica invariata delle baseline. La missione si ferma prima di qualsiasi lavoro neurale e non autorizza nuove griglie, R=64 o cambi scientifici. I risultati Step 2.3 rimangono storici: la preregistrazione cronologica non è attestabile dagli artefatti disponibili. Nessuna nuova esecuzione è stata svolta durante la preparazione del piano. Prima di 2.4 occorrono consegna e discussione con Enrico.
+Opus e Astra hanno revisionato indipendentemente `822ed52` e concluso «pronti dopo correzioni circoscritte». Enrico ha autorizzato il consolidamento con Cursor IDE locale ([roadmap_missione.md](roadmap_missione.md)). **Missione eseguita** su `mission/baseline-consolidation`: replica `consolidation_v1` numericamente identica allo storico entro le tolleranze fissate; report in `docs/month2/mission_baseline_consolidation_report.md`. I risultati Step 2.3 in `results/tables/` restano lo storico datato (provenienza incompleta; «preregistrato» non attestabile retroattivamente). Nessun neurale avviato. Prima di 2.4: revisione Enrico/ChatGPT del report di missione.
 
 ## Istruzioni pratiche per gli agenti di coding
 
@@ -244,7 +244,7 @@ Opus e Astra hanno revisionato indipendentemente `822ed52` e concluso «pronti d
 
 - [x] 2.1 — Protocollo pilota e default operativi versionati; autorizzazione Enrico registrata; limite proposal e assenza ratifica supervisori espliciti; fold geometricamente verificati (lock scientifico fold ancora aperto). Non implica GPU verificate né stats fit-only già calcolate.
 - [x] 2.2 — Pipeline Month-2 reale verificata in locale (fit-only, isolation, collate, gate TEST) + protezioni API (membership, provenance, aggregazione, prefetch). Engaging/GPU ancora non verificati; picco RAM legato al decode Arrow.
-- [x] 2.3 — Baseline CPU sul protocollo Mese 2 (GlobalMean/ParamMean/GappyPOD 2C ±AO/T-block, Oracle, HGB dense diagnostico); search preregistrata; report `02_baseline_validation.md`. R=64 non eseguito. Stop per revisione indipendente prima del 2.4.
+- [x] 2.3 — Baseline CPU sul protocollo Mese 2; report `02_baseline_validation.md`; consolidamento post-revisione eseguito (`roadmap_missione.md`, replica identica entro tolleranza). R=64 non eseguito. Stop per decisione Enrico prima del 2.4.
 - [ ] 2.4 — Primo neurale denso valido e confronto seen/VAL; optional temporale deciso separatamente.
 - [ ] 2.5 — Audit GLU concluso e adattamento scelto o rinviato con motivazione.
 - [ ] 2.6 — Primo neurale sparse e comparatori matched; confronto GLU presente oppure esplicitamente ancora aperto.
