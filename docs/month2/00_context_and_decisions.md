@@ -25,7 +25,7 @@ Ricognizione precedente del remoto `main` a `6fd0f15` (con diario semplificato p
 | Pipeline dati Month-2 | moduli `month2_*`, report `01_pipeline_validation.md` | **Verificata in locale** (batch reale, isolation, gate TEST). |
 | Baseline Mese 2 (Step 2.3) | `month2_baselines_v1`, report `02_baseline_validation.md` | Eseguite in locale CPU; storico in `results/tables/`. |
 | Consolidamento post-revisione | `consolidation_v1`, report `mission_baseline_consolidation_report.md` | **Completata**: isolation/YAML/timeline corretti; replica identica entro tolleranza; in attesa Enrico/ChatGPT. |
-| Modelli / training neurali Mese 2 | U0–U3 denso su `mission/dense-unet` | STOP B; U4 training scientifico non avviato. |
+| Modelli / training neurali Mese 2 | U0–U3 eseguiti; runner U4 pronto | Training scientifico U4 non avviato. |
 | GPU/allocazione Engaging | — | Host previsto; **non verificati**. Tetto 24 GPU-ore = proposta di ceiling, non allocazione disponibile. |
 
 ## 3. Lettura scientifica dei risultati corretti

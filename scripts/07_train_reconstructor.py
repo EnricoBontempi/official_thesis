@@ -37,6 +37,12 @@ from combustion_recon.training.dense_cache import (
     assert_dense_scientific_contract,
     build_dense_cache,
     subset_indices_for_overfit,
+    validate_dense_cache_manifest,
+)
+from combustion_recon.training.epoch_loop import (
+    EpochDenseTrainer,
+    EpochTrainConfig,
+    make_epoch_loader,
 )
 from combustion_recon.training.trainer import (
     DenseUNetTrainer,
@@ -47,6 +53,8 @@ from combustion_recon.training.trainer import (
     set_seed,
     write_json,
 )
+
+U4_CANDIDATE_CFG = ROOT / "configs" / "experiments" / "month2_dense_unet_u4_candidate.yaml"
 
 
 def _rss_gb() -> float:
@@ -435,6 +443,157 @@ def cmd_profile(args: argparse.Namespace) -> int:
     return 0
 
 
+def _git_head() -> str | None:
+    import subprocess
+
+    try:
+        return subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True, stderr=subprocess.DEVNULL
+        ).strip()
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return None
+
+
+def cmd_train_u4(args: argparse.Namespace) -> int:
+    """U4 scientific epoch training — refused unless explicitly authorized."""
+    if not args.authorize_scientific_u4:
+        raise SystemExit(
+            "Refusing U4 scientific training: pass --authorize-scientific-u4 only after "
+            "STOP B review / budget approval. Runner is prepared but U4 is NOT started."
+        )
+    if args.auto_lr_fallback_3e4:
+        raise SystemExit(
+            "Automatic lr=3e-4 fallback is disabled for this preparation; "
+            "do not pass --auto-lr-fallback-3e4 without a separate decision."
+        )
+
+    cand = load_yaml(args.config)
+    if cand.get("experiment_id") != "month2_dense_unet_u4_candidate_v1":
+        raise SystemExit(f"unexpected U4 candidate id: {cand.get('experiment_id')!r}")
+    if cand.get("scientific_training_authorized") is True and not args.authorize_scientific_u4:
+        raise SystemExit("inconsistent authorization flags")
+    # Parent dense scientific contract must still hold.
+    dense_cfg = load_yaml(args.dense_config)
+    contract = assert_dense_scientific_contract(dense_cfg)
+
+    tc = cand.get("training_candidate") or {}
+    model_cfg = cand.get("model") or {}
+    wall_hours = float(args.wall_hours if args.wall_hours is not None else tc.get("wall_time_cap_hours", 6.0))
+    device = args.device
+    if device == "auto":
+        device = "cuda" if torch.cuda.is_available() else str(tc.get("device", "cpu"))
+
+    overrides = {
+        "n_epochs": int(args.epochs) if args.epochs is not None else int(tc.get("n_epochs", 200)),
+        "batch_size": int(args.batch_size) if args.batch_size is not None else int(tc.get("batch_size", 8)),
+        "lr": float(args.lr) if args.lr is not None else float(tc.get("lr", 1e-3)),
+        "weight_decay": float(tc.get("weight_decay", 1e-4)),
+        "seed": int(args.seed) if args.seed is not None else int(tc.get("seed", 0)),
+        "base_channels": int(args.base_channels)
+        if args.base_channels is not None
+        else int(model_cfg.get("base_channels", 32)),
+        "device": device,
+        "wall_time_cap_hours": wall_hours,
+        "p_conditioning": not args.p_off,
+        "eval_every_epochs": int(tc.get("eval_every_epochs", 10)),
+    }
+    if float(overrides["lr"]) != 1e-3 and not args.allow_nondefault_lr:
+        raise SystemExit("Non-default lr requires --allow-nondefault-lr (no silent 3e-4 fallback)")
+
+    cache_root = Path(args.cache_root)
+    manifest = json.loads((cache_root / "manifest.json").read_text())
+    validate_dense_cache_manifest(
+        manifest,
+        cache_root=cache_root,
+        require_roles=("train_fit", "seen_train_eval", "val_eval"),
+    )
+
+    out_dir = Path(args.out_root) / args.run_id
+    if out_dir.exists() and any(out_dir.iterdir()) and args.resume is None:
+        raise SystemExit(
+            f"Run directory {out_dir} already exists; refuse overwrite. "
+            "Use a new --run-id or --resume checkpoints/last.pt"
+        )
+
+    set_seed(overrides["seed"])
+    # Fresh initialization — never load overfit/profile weights unless resuming THIS run.
+    model = build_dense_unet_from_config(
+        init_seed=overrides["seed"], base_channels=overrides["base_channels"]
+    )
+    train_ds = DenseUNetCacheDataset(
+        "train_fit", cache_root=cache_root, p_conditioning=overrides["p_conditioning"]
+    )
+    seen_ds = DenseUNetCacheDataset(
+        "seen_train_eval", cache_root=cache_root, p_conditioning=overrides["p_conditioning"]
+    )
+    val_ds = DenseUNetCacheDataset(
+        "val_eval", cache_root=cache_root, p_conditioning=overrides["p_conditioning"]
+    )
+    if len(train_ds) != 760:
+        raise SystemExit(f"train_fit must have 760 frames, got {len(train_ds)}")
+
+    ecfg = EpochTrainConfig(
+        n_epochs=overrides["n_epochs"],
+        batch_size=overrides["batch_size"],
+        lr=overrides["lr"],
+        weight_decay=overrides["weight_decay"],
+        seed=overrides["seed"],
+        device=overrides["device"],
+        eval_every_epochs=overrides["eval_every_epochs"],
+        wall_time_cap_s=wall_hours * 3600.0,
+        p_conditioning=overrides["p_conditioning"],
+        base_channels=overrides["base_channels"],
+        allow_lr_fallback_3e4=False,
+    )
+    normalizer = Month2FitOnlyNormalizer()
+    trainer = EpochDenseTrainer(
+        model, cfg=ecfg, normalizer=normalizer, n_train_samples=len(train_ds)
+    )
+    seen_loader, _ = make_epoch_loader(
+        seen_ds, batch_size=overrides["batch_size"], shuffle=False, seed=overrides["seed"]
+    )
+    val_loader, _ = make_epoch_loader(
+        val_ds, batch_size=overrides["batch_size"], shuffle=False, seed=overrides["seed"]
+    )
+
+    run_identity = {
+        "run_id": args.run_id,
+        "experiment_id": cand["experiment_id"],
+        "paired_experiment": cand.get("paired_experiment"),
+        "git_commit": _git_head(),
+        "dense_config_sha256": sha256_file(Path(args.dense_config)),
+        "u4_candidate_sha256": sha256_file(Path(args.config)),
+        "model_config_sha256": sha256_file(ROOT / "configs/models/unet_small.yaml"),
+        "stats_sha256": contract["stats_sha256"],
+        "cache_data_fingerprints": manifest.get("data_fingerprints")
+        or manifest.get("fingerprints"),
+        "architecture": {
+            "base_channels": overrides["base_channels"],
+            "n_params": model.count_parameters(),
+        },
+        "seed": overrides["seed"],
+        "p_conditioning": overrides["p_conditioning"],
+        "device": overrides["device"],
+        "precision": "fp32",
+        "overrides": overrides,
+        "budget_definitively_approved": bool(cand.get("budget_definitively_approved")),
+        "init_policy": "fresh_seed_no_overfit_or_profile_weights",
+        "authorize_scientific_u4": True,
+    }
+    write_json(out_dir / "effective_config.json", run_identity)
+
+    summary = trainer.fit(
+        train_ds,
+        seen_loader=seen_loader,
+        val_loader=val_loader,
+        out_dir=out_dir,
+        run_identity=run_identity,
+        resume_path=args.resume,
+    )
+    print(json.dumps(summary, indent=2, default=str))
+    return 0 if summary.get("completed") else 2
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description=__doc__)
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -487,6 +646,37 @@ def build_parser() -> argparse.ArgumentParser:
     pr.add_argument("--wall-minutes", type=float, default=120.0)
     pr.add_argument("--scientific", action="store_true")
     pr.set_defaults(func=cmd_profile)
+
+    tr = sub.add_parser(
+        "train-u4",
+        help="U4 scientific epoch training (requires --authorize-scientific-u4)",
+    )
+    tr.add_argument(
+        "--authorize-scientific-u4",
+        action="store_true",
+        help="Required explicit authorization after STOP B review",
+    )
+    tr.add_argument("--config", type=Path, default=U4_CANDIDATE_CFG)
+    tr.add_argument("--dense-config", type=Path, default=DEFAULT_DENSE_CFG)
+    tr.add_argument("--cache-root", type=Path, default=DEFAULT_CACHE_ROOT)
+    tr.add_argument("--out-root", type=Path, default=ROOT / "results" / "month2_dense_unet")
+    tr.add_argument("--run-id", type=str, required=True)
+    tr.add_argument("--epochs", type=int, default=None)
+    tr.add_argument("--batch-size", type=int, default=None)
+    tr.add_argument("--lr", type=float, default=None)
+    tr.add_argument("--seed", type=int, default=None)
+    tr.add_argument("--base-channels", type=int, default=None)
+    tr.add_argument("--device", type=str, default="auto")
+    tr.add_argument("--wall-hours", type=float, default=None)
+    tr.add_argument("--p-off", action="store_true")
+    tr.add_argument("--resume", type=Path, default=None)
+    tr.add_argument("--allow-nondefault-lr", action="store_true")
+    tr.add_argument(
+        "--auto-lr-fallback-3e4",
+        action="store_true",
+        help="Refused: no automatic lr fallback in this preparation",
+    )
+    tr.set_defaults(func=cmd_train_u4)
     return p
 
 

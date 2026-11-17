@@ -1,0 +1,62 @@
+# Candidate U4 run contract for dense U-Net (Step 2.4).
+# Prepared after STOP B profiling. Does NOT authorize execution by itself.
+# Budget approval and an explicit CLI authorization flag are required to start.
+
+experiment_id: month2_dense_unet_u4_candidate_v1
+paired_experiment: month2_dense_unet_v1
+status: candidate_prepared_not_authorized
+scientific_training_authorized: false
+budget_definitively_approved: false
+u4_executed: false
+
+inherits_scientific_contract:
+  path: configs/experiments/month2_dense_unet.yaml
+  note: Must satisfy assert_dense_scientific_contract on the parent dense YAML.
+
+model:
+  path: configs/models/unet_small.yaml
+  base_channels: 32
+
+training_candidate:
+  temporal_mode: single_frame
+  task_mode: temperature_free
+  K: 0
+  site_fraction: 1.0
+  p_conditioning: true   # p_on
+  seed: 0
+  device: cpu
+  precision: fp32
+  batch_size: 8
+  n_epochs: 200
+  lr: 1.0e-3
+  weight_decay: 1.0e-4
+  warmup_fraction_of_updates: 0.05
+  cosine_eta_min: 1.0e-5
+  grad_clip_norm: 1.0
+  eval_every_epochs: 10
+  wall_time_cap_hours: 6.0
+  wall_time_cap_configurable: true
+  allow_automatic_lr_fallback_3e4: false
+  num_workers: 0
+  init: fresh_seed0_no_overfit_or_profile_weights
+  selection:
+    role: val_eval
+    metric: mean_over_conditions_of_full_field_RMSE_K
+    tie_break: first_minimum
+  also_evaluate: [seen_train_eval]
+  early_stopping_performance: false
+
+artifacts:
+  results_root: results/month2_dense_unet
+  run_id_pattern: u4_pon_seed0_<timestamp_or_label>
+  checkpoints_gitignored: true
+  refuse_overwrite_existing_run_dir: true
+
+command_template: >
+  python scripts/07_train_reconstructor.py train-u4
+  --authorize-scientific-u4
+  --config configs/experiments/month2_dense_unet_u4_candidate.yaml
+  --dense-config configs/experiments/month2_dense_unet.yaml
+  --run-id u4_pon_seed0_v1
+  --cache-root data/processed/month2_dense_unet_cache
+  --wall-hours 6

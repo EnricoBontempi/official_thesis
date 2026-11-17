@@ -163,3 +163,13 @@ Questo file è il diario del progetto di tesi in `official_thesis` (ricostruzion
 - **GappyPOD denso:** `month2_dense_linear_v1`; R=32 K=0 cov=100%; λ selezionati VAL p_off=1e-3 (93.7 K), p_on=1e-2 (70.5 K); ParamMean TRAIN completo 88.0 K; sparse/consolidation intatti.
 - **Report:** [03_dense_velocity_diagnostic.md](month2/03_dense_velocity_diagnostic.md).
 - **Stop B:** U4 **non** avviato; attendere esame.
+
+---
+
+## 2026-11-17 — Preparazione runner U4 (training non eseguito)
+
+- **Autorizzato:** solo implementazione/test piccoli del percorso epoch-based U4.
+- **Implementato:** `training/epoch_loop.py`, CLI `train-u4` (richiede `--authorize-scientific-u4`), candidate YAML `month2_dense_unet_u4_candidate.yaml` (b=32, batch 8, CPU, 200 ep, lr=1e-3, wall 6 h configurabile, niente fallback 3e-4 automatico).
+- **Verificato:** `tests/test_unet_epoch_trainer.py` (visite campione, eval/selezione/tie-break, checkpoint, wall/non-finite, rifiuto CLI senza auth).
+- **Non eseguito:** training scientifico completo; nessuna nuova eval VAL scientifica; budget non dichiarato approvato.
+- **Comando futuro:** vedi report `03_dense_velocity_diagnostic.md` sezione U4.

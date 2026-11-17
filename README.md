@@ -7,7 +7,7 @@
 **Month 2 Roadmap:** [roadmap_month2.md](roadmap_month2.md) — operationally authorized by Enrico (2026-11-16); Step 2.1 protocol concretized; supervisor technical ratification tracked separately  
 **Month 2 Protocol:** [configs/splits/month2_frame_protocol.yaml](configs/splits/month2_frame_protocol.yaml), [configs/experiments/month2_pilot.yaml](configs/experiments/month2_pilot.yaml)  
 **Baseline Consolidation Mission:** [roadmap_missione.md](roadmap_missione.md) — completed on `mission/baseline-consolidation` at `3cf7bf0`; report [docs/month2/mission_baseline_consolidation_report.md](docs/month2/mission_baseline_consolidation_report.md); integration pending  
-**U-Net Mission:** [roadmap_unet.md](roadmap_unet.md) — Step 2.4; U0–U3 on `mission/dense-unet` ([report](docs/month2/03_dense_velocity_diagnostic.md)); **STOP B** — U4 scientific training not started
+**U-Net Mission:** [roadmap_unet.md](roadmap_unet.md) — Step 2.4; U0–U3 done on `mission/dense-unet`; U4 **runner ready, training not started** ([report](docs/month2/03_dense_velocity_diagnostic.md))
 **Research Log:** [docs/RESEARCH_LOG.md](docs/RESEARCH_LOG.md)  
 **Current Evidence & Open Decisions:** [docs/month2/00_context_and_decisions.md](docs/month2/00_context_and_decisions.md)
 

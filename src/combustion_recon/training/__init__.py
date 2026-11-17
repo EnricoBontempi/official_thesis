@@ -8,6 +8,12 @@ from combustion_recon.training.dense_cache import (
     refresh_dense_cache_manifest_metadata,
     validate_dense_cache_manifest,
 )
+from combustion_recon.training.epoch_loop import (
+    EpochDenseTrainer,
+    EpochTrainConfig,
+    select_best_val,
+    should_evaluate_epoch,
+)
 from combustion_recon.training.trainer import DenseUNetTrainer, TrainConfig
 
 __all__ = [
@@ -19,4 +25,8 @@ __all__ = [
     "validate_dense_cache_manifest",
     "DenseUNetTrainer",
     "TrainConfig",
+    "EpochDenseTrainer",
+    "EpochTrainConfig",
+    "select_best_val",
+    "should_evaluate_epoch",
 ]

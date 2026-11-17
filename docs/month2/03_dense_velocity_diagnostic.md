@@ -1,9 +1,9 @@
-# Dense velocity → temperature diagnostic (Step 2.4) — STOP B delivery
+# Dense velocity → temperature diagnostic (Step 2.4)
 
 **Project:** `EnricoBontempi/official_thesis` only (MIT/Deng Lab).  
 **Roadmap:** [roadmap_unet.md](../../roadmap_unet.md)  
-**Phase delivered:** **U0–U3**. **STOP B.**  
-**Not claimed:** Step 2.4 complete; **U4 not started**; scientific neural training; GLU.
+**Phases:** U0–U3 **executed** (STOP B). U4 **runner prepared, not executed**.  
+**Not claimed:** Step 2.4 complete; scientific U4 training; budget definitively approved; GLU.
 
 ## Status legend
 
@@ -110,21 +110,53 @@ Artifacts: `results/month2_dense_linear/dense_linear_u3_v1/`
 
 ---
 
+## U4 — Runner prepared (not executed)
+
+| Distinction | Status |
+|---|---|
+| Epoch runner + checkpoint/resume path | **Implemented / tested** |
+| Candidate config | `configs/experiments/month2_dense_unet_u4_candidate.yaml` |
+| Scientific U4 training | **Not started** (`u4_executed: false`) |
+| Budget definitively approved | **No** (candidate only) |
+
+**Candidate settings (not a final approval):** b=32, batch 8, CPU fp32, p_on, seed 0, 200 epochs, lr=1e-3, AdamW+warmup/cosine as roadmap, wall cap **6 h** (configurable/recorded), **no** automatic lr=3e-4.
+
+**Behaviour implemented:** fresh init (no overfit/profile weights); each epoch visits all 760 train_fit with reproducible shuffle; scheduler over total updates; seen+VAL eval every 10 epochs and last; VAL mean-condition RMSE selection with first-minimum ties; best+last checkpoints; explicit stop for non-finite / wall / error (status never falsely `completed`); train mode restored after eval; full run identity; refuse overwrite of existing run dirs; CLI requires `--authorize-scientific-u4`.
+
+**Resume:** epoch-boundary via `checkpoints/last.pt` (model/optim/sched/epoch/RNG). Mid-epoch shuffle continuity **not** claimed.
+
+**Tests:** `tests/test_unet_epoch_trainer.py` (+ existing dense suite) — visits, eval cadence, selection/tie-break, Kelvin aggregation path, train/eval restore, checkpoint reload, wall/non-finite stop, CLI refuse without auth.
+
+### Exact command for a later authorized run
+
+```bash
+python scripts/07_train_reconstructor.py train-u4 \
+  --authorize-scientific-u4 \
+  --config configs/experiments/month2_dense_unet_u4_candidate.yaml \
+  --dense-config configs/experiments/month2_dense_unet.yaml \
+  --run-id u4_pon_seed0_v1 \
+  --cache-root data/processed/month2_dense_unet_cache \
+  --wall-hours 6
+```
+
+Without `--authorize-scientific-u4` the process exits and does nothing.
+
 ## Checklist
 
 - [x] U0–U2 (STOP A) + corrective A1–A4  
 - [x] U3 profiling + dense GappyPOD — **STOP B**  
-- [ ] U4 scientific p_on training — **not authorized / not started**  
+- [x] U4 runner prepared (code/tests/config) — **training not executed**  
+- [ ] U4 scientific p_on run — **pending authorization**  
 - [ ] U5–U7 pending  
 
-## Decisions still needed before U4
+## Decisions still needed before executing U4
 
-1. Confirm budget proposal (b=32, batch=8, CPU, E_max=200, wall≥24 h) or enable verified GPU.  
-2. Whether high TRAIN grad-clip frequency warrants the single allowed lr fallback (3e-4) — optional, not auto.  
-3. Explicit authorization to run U4 after STOP B review.
+1. Confirm or revise budget (b=32, batch=8, CPU, E_max=200, wall 6 h candidate).  
+2. Whether high TRAIN grad-clip frequency warrants a separate lr=3e-4 attempt — not automatic.  
+3. Explicit go-ahead to run the command above.
 
 ## Explicit non-claims
 
-- **U4 was not started.**  
+- **U4 scientific training was not started.**  
 - Step 2.4 not complete.  
 - No neural p_off, GLU, sparse U-Net, T sensors, temporal windows, TEST, cluster, or heavy downloads.
