@@ -153,3 +153,13 @@ Questo file è il diario del progetto di tesi in `official_thesis` (ricostruzion
 - **Report:** [03_dense_velocity_diagnostic.md](month2/03_dense_velocity_diagnostic.md).
 - **Non eseguito / non dichiarato:** U3+, profiling completo, GappyPOD denso, training scientifico, selezione VAL, GLU/masked/T-sensor/tempo, Step 2.4 completo.
 - **Stop A:** attendere esame Enrico/ChatGPT.
+
+---
+
+## 2026-11-17 — STOP B: correzioni U1–U2 + U3 profiling/GappyPOD denso
+
+- **Correzioni:** isolamento sample→input→forward; validazione cache (identità protocollo, fingerprint dati≠modello, SHA inventario esplicito); contratto YAML consumato/rifiutato; rifiuto gradienti non finiti prima di `optimizer.step`. Commit codice `11aae27` prima degli esperimenti.
+- **Profiling (CPU, pesi nuovi):** 2 epoche TRAIN b=32 batch=8; ~93 s train + ~5 s eval; proiezione 200 ep+eval ≈2.6 h; proposta U4 b=32/batch8/CPU/E_max=200 (VAL non usata per scegliere).
+- **GappyPOD denso:** `month2_dense_linear_v1`; R=32 K=0 cov=100%; λ selezionati VAL p_off=1e-3 (93.7 K), p_on=1e-2 (70.5 K); ParamMean TRAIN completo 88.0 K; sparse/consolidation intatti.
+- **Report:** [03_dense_velocity_diagnostic.md](month2/03_dense_velocity_diagnostic.md).
+- **Stop B:** U4 **non** avviato; attendere esame.

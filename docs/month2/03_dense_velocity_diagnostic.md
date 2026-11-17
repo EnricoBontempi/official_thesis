@@ -1,111 +1,130 @@
-# Dense velocity → temperature diagnostic (Step 2.4) — STOP A delivery
+# Dense velocity → temperature diagnostic (Step 2.4) — STOP B delivery
 
 **Project:** `EnricoBontempi/official_thesis` only (MIT/Deng Lab).  
 **Roadmap:** [roadmap_unet.md](../../roadmap_unet.md)  
-**Phase delivered:** **U0–U2 only**. **STOP A.**  
-**Not claimed:** Step 2.4 complete; U3+; scientific training; VAL selection; GLU.
+**Phase delivered:** **U0–U3**. **STOP B.**  
+**Not claimed:** Step 2.4 complete; **U4 not started**; scientific neural training; GLU.
 
 ## Status legend
 
 | Label | Meaning |
 |---|---|
-| Implemented | Code/config present on the branch |
-| Executed | Ran locally in this mission |
-| Verified | Checks/tests passed with recorded evidence |
-| Pending | Not part of this STOP A delivery |
+| Implemented / Executed / Verified / Pending | as in STOP A |
 
-## U0 — Preflight
-
-| Item | Value | Status |
-|---|---|---|
-| Work branch | `mission/dense-unet` | verified |
-| Dependencies | consolidation `3cf7bf0` + roadmap `adabacc` (merged on branch) | verified |
-| Python / torch | 3.13.13 / 2.15.0+cu132 | verified |
-| CUDA | **False** (CPU used) | verified |
-| Host RAM / disk | ~25 GiB RAM; ~819 GiB free | inspected |
-| Raw local | `data/raw/combustion/hf_dataset/numerical` (~59 GB) | verified |
-| TEST payloads | not accessed | verified |
-| HONF / thesis-research | not used | verified |
-
-Document merge conflicts (README, RESEARCH_LOG, roadmap_month2) resolved by preserving consolidation evidence **and** the published U-Net plan.
-
-## U1 — Dense contract and cache
-
-**Implemented**
-- `configs/experiments/month2_dense_unet.yaml` — `month2_dense_unet_v1` (distinct from sparse baselines)
-- `configs/models/unet_small.yaml` — b=32 candidate; concat-p; head std=1e-3
-- `src/combustion_recon/training/dense_cache.py`
-- Compact versioned stub: `data/manifests/month2_dense_unet_cache_manifest.json`
-- Build log: `results/month2_dense_unet/u1_cache_build.json`
-
-**Executed / verified**
-| Role | Count | On-disk (role dir) |
-|---|---:|---:|
-| train_fit | 760 | ~191 MiB |
-| seen_train_eval | 220 | ~56 MiB |
-| val_eval | 123 | ~31 MiB |
-| **Total payload** | **1103** | **~277 MiB** (`bytes_total` 289,774,422) |
-
-- Build wall ≈ **493 s**; peak RSS ≈ **6.5 GiB**
-- Geometry shared; channels `[vi_norm, vj_norm, x_scaled, y_scaled, nh3_norm, phi_norm]`; targets separate
-- Dense mask all-True; K=0; site_fraction=1.0; fit-only stats reused (T_norm TRAIN mean≈0, std≈1)
-- Shard provenance: `remote_file_inventory.json` LFS sha256 + local size verify (23 shards); no TEST
-- Temporal flags preserved; single-frame; `40NH3_1.2` association remains unverified (warning on seen index 2000 path as expected)
-- Spot checks vs `Month2ReconDataset` passed (pytest)
-
-VAL is cached for later declared selection only; **not used for U2 model decisions**.
-
-## U2 — Network, trainer, tests, tiny overfit
-
-**Implemented**
-- `src/combustion_recon/models/unet.py` — DenseUNet
-- `src/combustion_recon/training/trainer.py`
-- `src/combustion_recon/training/snapshot_swap.py` (U5 pairing helper; **not executed on VAL**)
-- `scripts/07_train_reconstructor.py` (`build-cache`, `overfit`; `--scientific` refused)
-- `tests/test_unet_dense.py`
-
-**Architecture (effective)**  
-Encoder 128:b → 64:2b → 32:4b → 16:8b → bottleneck 8:8b; four bilinear ups + concat skips; 1×1 linear head → T_norm. GroupNorm(8)+SiLU; conv bias=True. Condizionamento = sola concatenazione canali p.  
-**Parameters (trainable):** **4,902,753** (`sum(p.numel() for p in parameters if requires_grad)`), b=32.  
-Head init N(0, 1e-3), bias 0 (non all-zero).
-
-**Tests executed:** `pytest tests/test_unet_dense.py` → **11 passed** (isolation, gradients, checkpoint reload, evaluator fail-fast, cache contract, dataset spot-check, swap pairing).  
-**Not executed here:** U3 profiling, dense GappyPOD, scientific VAL metrics for selection, MAC/FLOP tooling (not required for STOP A).
-
-**Overfit diagnostic (executed)** — `results/month2_dense_unet/u2_overfit/overfit_summary.json`
+## Git / dependencies
 
 | Item | Value |
 |---|---|
-| Frames (cache indices) | 84, 102, 228, 249, 347, 356, 393, 398 |
-| Conditions | `0NH3_1.h5`, `0NH3_1.25.h5`, `20NH3_1.05.h5`, `20NH3_1.2.h5` |
-| Updates | 500 (max_updates); samples_seen 4000 |
-| Device | CPU |
-| Initial MSE_norm / RMSE_K | 0.909 / 316.2 K |
-| Final MSE_norm / RMSE_K | 0.00162 / 13.4 K |
-| ParamMean same subset (diag.) | mean RMSE ≈ 106.4 K |
-| Wall / peak RSS | ≈ 231 s / ≈ 1.58 GiB |
-| Checkpoint reload max \|Δpred\| | 0 |
-| Learning demonstrated | **true** (final MSE < 0.5× initial) |
+| Branch | `mission/dense-unet` |
+| STOP A | `3643ce5` |
+| Corrective + U3 code (pre-experiment) | `11aae27` |
+| STOP B results commit | *(this delivery)* |
+| Dependencies | consolidation `3cf7bf0` + roadmap `adabacc` |
+| Merge to main | **not** done |
 
-Checkpoint `overfit_last.pt` and maps `.npz` remain **out of Git**.
+---
 
-## Checklist (roadmap_unet)
+## A — Corrective completion U1–U2 (verified)
 
-- [x] U0 — Checkout with roadmap + consolidation — **verified**
-- [x] U1 — Dense contract + cache — **verified**
-- [x] U2 — Implementation/tests/overfit — **verified** → **STOP A**
-- [ ] U3 — Profiling + dense GappyPOD — **pending**
-- [ ] U4–U7 — **pending**
+### A1 Isolation
+Replaced the vacuous same-`x` mutation test with `test_mutation_isolation_sample_path_to_forward`: synthetic cache-like fields → `dense_fields_to_input_tensor` → eval forward. Mutating T / T_norm / vk / metadata leaves input+pred unchanged; p_off ignores source p; allowed vi/p changes move predictions. Distinguishes coverage from upstream `InputIsolationProbe` / sparse pack tests.
 
-## Issues / decisions before U3
+### A2 Cache validation
+`validate_dense_cache_manifest` now checks: allowed roles, required role presence, protocol `sim_id`/`frame_index`/`role` order, shapes/dtype/lengths, stats/protocol/splits/geometry fingerprints. **Data fingerprints** separated from **model fingerprints** (width/budget/config sha do not invalidate data reuse). Shard SHA policy explicit: inventory LFS + local size — **not** local content re-hash. Metadata refreshed in place via `refresh_dense_cache_manifest_metadata` (payloads untouched). Rejection tests for altered frames/stats.
 
-1. Fix **b ∈ {32,16}**, batch, device, E_max after measured profiling (CPU-only host today; GPU not available in this environment).
-2. Grad-clip fired on **21%** of overfit updates (norm>1) — monitor in profiling; not a reason to change lr yet.
-3. ParamMean comparison on the 8-frame subset is **diagnostic only** (refit on those conditions); scientific matched ParamMean uses the consolidated TRAIN fit.
-4. Cache sha256 provenance is inventory-backed + size-checked, not re-hashed locally (intentional cost control); re-hash optional if auditors require byte-identity beyond size+inventory.
+### A3 YAML contract
+`assert_dense_scientific_contract` consumes/refuses: 2C, single-frame, temperature_free, K=0, coverage 1.0, channel order, stats/protocol paths. Profiling records `effective_config.json` including overrides.
+
+### A4 Numeric safety
+Trainer refuses non-finite parameter gradients / grad-norm **before** `optimizer.step` (finite loss alone insufficient). Loss/lr/clip defaults unchanged despite high clip rates in profiling.
+
+### Tests executed
+- `tests/test_unet_dense.py` — 16 passed  
+- Regression: `test_model_input_isolation`, `test_month2_api_guards`, `test_temporal_quality`, `test_month2_pipeline`, `test_baselines` — passed  
+- **Not repeated:** 500-update overfit (no numerical path change requiring it)  
+- **Missing / not claimed:** local re-hash of all raw arrows; MAC/FLOP tooling
+
+---
+
+## U3 — Profiling (executed)
+
+| Item | Value |
+|---|---|
+| Code SHA at run | `11aae27` |
+| Weights | **new** (seed 0); overfit **not** reused |
+| Device | CPU; torch threads 8; CUDA false |
+| b / batch / epochs | 32 / 8 / 2 |
+| Updates | 190 (95/epoch × 2) |
+| Train wall | 93.4 s |
+| VAL eval wall (timing only) | 4.9 s |
+| Peak RSS | ~1.74 GiB |
+| TRAIN loss | 0.877 → 0.101 (finite); clip freq ~0.74 |
+| Projected 200 ep + eval/10 | **~2.62 h** CPU |
+| Logged VAL RMSE (non-decisive) | 80.9 K |
+
+**Budget proposal for U4 (not launched):** b=32, batch=8, device=CPU (until GPU verified), E_max=200, lr=1e-3, eval every 10, wall cap ≥24 h (measured need ≪24 h). VAL metrics **not** used to choose width/lr. High clip frequency noted for monitoring in U4 — no lr change from this alone.
+
+Artifacts: `results/month2_dense_unet/u3_profile/`
+
+---
+
+## U3 — Dense GappyPOD (executed)
+
+| Item | Value |
+|---|---|
+| experiment_id | `month2_dense_linear_v1` |
+| Config | `configs/experiments/month2_dense_linear.yaml` |
+| R / K / coverage | 32 / 0 / 1.0 (single all-True mask) |
+| Frames | 760 / 220 / 123; fit-only stats |
+| ParamMean | full TRAIN 20 conditions, basis `piecewise_phi1`, α=0.01 (**not** 8-frame overfit) |
+| Wall / RSS | ~51 s / ~2.61 GiB |
+| Sparse contract / consolidation_v1 | **untouched** |
+
+### λ search (VAL mean-over-conditions RMSE_K)
+
+| p | λ | VAL |
+|---|---:|---:|
+| off | 1e-4 | 104.20 |
+| off | **1e-3** ★ | **93.66** |
+| off | 1e-2 | 96.67 |
+| off | 1e-1 | 123.05 |
+| off | 1 | 136.93 |
+| on | 1e-4 | 82.44 |
+| on | 1e-3 | 71.66 |
+| on | **1e-2** ★ | **70.46** |
+| on | 1e-1 | 80.85 |
+| on | 1 | 86.88 |
+
+### Selected + matched references (VAL)
+
+| Method | VAL mean-cond RMSE_K |
+|---|---:|
+| GlobalMean | 139.70 |
+| ParamMean (full TRAIN) | 88.01 |
+| GappyPOD dense p_off λ=1e-3 | 93.66 |
+| GappyPOD dense p_on λ=1e-2 | **70.46** |
+
+Per-condition (selected GappyPOD dense p_on): `0NH3_1.05` 94.0; `20NH3_1.1` 69.4; `40NH3_0.9` 47.9 K.
+
+Artifacts: `results/month2_dense_linear/dense_linear_u3_v1/`
+
+---
+
+## Checklist
+
+- [x] U0–U2 (STOP A) + corrective A1–A4  
+- [x] U3 profiling + dense GappyPOD — **STOP B**  
+- [ ] U4 scientific p_on training — **not authorized / not started**  
+- [ ] U5–U7 pending  
+
+## Decisions still needed before U4
+
+1. Confirm budget proposal (b=32, batch=8, CPU, E_max=200, wall≥24 h) or enable verified GPU.  
+2. Whether high TRAIN grad-clip frequency warrants the single allowed lr fallback (3e-4) — optional, not auto.  
+3. Explicit authorization to run U4 after STOP B review.
 
 ## Explicit non-claims
 
-- Step **2.4 not complete**.
-- **U3 and scientific training were not started.**
-- No full-epoch profiling, no dense GappyPOD fit, no VAL-guided selection, no GLU / masked U-Net / T sensors / temporal windows, no TEST access, no cluster work.
+- **U4 was not started.**  
+- Step 2.4 not complete.  
+- No neural p_off, GLU, sparse U-Net, T sensors, temporal windows, TEST, cluster, or heavy downloads.

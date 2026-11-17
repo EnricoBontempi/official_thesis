@@ -1,0 +1,10 @@
+{
+  "p_off": {
+    "ridge_lambda": 0.001,
+    "val_mean_condition_rmse_K": 93.66311698857453
+  },
+  "p_on": {
+    "ridge_lambda": 0.01,
+    "val_mean_condition_rmse_K": 70.46287221326743
+  }
+}

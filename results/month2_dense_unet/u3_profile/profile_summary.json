@@ -1,0 +1,90 @@
+{
+  "budget_proposal_for_u4": {
+    "E_max": 200,
+    "base_channels": 32,
+    "batch_size": 8,
+    "device": "cpu",
+    "eval_every_epochs": 10,
+    "lr": 0.001,
+    "rationale": "Retain b=32, batch=8 on measured CPU profile unless GPU becomes available",
+    "val_metrics_used_for_choice": false,
+    "wall_time_cap_h": 24.0
+  },
+  "effective_config": {
+    "dense_config_path": "/home/enric/projects/official_thesis/configs/experiments/month2_dense_unet.yaml",
+    "dense_config_sha256": "988babff88f233d0d6e421c8eac09070a9ffae10781a1d7f791260fd5d5e2c33",
+    "dense_contract": {
+      "K": 0,
+      "channel_order": [
+        "vi_norm",
+        "vj_norm",
+        "x_scaled",
+        "y_scaled",
+        "nh3_norm",
+        "phi_norm"
+      ],
+      "experiment_id": "month2_dense_unet_v1",
+      "protocol_path": "/home/enric/projects/official_thesis/configs/splits/month2_frame_protocol.yaml",
+      "protocol_scientific_sha256": "e21f7f245c8273f3da4cad1f2cddaed54613e366bb947685b1d2d3969b189eab",
+      "site_fraction": 1.0,
+      "splits_path": "/home/enric/projects/official_thesis/configs/splits/splits_interp_extrap.yaml",
+      "splits_sha256": "acb87bf95852e7849f88a270af8cbd211ad999d0039c35885232b7bc2a99e7b9",
+      "stats_path": "/home/enric/projects/official_thesis/data/manifests/train_norm_stats_month2_fit.json",
+      "stats_sha256": "678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e",
+      "task_mode": "temperature_free",
+      "temporal_mode": "single_frame",
+      "velocity_components": "planar_2C"
+    },
+    "max_updates": 190,
+    "n_params": 4902753,
+    "n_train": 760,
+    "n_val": 123,
+    "note_val_metrics": "VAL timing only; metrics recorded for cost accounting, NOT used to choose width/lr/budget",
+    "overrides": {
+      "base_channels": 32,
+      "batch_size": 8,
+      "device": "cpu",
+      "epochs": 2.0,
+      "lr": 0.001,
+      "p_off": false,
+      "seed": 0,
+      "wall_minutes": 120.0,
+      "weight_decay": 0.0001
+    },
+    "phase": "U3_profiling",
+    "scientific_training": false,
+    "torch_threads": 8,
+    "u4_authorized": false,
+    "updates_per_epoch": 95
+  },
+  "eval_wall_s": 4.903246865998881,
+  "overfit_weights_reused": false,
+  "peak_rss_GB": 1.7444610595703125,
+  "projected": {
+    "candidate_E_max_200_train_only_h": 2.5951470295277534,
+    "candidate_E_max_200_with_eval_every_10_h": 2.6237493029127466,
+    "sec_per_train_epoch": 46.71264653149956,
+    "sec_per_update": 0.4917120687526269,
+    "sec_per_val_eval_pass": 4.903246865998881
+  },
+  "status": "ok",
+  "train_result": {
+    "clip_events": 141,
+    "clip_frequency": 0.7421052631578947,
+    "elapsed_s": 93.42496802499954,
+    "first_loss": 0.8765071630477905,
+    "last_loss": 0.10075975209474564,
+    "samples_seen": 1520,
+    "stopped_reason": "max_updates",
+    "updates": 190
+  },
+  "train_stability": {
+    "clip_frequency": 0.7421052631578947,
+    "finite_throughout": true,
+    "first_loss": 0.8765071630477905,
+    "last_loss": 0.10075975209474564,
+    "stopped_reason": "max_updates"
+  },
+  "train_wall_s": 93.42529306299912,
+  "val_mean_condition_rmse_K_logged_not_for_selection": 80.87592091571534
+}
