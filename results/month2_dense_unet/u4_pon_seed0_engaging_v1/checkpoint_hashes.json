@@ -1,0 +1,12 @@
+{
+  "best.pt": {
+    "path": "/home/bontempi/orcd/pool/official_thesis_runs/u4_pon_seed0_engaging_v1/checkpoints/best.pt",
+    "sha256": "6d456abcb5653c16a7a90df40eda377caf42ffb94fd829a65f4c06be58a03634",
+    "bytes": 60028822
+  },
+  "last.pt": {
+    "path": "/home/bontempi/orcd/pool/official_thesis_runs/u4_pon_seed0_engaging_v1/checkpoints/last.pt",
+    "sha256": "b2824084052e797c0e864e38848eed4fd8a8a0479908e2fe7862a96623e72538",
+    "bytes": 64032662
+  }
+}

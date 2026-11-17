@@ -2,8 +2,8 @@
 
 **Project:** `EnricoBontempi/official_thesis` only (MIT/Deng Lab).  
 **Roadmap:** [roadmap_unet.md](../../roadmap_unet.md)  
-**Phases:** U0–U3 **executed** (STOP B). U4 **authorized by Enrico 2026-11-17** for Engaging prep + smoke/profile + one p_on seed-0 run (max 1000).  
-**Not claimed:** Step 2.4 complete; supervisor ratification; U5+; GLU.
+**Phases:** U0–U4 **executed** through Engaging p_on seed-0 (early stop). U5+ not started.  
+**Not claimed:** Step 2.4 complete (U5–U7 open); supervisor ratification; U5/p_off/other seeds; GLU.
 
 ## Status legend
 
@@ -110,46 +110,37 @@ Artifacts: `results/month2_dense_linear/dense_linear_u3_v1/`
 
 ---
 
-## U4 — Authorized Engaging run (prep)
+## U4 — Engaging p_on seed 0 (executed)
 
-| Distinction | Status |
+| Item | Value |
 |---|---|
-| Epoch runner + epoch-boundary resume | **Hardened / tested** (complete vs partial ckpt) |
-| Config | `month2_dense_unet_u4_engaging_v1` in `month2_dense_unet_u4_candidate.yaml` |
-| Decision | **Enrico 2026-11-17** (operational; no supervisor ratification claimed) |
-| Scientific U4 training | **Authorized** for one p_on seed-0 Engaging run after smoke/gate |
-| Replaces | CPU/200 candidate; **not** Opus WSD |
+| Decision | Enrico 2026-11-17 (operational; no supervisor ratification claimed) |
+| Commit | `50bda7fe42323d2abd8ef46763be65ccbaf3f008` |
+| Job | `29465586` · `mit_amf_advanced_gpu` · `mit_normal_gpu` · QoS AMF · **L40S** · `node3008` |
+| Run dir | `results/month2_dense_unet/u4_pon_seed0_engaging_v1/` (+ Engaging pool twin) |
+| Status | `stopped_early_plateau` at **730**/1000 epochs |
+| Best VAL macro RMSE | **26.931 K** @ epoch **160** (first absolute min) |
+| Last VAL | 28.055 K @ 730 |
+| Seen / TRAIN @ best | 37.675 K / 13.652 K |
+| Queue / compute | ≈132 s / ≈28.5 min (smoke gate ≈0.85 h ≪ 4.5 h) |
+| Dense GappyPOD p_on VAL (U3) | ≈70.46 K (matched contract; linear comparator) |
+| Checkpoint SHA | see `checkpoint_hashes.json` (`.pt` on Engaging, gitignored) |
 
-**Authorized settings:** b=32, batch 8, CUDA fp32 (TF32 off), p_on, seed 0, **max 1000 epochs**, AdamW lr=1e-3, warmup **950** updates then ReduceLROnPlateau on VAL RMSE, eval train/seen/VAL every 10, best=first VAL min, early stop ≥200 ep / 15 eval / 0.1% rel (reset on LR drop), wall ≤6 h on `mit_normal_gpu` AMF.
+Full curves, per-frame best/last, and scheduler counters: `auto_report.md`, `eval_history.json`, `evals/epoch_0160`, `evals/epoch_0730`.
 
-**Resume policy:** only `dense_unet_epoch_complete_v2`; mid-epoch interrupt → `partial_interrupt.pt` without bumping completed epochs or overwriting `last.pt`; incompatible data/arch/science rejected; n_epochs extension requires explicit flag.
-
-**Cache:** payload SHA256 map in `data/manifests/month2_dense_unet_cache_payload_hashes.json` (aggregate `d0b1d068…`); verify after Engaging transfer.
-
-### Engaging command (after smoke gate)
-
-```bash
-python scripts/07_train_reconstructor.py train-u4 \
-  --authorize-scientific-u4 \
-  --config configs/experiments/month2_dense_unet_u4_candidate.yaml \
-  --dense-config configs/experiments/month2_dense_unet.yaml \
-  --run-id u4_pon_seed0_engaging_v1 \
-  --cache-root "$CACHE" \
-  --expect-cache-hashes "$HASHES" \
-  --device cuda \
-  --wall-hours 6
-```
+**Env delta vs local WSL:** Engaging `torch 2.8.0+cu128` (local `.venv` was `2.15.0+cu132`); dedicated `~/envs/official_thesis` (HONF env untouched).
 
 ## Checklist
 
 - [x] U0–U2 (STOP A) + corrective A1–A4  
 - [x] U3 profiling + dense GappyPOD — **STOP B**  
-- [x] U4 pre-run corrections + Engaging decision recorded  
-- [ ] U4 scientific p_on Engaging run — **in progress this mandate**  
+- [x] U4 pre-run corrections + Engaging decision  
+- [x] U4 scientific p_on Engaging run — **done; STOP before U5**  
 - [ ] U5–U7 pending  
 
 ## Explicit non-claims
 
-- Step 2.4 not complete until U4 finishes and is evaluated.  
-- No U5/p_off/other seeds/GLU/sparse/T-sensors/TEST in this mandate.  
-- No automatic continuation past 1000 epochs.
+- Step 2.4 not complete (U5–U7 open).  
+- Single seed; no robustness claim; VAL used for selection.  
+- No U5/p_off/other seeds/GLU/sparse/T-sensors/TEST executed here.  
+- Budget not open for continuation: early-stopped before 1000 while not still improving under the 0.1% rule.

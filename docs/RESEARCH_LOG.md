@@ -192,3 +192,13 @@ Questo file è il diario del progetto di tesi in `official_thesis` (ricostruzion
 - **Pre-run chiuso:** checkpoint complete vs partial; interrupt non incrementa epoche; `last.pt` non sovrascritto da stato parziale; resume rifiuta incompatibilità; YAML consumato/rifiutato; config effettiva+provenienza; hash payload cache; metriche per-frame; resume solo a confine d’epoca (test continuo vs resume). Schedule: warmup 950 + ReduceLROnPlateau; early stop 200/15/0.1% con reset su LR drop.
 - **HONF (sola lettura):** launcher dbg4b in `hetmf-runs/launcher-ops/debug-step4b/`; B2 AMF usa `mit_amf_advanced_gpu` + `mit_normal_gpu`. Nessuna modifica a env/job HONF; env tesi dedicato `~/envs/official_thesis`.
 - **Prossimo in questo incarico:** commit prep → checkout/cache Engaging → smoke/profiling GPU → gate 4.5 h → un training se passa.
+
+---
+
+## 2026-11-17 — U4 Engaging eseguito (p_on seed 0) e STOP
+
+- **Avvio:** job `29465586`, `mit_amf_advanced_gpu` / `mit_normal_gpu` / QoS AMF, GPU **L40S**, nodo `node3008`, SHA `50bda7f`, run `u4_pon_seed0_engaging_v1`. Coda ≈132 s; calcolo ≈28.5 min. Smoke/profile job `29465473` (gate ≈0.85 h ≪ 4.5 h).
+- **Esito:** `stopped_early_plateau` a **730** epoche (max 1000); best VAL macro RMSE **26.931 K** @ ep. **160**; last 28.055 K; TRAIN@best 13.65 K, seen@best 37.68 K. LR finale 1e-5. Checkpoint hash in `results/.../checkpoint_hashes.json` (`.pt` su Engaging pool).
+- **Confronto lineare matched (U3):** GappyPOD denso p_on VAL selezionato ≈70.5 K. Un solo seed; niente U5/p_off.
+- **Report:** `results/month2_dense_unet/u4_pon_seed0_engaging_v1/auto_report.md` + aggiornamento `03_dense_velocity_diagnostic.md`.
+- **STOP:** nessun U5, p_off, altri seed, GLU, sparse, sensori T o TEST.

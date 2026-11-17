@@ -246,7 +246,7 @@ Tutti gli step sono inizialmente **[ ] non eseguiti**. Codice presente non equiv
 - [x] U1 — Contratto denso e cache verificati. (760/220/123; payload gitignored; stub `data/manifests/month2_dense_unet_cache_manifest.json`; validazione rafforzata post-STOP A)
 - [x] U2 — Implementazione/test/overfit consegnati. **STOP A.** + correzioni isolamento/grad/YAML; Step 2.4 **non** dichiarato completo
 - [x] U3 — Profiling e GappyPOD denso; budget proposto. **STOP B.** (U4 non avviato)
-- [ ] U4 — Primo training p_on seed 0 eseguito. *(autorizzato Engaging 2026-11-17; correzioni resume/config pre-run; training da avviare dopo smoke/profiling e gate 4.5 h)*
+- [x] U4 — Primo training p_on seed 0 eseguito su Engaging (job `29465586`, L40S, early stop ep. 730, best VAL 26.93 K @160). **STOP prima di U5.**
 - [ ] U5 — Controllo istantanee e interpretazione. **STOP C.**
 - [ ] U6 — p_off/seed eseguiti oppure rinvii registrati.
 - [ ] U7 — Report finale e scelta del prossimo incarico.

@@ -5,10 +5,10 @@
 
 experiment_id: month2_dense_unet_u4_engaging_v1
 paired_experiment: month2_dense_unet_v1
-status: authorized_engaging_single_run_pon_seed0
+status: executed_engaging_single_run_pon_seed0_early_stop
 scientific_training_authorized: true
 budget_definitively_approved: true
-u4_executed: false
+u4_executed: true
 
 decision:
   by: Enrico
@@ -18,6 +18,14 @@ decision:
     VAL/DEV; early stop on plateau. Replaces CPU/200 candidate. Does not adopt
     Opus WSD branching. Continuation past 1000 only by later explicit decision.
   supervisor_ratification: not_claimed
+  execution_record:
+    run_id: u4_pon_seed0_engaging_v1
+    slurm_job_id: "29465586"
+    git_commit: 50bda7fe42323d2abd8ef46763be65ccbaf3f008
+    status: stopped_early_plateau
+    best_val_rmse_K: 26.931456559998264
+    best_val_epoch: 160
+    epochs_completed: 730
 
 inherits_scientific_contract:
   path: configs/experiments/month2_dense_unet.yaml

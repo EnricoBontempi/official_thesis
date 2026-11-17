@@ -1,0 +1,27 @@
+{
+  "aggregate_sha256": "d0b1d06805562cda49a86ea9ab1f289ce202562549482533b272efb19a69c725",
+  "cache_root": "/home/bontempi/orcd/pool/official_thesis_data/month2_dense_unet_cache",
+  "files": {
+    "geometry.npz": "97e2e9df79c87a3fbf019fa1d9ac270aafe42319f83425afb5f3fb3be8f36ce7",
+    "manifest.json": "56e988e8b89b436c0e96659e1103359b658ae08a60160a635ec39b1ef2aa36f0",
+    "seen_train_eval/frames.json": "1a3bcd1a2fb672324ad0c695c30ccc052c890d5f3872ef92ea277e16b0f766d1",
+    "seen_train_eval/p_norm.npy": "07f4ba5804f2797fb6a4e8ae5034cac2e9b611105dba23aa53003db5f6b71be4",
+    "seen_train_eval/target_T_K.npy": "3127d94a175aba856314b6427d3770922f51fb4ee4e29dbbef94b396a2b7f2b9",
+    "seen_train_eval/target_T_norm.npy": "7d591951848b197fda5fffc0d05daafe54e03645ddf24661bcc942633d5baa3f",
+    "seen_train_eval/vi_norm.npy": "b406b2b435f95a1910ecf7a09ce05a63979e7cf1bfdd2b1524c1c6541d883d8e",
+    "seen_train_eval/vj_norm.npy": "9b486f9ce42b1dfeeec41ae8e68261bb7e633d5f1e22344ed54bf0642345f40b",
+    "train_fit/frames.json": "5d469c146b9e91edcfe9f94ef73a1010b0333e398ba55054b83317f6fcbc8df7",
+    "train_fit/p_norm.npy": "233b82ecc399c19567a1c8db94404326d292a269dc78d17c73f56647b613c4f4",
+    "train_fit/target_T_K.npy": "0902cc9d0d75902538ef43bde808041aa2643ee91b4068a572ddfd696ea490cb",
+    "train_fit/target_T_norm.npy": "65475dff22732b948db6c596648e6949118ef0b4a5ed6f40e0d523cc1afc86d6",
+    "train_fit/vi_norm.npy": "3ba172568728dc629e7d6e948e1284f7e664ddb74509ff4cc12cea1342c51251",
+    "train_fit/vj_norm.npy": "dec56cf8d6127b9a655e57782b15a6593c44542c0bff3809e0e02829d073dbce",
+    "val_eval/frames.json": "d17fb6a1876d31e52a053c9a3d05f0382b61480578a8d26f51be178ba740a01b",
+    "val_eval/p_norm.npy": "54430dc9a3207e9f2676e2c896b3610caa5e86eaab51436f3cb7c304521ae6b0",
+    "val_eval/target_T_K.npy": "d2b94ac35fc888a2583dcb1df6a5623dbb60f3bd413052b11ffed57ff8543efe",
+    "val_eval/target_T_norm.npy": "a13ae5f7009caefe341cf0e7478fce168c90fca8e4ce9af7cfcf4a4e96a24c25",
+    "val_eval/vi_norm.npy": "79b357b69402c8e01038ff0b46cb000023a51ba1708c3645a4c1c46d6b5281a1",
+    "val_eval/vj_norm.npy": "969634ba374a7963f71b706174d3fd9b82c5db79297e32dfd1ad928e0f0c036f"
+  },
+  "n_files": 20
+}

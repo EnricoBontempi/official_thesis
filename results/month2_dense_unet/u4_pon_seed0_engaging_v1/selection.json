@@ -1,0 +1,29 @@
+{
+  "best": {
+    "best_val_metric": 26.931456559998264,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 26.931456559998264,
+    "epoch": 160,
+    "lr": 0.001,
+    "lr_reduced": false,
+    "seen_mean_condition_rmse_K": 37.675490288478024,
+    "train_mean_condition_rmse_K": 13.651756953204956,
+    "update": 15200,
+    "val_mean_condition_rmse_K": 26.931456559998264
+  },
+  "best_val_epoch": 160,
+  "best_val_metric": 26.931456559998264,
+  "last_epoch": 730,
+  "last_eval": {
+    "best_val_metric": 26.931456559998264,
+    "early_stop_bad_evals": 15,
+    "early_stop_ref_metric": 26.931456559998264,
+    "epoch": 730,
+    "lr": 1e-05,
+    "lr_reduced": false,
+    "seen_mean_condition_rmse_K": 36.908304325628976,
+    "train_mean_condition_rmse_K": 3.73390093192756,
+    "update": 69350,
+    "val_mean_condition_rmse_K": 28.055381221175754
+  }
+}
