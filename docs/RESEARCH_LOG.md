@@ -132,3 +132,15 @@ Questo file è il diario del progetto di tesi in `official_thesis` (ricostruzion
 - **Contesto:** Opus su `129f298` — verdetto «accettabile dopo piccola correzione»; metriche storiche/replicate verificate (63 colonne comuni).
 - **Correzione:** su `40NH3_1.2` l’associazione campo↔tempo è **non verificata per tutti gli indici**; `time_validated` non è più True su 0–1999; flag espliciti + guardia temporale; metadata dataset; niente rerun/baseline/neurali.
 - **Invarianti:** freeze replica `2c800ce` e CSV `consolidation_v1` restano tali; cambia solo la semantica dei metadata del lettore.
+
+---
+
+## 2026-11-17 — Preparazione della missione U-Net densa (Step 2.4)
+
+- **Mandato:** Enrico ha confermato il diagnostico U-Net e richiesto una roadmap dedicata e il push, dopo aver discusso la proposta dettagliata Opus. Questa attività pubblica il piano: nessuna implementazione, verifica raw, fitting o training eseguito qui; nessuna nuova ratifica supervisori.
+- **Stato remoto verificato:** main `f34ce8c`; consolidamento completato su `mission/baseline-consolidation` a `3cf7bf0`, ancora non integrato. Il report del branch riporta replica invariata (66.180 righe, differenza massima metriche zero); freeze eseguito `2c800ce`, risultati `129f298`. La correzione successiva riguarda i metadati temporali di tutto lo shard anomalo, senza rerun. Queste evidenze del branch non vengono presentate come già integrate in main.
+- **Output:** [roadmap_unet.md](../roadmap_unet.md), dettaglio operativo U0–U7 del solo Step 2.4; collegamenti e stato aggiornati in README, roadmap Mese 2 e registro. Nessuna roadmap concorrente per l'intero Mese 2.
+- **Configurazione di partenza:** vi/vj densi single-frame + coordinate + canali costanti NH3/phi; T supervisionata ma assente dagli input; previsione diretta normalizzata, MSE, p_on seed 0. FiLM, residuo ParamMean, tempo, GLU e sensori T fuori missione. Architettura/budget finali da fissare con profiling, non su prestazioni VAL.
+- **Confronti:** ParamMean e GappyPOD denso matched; scambio deterministico delle velocità fra istantanee della stessa condizione per verificare l'uso dell'allineamento istantaneo. Nessuna inferenza automatica di limite fisico o robustezza da un singolo seed.
+- **Precisazioni rispetto alla proposta Opus:** testa inizializzata con piccoli pesi non nulli per consentire gradienti fin dal primo backward; niente soglia universale “tutte le tre VAL”; niente estensioni automatiche di capacità/frame; distanze fra indici distinte da tempi verificati; lambda denso riselezionato senza dichiarare invalido a priori quello sparse.
+- **Workflow:** implementazione/test/overfit → STOP A; profiling + riferimento denso → STOP B; training p_on e interpretazione → STOP C; p_off/repliche con incarico delimitato. Il prossimo prompt a Cursor definirà l'ambito attivo. Pubblicare questo piano non dichiara alcuno di questi step completato.
