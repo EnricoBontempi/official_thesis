@@ -1,6 +1,6 @@
 # Mission M1 — Timestamp audit for `40NH3_1.2.h5`
 
-**Date:** 2026-11-16 (America/New_York)  
+**Date:** 2026-11-16 (America/New_York); **metadata correction:** 2026-11-17  
 **Shard:** `data/raw/combustion/hf_dataset/numerical/data-00022-of-00030.arrow`  
 **sim_id:** `40NH3_1.2.h5`
 
@@ -27,17 +27,31 @@ SHA/size match the Month-1 remote inventory. Raw bytes were not modified.
 
 The Step-2.3 reader extrapolated `t[2000]=2.00025` beyond audit `t_end=2.0`, assuming the short array lacked the **last** sample. Evidence contradicts that:
 
-1. Validated `t` already ends at 2.0 with 2000 samples.
+1. The `t` array already ends at 2.0 with 2000 samples.
 2. The irregular gap is interior (index 1098/1099 of the uniform grid).
 3. Numerical index 2000 is a **duplicate field snapshot** of index 1999, not a new physical time.
 
-## Policy adopted for single-frame Month-2 use
+## Post-replica metadata correction (2026-11-17)
 
-- Generic short-`t` padding / extrapolation is **refused** (`TimelineError`).
-- Non-finite or decreasing timelines are **refused**.
-- For this identity-bound anomaly only (`sim_id`, filename, size, sha256):
-  - indices `0…1999`: serve fields with original `t[i]`, `time_validated=True`;
-  - index `2000`: serve fields with `time_validated=False`, `t=NaN`, **no invented coordinate**, only if `numerical[2000]==numerical[1999]`.
-- Month-2 primary baselines remain **single-frame by index**; they do not use absolute time. Temporal forecasting / multi-frame alignment stays **unauthorized** for this shard until a scientific decision is made.
+Opus review of consolidation commit `129f298` found residual over-claim: `_resolve_time` had set `time_validated=True` for indices `0…1999` merely because `t[i]` exists. **Presence of a coordinate ≠ verified field↔time association**, given the interior gap and duplicate packing.
+
+### Definitive flags (`combustion_recon.data.temporal_quality`)
+
+| Flag | Meaning on this shard |
+|---|---|
+| `has_original_time_coordinate` | `True` for `i < 2000` (archival `t[i]` retained); `False` for `i=2000` (no invented coordinate) |
+| `timeline_regular` | `False` (documented interior gap) |
+| `field_time_association_verified` | `False` for **all** indices |
+| `time_validated` | Compatibility alias; also `False` for **all** indices |
+| `duplicate_of` | `1999` when `i=2000`; else `None` |
+| `time_coordinate_original` / `t` | Archival original when present; **not** presented as validated physical time of the field |
+
+`require_verified_field_time_association(...)` refuses multi-frame / forecasting use when association is unverified. **Single-frame-by-index remains allowed**; samples are not silently dropped or deduplicated.
+
+### What was not changed
+
+- No raw rewrite; no protocol frame list change; no baseline rerun.
+- Historical CSV / `consolidation_v1` artifacts unchanged.
+- Freeze commit of the replica remains `2c800ce`; reader SHA changes only because metadata logic changed after that freeze.
 
 Machine-readable companion: `results/baseline_consolidation/timestamp_diagnosis_40NH3_1.2.json`.

@@ -124,3 +124,11 @@ Questo file è il diario del progetto di tesi in `official_thesis` (ricostruzion
 - **Replica vs `822ed52`:** metriche per-frame max abs diff = 0; selezioni identiche; classificazione `identical_or_within_tolerance`.
 - **Report:** [mission_baseline_consolidation_report.md](month2/mission_baseline_consolidation_report.md). Storico `results/tables/` intatto.
 - **Stop:** nessun U-Net/GLU/Step 2.4; attendere Enrico/ChatGPT. Corregge anche la lettura troppo forte di «preregistrato» sul run storico (non attestabile cronologicamente).
+
+---
+
+## 2026-11-17 — Correzione metadati temporali post-revisione Opus
+
+- **Contesto:** Opus su `129f298` — verdetto «accettabile dopo piccola correzione»; metriche storiche/replicate verificate (63 colonne comuni).
+- **Correzione:** su `40NH3_1.2` l’associazione campo↔tempo è **non verificata per tutti gli indici**; `time_validated` non è più True su 0–1999; flag espliciti + guardia temporale; metadata dataset; niente rerun/baseline/neurali.
+- **Invarianti:** freeze replica `2c800ce` e CSV `consolidation_v1` restano tali; cambia solo la semantica dei metadata del lettore.

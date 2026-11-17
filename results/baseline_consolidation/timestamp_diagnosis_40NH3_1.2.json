@@ -25,5 +25,13 @@
   "uniform_missing_time_hypothesis": 1.77475,
   "frame_2000_duplicate_of_1999": true,
   "previous_pad_last_t_rejected": true,
-  "policy": "single_frame_index_unvalidated_time_for_fi>=t_len_only_if_duplicate"
+  "policy": "single_frame_index_unvalidated_time_for_fi>=t_len_only_if_duplicate",
+  "post_replica_metadata_correction": {
+    "date": "2026-11-17",
+    "field_time_association_verified_for_all_indices": false,
+    "time_validated_compat_false_for_all_indices": false,
+    "has_original_time_coordinate_i_lt_2000": true,
+    "duplicate_of_2000": 1999,
+    "note": "Presence of t[i] is not treated as verified field\u2194time association."
+  }
 }

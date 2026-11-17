@@ -23,11 +23,17 @@ random access without re-decoding. Counters: ``stats['shard_decodes']``,
 Temporal policy
 ---------------
 Valid timelines (finite, non-decreasing, length matching ``shape_t``) are
-accepted as-is. Generic extrapolation / padding of short ``t`` arrays is
-**refused**. One documented packaging anomaly
-(``40NH3_1.2.h5`` / ``data-00022-of-00030.arrow``) may be read in
-**single-frame-by-index** mode with ``time_validated=False`` and **no**
-invented timestamps when the file SHA/size match the remote inventory.
+accepted as-is with ``field_time_association_verified=True``. Generic
+extrapolation / padding of short ``t`` arrays is **refused**.
+
+The documented packaging anomaly ``40NH3_1.2.h5``
+(``data-00022-of-00030.arrow``) may be read in **single-frame-by-index** mode
+when SHA/size match the remote inventory. For **every** index of that shard:
+``field_time_association_verified=False`` and compatibility
+``time_validated=False`` (presence of ``t[i]`` alone does not prove
+field↔time association). Original coordinates may be retained as archival
+metadata; missing coordinates are never invented. See
+``combustion_recon.data.temporal_quality``.
 """
 
 from __future__ import annotations
@@ -65,21 +71,28 @@ KNOWN_T_LEN_MISMATCH: dict[str, dict[str, Any]] = {
         "audit_t_start": 1.5,
         "audit_t_end": 2.0,
         "note": (
-            "numerical frame 2000 is an exact duplicate of frame 1999; "
-            "t has 2000 validated samples spanning audit [1.5, 2.0]. "
-            "Index 2000 has no original timestamp — single-frame fields only."
+            "t has an interior gap; numerical frame 2000 duplicates 1999; "
+            "field↔time association is not verified for any index on this shard. "
+            "Single-frame-by-index is allowed; temporal protocols are not."
         ),
+        "duplicate_frame_index": 2000,
+        "duplicate_of_index": 1999,
     }
 }
 
 
 class TimelineError(ValueError):
-    """Raised when temporal coordinates are invalid or unhandled."""
+    """Raised when temporal coordinates are invalid, unhandled, or unverified for temporal use."""
 
 
 @dataclass(frozen=True)
 class CompactFrame:
-    """Single-frame physical fields needed by the Month-2 primary protocol."""
+    """Single-frame physical fields needed by the Month-2 primary protocol.
+
+    Temporal flags (see ``temporal_quality``) describe provenance only; they are
+    not model inputs. ``t`` may hold an archival original coordinate even when
+    ``field_time_association_verified`` is False.
+    """
 
     temperature: np.ndarray  # (H, W) float32
     velocity_i: np.ndarray
@@ -90,7 +103,12 @@ class CompactFrame:
     t: float
     sim_id: str
     frame_index: int
+    # Compatibility alias of field_time_association_verified
     time_validated: bool = True
+    has_original_time_coordinate: bool = True
+    timeline_regular: bool = True
+    field_time_association_verified: bool = True
+    duplicate_of: int | None = None
 
 
 def validate_timeline(t: np.ndarray, *, sim_id: str) -> None:
@@ -101,6 +119,19 @@ def validate_timeline(t: np.ndarray, *, sim_id: str) -> None:
         raise TimelineError(f"{sim_id}: non-finite values in t")
     if t.size >= 2 and np.any(np.diff(t) < 0):
         raise TimelineError(f"{sim_id}: t is not non-decreasing")
+
+
+def timeline_is_approximately_regular(
+    t: np.ndarray, *, rel_tol: float = 1e-6, abs_tol: float = 1e-15
+) -> bool:
+    """True when all consecutive diffs match the median spacing within tolerance."""
+    if t.size < 2:
+        return True
+    d = np.diff(t)
+    med = float(np.median(d))
+    if med <= 0:
+        return False
+    return bool(np.all(np.isclose(d, med, rtol=rel_tol, atol=abs_tol)))
 
 
 def sha256_file(path: Path, *, chunk: int = 8 * 1024 * 1024) -> str:
@@ -175,11 +206,19 @@ class ShardStore:
         t: np.ndarray,
         shape_t: int,
         numerical: np.ndarray,
-    ) -> tuple[float, bool]:
-        """Return (t_value, time_validated) for frame index ``fi``."""
+    ) -> dict[str, Any]:
+        """Return temporal provenance for frame index ``fi`` (never invents coordinates)."""
         validate_timeline(t, sim_id=sim_id)
         if t.size == shape_t:
-            return float(t[fi]), True
+            regular = timeline_is_approximately_regular(t)
+            return {
+                "t": float(t[fi]),
+                "has_original_time_coordinate": True,
+                "timeline_regular": regular,
+                "field_time_association_verified": True,
+                "time_validated": True,
+                "duplicate_of": None,
+            }
 
         if t.size > shape_t:
             raise TimelineError(
@@ -215,24 +254,41 @@ class ShardStore:
                 )
 
         self.stats["known_t_mismatch_hits"] = int(self.stats.get("known_t_mismatch_hits", 0)) + 1
-        if fi < t.size:
-            return float(t[fi]), True
-
-        # Index beyond validated t: allow single-frame fields only if they are
-        # an exact duplicate of the last indexed frame (observed for this shard).
-        last = int(t.size - 1)
-        if not np.array_equal(numerical[fi], numerical[last]):
-            raise TimelineError(
-                f"{sim_id}: frame {fi} is beyond t_len={t.size} and is not an exact "
-                f"duplicate of frame {last}; refusing unvalidated time association"
-            )
-        warnings.warn(
-            f"{sim_id}: serving frame {fi} with time_validated=False "
-            f"(no original timestamp; fields duplicate frame {last}). {spec['note']}",
-            stacklevel=2,
-        )
+        # Entire anomalous shard: association unverified (presence of t[i] ≠ proof).
         self.stats["time_unvalidated_frames"] = int(self.stats.get("time_unvalidated_frames", 0)) + 1
-        return float("nan"), False
+
+        dup_of: int | None = None
+        has_orig = fi < t.size
+        if has_orig:
+            t_val = float(t[fi])
+        else:
+            dup_src = int(spec["duplicate_of_index"])
+            if fi != int(spec["duplicate_frame_index"]):
+                raise TimelineError(
+                    f"{sim_id}: frame {fi} is beyond t_len={t.size} and is not the "
+                    f"documented duplicate index {spec['duplicate_frame_index']}"
+                )
+            if not np.array_equal(numerical[fi], numerical[dup_src]):
+                raise TimelineError(
+                    f"{sim_id}: frame {fi} is beyond t_len={t.size} and is not an exact "
+                    f"duplicate of frame {dup_src}; refusing read"
+                )
+            dup_of = dup_src
+            t_val = float("nan")
+            warnings.warn(
+                f"{sim_id}: serving frame {fi} without original time coordinate "
+                f"(fields duplicate frame {dup_src}). {spec['note']}",
+                stacklevel=2,
+            )
+
+        return {
+            "t": t_val,
+            "has_original_time_coordinate": has_orig,
+            "timeline_regular": False,  # documented interior gap in t
+            "field_time_association_verified": False,
+            "time_validated": False,  # compatibility: never True on this shard
+            "duplicate_of": dup_of,
+        }
 
     def _materialize_frames(
         self, sim_id: str, frame_indices: Sequence[int]
@@ -255,7 +311,7 @@ class ShardStore:
             fi = int(fi)
             if fi < 0 or fi >= shape[0]:
                 raise IndexError(f"{sim_id}: frame {fi} out of range [0, {shape[0]})")
-            t_val, time_ok = self._resolve_time(
+            prov = self._resolve_time(
                 sim_id=sim_id,
                 path=path,
                 fi=fi,
@@ -271,10 +327,16 @@ class ShardStore:
                 velocity_k=np.array(frame[:, :, CH_VK], dtype=np.float32, copy=True),
                 x=x,
                 y=y,
-                t=t_val,
+                t=float(prov["t"]),
                 sim_id=sim_id,
                 frame_index=fi,
-                time_validated=time_ok,
+                time_validated=bool(prov["time_validated"]),
+                has_original_time_coordinate=bool(prov["has_original_time_coordinate"]),
+                timeline_regular=bool(prov["timeline_regular"]),
+                field_time_association_verified=bool(
+                    prov["field_time_association_verified"]
+                ),
+                duplicate_of=prov["duplicate_of"],
             )
             out[fi] = compact
             self.stats["frames_materialized"] += 1

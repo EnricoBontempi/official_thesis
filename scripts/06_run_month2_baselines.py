@@ -215,8 +215,11 @@ def _compact_to_dict(
     xx,
     yy,
 ) -> dict[str, Any]:
+    from combustion_recon.data.temporal_quality import temporal_quality_from_mapping
+
     vi = fr.velocity_i.astype(np.float64)
     vj = fr.velocity_j.astype(np.float64)
+    tq = temporal_quality_from_mapping(fr)
     return {
         "sim_id": sid,
         "frame": int(fr.frame_index),
@@ -233,6 +236,8 @@ def _compact_to_dict(
         "x2d": xx,
         "y2d": yy,
         "umag": np.sqrt(vi**2 + vj**2),
+        # Temporal provenance for future per-frame tables (not model inputs).
+        **tq,
     }
 
 
@@ -504,6 +509,18 @@ def evaluate_method_on_frames(
                 else np.zeros_like(true, dtype=bool)
             )
             layout_id = tags.get("layout_id", cfg["data"]["layout_id"])
+            temporal_tags = {
+                k: fr[k]
+                for k in (
+                    "has_original_time_coordinate",
+                    "timeline_regular",
+                    "field_time_association_verified",
+                    "time_validated",
+                    "duplicate_of",
+                    "time_coordinate_original",
+                )
+                if k in fr
+            }
             row = evaluate_frame_prediction(
                 pred,
                 true,
@@ -522,6 +539,7 @@ def evaluate_method_on_frames(
                 observation_hash=obs_hash,
                 layout_id=layout_id,
                 task_mode="temperature_assisted" if K > 0 else "temperature_free",
+                **temporal_tags,
                 **{k: v for k, v in tags.items() if k != "layout_id"},
             )
             rows.append(row)
@@ -1005,6 +1023,18 @@ def run(
             for fr in frames:
                 for rep in replicas:
                     pred = pod.project_oracle_T(fr["T"], nh3=fr["nh3"], phi=fr["phi"])
+                    temporal_tags = {
+                        k: fr[k]
+                        for k in (
+                            "has_original_time_coordinate",
+                            "timeline_regular",
+                            "field_time_association_verified",
+                            "time_validated",
+                            "duplicate_of",
+                            "time_coordinate_original",
+                        )
+                        if k in fr
+                    }
                     row = evaluate_frame_prediction(
                         pred,
                         fr["T"],
@@ -1027,6 +1057,7 @@ def run(
                         layout_id=layout_id,
                         AO_tau=float("nan"),
                         task_mode="oracle",
+                        **temporal_tags,
                     )
                     all_rows.append(row)
 

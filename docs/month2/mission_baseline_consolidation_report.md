@@ -1,10 +1,11 @@
 # Mission report — Baseline consolidation (pre-neural)
 
-**Stato finale:** **COMPLETATA, IN ATTESA DI REVISIONE**  
+**Stato finale:** **COMPLETATA** (revisione Opus accettabile dopo correzione metadati temporali)  
 **Branch:** `mission/baseline-consolidation`  
 **Commit codice eseguito (freeze M4):** `2c800cedd1cccc6935eb64c6af57fbdd6001aee8`  
+**Consegna risultati replica:** `129f2982100437654da9dadf59588f2d86c59a35`  
 **Base scientifica storica:** `822ed52c07eded37bba4f79af0f2177da4aa36eb`  
-**Run replica:** `results/baseline_consolidation/consolidation_v1/`  
+**Run replica:** `results/baseline_consolidation/consolidation_v1/` (non ricalcolata)  
 **Nessun lavoro neurale avviato.**
 
 ## Checklist M0–M7
@@ -31,8 +32,18 @@
 ## Diagnosi dati / limiti temporali
 
 - Single-frame per indice resta valido per il confronto baseline.
-- Uso temporale multi-frame / forecasting su `40NH3_1.2` **non autorizzato** (tempo non validato a i=2000; gap interno in `t`).
+- Uso temporale multi-frame / forecasting su `40NH3_1.2` **non autorizzato**.
 - Stats fit-only **non** rigenerate.
+
+### Correzione metadati post-replica (dopo revisione Opus su `129f298`)
+
+Problema residuo: `time_validated=True` sugli indici `0…1999` perché esisteva `t[i]`, nonostante gap interno e packing ambiguo. **Corretto senza rerun.**
+
+- Su **tutto** lo shard anomalo: `field_time_association_verified=False` e `time_validated=False`.
+- Distinzione esplicita: presenza coordinata originale vs regolarità timeline vs associazione verificata vs `duplicate_of=1999` (solo i=2000).
+- Flag propagati in `Month2ReconDataset.metadata` (non in `model_inputs`); disponibili per futuri CSV per-frame; artefatti `consolidation_v1` / storici **non** riscritti.
+- Guardia `require_verified_field_time_association` rifiuta l’uso temporale non verificato.
+- Il nuovo hash del lettore (`shard_access.py`) deriva da questa modifica di metadata; il freeze eseguito della replica resta `2c800ce`.
 
 ## Ambiente e comandi
 

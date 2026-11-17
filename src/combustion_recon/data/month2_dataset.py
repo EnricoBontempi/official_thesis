@@ -249,12 +249,22 @@ class Month2ReconDataset(Dataset):
             "temperature_normalized": t_n,
         }
 
+        from combustion_recon.data.temporal_quality import temporal_quality_from_mapping
+
+        tq = temporal_quality_from_mapping(fr)
         metadata = {
             "sim_id": sim_id,
             "split": ident["split"],
             "role": self.role,
             "frame_index": frame_index,
+            # Archival coordinate only; not proof of field↔time association.
             "time": float(fr.t),
+            "time_coordinate_original": tq["time_coordinate_original"],
+            "has_original_time_coordinate": tq["has_original_time_coordinate"],
+            "timeline_regular": tq["timeline_regular"],
+            "field_time_association_verified": tq["field_time_association_verified"],
+            "time_validated": tq["time_validated"],
+            "duplicate_of": tq["duplicate_of"],
             "nh3_fraction": float(ident["nh3_fraction"]),
             "phi": float(ident["phi"]),
             "equivalence_ratio": float(ident["equivalence_ratio"]),

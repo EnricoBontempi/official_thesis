@@ -89,7 +89,21 @@ def build_frames_manifest(
             "TEST roles list indices for future frozen evaluation only.",
             "This manifest does not materialize field payloads.",
             "seen_train_eval is a later temporal block of the same TRAIN trajectories.",
+            "Temporal quality: Month-2 primary protocol is single-frame-by-index.",
+            "Known packaging anomaly 40NH3_1.2.h5 (data-00022): interior t gap; "
+            "numerical frame 2000 duplicates 1999; field↔time association is NOT "
+            "verified for any index on that shard (see docs/month2/mission_baseline_timestamp_audit.md). "
+            "Do not use that shard for multi-frame/forecasting without a new protocol decision.",
         ],
+        "temporal_quality_policy": {
+            "primary_protocol": "single_frame_by_index",
+            "anomalous_sim_ids": ["40NH3_1.2.h5"],
+            "flags_documented_in": "combustion_recon.data.temporal_quality",
+            "note": (
+                "Existing month2_frames.json on disk is historical; regenerating this "
+                "builder updates notes for future manifests only."
+            ),
+        },
     }
 
 

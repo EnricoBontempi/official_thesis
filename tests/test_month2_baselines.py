@@ -159,8 +159,14 @@ def test_anomalous_shard_time_policy_real_raw():
     sid = "40NH3_1.2.h5"
     f0 = store.get_frame(sid, 1999)
     f1 = store.get_frame(sid, 2000)
-    assert f0.time_validated is True
+    # Entire anomalous shard: association unverified (compat time_validated False)
+    assert f0.field_time_association_verified is False
+    assert f0.time_validated is False
+    assert f0.has_original_time_coordinate is True
     assert f1.time_validated is False
+    assert f1.field_time_association_verified is False
+    assert f1.has_original_time_coordinate is False
     assert np.isnan(f1.t)
+    assert f1.duplicate_of == 1999
     assert np.array_equal(f0.temperature, f1.temperature)
     assert store.stats["time_unvalidated_frames"] >= 1
