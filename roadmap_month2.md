@@ -225,6 +225,10 @@ Non replicare tre seed per ogni riga di ricerca iperparametrica. Ripetere i fina
 - **Verifiche/completamento:** un altro agente può ricostruire ogni tabella da commit/config/dati identificati; checkpoint e risultati pesanti hanno riferimento persistente fuori Git; nessuna conclusione di impossibilità fisica da un modello fallito; novità metodologica non dichiarata per il solo uso di FiLM/maschere.
 - **Passaggio:** decisione registrata e una domanda successiva falsificabile. Se manca la ratifica scientifica, dichiarare “baseline/primo pilot completati, revisione aperta”, non “Mese 2 approvato”.
 
+## Missione attiva dopo la revisione delle baseline
+
+Opus e Astra hanno revisionato indipendentemente `822ed52` e concluso «pronti dopo correzioni circoscritte». Enrico ha autorizzato il consolidamento con Cursor IDE locale: [roadmap_missione.md](roadmap_missione.md) dettaglia correzioni, diagnosi raw, provenienza e una replica invariata delle baseline. La missione si ferma prima di qualsiasi lavoro neurale e non autorizza nuove griglie, R=64 o cambi scientifici. I risultati Step 2.3 rimangono storici: la preregistrazione cronologica non è attestabile dagli artefatti disponibili. Nessuna nuova esecuzione è stata svolta durante la preparazione del piano. Prima di 2.4 occorrono consegna e discussione con Enrico.
+
 ## Istruzioni pratiche per gli agenti di coding
 
 1. Prima di ogni task leggere istruzioni correnti, `git status`, remoto aggiornato, diario, questa roadmap e decisioni applicabili. Non importare esperimenti o diario di `thesis-research`/HONF.

@@ -103,3 +103,14 @@ Questo file è il diario del progetto di tesi in `official_thesis` (ricostruzion
 - **Controlli:** AO Centered-RMSE invariante; K=0 T-block flag = free; maschere K condivise; adapter≡API storica; contenitori observed-only. Fix locale: pad `t` su `40NH3_1.2.h5` (t_shape=2000 vs shape_t=2001).
 - **Costi:** ~32 min wall; peak RSS ~10.4 GiB; 23 shard decode. Pytest mirati 35 passed.
 - **Stop:** nessuna Step 2.4 / U-Net / GLU; revisione indipendente prima dei neurali.
+
+
+---
+
+## 2026-11-16 — Revisioni Opus/Astra e missione di consolidamento prima dei neurali
+
+- **Provenienza:** Enrico ha condiviso le due revisioni indipendenti di `822ed52`; entrambe concludono «pronti dopo correzioni circoscritte». I revisori non disponevano dei raw; i loro controlli non equivalgono a un rerun completo locale.
+- **Decisione di Enrico:** affidare a Cursor IDE locale correzioni e replica invariata delle baseline, con arresto prima di implementazioni/training neurali e prima di cambi scientifici. Creato [roadmap_missione.md](../roadmap_missione.md), collegato al piano principale.
+- **Ambito:** controlli d'isolamento effettivi, diagnosi del timestamp `40NH3_1.2`, tracciabilità codice/ambiente/dati, contratto YAML, aggregazione e confronto con il run storico. Il vecchio «preregistrato» è una dichiarazione non attestabile cronologicamente; la replica non ne riscrive la storia.
+- **Rinviati:** U-Net/GLU, R=64, nuove griglie/τ, esperimenti temporali e modifiche agli split. La futura consegna del codice sarà su branch/PR senza merge automatico.
+- **Stato:** piano preparato da ChatGPT/Codex e autorizzato per l'esecuzione futura; in questa attività nessuna modifica di codice, nessun rerun, nessun training.

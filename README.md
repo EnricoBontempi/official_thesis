@@ -6,6 +6,7 @@
 **Month 1 Roadmap:** [roadmap_month1.md](roadmap_month1.md)  
 **Month 2 Roadmap:** [roadmap_month2.md](roadmap_month2.md) — operationally authorized by Enrico (2026-11-16); Step 2.1 protocol concretized; supervisor technical ratification tracked separately  
 **Month 2 Protocol:** [configs/splits/month2_frame_protocol.yaml](configs/splits/month2_frame_protocol.yaml), [configs/experiments/month2_pilot.yaml](configs/experiments/month2_pilot.yaml)  
+**Active Baseline Consolidation Mission:** [roadmap_missione.md](roadmap_missione.md) — Cursor IDE; stop before neural work  
 **Research Log:** [docs/RESEARCH_LOG.md](docs/RESEARCH_LOG.md)  
 **Current Evidence & Open Decisions:** [docs/month2/00_context_and_decisions.md](docs/month2/00_context_and_decisions.md)
 
@@ -20,7 +21,7 @@ This repository contains the codebase, experimental configurations, data audit p
 - `external/GLU_Reconstruction/`: **Untouched upstream reference implementation** of **GLU** (`arXiv:2603.26023`, [cosmos2w/GLU_Reconstruction](https://github.com/cosmos2w/GLU_Reconstruction)) provided by the Deng Lab authors. Kept strictly unmodified as the laboratory reference baseline; all thesis-specific adaptations live in `src/combustion_recon/`.
 - `configs/`: Locked operating-condition splits (`splits_interp_extrap.yaml`), evaluation protocol, and observation layouts.
 - `docs/month1/` & `overleaf_month1_report/`: Month 1 audit reports, baseline feasibility study, and LaTeX progress report.
-- `docs/month2/` & `roadmap_month2.md`: Decision register and Month-2 plan. Step 2.1 protocol configs and Step 2.2 data pipeline (`Month2ReconDataset`, fit-only stats, manifests) are in place; neural training and Month-2 baseline runs start at Step 2.3+.
+- `docs/month2/` & `roadmap_month2.md`: Decision register and Month-2 plan. Step 2.1 protocol configs and Step 2.2 data pipeline (`Month2ReconDataset`, fit-only stats, manifests) are in place; Step 2.3 baseline results are available; their post-review consolidation follows `roadmap_missione.md`. Neural work has not started.
 - `scripts/` & `tests/`: Reproducible execution scripts and automated `pytest` guardrails.
 
 ### Key Scientific Constraints
