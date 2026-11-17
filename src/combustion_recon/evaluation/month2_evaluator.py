@@ -30,6 +30,7 @@ EXCLUDED_SHAPE_METRICS = ("top25pct_iou", "top25pct_dice", "top25pct_threshold_K
 HOMOGENEITY_KEYS: tuple[str, ...] = (
     "role",
     "method",
+    "variant",
     "p_conditioning",
     "K",
     "site_fraction",
@@ -37,6 +38,10 @@ HOMOGENEITY_KEYS: tuple[str, ...] = (
     "mask_replica_id",
     "layout_id",
     "task_mode",
+    "R",
+    "ridge_lambda",
+    "w_T",
+    "AO_tau",
 )
 
 
@@ -173,7 +178,10 @@ def _assert_homogeneous_config(
 
 def json_safe(v: Any) -> Any:
     if isinstance(v, (np.generic,)):
-        return v.item()
+        v = v.item()
+    # NaN != NaN would break set uniqueness; normalize missing floats.
+    if isinstance(v, float) and np.isnan(v):
+        return "__NAN__"
     return v
 
 

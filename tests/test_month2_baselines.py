@@ -1,9 +1,11 @@
-"""Month-2 baseline adapter invariants (no full experiment)."""
+"""Month-2 baseline adapter invariants and timeline policy tests."""
 
 from __future__ import annotations
 
 import numpy as np
+import pytest
 
+from combustion_recon.data.shard_access import TimelineError, validate_timeline
 from combustion_recon.models.baselines import (
     GappyPODReconstructor,
     GlobalTrainMeanPredictor,
@@ -102,7 +104,6 @@ def test_gappy_k0_tblock_matches_free_and_hidden_vel_irrelevant():
     p1 = predict_gappy(pod, mi, use_temperature_block=True, p_conditioning=False)
     assert np.allclose(p0, p1)
 
-    # Mutating values outside mask cannot change inputs (inputs only store observed sites)
     vi2 = vi.copy()
     vi2[~mask] += 50
     vals2 = np.stack([vi2[ys, xs], vj[ys, xs]], axis=1)
@@ -119,21 +120,47 @@ def test_global_mean_fit_smoke():
     assert np.allclose(m.predict(), 2.0)
 
 
-def test_t_coord_pad_for_short_timeline_shard():
-    """40NH3_1.2.h5 has shape_t=2001 but t_shape=2000; protocol uses index 2000."""
+def test_validate_timeline_rejects_decreasing_and_nan():
+    with pytest.raises(TimelineError):
+        validate_timeline(np.array([1.0, 0.5]), sim_id="x")
+    with pytest.raises(TimelineError):
+        validate_timeline(np.array([1.0, np.nan]), sim_id="x")
+    validate_timeline(np.array([1.0, 1.0, 1.25]), sim_id="x")  # non-decreasing OK
+
+
+def test_generic_short_t_padding_refused(tmp_path, monkeypatch):
+    """Synthetic short-t shard without known exception must fail (no generic pad)."""
+    from combustion_recon.data import shard_access as sa
+
+    # Build a fake path/row path is hard; unit-test _resolve_time via TimelineError on unknown sim
+    t = np.linspace(0.0, 1.0, 10)
+    numerical = np.zeros((12, 2, 2, 15), dtype=np.float32)
+    store = sa.ShardStore(raw_dir=tmp_path, shard_map={"other.h5": "missing.arrow"}, verify_known_mismatch_sha=False)
+    with pytest.raises(TimelineError, match="without a known exception"):
+        store._resolve_time(
+            sim_id="other.h5",
+            path=tmp_path / "missing.arrow",
+            fi=11,
+            t=t,
+            shape_t=12,
+            numerical=numerical,
+        )
+
+
+def test_anomalous_shard_time_policy_real_raw():
     from pathlib import Path
 
     from combustion_recon.data.shard_access import ShardStore
 
     raw = Path("data/raw/combustion/hf_dataset/numerical")
-    if not (raw / "data-00000-of-00030.arrow").exists():
-        return  # skip offline
+    if not (raw / "data-00022-of-00030.arrow").exists():
+        pytest.skip("raw Arrow shards not available")
     store = ShardStore(raw_dir=raw, max_cached_frames=4)
     sid = "40NH3_1.2.h5"
-    store.prefetch(sid, [1999, 2000])
     f0 = store.get_frame(sid, 1999)
     f1 = store.get_frame(sid, 2000)
-    assert f1.frame_index == 2000
-    assert store.stats["t_coord_pads"] >= 1
-    assert np.isfinite(f1.t)
-    assert f1.t >= f0.t
+    assert f0.time_validated is True
+    assert f1.time_validated is False
+    assert np.isnan(f1.t)
+    assert np.array_equal(f0.temperature, f1.temperature)
+    assert store.stats["time_unvalidated_frames"] >= 1

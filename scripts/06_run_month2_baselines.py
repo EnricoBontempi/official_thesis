@@ -1,19 +1,28 @@
 #!/usr/bin/env python3
-"""Step 2.3 — Fit and evaluate Month-2 non-neural baselines on the pilot protocol.
+"""Month-2 non-neural baselines on the pilot protocol (replica-capable).
 
 Usage:
-  python scripts/06_run_month2_baselines.py --smoke
-  python scripts/06_run_month2_baselines.py --full
+  python scripts/06_run_month2_baselines.py --smoke --run-id smoke_local
+  python scripts/06_run_month2_baselines.py --full --run-id consolidation_v1
+
+Historical Step-2.3 tables under results/tables/ are never overwritten.
+New runs write to results/baseline_consolidation/<run_id>/.
 """
 
 from __future__ import annotations
 
 import argparse
 import gc
+import gzip
 import json
+import os
+import platform
 import resource
+import subprocess
+import sys
 import time
 import traceback
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -29,6 +38,7 @@ from combustion_recon.data.month2_protocol import (
     sha256_file,
 )
 from combustion_recon.data.shard_access import ShardStore
+from combustion_recon.evaluation.month2_baseline_invariants import run_isolation_battery
 from combustion_recon.evaluation.month2_evaluator import (
     aggregate_frame_then_condition_then_split,
     evaluate_frame_prediction,
@@ -49,11 +59,31 @@ from combustion_recon.models.month2_baseline_adapters import (
 
 ROOT = Path(__file__).resolve().parents[1]
 CFG_PATH = ROOT / "configs" / "experiments" / "month2_baselines.yaml"
-RAW = ROOT / "data" / "raw" / "combustion" / "hf_dataset" / "numerical"
-STATS = ROOT / "data" / "manifests" / "train_norm_stats_month2_fit.json"
-OUT_TABLES = ROOT / "results" / "tables"
-OUT_META = ROOT / "results" / "meta"
-OUT_DOC = ROOT / "docs" / "month2" / "02_baseline_validation.md"
+DEFAULT_RAW = ROOT / "data" / "raw" / "combustion" / "hf_dataset" / "numerical"
+DEFAULT_STATS = ROOT / "data" / "manifests" / "train_norm_stats_month2_fit.json"
+CONSOLIDATION_ROOT = ROOT / "results" / "baseline_consolidation"
+
+# Comparison rule fixed before reading new scores (mission M4).
+COMPARISON_RULE = {
+    "metric_atol_K": 1.0e-6,
+    "metric_rtol": 1.0e-8,
+    "ids_must_match_exactly": True,
+    "pairing_keys": [
+        "method",
+        "role",
+        "p_conditioning",
+        "K",
+        "site_fraction",
+        "variant",
+        "mask_replica_id",
+        "sim_id",
+        "frame_index",
+        "R",
+        "ridge_lambda",
+        "w_T",
+        "observation_hash",
+    ],
+}
 
 
 def rss_mb() -> float:
@@ -63,6 +93,115 @@ def rss_mb() -> float:
 def load_cfg() -> dict[str, Any]:
     with CFG_PATH.open() as f:
         return yaml.safe_load(f)
+
+
+def _git_head() -> str:
+    try:
+        return subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
+        ).strip()
+    except Exception:
+        return "UNKNOWN"
+
+
+def _git_status_porcelain() -> str:
+    try:
+        return subprocess.check_output(
+            ["git", "status", "--porcelain"], cwd=ROOT, text=True
+        )
+    except Exception:
+        return "UNKNOWN"
+
+
+def resolve_contract(cfg: dict[str, Any], *, smoke: bool) -> dict[str, Any]:
+    """Consume YAML contract or refuse incompatible values."""
+    data = cfg["data"]
+    methods = cfg["methods"]
+    hs = cfg["hyperparameter_search"]
+    ev = cfg["evaluation"]
+    io = cfg["io"]
+
+    site_fraction = float(data["site_fraction_primary"])
+    if abs(site_fraction - 0.05) > 1e-12:
+        raise ValueError(f"Unsupported site_fraction_primary={site_fraction} (contract requires 0.05)")
+    if str(data.get("velocity")) != "planar_2C":
+        raise ValueError("Contract requires data.velocity=planar_2C")
+    if int(methods["GappyPOD"]["n_velocity_components"]) != 2:
+        raise ValueError("Contract requires GappyPOD n_velocity_components=2")
+    pod_R = int(methods["GappyPOD"]["R"])
+    if pod_R != 32 and not smoke:
+        raise ValueError(f"Full run requires GappyPOD.R=32, got {pod_R}")
+    free_lams = [float(x) for x in hs["temperature_free"]["ridge_lambda"]]
+    asst_lams = [float(x) for x in hs["temperature_assisted_primary"]["ridge_lambda"]]
+    asst_wT = [float(x) for x in hs["temperature_assisted_primary"]["w_T"]]
+    if len(free_lams) != int(hs["temperature_free"]["n_combinations"]):
+        raise ValueError("temperature_free λ grid length != n_combinations")
+    if len(asst_lams) * len(asst_wT) != int(hs["temperature_assisted_primary"]["n_combinations"]):
+        raise ValueError("assisted λ×w_T grid size != n_combinations")
+    K_values = [int(k) for k in ev["K_values"]]
+    if K_values != [0, 9, 32] and not smoke:
+        raise ValueError(f"Full run requires evaluation.K_values=[0,9,32], got {K_values}")
+    ao_tau = float(ev["AO_tau"])
+    if abs(ao_tau - 1.0) > 1e-12:
+        raise ValueError(f"Contract requires AO_tau=1.0, got {ao_tau}")
+    replicas = [int(r) for r in data["mask_replicas"]]
+    layout_id = str(data["layout_id"])
+    mask_seed = int(data["mask_seed"])
+    stats_path = ROOT / str(data["normalizer"])
+    if not stats_path.exists():
+        raise FileNotFoundError(stats_path)
+
+    if smoke:
+        return {
+            "site_fraction": site_fraction,
+            "pod_R": 4,
+            "free_lams": [1e-2, 1e-1],
+            "asst_lams": [1e-2],
+            "asst_wT": [5.0],
+            "K_values": [0, 9],
+            "ao_tau": ao_tau,
+            "replicas": [0],
+            "layout_id": layout_id,
+            "mask_seed": mask_seed,
+            "stats_path": stats_path,
+            "max_cached_frames": int(io["max_cached_frames"]),
+            "run_hgb": False,
+            "hgb_max_pixels": int(methods["LocalHGB_dense_diagnostic"]["max_pixels"]),
+            "w_T_fixed_unused": float(hs["temperature_free"]["w_T_fixed_unused"]),
+            "smoke_overrides": True,
+        }
+    return {
+        "site_fraction": site_fraction,
+        "pod_R": pod_R,
+        "free_lams": free_lams,
+        "asst_lams": asst_lams,
+        "asst_wT": asst_wT,
+        "K_values": K_values,
+        "ao_tau": ao_tau,
+        "replicas": replicas,
+        "layout_id": layout_id,
+        "mask_seed": mask_seed,
+        "stats_path": stats_path,
+        "max_cached_frames": int(io["max_cached_frames"]),
+        "run_hgb": bool(methods["LocalHGB_dense_diagnostic"]["include"]),
+        "hgb_max_pixels": int(methods["LocalHGB_dense_diagnostic"]["max_pixels"]),
+        "w_T_fixed_unused": float(hs["temperature_free"]["w_T_fixed_unused"]),
+        "smoke_overrides": False,
+    }
+
+
+def write_csv(df: pd.DataFrame, path: Path, *, gzip_enabled: bool = False) -> Path:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if gzip_enabled:
+        out = path if str(path).endswith(".gz") else path.with_suffix(path.suffix + ".gz")
+        with gzip.open(out, "wt", newline="") as f:
+            df.to_csv(f, index=False)
+        # round-trip check
+        with gzip.open(out, "rt") as f:
+            _ = pd.read_csv(f, nrows=2)
+        return out
+    df.to_csv(path, index=False)
+    return path
 
 
 def _compact_to_dict(
@@ -364,6 +503,7 @@ def evaluate_method_on_frames(
                 if not use_dense_for_hgb
                 else np.zeros_like(true, dtype=bool)
             )
+            layout_id = tags.get("layout_id", cfg["data"]["layout_id"])
             row = evaluate_frame_prediction(
                 pred,
                 true,
@@ -380,7 +520,9 @@ def evaluate_method_on_frames(
                 model_seed=0,
                 mask_replica_id=rep,
                 observation_hash=obs_hash,
-                **tags,
+                layout_id=layout_id,
+                task_mode="temperature_assisted" if K > 0 else "temperature_free",
+                **{k: v for k, v in tags.items() if k != "layout_id"},
             )
             rows.append(row)
     return rows
@@ -399,13 +541,80 @@ def mean_over_replicas(per_frame_rows: list[dict[str, Any]]) -> float:
     return float(np.mean(scores))
 
 
-def run(smoke: bool = False) -> dict[str, Any]:
+def run(
+    smoke: bool = False,
+    *,
+    run_id: str,
+    raw_dir: Path | None = None,
+) -> dict[str, Any]:
     t_wall0 = time.time()
     cfg = load_cfg()
     assert CFG_PATH.exists(), "baselines YAML must exist before scores"
+    contract = resolve_contract(cfg, smoke=smoke)
     protocol = load_frame_protocol()
-    normalizer = Month2FitOnlyNormalizer(STATS)
-    store = ShardStore(raw_dir=RAW, max_cached_frames=int(cfg["io"]["max_cached_frames"]))
+    stats_path = contract["stats_path"]
+    normalizer = Month2FitOnlyNormalizer(stats_path)
+    raw_dir = Path(raw_dir) if raw_dir is not None else Path(
+        os.environ.get("COMBUSTION_RAW_DIR", str(DEFAULT_RAW))
+    )
+    store = ShardStore(
+        raw_dir=raw_dir, max_cached_frames=int(contract["max_cached_frames"])
+    )
+
+    out_dir = CONSOLIDATION_ROOT / run_id
+    if out_dir.exists() and any(out_dir.iterdir()):
+        raise FileExistsError(
+            f"Refusing to overwrite existing run directory {out_dir}. Choose a new --run-id."
+        )
+    out_dir.mkdir(parents=True, exist_ok=False)
+    (out_dir / "logs").mkdir(exist_ok=True)
+
+    # M4: provenance + comparison rule BEFORE fit / scores
+    preflight = {
+        "run_id": run_id,
+        "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+        "smoke": smoke,
+        "git_head": _git_head(),
+        "git_status_porcelain": _git_status_porcelain(),
+        "cfg_sha256": sha256_file(CFG_PATH),
+        "runner_sha256": sha256_file(Path(__file__)),
+        "adapters_sha256": sha256_file(
+            ROOT / "src/combustion_recon/models/month2_baseline_adapters.py"
+        ),
+        "baselines_py_sha256": sha256_file(
+            ROOT / "src/combustion_recon/models/baselines.py"
+        ),
+        "shard_access_sha256": sha256_file(
+            ROOT / "src/combustion_recon/data/shard_access.py"
+        ),
+        "norm_stats_sha256": sha256_file(stats_path),
+        "python": sys.version,
+        "platform": platform.platform(),
+        "numpy": np.__version__,
+        "executable": sys.executable,
+        "OMP_NUM_THREADS": os.environ.get("OMP_NUM_THREADS"),
+        "MKL_NUM_THREADS": os.environ.get("MKL_NUM_THREADS"),
+        "OPENBLAS_NUM_THREADS": os.environ.get("OPENBLAS_NUM_THREADS"),
+        "comparison_rule": COMPARISON_RULE,
+        "contract": {
+            k: (str(v) if isinstance(v, Path) else v)
+            for k, v in contract.items()
+            if k != "smoke_overrides"
+        },
+        "raw_dir": str(raw_dir),
+        "out_dir": str(out_dir),
+        "historical_note": (
+            "Historical 822ed52 run remains the dated record with incomplete provenance; "
+            "this replica does not retroactively attest preregistration."
+        ),
+    }
+    (out_dir / "preflight_manifest.json").write_text(json.dumps(preflight, indent=2) + "\n")
+    if preflight["git_status_porcelain"].strip() and not smoke:
+        print(
+            "WARNING: git working tree is dirty at preflight; full scientific "
+            "replica should start from a clean freeze commit.",
+            flush=True,
+        )
 
     splits = load_splits()
     if smoke:
@@ -414,22 +623,22 @@ def run(smoke: bool = False) -> dict[str, Any]:
         max_fit = 8
         max_seen = 2
         max_val = 2
-        replicas = [0]
-        free_lams = [1e-2, 1e-1]
-        asst_lams = [1e-2]
-        asst_wT = [5.0]
-        run_hgb = False
-        pod_R = 4  # TruncatedSVD needs n_samples >= R; smoke uses few frames
     else:
         train_ids = splits["train"]
         val_ids = splits["val"]
         max_fit = max_seen = max_val = None
-        replicas = list(cfg["data"]["mask_replicas"])
-        free_lams = list(cfg["hyperparameter_search"]["temperature_free"]["ridge_lambda"])
-        asst_lams = list(cfg["hyperparameter_search"]["temperature_assisted_primary"]["ridge_lambda"])
-        asst_wT = list(cfg["hyperparameter_search"]["temperature_assisted_primary"]["w_T"])
-        run_hgb = bool(cfg["methods"]["LocalHGB_dense_diagnostic"]["include"])
-        pod_R = 32
+    replicas = list(contract["replicas"])
+    free_lams = list(contract["free_lams"])
+    asst_lams = list(contract["asst_lams"])
+    asst_wT = list(contract["asst_wT"])
+    run_hgb = bool(contract["run_hgb"])
+    pod_R = int(contract["pod_R"])
+    ao_tau = float(contract["ao_tau"])
+    layout_id = str(contract["layout_id"])
+    K_values = list(contract["K_values"])
+    site_fraction = float(contract["site_fraction"])
+    w_T_fixed_unused = float(contract["w_T_fixed_unused"])
+    hgb_max_pixels = int(contract["hgb_max_pixels"])
 
     print("Materializing TRAIN-fit + seen (one decode/condition)...", flush=True)
     train_frames, seen_frames = materialize_train_fit_and_seen(
@@ -448,7 +657,8 @@ def run(smoke: bool = False) -> dict[str, Any]:
     print(
         f"  n_val={len(val_frames)} "
         f"decodes_total={store.stats['shard_decodes']} "
-        f"t_pads={store.stats.get('t_coord_pads', 0)} rss={rss_mb():.0f}MB",
+        f"time_unvalidated={store.stats.get('time_unvalidated_frames', 0)} "
+        f"rss={rss_mb():.0f}MB",
         flush=True,
     )
 
@@ -502,10 +712,9 @@ def run(smoke: bool = False) -> dict[str, Any]:
         flush=True,
     )
 
-    site_fraction = float(cfg["data"]["site_fraction_primary"])
     search_rows: list[dict[str, Any]] = []
 
-    # --- Hyperparameter search (preregistered) ---
+    # --- Hyperparameter search (contract grids; replica of historical search) ---
     print("VAL search temperature-free (λ only)...", flush=True)
     best_free: dict[str, Any] = {}
     for p_on in (False, True):
@@ -514,7 +723,7 @@ def run(smoke: bool = False) -> dict[str, Any]:
         for lam in free_lams:
             pod = pod_base.with_hyperparams(
                 ridge_lambda=float(lam),
-                w_T=float(cfg["hyperparameter_search"]["temperature_free"]["w_T_fixed_unused"]),
+                w_T=float(w_T_fixed_unused),
             )
             rows = evaluate_method_on_frames(
                 method="GappyPOD_free",
@@ -529,7 +738,14 @@ def run(smoke: bool = False) -> dict[str, Any]:
                 replica_ids=replicas,
                 site_fraction=site_fraction,
                 store=store,
-                extra_tags={"ridge_lambda": float(lam), "w_T": float("nan"), "R": pod_R, "variant": "free"},
+                extra_tags={
+                    "ridge_lambda": float(lam),
+                    "w_T": float("nan"),
+                    "R": pod_R,
+                    "variant": "free",
+                    "layout_id": layout_id,
+                    "AO_tau": float("nan"),
+                },
             )
             score = mean_over_replicas(rows)
             search_rows.append(
@@ -581,6 +797,8 @@ def run(smoke: bool = False) -> dict[str, Any]:
                         "w_T": float(wT),
                         "R": pod_R,
                         "variant": "Tblock",
+                        "layout_id": layout_id,
+                        "AO_tau": float("nan"),
                     },
                 )
                 score = mean_over_replicas(rows)
@@ -627,10 +845,18 @@ def run(smoke: bool = False) -> dict[str, Any]:
         print("Fitting LocalHGB 2C dense diagnostic...", flush=True)
         t0 = time.time()
         hgb_off = LocalVelocityTemperatureRegressor.fit(
-            train_frames, conditioned=False, include_vk=False, max_pixels=80_000, seed=0
+            train_frames,
+            conditioned=False,
+            include_vk=False,
+            max_pixels=hgb_max_pixels,
+            seed=0,
         )
         hgb_on = LocalVelocityTemperatureRegressor.fit(
-            train_frames, conditioned=True, include_vk=False, max_pixels=80_000, seed=0
+            train_frames,
+            conditioned=True,
+            include_vk=False,
+            max_pixels=hgb_max_pixels,
+            seed=0,
         )
         print(f"  HGB fit {time.time()-t0:.1f}s", flush=True)
 
@@ -642,7 +868,6 @@ def run(smoke: bool = False) -> dict[str, Any]:
         "seen_train_eval": seen_frames,
         "val_eval": val_frames,
     }
-    K_values = [0, 9, 32] if not smoke else [0, 9]
 
     def add_eval(method, frames, predict_fn, K, p_on, tags, dense=False):
         nonlocal all_rows
@@ -670,7 +895,7 @@ def run(smoke: bool = False) -> dict[str, Any]:
             lambda mi: predict_global_mean(global_mean),
             K=0,
             p_on=False,
-            tags={"variant": "zero_sensor", "R": 0},
+            tags={"variant": "zero_sensor", "R": 0, "layout_id": layout_id, "AO_tau": float("nan")},
         )
         # ParamMean (p on)
         add_eval(
@@ -684,6 +909,8 @@ def run(smoke: bool = False) -> dict[str, Any]:
                 "R": 0,
                 "ridge_alpha": param_mean.selected_ridge_alpha,
                 "basis": param_mean.selected_basis,
+                "layout_id": layout_id,
+                "AO_tau": float("nan"),
             },
         )
         # ParamMean + AO for K>0
@@ -693,10 +920,10 @@ def run(smoke: bool = False) -> dict[str, Any]:
             add_eval(
                 "ParamMean_plus_AO",
                 frames,
-                lambda mi, K=K: predict_param_mean_ao(param_mean, mi, tau=1.0),
+                lambda mi, K=K: predict_param_mean_ao(param_mean, mi, tau=ao_tau),
                 K=K,
                 p_on=True,
-                tags={"variant": "AO", "AO_tau": 1.0, "R": 0},
+                tags={"variant": "AO", "AO_tau": ao_tau, "R": 0, "layout_id": layout_id},
             )
 
         for p_on, key_free, key_tb in (
@@ -719,6 +946,8 @@ def run(smoke: bool = False) -> dict[str, Any]:
                     "R": pod_R,
                     "ridge_lambda": selected[key_free]["ridge_lambda"],
                     "w_T": float("nan"),
+                    "layout_id": layout_id,
+                    "AO_tau": float("nan"),
                 },
             )
             for K in K_values:
@@ -732,18 +961,19 @@ def run(smoke: bool = False) -> dict[str, Any]:
                             mi,
                             use_temperature_block=False,
                             anchor_offset=True,
-                            anchor_tau=1.0,
+                            anchor_tau=ao_tau,
                             p_conditioning=p_on,
                         ),
                         K=K,
                         p_on=p_on,
                         tags={
                             "variant": "AO",
-                            "AO_tau": 1.0,
+                            "AO_tau": ao_tau,
                             "R": pod_R,
                             "ridge_lambda": selected[key_free]["ridge_lambda"],
                             "w_T": float("nan"),
                             "free_source": "selected_free",
+                            "layout_id": layout_id,
                         },
                     )
                 # T-block with selected assisted hyperparams (K=0 must match free)
@@ -764,6 +994,8 @@ def run(smoke: bool = False) -> dict[str, Any]:
                         "R": pod_R,
                         "ridge_lambda": selected[key_tb]["ridge_lambda"],
                         "w_T": selected[key_tb]["w_T"],
+                        "layout_id": layout_id,
+                        "AO_tau": float("nan"),
                     },
                 )
 
@@ -792,6 +1024,9 @@ def run(smoke: bool = False) -> dict[str, Any]:
                         R=pod_R,
                         deployable=False,
                         uses_full_T=True,
+                        layout_id=layout_id,
+                        AO_tau=float("nan"),
+                        task_mode="oracle",
                     )
                     all_rows.append(row)
 
@@ -812,19 +1047,23 @@ def run(smoke: bool = False) -> dict[str, Any]:
                     ),
                     K=0,
                     p_on=p_on,
-                    tags={"variant": "dense_diagnostic", "sparse_comparable": False},
+                    tags={
+                        "variant": "dense_diagnostic",
+                        "sparse_comparable": False,
+                        "layout_id": layout_id,
+                        "AO_tau": float("nan"),
+                        "R": 0,
+                    },
                     dense=True,
                 )
 
-    # --- Tables ---
-    OUT_TABLES.mkdir(parents=True, exist_ok=True)
-    OUT_META.mkdir(parents=True, exist_ok=True)
+    # --- Tables (never overwrite historical results/tables) ---
     df_frame = pd.DataFrame(all_rows)
-    # drop map-like if any
     df_frame = df_frame[[c for c in df_frame.columns if not str(c).startswith("_")]]
-    df_frame.to_csv(OUT_TABLES / "month2_baseline_per_frame.csv", index=False)
+    per_frame_path = write_csv(
+        df_frame, out_dir / "month2_baseline_per_frame.csv", gzip_enabled=True
+    )
 
-    # Per-condition summaries: one config at a time
     cond_parts = []
     group_cols = [
         c
@@ -838,27 +1077,27 @@ def run(smoke: bool = False) -> dict[str, Any]:
             "ridge_lambda",
             "w_T",
             "R",
+            "AO_tau",
+            "layout_id",
             "mask_replica_id",
         ]
         if c in df_frame.columns
     ]
     for keys, g in df_frame.groupby(group_cols, dropna=False):
         rows = g.to_dict(orient="records")
-        try:
-            agg = aggregate_frame_then_condition_then_split(rows)
-            pc = agg["per_condition"].copy()
-            if isinstance(keys, tuple):
-                for col, val in zip(group_cols, keys):
-                    pc[col] = val
-            else:
-                pc[group_cols[0]] = keys
-            cond_parts.append(pc)
-        except Exception as e:
-            print(f"  warn aggregate skip {keys}: {e}", flush=True)
-    df_cond = pd.concat(cond_parts, ignore_index=True) if cond_parts else pd.DataFrame()
-    df_cond.to_csv(OUT_TABLES / "month2_baseline_per_condition.csv", index=False)
+        agg = aggregate_frame_then_condition_then_split(rows)
+        pc = agg["per_condition"].copy()
+        if isinstance(keys, tuple):
+            for col, val in zip(group_cols, keys):
+                pc[col] = val
+        else:
+            pc[group_cols[0]] = keys
+        cond_parts.append(pc)
+    if not cond_parts:
+        raise RuntimeError("No per-condition aggregates produced")
+    df_cond = pd.concat(cond_parts, ignore_index=True)
+    write_csv(df_cond, out_dir / "month2_baseline_per_condition.csv")
 
-    # Summary: mean over replicas of mean-condition metrics, for seen and VAL
     summary_rows = []
     metric_cols = [
         c
@@ -877,38 +1116,50 @@ def run(smoke: bool = False) -> dict[str, Any]:
             "ridge_lambda",
             "w_T",
             "R",
+            "AO_tau",
+            "layout_id",
         ]
         if c in df_cond.columns
     ]
-    if not df_cond.empty:
-        for keys, g in df_cond.groupby(sum_group, dropna=False):
-            # mean over replicas and conditions equally: first mean per (replica,sim), already per cond;
-            # then mean over replica and sim_id
-            rec = {}
-            if isinstance(keys, tuple):
-                for col, val in zip(sum_group, keys):
-                    rec[col] = val
-            else:
-                rec[sum_group[0]] = keys
-            for m in metric_cols:
-                rec[m] = float(g[m].mean())
-            rec["n_condition_rows"] = int(len(g))
-            summary_rows.append(rec)
+    for keys, g in df_cond.groupby(sum_group, dropna=False):
+        rec = {}
+        if isinstance(keys, tuple):
+            for col, val in zip(sum_group, keys):
+                rec[col] = val
+        else:
+            rec[sum_group[0]] = keys
+        for m in metric_cols:
+            rec[m] = float(g[m].mean())
+        rec["n_condition_rows"] = int(len(g))
+        summary_rows.append(rec)
     df_sum = pd.DataFrame(summary_rows)
-    df_sum.to_csv(OUT_TABLES / "month2_baseline_summary.csv", index=False)
+    write_csv(df_sum, out_dir / "month2_baseline_summary.csv")
 
     df_search = pd.DataFrame(search_rows)
-    df_search.to_csv(OUT_TABLES / "month2_baseline_search.csv", index=False)
+    write_csv(df_search, out_dir / "month2_baseline_search.csv")
 
-    # Isolation / AO checks + adapter vs historical API parity
-    checks = run_invariant_checks(
-        val_frames[:1],
-        selected["free_p_off"]["pod"],
-        selected["tblock_p_off"]["pod"],
-        param_mean,
-        normalizer,
-        cfg,
-        store,
+    # Isolation battery on real VAL frames (fail-fast)
+    print("Running isolation battery...", flush=True)
+    checks = run_isolation_battery(
+        frames=val_frames,
+        make_sample=lambda fr, **kw: make_sample(
+            fr,
+            normalizer=normalizer,
+            **kw,
+        ),
+        pods_free={
+            False: selected["free_p_off"]["pod"],
+            True: selected["free_p_on"]["pod"],
+        },
+        pods_tblock={
+            False: selected["tblock_p_off"]["pod"],
+            True: selected["tblock_p_on"]["pod"],
+        },
+        global_mean=global_mean,
+        param_mean=param_mean,
+        mask_seed=int(contract["mask_seed"]),
+        site_fraction=site_fraction,
+        max_frames=1 if smoke else 2,
     )
     checks.update(
         adapter_historical_parity(
@@ -919,8 +1170,16 @@ def run(smoke: bool = False) -> dict[str, Any]:
         )
     )
 
+    # Provenance for anomalous shard (verified when touched)
+    anomalous_sha = None
+    try:
+        anomalous_sha = store.file_sha256("40NH3_1.2.h5")
+    except Exception as e:
+        anomalous_sha = f"unavailable:{e}"
+
     meta = {
         "experiment_id": cfg["experiment_id"],
+        "run_id": run_id,
         "smoke": smoke,
         "wall_time_s": time.time() - t_wall0,
         "peak_rss_mb": rss_mb(),
@@ -928,6 +1187,8 @@ def run(smoke: bool = False) -> dict[str, Any]:
         "n_train_fit": len(train_frames),
         "n_seen": len(seen_frames),
         "n_val": len(val_frames),
+        "out_dir": str(out_dir),
+        "per_frame_path": str(per_frame_path),
         "selected": {
             "free_p_off_lambda": selected["free_p_off"]["ridge_lambda"],
             "free_p_on_lambda": selected["free_p_on"]["ridge_lambda"],
@@ -942,13 +1203,16 @@ def run(smoke: bool = False) -> dict[str, Any]:
             "param_mean": selected["param_mean"],
         },
         "fit_times_s": {"means": t_fit_means, "pod": t_fit_pod},
+        "preflight": preflight,
         "hashes": {
             "baselines_yaml": sha256_file(CFG_PATH),
             "frame_protocol": sha256_file(ROOT / "configs/splits/month2_frame_protocol.yaml"),
-            "norm_stats": sha256_file(STATS),
+            "norm_stats": sha256_file(stats_path),
             "splits": sha256_file(ROOT / "configs/splits/splits_interp_extrap.yaml"),
+            "anomalous_shard_40NH3_1.2_sha256_verified": anomalous_sha,
         },
         "invariant_checks": checks,
+        "comparison_rule": COMPARISON_RULE,
         "pod_vs_normalizer_scales": {
             "pod_scale_T": pod_off.scale_T,
             "pod_scale_vi": pod_off.scale_vi,
@@ -958,10 +1222,21 @@ def run(smoke: bool = False) -> dict[str, Any]:
         },
         "hgb_included": run_hgb,
     }
-    (OUT_META / "month2_baseline_run_manifest.json").write_text(json.dumps(meta, indent=2) + "\n")
+    (out_dir / "run_manifest.json").write_text(json.dumps(meta, indent=2) + "\n")
 
-    write_report(cfg, df_sum, df_search, meta, df_cond)
-    print(json.dumps({"status": "PASS", "wall_s": meta["wall_time_s"], "rss_mb": meta["peak_rss_mb"]}, indent=2))
+    write_auto_report(cfg, df_sum, df_search, meta, df_cond, out_dir / "auto_report.md")
+    print(
+        json.dumps(
+            {
+                "status": "PASS",
+                "run_id": run_id,
+                "wall_s": meta["wall_time_s"],
+                "rss_mb": meta["peak_rss_mb"],
+                "out_dir": str(out_dir),
+            },
+            indent=2,
+        )
+    )
     return meta
 
 
@@ -1002,151 +1277,79 @@ def adapter_historical_parity(frames, pod, normalizer, cfg) -> dict[str, Any]:
     }
 
 
-def run_invariant_checks(frames, pod_free, pod_tb, param_mean, normalizer, cfg, store):
-    if not frames:
-        return {"skipped": True}
-    fr = frames[0]
-    mask_seed = int(cfg["data"]["mask_seed"])
-    site_fraction = float(cfg["data"]["site_fraction_primary"])
-    out = {}
 
-    s0 = make_sample(
-        fr, K=0, p_conditioning=False, replica_id=0, mask_seed=mask_seed,
-        site_fraction=site_fraction, normalizer=normalizer, store=store,
-    )
-    s9 = make_sample(
-        fr, K=9, p_conditioning=False, replica_id=0, mask_seed=mask_seed,
-        site_fraction=site_fraction, normalizer=normalizer, store=store,
-    )
-    # Same velocity mask for K=0 and K=9
-    out["same_velocity_mask_K0_K9"] = bool(
-        np.array_equal(s0["model_inputs"]["mask_velocity"], s9["model_inputs"]["mask_velocity"])
-    )
-    # Same model+hyperparams at K=0: T-block flag with empty T mask == free
-    p_free = predict_gappy(pod_free, s0["model_inputs"], use_temperature_block=False, p_conditioning=False)
-    p_tb0 = predict_gappy(pod_free, s0["model_inputs"], use_temperature_block=True, p_conditioning=False)
-    out["K0_tblock_matches_free_maxabs"] = float(np.max(np.abs(p_free - p_tb0)))
-
-    # AO centered-RMSE invariance (AO vs free on same free prediction)
-    p_ao = predict_gappy(
-        pod_free, s9["model_inputs"], use_temperature_block=False, anchor_offset=True, p_conditioning=False
-    )
-    true = fr["T"]
-
-    def centered_rmse(pred, tgt):
-        err = pred - tgt
-        b = err.mean()
-        return float(np.sqrt(np.mean((err - b) ** 2)))
-
-    # Compare AO to free prediction on the same K=9 velocity mask (free ignores T)
-    p_free9 = predict_gappy(
-        pod_free, s9["model_inputs"], use_temperature_block=False, anchor_offset=False, p_conditioning=False
-    )
-    out["AO_centered_rmse_free"] = centered_rmse(p_free9, true)
-    out["AO_centered_rmse_ao"] = centered_rmse(p_ao, true)
-    out["AO_centered_rmse_absdiff"] = abs(out["AO_centered_rmse_free"] - out["AO_centered_rmse_ao"])
-
-    grids = observed_grids_from_model_inputs(s9["model_inputs"])
-    p1 = predict_gappy(pod_tb, s9["model_inputs"], use_temperature_block=True, p_conditioning=False)
-    # Sparse model_inputs only store observed sites: mutating hidden velocity elsewhere
-    # cannot enter the adapter → prediction unchanged (same inputs object).
-    p2 = predict_gappy(pod_tb, s9["model_inputs"], use_temperature_block=True, p_conditioning=False)
-    out["hidden_velocity_mutation_maxabs"] = float(np.max(np.abs(p1 - p2)))
-    out["observed_only_containers"] = bool(
-        np.all(grids["vi"][~grids["vel_mask"]] == 0.0)
-        and np.all(grids["vj"][~grids["vel_mask"]] == 0.0)
-        and np.all(grids["vk"] == 0.0)
-    )
-    # Mutate T outside anchors in a copy of model_inputs: anchors-only values → unchanged Tblock
-    mi_poison = {k: (v.copy() if isinstance(v, np.ndarray) else v) for k, v in s9["model_inputs"].items()}
-    # Cannot inject off-anchor T via model_inputs (only anchor_values exist); verify that.
-    out["off_anchor_T_not_in_model_inputs"] = True
-    out["vk_placeholder_zero"] = True
-    out["same_velocity_mask_ok"] = out["same_velocity_mask_K0_K9"]
-    return out
-
-
-def write_report(cfg, df_sum, df_search, meta, df_cond):
-    def slice_sum(role, methods=None):
+def write_auto_report(cfg, df_sum, df_search, meta, df_cond, path: Path) -> None:
+    """Machine-generated report only (no editorial interpretation)."""
+    def slice_sum(role):
         if df_sum.empty:
-            return pd.DataFrame()
+            return "(empty)"
         d = df_sum[df_sum["role"] == role]
-        if methods is not None:
-            d = d[d["method"].isin(methods)]
-        cols = [c for c in ["method", "p_conditioning", "K", "variant", "rmse_K", "abs_bias_K", "centered_rmse_K"] if c in d.columns]
-        return d[cols].sort_values([c for c in ["method", "p_conditioning", "K"] if c in cols])
+        cols = [
+            c
+            for c in [
+                "method",
+                "p_conditioning",
+                "K",
+                "variant",
+                "rmse_K",
+                "abs_bias_K",
+                "centered_rmse_K",
+            ]
+            if c in d.columns
+        ]
+        return d[cols].sort_values([c for c in ["method", "p_conditioning", "K"] if c in cols]).to_string(
+            index=False
+        )
 
     lines = [
-        "# Month 2 — Baseline validation (Step 2.3)",
+        "# Month-2 baseline run — automatic report",
         "",
-        f"**Experiment:** `{cfg['experiment_id']}`",
-        f"**Smoke:** {meta['smoke']}",
-        f"**Wall time:** {meta['wall_time_s']:.1f}s; **peak RSS:** {meta['peak_rss_mb']:.0f} MiB",
-        f"**Store decodes:** {meta['store_stats'].get('shard_decodes')}",
+        f"- experiment_id: `{cfg['experiment_id']}`",
+        f"- run_id: `{meta.get('run_id')}`",
+        f"- smoke: {meta['smoke']}",
+        f"- wall_time_s: {meta['wall_time_s']:.3f}",
+        f"- peak_rss_mb: {meta['peak_rss_mb']:.3f}",
+        f"- shard_decodes: {meta['store_stats'].get('shard_decodes')}",
+        f"- git_head_preflight: `{meta.get('preflight', {}).get('git_head')}`",
         "",
-        "## Preregistered search",
-        "```yaml",
-        yaml.dump(cfg["hyperparameter_search"], default_flow_style=False).strip(),
-        "```",
-        "",
-        "### Selected hyperparameters",
+        "## Selected hyperparameters",
         "```json",
         json.dumps(meta["selected"], indent=2),
         "```",
         "",
-        "### Search table (head)",
+        "## Search table",
         "```",
         df_search.to_string(index=False) if not df_search.empty else "(empty)",
         "```",
         "",
-        "## Summary — seen_train_eval",
+        "## Summary seen_train_eval",
         "```",
-        slice_sum("seen_train_eval").to_string(index=False),
-        "```",
-        "",
-        "## Summary — val_eval",
-        "```",
-        slice_sum("val_eval").to_string(index=False),
+        slice_sum("seen_train_eval"),
         "```",
         "",
-        "## VAL per-condition (selected sparse methods)",
+        "## Summary val_eval",
+        "```",
+        slice_sum("val_eval"),
+        "```",
         "",
-    ]
-    if not df_cond.empty:
-        d = df_cond[
-            (df_cond["role"] == "val_eval")
-            & (df_cond["method"].isin(["GlobalTrainMean", "ParamConditionedMean", "GappyPOD_free", "GappyPOD_plus_AO", "GappyPOD_Tblock", "OraclePOD"]))
-        ]
-        keep = [c for c in ["method", "sim_id", "p_conditioning", "K", "variant", "mask_replica_id", "rmse_K", "abs_bias_K", "centered_rmse_K"] if c in d.columns]
-        lines.append("```")
-        lines.append(d[keep].sort_values([c for c in ["method", "K", "sim_id"] if c in keep]).to_string(index=False))
-        lines.append("```")
-    lines += [
-        "",
-        "## Scales / isolation / costs",
+        "## Invariant checks / costs",
         "```json",
         json.dumps(
             {
-                "pod_vs_normalizer_scales": meta["pod_vs_normalizer_scales"],
                 "invariant_checks": meta["invariant_checks"],
                 "fit_times_s": meta["fit_times_s"],
-                "hgb_included": meta["hgb_included"],
+                "store_stats": meta["store_stats"],
+                "comparison_rule": meta.get("comparison_rule"),
             },
             indent=2,
+            default=str,
         ),
         "```",
         "",
-        "## Interpretation notes (prudent)",
-        "- OraclePOD uses full T and is not a deployable sensor method.",
-        "- LocalHGB_dense (if present) uses dense velocity; not sparse-comparable.",
-        "- AO vs T-block are distinct assisted mechanisms; AO preserves Centered-RMSE by construction.",
-        "- Train-fit errors are not evidence of generalization.",
-        "- No TEST payloads were used; no Month-1 tables overwritten.",
-        "",
-        "## Status: results written for independent review before Step 2.4",
+        "Editorial interpretation belongs in docs/month2/mission_baseline_consolidation_report.md.",
         "",
     ]
-    OUT_DOC.write_text("\n".join(lines) + "\n")
+    path.write_text("\n".join(lines) + "\n")
 
 
 def main():
@@ -1154,8 +1357,18 @@ def main():
     g = ap.add_mutually_exclusive_group(required=True)
     g.add_argument("--smoke", action="store_true")
     g.add_argument("--full", action="store_true")
+    ap.add_argument("--run-id", required=True, help="Unique id under results/baseline_consolidation/")
+    ap.add_argument(
+        "--raw-dir",
+        default=None,
+        help="Optional override for Arrow numerical directory (or set COMBUSTION_RAW_DIR)",
+    )
     args = ap.parse_args()
-    run(smoke=args.smoke)
+    run(
+        smoke=args.smoke,
+        run_id=args.run_id,
+        raw_dir=Path(args.raw_dir) if args.raw_dir else None,
+    )
 
 
 if __name__ == "__main__":
