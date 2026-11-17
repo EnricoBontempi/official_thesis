@@ -18,7 +18,7 @@
 | Branch | `mission/dense-unet` |
 | STOP A | `3643ce5` |
 | Corrective + U3 code (pre-experiment) | `11aae27` |
-| STOP B results commit | *(this delivery)* |
+| STOP B results commit | `64186a77c8603e617aed50c793a72e7f39059adb` |
 | Dependencies | consolidation `3cf7bf0` + roadmap `adabacc` |
 | Merge to main | **not** done |
 
