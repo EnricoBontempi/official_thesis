@@ -101,7 +101,8 @@ Artifacts: `results/month2/sparse_s3_glu_diagnostic_overfit/` (`report.json`, ma
 | Runner | `sparse_scientific_loop.py` riusa schedule/checkpoint U4 (warmup 950, plateau VAL 5%×3 repl, early-stop, tranche 1000, extend esplicita) |
 | Config | `month2_sparse_scientific_candidate.yaml` (S5 **non** autorizzato); profiling `month2_sparse_s4_profiling.yaml` |
 | Resume tests | `tests/test_sparse_scientific_trainer.py` (warmup/plateau/contatori/LR/RNG/mask epoch/GLU buffers) |
-| Profiling jobs | U-Net + GLU su AMF `mit_normal_gpu` / L40S, diagnostici, no S5 |
+| Profiling jobs | **submitted** (non completati): U-Net `29552531`, GLU `29552532`; SHA `b844944`; AMF `mit_normal_gpu` / L40S |
+| Output attesi | `/home/bontempi/orcd/pool/official_thesis_runs/s4_profile_sparse_unet_29552531/` e `.../s4_profile_adapted_glu_29552532/` |
 | GappyPOD 1/20% | config preparata; **bloccata**: oggetti POD fittati non persistiti da `month2_baselines_v1` (niente refit silenzioso) |
 
 Freeze finale e passaggio a S5: **dopo** che Enrico riporta gli output di profiling.
