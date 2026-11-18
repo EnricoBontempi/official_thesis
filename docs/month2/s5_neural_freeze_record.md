@@ -57,3 +57,13 @@ Launcher record: `/home/bontempi/orcd/pool/official_thesis_runs/launcher/s5_subm
 ## Duration note
 
 S4 **estimates** (not measured S5 runtime): U-Net ~2–3 h/run, GLU ~3–4.5 h/run, high uncertainty, possible early stop. Actual duration unknown until Enrico inspects.
+
+## Failed first attempt and launcher fix (2026-11-18)
+
+**Correction to the status above:** jobs 29555700–29555703 were reported FAILED (ExitCode 1:0, 0 s); no S5 training ran. They are preserved as failed attempts, with no scientific result.
+
+- **Verified bug (local reproduction):** launchers did `source "$(dirname "$0")/_s5_train_common.inc.sh"`. Under `sbatch`, `$0` is the Slurm spool copy, so the include does not exist. A copy of the old launcher run outside the repo directory exits rc=1 at that line, matching `1:0` / 0 s.
+- **Not confirmed:** the Slurm logs (`slurm-2955570x.out`) were not readable, so the historical cause is inferred, not read from logs. The inference is consistent but unproven.
+- **Fix:** the common env is inlined in each `scripts/engaging/s5_*.sbatch`; `_s5_train_common.inc.sh` removed. The S5 config, data, masks and protocol are unchanged.
+- **Checks:** `bash -n` on all four launchers; the fixed launcher, run from a spool-like copy with a fake HOME and a stub python, reaches the training entrypoint with the expected arguments. The gate exits 78 without `AUTHORIZE_S5_SUBMIT=1`. No CUDA or training was run.
+- **Submission blocked (2026-11-18 ~14:00 EST):** on login008 (via a new channel on the existing `engaging` mux master, no session closed), `/home` and `~/envs/official_thesis` respond, but `ls -d /orcd/pool/005/bontempi` timed out (`timeout 6`, rc=124). The code checkout and data are in that pool, so the remote checkout could not be updated or verified and **no new jobs were submitted**.

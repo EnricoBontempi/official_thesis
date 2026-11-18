@@ -17,7 +17,20 @@ if [[ "${AUTHORIZE_S5_SUBMIT:-0}" != "1" ]]; then
   exit 78
 fi
 
-source "$(dirname "$0")/_s5_train_common.inc.sh"
+# Common env inlined: under sbatch $0 is the Slurm spool copy, so a relative source fails.
+TIP="${TIP:-$HOME/orcd/pool/official_thesis}"
+PY="${PY:-$HOME/envs/official_thesis/bin/python}"
+CACHE="${CACHE:-$HOME/orcd/pool/official_thesis_data/month2_dense_unet_cache}"
+HASHES="${HASHES:-$HOME/orcd/pool/official_thesis_data/cache_payload_hashes.json}"
+MASKS="${MASKS:-$HOME/orcd/pool/official_thesis_data/month2_sparse_eval_masks}"
+OUT_ROOT="${OUT_ROOT:-$HOME/orcd/pool/official_thesis_runs}"
+export PYTHONUNBUFFERED=1
+export PYTHONDONTWRITEBYTECODE=1
+export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-8}"
+unset PYTHONPATH
+export PYTHONPATH="$TIP/src"
+cd "$TIP"
+SHA="$(cat .git_commit 2>/dev/null || git rev-parse HEAD)"
 CFG="configs/experiments/s5_adapted_glu_poff_seed0.yaml"
 RUN_ID="s5_adapted_glu_poff_seed0"
 OUT="$OUT_ROOT/$RUN_ID"
