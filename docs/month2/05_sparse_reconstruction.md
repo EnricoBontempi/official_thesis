@@ -1,6 +1,6 @@
 # Sparse reconstruction — S1–S3 technical status
 
-**Status:** S4 profiling attempt-2 **COMPLETED** (`completed_diagnostic`); freeze **candidato** per screening neurale ([s4_scientific_freeze_candidate.md](s4_scientific_freeze_candidate.md)). GappyPOD 1/20% ancora **bloccato**. S5 **non** autorizzato/sottomesso.  
+**Status:** Freeze neurale S5 **definitivo** + **submitted** ([s5_neural_freeze_record.md](s5_neural_freeze_record.md)). GappyPOD 1/20% ancora **bloccato** (S4 non tutto chiuso). Run S5 **non** dichiarati completati.  
 **Branch:** `mission/dense-unet`.  
 **Record submission:** [s4_profiling_submission_record.md](s4_profiling_submission_record.md).
 
@@ -105,7 +105,7 @@ Artifacts: `results/month2/sparse_s3_glu_diagnostic_overfit/` (`report.json`, ma
 | Misure chiave | U-Net peak VRAM **0.60 GB**, loop 2ep+VAL **31.6 s**; GLU **4.33 GB**, **40.7 s**; batch **8**, microbatch **null**; query GLU **16384**; CPU/GPU ok (atol/rtol 1e-4); loss/grad smoke finiti |
 | Stima tranche 1000 | **Stima** (non misura): U-Net ~2–3 h, GLU ~3–4.5 h incl. eval multi-ruolo ogni 10; incertezza alta (±40%); nessun tetto scientifico in ore |
 | Freeze | Candidato operativo: mem 64G, wall scheduler 6:00:00, microbatch null — vedi freeze candidate. **Non** equivale ad autorizzazione S5 |
-| S5 | Quattro config aggiornate ai campi operativi candidati; `scientific_training_authorized` / `s5_submission_authorized` **false**; **nessuna** submission |
+| S5 | Quattro config **frozen+authorized**; jobs **submitted** (vedi record); non dichiarati completati |
 | GappyPOD 1/20% | **Bloccata**: manca archivio POD fit (`pod_p_off`/`pod_p_on`); λ 5% riusabili; **non** blocca training neurale S5 |
 
 RMSE VAL del profiling sono diagnostici e **non** usati per architettura/LR/variante.
@@ -120,7 +120,7 @@ Sparse scientific + GLU/sparse/dense epoch: eseguiti in consegna S4 (vedi diario
 
 ## 7. Limits / aperti
 
-- Freeze neurale: **candidato**; S5 attende decisione/autorizzazione Enrico (nessun job nuovo da questa consegna).
+- Freeze neurale: **definitivo**; S5 **submitted**; esiti a cura di Enrico (nessun polling in consegna).
 - Timing TRAIN vs VAL non separati nel report profiling; stime tranche derivate.
 - Resume continuo Engaging su payload reale: non rieseguito nel profiling (solo test sintetici).
 - GappyPOD nested 1/20%: artifact POD non persistiti da `month2_baselines_v1`.

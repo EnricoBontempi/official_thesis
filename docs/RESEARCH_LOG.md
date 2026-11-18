@@ -328,3 +328,13 @@ Questo file è il diario del progetto di tesi in `official_thesis` (ricostruzion
 - **Geometria di dominio fissa:** center/L da assi completi `geometry.npz` (o assi sintetici espliciti), persistiti come buffer; errore se mancano; niente inferenza silenziosa dal primo batch. Invarianti A–E: max_abs misurati 0 (subset/batch/chunk/reload) con tol dichiarate. Diagnostici full-grid precedenti: sensors∪full queries ≡ mappa dominio (diff 0); chunking già applicava q prima dello split — non invalidare retroattivamente full/chunk. Sottoinsiemi angolo possono differire (L_diff≈0.060). Metriche overfit non riscritte; nessun tuning σ/VAL.
 - **Isolamento T non vacuo:** mutazione T sul campione sorgente + rebuild `build_canonical_observation`; target cambiato, input GLU e predizione identici; firma senza target/G_full; p_off da p sorgente mutati; rtol=0.
 - **Test:** 45 passed. Audit `04` / report `05` / diario aggiornati. **STOP B** — nessun S4.
+
+---
+
+## 2026-11-18 — S5 neural freeze + four-run submission (STOP after IDs)
+
+- **Checkpoint fix:** `best.pt` saved after scheduler/early-stop/history updates; selected weights preserved; atomic save; tests strengthened (warmup crossed, LR reduce asserted, early-stop reset, resume best/extend, partial reject).
+- **Freeze:** four S5 configs authorized (`scientific_training_authorized` + `s5_submission_authorized`); wall internal 5.5 h under Slurm 6 h; microbatch null; p_off applied per batch.
+- **S4:** neural profiling OK; GappyPOD 1/20% still open — S4 not fully closed.
+- **Submission:** four independent normal L40S jobs; no preemptable; no polling; HONF untouched. Record: `docs/month2/s5_neural_freeze_record.md`.
+

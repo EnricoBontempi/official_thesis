@@ -118,6 +118,22 @@ def _state_from_mapping(raw: dict[str, Any]) -> SparseScientificState:
     return SparseScientificState(**{k: raw[k] for k in allowed if k in raw})
 
 
+def _atomic_torch_save(payload: dict[str, Any], path: Path) -> None:
+    """Write checkpoint via temp file + os.replace to avoid truncated .pt files."""
+    import os
+
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name(f".{path.name}.tmp.{os.getpid()}")
+    try:
+        torch.save(payload, tmp)
+        os.replace(tmp, path)
+    except Exception:
+        if tmp.exists():
+            tmp.unlink(missing_ok=True)
+        raise
+
+
 def save_sparse_scientific_checkpoint(
     path: str | Path,
     *,
@@ -132,13 +148,15 @@ def save_sparse_scientific_checkpoint(
     curves: list[dict[str, Any]] | None = None,
     clip_events: int = 0,
     extra: dict[str, Any] | None = None,
+    model_state_dict: dict[str, Any] | None = None,
 ) -> None:
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
+    weights = model_state_dict if model_state_dict is not None else model.state_dict()
     payload: dict[str, Any] = {
         "checkpoint_kind": checkpoint_kind,
         "resumable": checkpoint_kind == CHECKPOINT_KIND_COMPLETE,
-        "model_state_dict": model.state_dict(),
+        "model_state_dict": weights,
         "optimizer_state_dict": optimizer.state_dict(),
         "plateau_scheduler_state_dict": (
             plateau_scheduler.state_dict() if plateau_scheduler is not None else None
@@ -163,7 +181,7 @@ def save_sparse_scientific_checkpoint(
         payload["dataloader_generator_state"] = loader_generator.get_state()
     if _is_adapted_glu(model):
         payload["glu_geometry_meta"] = dict(model.geometry_meta)
-    torch.save(payload, path)
+    _atomic_torch_save(payload, path)
 
 
 def load_sparse_scientific_checkpoint(
@@ -292,6 +310,7 @@ def assert_sparse_scientific_candidate_contract(cand: dict[str, Any]) -> dict[st
             "family",
             "s5_submission_authorized",
             "operational_provisional_pending_s4_profiling",
+            "operational_from_s4_profiling_candidate",
         }
     )
     if unknown_top:
@@ -1079,6 +1098,10 @@ class SparseScientificTrainer:
 
                     score = val_out["mean_condition_rmse_K"]
                     lr_before = self._current_lr()
+                    # Defer best.pt write until AFTER early-stop/plateau/history updates
+                    # so resumable best carries coherent epoch-boundary state. Weights
+                    # remain those of the absolute-best selection (snapshot below).
+                    selected_best_weights: dict[str, Any] | None = None
                     if score is not None and math.isfinite(float(score)):
                         score_f = float(score)
                         if self.state.best_val_metric is None or score_f < float(
@@ -1086,24 +1109,10 @@ class SparseScientificTrainer:
                         ):
                             self.state.best_val_metric = score_f
                             self.state.best_val_epoch = int(self.state.epoch)
-                            save_sparse_scientific_checkpoint(
-                                ckpt_dir / "best.pt",
-                                model=self.model,
-                                optimizer=self.optimizer,
-                                plateau_scheduler=self.plateau_scheduler,
-                                state=self.state,
-                                cfg=self.cfg,
-                                checkpoint_kind=CHECKPOINT_KIND_COMPLETE,
-                                loader_generator=self.loader_generator,
-                                eval_history=self.eval_history,
-                                curves=self.curves,
-                                clip_events=self.clip_events,
-                                extra={
-                                    "selection_metric": "val_mean_condition_rmse_K",
-                                    "selection_value": self.state.best_val_metric,
-                                    "run_identity": run_identity,
-                                },
-                            )
+                            selected_best_weights = {
+                                k: v.detach().cpu().clone()
+                                for k, v in self.model.state_dict().items()
+                            }
 
                         if self.state.early_stop_ref_metric is None:
                             self.state.early_stop_ref_metric = score_f
@@ -1147,6 +1156,32 @@ class SparseScientificTrainer:
                             f"{self.cfg.early_stop_rel_improvement}_"
                             f"for_{self.state.early_stop_bad_evals}_evals"
                         )
+
+                    if selected_best_weights is not None:
+                        save_sparse_scientific_checkpoint(
+                            ckpt_dir / "best.pt",
+                            model=self.model,
+                            optimizer=self.optimizer,
+                            plateau_scheduler=self.plateau_scheduler,
+                            state=self.state,
+                            cfg=self.cfg,
+                            checkpoint_kind=CHECKPOINT_KIND_COMPLETE,
+                            loader_generator=self.loader_generator,
+                            eval_history=self.eval_history,
+                            curves=self.curves,
+                            clip_events=self.clip_events,
+                            model_state_dict=selected_best_weights,
+                            extra={
+                                "selection_metric": "val_mean_condition_rmse_K",
+                                "selection_value": self.state.best_val_metric,
+                                "selection_epoch": self.state.best_val_epoch,
+                                "run_identity": run_identity,
+                                "best_weights_are_absolute_min_selection": True,
+                                "epoch_boundary_state_after_scheduler_counters": True,
+                            },
+                        )
+
+                    if self.state.status == "stopped_early_plateau":
                         save_sparse_scientific_checkpoint(
                             ckpt_dir / "last.pt",
                             model=self.model,

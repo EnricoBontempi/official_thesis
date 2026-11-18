@@ -1,20 +1,19 @@
-# S5 screening candidate — PREPARED ONLY (not authorized, not submitted).
+# S5 screening — neural protocol FROZEN; authorized for these four runs only.
 # Fresh init; must not reuse S4 profiling weights. Observations/architecture/supervision unchanged.
 
 experiment_id: month2_sparse_s5_unet_pon_seed0_v1
-status: freeze_candidate_awaiting_enrico_s5_authorization
-scientific_training_authorized: false
+status: neural_protocol_frozen_s5_authorized
+scientific_training_authorized: true
 profiling_diagnostic_only: false
-s5_submission_authorized: false
+s5_submission_authorized: true
 family: sparse_unet
 
 decision:
   by: Enrico
   date: "2026-11-18"
   summary: >
-    Prepared S5 sparse_unet p_on seed-0 candidate. Launch only after explicit
-    authorization once S4 profiling outputs are reviewed. Operational walltime /
-    operational time/mem/microbatch resolved as candidate from S4 profiling; launch still unauthorized.
+    Enrico authorized S5 neural screening after S4 profiling review (2026-11-18).
+    Protocol frozen; fresh init; no S4 diagnostic weight reuse; GappyPOD 1/20% remains open.
   supervisor_ratification: not_claimed
 
 inherits_protocol:
@@ -59,14 +58,14 @@ training_candidate:
   grad_clip_norm: 1.0
   eval_every_epochs: 10
   eval_roles: [train_fit, seen_train_eval, val_eval]
-  wall_time_cap_hours: 6.0
+  wall_time_cap_hours: 5.5
   wall_time_cap_configurable: true
   allow_automatic_lr_fallback_3e4: false
   num_workers: 0
   init: fresh_seed0_no_overfit_or_profile_weights
   decode_chunk_size: 512
   decode_chunked_eval: true
-  microbatch_size: null  # freeze candidate: unused (VRAM OK at batch 8 on L40S); not an S5 launch auth
+  microbatch_size: null  # frozen: unused (VRAM OK at batch 8 on L40S)
   selection:
     role: val_eval
     coverage: 0.05
@@ -108,10 +107,9 @@ operational_from_s4_profiling_candidate:
   profiling_jobs: [29554165, 29554166]
   profiling_code_sha: 740805f7e5537090a0f08478cdc1587ed6c9c5e3
   note: >
-    Operational fields resolved from S4 profiling measures (candidate freeze).
-    scientific_training_authorized and s5_submission_authorized remain false.
-    Scheduler wall is not a scientific hour cap; use complete-boundary resume to extend.
-  freeze_record: docs/month2/s4_scientific_freeze_candidate.md
+    Neural protocol frozen for S5. scientific_training_authorized and s5_submission_authorized true for these four runs only.
+    Internal wall_time_cap_hours=5.5 leaves margin under Slurm 06:00:00; incomplete epochs → partial, not convergence.
+  freeze_record: docs/month2/s5_neural_freeze_record.md
 
 artifacts:
   results_root_engaging: /home/bontempi/orcd/pool/official_thesis_runs

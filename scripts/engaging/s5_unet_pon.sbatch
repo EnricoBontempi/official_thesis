@@ -1,13 +1,13 @@
 #!/bin/bash
-# S5 screening launcher — PREPARED ONLY. Do not submit until Enrico authorizes.
-# No afterok on profiling jobs. No reuse of S4 profiling weights.
+# S5 screening launcher — Enrico-authorized neural freeze (four runs only).
+# No afterok. No reuse of S4 profiling weights. No automatic requeue.
 #SBATCH --job-name=s5_unet_pon
 #SBATCH --account=mit_amf_advanced_gpu
 #SBATCH --partition=mit_normal_gpu
 #SBATCH --qos=mit_amf_advanced_gpu
 #SBATCH --gres=gpu:l40s:1
 #SBATCH --cpus-per-task=8
-# Operational candidate from S4 profiling (still requires AUTHORIZE_S5_SUBMIT=1):
+# Frozen ops from S4 profiling (still requires AUTHORIZE_S5_SUBMIT=1 at submit time):
 #SBATCH --mem=64G
 #SBATCH --time=06:00:00
 set -euo pipefail
@@ -34,14 +34,14 @@ mkdir -p "$OUT"
   echo "GIT_SHA=$SHA"
   echo "CONFIG=$CFG"
   echo "RUN_ID=$RUN_ID"
-  echo "NOTE=operational freeze candidate from S4 profiling; submission still gated"
+  echo "NOTE=neural protocol frozen; S5 authorized; wall_cap_internal=5.5h under Slurm 6h"
   date -Is
 } | tee "$OUT/slurm_context.txt"
 
 "$PY" -c "import torch; print('torch', torch.__version__, 'cuda', torch.version.cuda, 'avail', torch.cuda.is_available()); print(torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'no-gpu')"
 
 # Requires YAML scientific_training_authorized:true AND CLI flag.
-# microbatch remains null/PROVISIONAL unless YAML updated after profiling.
+# microbatch null (frozen). Internal wall guard 5.5h < Slurm 6h.
 "$PY" scripts/16_train_sparse_scientific.py \
   --config "$CFG" \
   --authorize-scientific-s5 \

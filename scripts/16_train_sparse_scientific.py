@@ -95,9 +95,17 @@ def main() -> int:
     if not run_id:
         raise SystemExit("run_id required")
     out_dir = out_root / run_id
-    if out_dir.exists() and any(out_dir.iterdir()):
-        raise SystemExit(f"refuse overwrite existing run dir: {out_dir}")
-    out_dir.mkdir(parents=True, exist_ok=False)
+    # Launchers may pre-create the run dir with slurm_context/stdout only.
+    launcher_only = {"slurm_context.txt", "stdout.log", "dep_preflight.json"}
+    if out_dir.exists():
+        existing = {p.name for p in out_dir.iterdir()}
+        blocked = existing - launcher_only
+        if blocked:
+            raise SystemExit(
+                f"refuse overwrite existing run dir {out_dir}: unexpected entries {sorted(blocked)}"
+            )
+    else:
+        out_dir.mkdir(parents=True, exist_ok=False)
 
     cache_root = Path(args.cache_root)
     manifest = json.loads((cache_root / "manifest.json").read_text())
@@ -191,8 +199,10 @@ def main() -> int:
         "stats_sha256": sha256_file(Path(args.stats)),
         "cache_payload_sha256": payload_hashes,
         "mask_payload_sha256": sha256_file(Path(args.mask_root) / "manifest.json"),
-        "operational_provisional": cand.get("operational_provisional_pending_s4_profiling"),
+        "operational": cand.get("operational_from_s4_profiling_candidate")
+        or cand.get("operational_provisional_pending_s4_profiling"),
         "contract_meta": meta,
+        "refuse_s4_profile_checkpoints": True,
     }
     write_json(out_dir / "effective_config.json", {"candidate": cand, "runtime_cfg": cfg.__dict__})
     summary = trainer.fit(

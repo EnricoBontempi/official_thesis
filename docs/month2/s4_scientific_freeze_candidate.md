@@ -1,9 +1,9 @@
-# S4 scientific freeze candidate (not an S5 authorization)
+# S4 scientific freeze candidate (superseded for launch)
 
 **Branch:** `mission/dense-unet`  
 **Profiling code SHA:** `740805f7e5537090a0f08478cdc1587ed6c9c5e3`  
 **Jobs:** U-Net `29554165`, GLU `29554166` — both `COMPLETED` `0:0`, status `completed_diagnostic`.  
-**This file does not authorize S5 submission.** `scientific_training_authorized` / `s5_submission_authorized` remain false until Enrico explicitly enables them.
+**Superseded for S5 launch** by [s5_neural_freeze_record.md](s5_neural_freeze_record.md) after Enrico’s authorization. This file remains the profiling-outcomes reference.
 
 ---
 

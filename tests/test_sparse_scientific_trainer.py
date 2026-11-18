@@ -172,12 +172,9 @@ def test_sparse_unet_visits_and_eval_cadence(tmp_path: Path):
     assert train.epochs_seen == [0, 1, 2, 3, 4]
 
 
-def test_continuous_vs_resume_compares_lr_counters_rng(tmp_path: Path):
-    train = TinySparseDS(8, "train_fit", seed=0)
-    val = TinySparseDS(4, "val_eval", seed=1)
-    normalizer = Month2FitOnlyNormalizer()
-    identity = {
-        "run_id": "cmp",
+def _identity(run_id: str = "cmp") -> dict:
+    return {
+        "run_id": run_id,
         "family": "sparse_unet",
         "protocol_sha256": "p",
         "scientific_candidate_sha256": "s",
@@ -186,6 +183,13 @@ def test_continuous_vs_resume_compares_lr_counters_rng(tmp_path: Path):
         "cache_payload_sha256": "c",
         "mask_payload_sha256": "mk",
     }
+
+
+def test_continuous_vs_resume_compares_lr_counters_rng(tmp_path: Path):
+    train = TinySparseDS(8, "train_fit", seed=0)
+    val = TinySparseDS(4, "val_eval", seed=1)
+    normalizer = Month2FitOnlyNormalizer()
+    identity = _identity("cmp")
 
     set_seed(0)
     cfg_full = _cfg(n_epochs=4, eval_every_epochs=2, warmup_updates=3, seed=0)
@@ -202,6 +206,8 @@ def test_continuous_vs_resume_compares_lr_counters_rng(tmp_path: Path):
     cont_lr = cont._current_lr()
     cont_update = cont.state.update
     cont_bad = cont.state.early_stop_bad_evals
+    cont_opt_keys = set(cont.optimizer.state_dict()["state"])
+    cont_hist = list(cont.eval_history)
 
     set_seed(0)
     train2 = TinySparseDS(8, "train_fit", seed=0)
@@ -216,6 +222,8 @@ def test_continuous_vs_resume_compares_lr_counters_rng(tmp_path: Path):
     last = tmp_path / "resume" / "checkpoints" / "last.pt"
     mid = torch.load(last, weights_only=False)
     assert mid["epoch_state"]["epoch"] == 2
+    assert mid["checkpoint_kind"] == CHECKPOINT_KIND_COMPLETE
+    assert mid["resumable"] is True
 
     cfg_b = _cfg(n_epochs=4, eval_every_epochs=2, warmup_updates=3, seed=0)
     b = SparseScientificTrainer(
@@ -239,14 +247,23 @@ def test_continuous_vs_resume_compares_lr_counters_rng(tmp_path: Path):
     assert b.state.update == cont_update
     assert abs(b._current_lr() - cont_lr) < 1e-15
     assert b.state.early_stop_bad_evals == cont_bad
-    assert len(b.eval_history) == len(cont.eval_history)
+    assert b.state.best_val_metric == cont.state.best_val_metric
+    assert b.state.best_val_epoch == cont.state.best_val_epoch
+    assert len(b.eval_history) == len(cont_hist)
+    assert [e["epoch"] for e in b.eval_history] == [e["epoch"] for e in cont_hist]
+    # First fit applies mask epochs 0..1; resume restores mask_epoch then continues 2..3.
+    assert train2.epochs_seen[:2] == [0, 1]
+    assert train2.epochs_seen[-2:] == [2, 3]
+    # Optimizer AdamW state restored (non-empty after training).
+    assert cont_opt_keys
+    assert set(b.optimizer.state_dict()["state"]) == cont_opt_keys
 
 
 def test_resume_rejects_incompatible_and_partial(tmp_path: Path):
     train = TinySparseDS(8, "train_fit", seed=0)
     val = TinySparseDS(4, "val_eval", seed=1)
     normalizer = Month2FitOnlyNormalizer()
-    identity = {"run_id": "rej", "family": "sparse_unet"}
+    identity = _identity("rej")
     cfg = _cfg(n_epochs=1, eval_every_epochs=1)
     tr = SparseScientificTrainer(
         SparseUNet(base_channels=8, groups=1, init_seed=0),
@@ -273,21 +290,44 @@ def test_resume_rejects_incompatible_and_partial(tmp_path: Path):
             allow_extend_max_epochs=True,
         )
 
+    # Explicit partial checkpoint must be refused for scientific resume.
+    partial = tmp_path / "rej" / "checkpoints" / "partial_interrupt.pt"
+    blob = torch.load(last, weights_only=False)
+    blob["checkpoint_kind"] = CHECKPOINT_KIND_PARTIAL
+    blob["resumable"] = False
+    torch.save(blob, partial)
+    tr3 = SparseScientificTrainer(
+        SparseUNet(base_channels=8, groups=1, init_seed=0),
+        cfg=_cfg(n_epochs=2, eval_every_epochs=1),
+        normalizer=normalizer,
+        n_train_samples=8,
+    )
+    with pytest.raises(ResumeIncompatibilityError):
+        tr3.fit(
+            train,
+            val_ds=val,
+            out_dir=tmp_path / "rej",
+            run_identity=identity,
+            resume_path=partial,
+            allow_extend_max_epochs=True,
+        )
 
-def test_warmup_then_plateau_and_early_stop_counters(tmp_path: Path):
-    """Exercise warmup completion, LR reduce, and early-stop counters (synthetic)."""
+
+def test_warmup_plateau_lr_reduce_and_early_stop_reset(tmp_path: Path):
+    """Synthetic schedule: warmup crossed, LR reduce asserted, early-stop reset exercised."""
     train = TinySparseDS(8, "train_fit", seed=0)
     val = TinySparseDS(4, "val_eval", seed=2)
     normalizer = Month2FitOnlyNormalizer()
-    # Small warmup; plateau patience 0 effectively via patience_evals=0? patience min 1
+    # 2 updates/epoch → warmup_updates=2 finishes during epoch 1.
     cfg = _cfg(
-        n_epochs=6,
+        n_epochs=8,
         eval_every_epochs=1,
         warmup_updates=2,
-        plateau_patience_evals=1,
-        early_stop_min_epochs=3,
-        early_stop_patience_evals=2,
-        early_stop_rel_improvement=0.5,  # hard to improve → accumulate bad evals
+        plateau_patience_evals=0,
+        plateau_threshold_rel=0.0,
+        early_stop_min_epochs=4,
+        early_stop_patience_evals=3,
+        early_stop_rel_improvement=0.5,
         batch_size=4,
     )
     tr = SparseScientificTrainer(
@@ -296,24 +336,131 @@ def test_warmup_then_plateau_and_early_stop_counters(tmp_path: Path):
         normalizer=normalizer,
         n_train_samples=8,
     )
-    # Force flat VAL by stubbing evaluate_val_replicas
-    tr.evaluate_val_replicas = lambda *a, **k: {  # type: ignore[method-assign]
-        "per_replica": [{"replica_id": 0, "mean_condition_rmse_K": 10.0}],
-        "mean_condition_rmse_K": 10.0,
-        "rows": [],
-    }
+    # Flat VAL after first eval → plateau must reduce LR; early-stop bad evals accumulate
+    # then reset on LR drop at least once.
+    scores = [10.0] * 20
+
+    def _stub(*_a, **_k):
+        s = scores.pop(0) if scores else 10.0
+        return {
+            "per_replica": [{"replica_id": 0, "mean_condition_rmse_K": s}],
+            "mean_condition_rmse_K": s,
+            "rows": [],
+        }
+
+    tr.evaluate_val_replicas = _stub  # type: ignore[method-assign]
     summary = tr.fit(
         train,
         val_ds=val,
         out_dir=tmp_path / "sched",
-        run_identity={"run_id": "sched", "family": "sparse_unet"},
+        run_identity=_identity("sched"),
     )
-    assert tr.state.update >= 2
-    # After warmup, LR should reach base then possibly reduce
-    assert tr.state.epoch >= 3
+    assert tr.state.update >= int(cfg.warmup_updates), "warmup must be crossed"
+    # At least one eval after warmup must record an actual LR reduction.
+    reduced = [e for e in tr.eval_history if e.get("lr_reduced") is True]
+    assert reduced, "ReduceLROnPlateau must actually reduce LR under flat VAL"
+    assert reduced[0]["lr_after"] < reduced[0]["lr_before"]
+    assert tr._current_lr() < float(cfg.lr) - 1e-15
+    # Early-stop counter must have been non-zero then reset by LR reduce at least once.
+    assert any(
+        e.get("lr_reduced") is True and int(e.get("early_stop_bad_evals", -1)) == 0
+        for e in tr.eval_history
+    ), "early-stop counter must reset on LR reduce"
     assert summary["status"] in {"stopped_early_plateau", "completed"}
     if summary["status"] == "stopped_early_plateau":
-        assert tr.state.early_stop_bad_evals >= 2
+        assert tr.state.early_stop_bad_evals >= int(cfg.early_stop_patience_evals)
+
+    best = tmp_path / "sched" / "checkpoints" / "best.pt"
+    last = tmp_path / "sched" / "checkpoints" / "last.pt"
+    assert best.exists() and last.exists()
+    best_p = torch.load(best, weights_only=False)
+    last_p = torch.load(last, weights_only=False)
+    assert best_p["checkpoint_kind"] == CHECKPOINT_KIND_COMPLETE
+    assert best_p["resumable"] is True
+    # best.pt must include post-scheduler counter fields in its latest history entry.
+    assert best_p["eval_history"]
+    be = best_p["eval_history"][-1]
+    assert "early_stop_bad_evals" in be
+    assert "early_stop_ref_metric" in be
+    assert be.get("best_val_metric") == best_p["epoch_state"]["best_val_metric"]
+    # Coherent epoch-boundary bookkeeping (same epoch index in best selection state).
+    assert best_p["epoch_state"]["best_val_epoch"] == be["epoch"] or best_p["epoch_state"][
+        "best_val_epoch"
+    ] <= last_p["epoch_state"]["epoch"]
+
+
+def test_resume_from_corrected_best_and_extend_tranche(tmp_path: Path):
+    """Resume from best.pt; extend n_epochs without resetting counters/history."""
+    train = TinySparseDS(8, "train_fit", seed=0)
+    val = TinySparseDS(4, "val_eval", seed=1)
+    normalizer = Month2FitOnlyNormalizer()
+    identity = _identity("best_resume")
+    cfg = _cfg(n_epochs=3, eval_every_epochs=1, warmup_updates=2, seed=0)
+    scores = [5.0, 4.0, 4.5]
+
+    def _make_trainer():
+        tr = SparseScientificTrainer(
+            SparseUNet(base_channels=8, groups=1, init_seed=0),
+            cfg=cfg,
+            normalizer=normalizer,
+            n_train_samples=8,
+        )
+        seq = list(scores)
+
+        def _stub(*_a, **_k):
+            s = seq.pop(0) if seq else 4.5
+            return {
+                "per_replica": [{"replica_id": 0, "mean_condition_rmse_K": s}],
+                "mean_condition_rmse_K": s,
+                "rows": [],
+            }
+
+        tr.evaluate_val_replicas = _stub  # type: ignore[method-assign]
+        return tr
+
+    set_seed(0)
+    tr = _make_trainer()
+    tr.fit(train, val_ds=val, out_dir=tmp_path / "br", run_identity=identity)
+    best = tmp_path / "br" / "checkpoints" / "best.pt"
+    assert best.exists()
+    best_p = torch.load(best, weights_only=False)
+    assert best_p["epoch_state"]["best_val_epoch"] == 2
+    assert best_p["extra"].get("epoch_boundary_state_after_scheduler_counters") is True
+
+    # Extend tranche from best without wiping scientific history.
+    cfg2 = _cfg(n_epochs=5, eval_every_epochs=1, warmup_updates=2, seed=0)
+    tr2 = SparseScientificTrainer(
+        SparseUNet(base_channels=8, groups=1, init_seed=0),
+        cfg=cfg2,
+        normalizer=normalizer,
+        n_train_samples=8,
+    )
+    # Continue with flat scores after resume.
+    flat = [4.5, 4.5, 4.5]
+
+    def _stub2(*_a, **_k):
+        s = flat.pop(0) if flat else 4.5
+        return {
+            "per_replica": [{"replica_id": 0, "mean_condition_rmse_K": s}],
+            "mean_condition_rmse_K": s,
+            "rows": [],
+        }
+
+    tr2.evaluate_val_replicas = _stub2  # type: ignore[method-assign]
+    hist_before = len(best_p["eval_history"])
+    tr2.fit(
+        TinySparseDS(8, "train_fit", seed=0),
+        val_ds=val,
+        out_dir=tmp_path / "br_ext",
+        run_identity=identity,
+        resume_path=best,
+        allow_extend_max_epochs=True,
+    )
+    assert tr2.state.epoch == 5
+    assert len(tr2.eval_history) > hist_before
+    assert tr2.state.best_val_metric == pytest.approx(4.0)
+    assert tr2.state.best_val_epoch == 2
+    assert tr2.state.update > best_p["epoch_state"]["update"]
 
 
 def test_glu_geometry_persisted_in_scientific_checkpoint(tmp_path: Path):
