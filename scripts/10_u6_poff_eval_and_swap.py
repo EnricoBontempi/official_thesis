@@ -25,7 +25,18 @@ import pandas as pd
 import torch
 
 ROOT = Path(__file__).resolve().parents[1]
+# Engaging tip may be reached via symlink (~/orcd/... → /orcd/pool/005/...).
+ROOT_RESOLVED = ROOT.resolve()
 sys.path.insert(0, str(ROOT / "src"))
+
+
+def _relpath(path: Path) -> str:
+    """Stable relative path even when args use a different symlink prefix."""
+    p = Path(path).resolve()
+    try:
+        return str(p.relative_to(ROOT_RESOLVED))
+    except ValueError:
+        return str(p)
 
 from combustion_recon.data.month2_normalizer import Month2FitOnlyNormalizer
 from combustion_recon.evaluation.month2_evaluator import (
@@ -209,7 +220,7 @@ def load_u3_matched(role: str) -> dict[str, dict[str, Any]]:
         out[label] = {
             "macro_rmse_K": _macro_from_rows(rows, role),
             "n_frames": len(sub),
-            "source": str(U3_TABLE.relative_to(ROOT)),
+            "source": _relpath(U3_TABLE),
             "per_condition": (
                 aggregate_frame_then_condition_then_split(rows)["per_condition"][
                     ["sim_id", "rmse_K", "abs_bias_K", "centered_rmse_K", "jet_rmse_K", "high_rmse_K"]
@@ -761,14 +772,14 @@ def main() -> int:
             al = pd.read_csv(u5_al)
             matched[role]["DenseUNet_p_on_aligned"] = {
                 "macro_rmse_K": float(al["rmse_K"].mean()),
-                "source": str(u5_al.relative_to(ROOT)),
+                "source": _relpath(u5_al),
                 "per_condition": al.to_dict(orient="records"),
             }
         if u5_sw.is_file():
             sw = pd.read_csv(u5_sw)
             matched[role]["DenseUNet_p_on_swapped"] = {
                 "macro_rmse_K": float(sw["rmse_K"].mean()),
-                "source": str(u5_sw.relative_to(ROOT)),
+                "source": _relpath(u5_sw),
             }
         matched[role]["DenseUNet_p_off_aligned"] = {
             "macro_rmse_K": summary_blocks[role]["aligned_macro_rmse_K"]
