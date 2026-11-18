@@ -308,7 +308,7 @@ Questo file è il diario del progetto di tesi in `official_thesis` (ricostruzion
 - **Fix env (solo thesis):** `pip install einops==0.8.2` in `/home/bontempi/envs/official_thesis`; HONF/`~/envs/honf` non toccato; torch/CUDA non aggiornati.
 - **Fix import:** lazy GLU in `models/__init__.py`; import GLU condizionale in `s4_sparse_profile.py`; helper lazy in `sparse_scientific_loop.py`; preflight `s4_dep_preflight.py` nei launcher.
 - **Test locali:** 30 passed (sparse scientific + GLU + sparse U-Net).
-- **Resubmit solo profiling** (nuove directory; attempt-1 preservato; no preemptable; no S5/afterok; no auto-requeue). Record: `docs/month2/s4_profiling_submission_record.md` stato **submitted**. S4 non concluso; freeze non dichiarato.
+- **Resubmit solo profiling** (SHA `740805f`): U-Net **29554165**, GLU **29554166**; nuove directory; attempt-1 preservato; no preemptable; no S5/afterok; no auto-requeue. Record: `docs/month2/s4_profiling_submission_record.md` stato **submitted**. S4 non concluso; freeze non dichiarato.
 
 ---
 

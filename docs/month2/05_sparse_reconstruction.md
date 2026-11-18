@@ -102,8 +102,8 @@ Artifacts: `results/month2/sparse_s3_glu_diagnostic_overfit/` (`report.json`, ma
 | Runner | `sparse_scientific_loop.py` riusa schedule/checkpoint U4 (warmup 950, plateau VAL 5%×3 repl, early-stop, tranche 1000, extend esplicita) |
 | Config | `month2_sparse_scientific_candidate.yaml` (S5 **non** autorizzato); profiling `month2_sparse_s4_profiling.yaml` |
 | Resume tests | `tests/test_sparse_scientific_trainer.py` (warmup/plateau/contatori/LR/RNG/mask epoch/GLU buffers) |
-| Profiling jobs | Attempt-1 **FAILED**: U-Net **29552531**, GLU **29552532** (SHA `b844944`, `einops` missing; dirs preservate). Attempt-2 **submitted** dopo fix `einops==0.8.2` + lazy imports + preflight; vedi record. Nessun auto-requeue. |
-| Log assoluti | Attempt-1: `…/slurm-29552531.out`, `…/slurm-29552532.out`. Attempt-2: nuove run dirs `…/s4_profile_*_<newjobid>/` + `slurm-<newjobid>.out` |
+| Profiling jobs | Attempt-1 **FAILED**: U-Net **29552531**, GLU **29552532** (SHA `b844944`, `einops` missing; dirs preservate). Attempt-2 **submitted**: U-Net **29554165**, GLU **29554166** (SHA `740805f`, `einops==0.8.2` + lazy imports + preflight). Nessun auto-requeue. |
+| Log assoluti | Attempt-1: `…/slurm-29552531.out`, `…/slurm-29552532.out`. Attempt-2: `…/s4_profile_sparse_unet_29554165/`, `…/s4_profile_adapted_glu_29554166/`, `…/slurm-29554165.out`, `…/slurm-29554166.out` |
 | S5 prep | Quattro YAML + quattro sbatch + `scripts/16_train_sparse_scientific.py`; auth gates; walltime/mem/microbatch **PROVISIONAL**; **nessuna** submission / afterok |
 | GappyPOD 1/20% | ancora **bloccata** (artifact POD mancanti) |
 
