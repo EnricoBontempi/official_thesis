@@ -1,0 +1,52 @@
+[
+  {
+    "best_val_metric": 157.87154465955226,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 157.87154465955226,
+    "epoch": 1,
+    "lr": 0.001,
+    "lr_reduced": false,
+    "mask_epoch": 0,
+    "update": 95,
+    "val_mean_condition_rmse_K": 157.87154465955226,
+    "val_per_replica": [
+      {
+        "mean_condition_rmse_K": 157.7645747873429,
+        "replica_id": 0
+      },
+      {
+        "mean_condition_rmse_K": 159.09329571694613,
+        "replica_id": 1
+      },
+      {
+        "mean_condition_rmse_K": 156.75676347436772,
+        "replica_id": 2
+      }
+    ]
+  },
+  {
+    "best_val_metric": 130.21336060183663,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 130.21336060183663,
+    "epoch": 2,
+    "lr": 0.001,
+    "lr_reduced": false,
+    "mask_epoch": 1,
+    "update": 190,
+    "val_mean_condition_rmse_K": 130.21336060183663,
+    "val_per_replica": [
+      {
+        "mean_condition_rmse_K": 130.84362265457656,
+        "replica_id": 0
+      },
+      {
+        "mean_condition_rmse_K": 131.06032889562096,
+        "replica_id": 1
+      },
+      {
+        "mean_condition_rmse_K": 128.73613025531233,
+        "replica_id": 2
+      }
+    ]
+  }
+]

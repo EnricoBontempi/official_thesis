@@ -1,0 +1,11 @@
+SLURM_JOB_ID=29554165
+SLURM_JOB_NAME=s4_prof_unet
+SLURM_JOB_PARTITION=mit_normal_gpu
+SLURM_JOB_ACCOUNT=mit_amf_advanced_gpu
+SLURM_JOB_QOS=mit_amf_advanced_gpu
+SLURM_GPUS_ON_NODE=1
+CUDA_VISIBLE_DEVICES=0
+GIT_SHA=740805f7e5537090a0f08478cdc1587ed6c9c5e3
+PY=/home/bontempi/envs/official_thesis/bin/python
+PREV_FAILED_REF=/home/bontempi/orcd/pool/official_thesis_runs/s4_profile_sparse_unet_29552531
+2026-11-18T12:28:22-05:00

@@ -2,7 +2,7 @@
 # Fresh init; must not reuse S4 profiling weights. Observations/architecture/supervision unchanged.
 
 experiment_id: month2_sparse_s5_glu_poff_seed0_v1
-status: prepared_awaiting_s4_profiling_decision
+status: freeze_candidate_awaiting_enrico_s5_authorization
 scientific_training_authorized: false
 profiling_diagnostic_only: false
 s5_submission_authorized: false
@@ -14,7 +14,7 @@ decision:
   summary: >
     Prepared S5 adapted_glu p_off seed-0 candidate. Launch only after explicit
     authorization once S4 profiling outputs are reviewed. Operational walltime /
-    memory / microbatch remain provisional.
+    operational time/mem/microbatch resolved as candidate from S4 profiling; launch still unauthorized.
   supervisor_ratification: not_claimed
 
 inherits_protocol:
@@ -66,7 +66,7 @@ training_candidate:
   init: fresh_seed0_no_overfit_or_profile_weights
   decode_chunk_size: 512
   decode_chunked_eval: true
-  microbatch_size: null  # PROVISIONAL — set only after S4 profiling decision
+  microbatch_size: null  # freeze candidate: unused (VRAM OK at batch 8 on L40S); not an S5 launch auth
   selection:
     role: val_eval
     coverage: 0.05
@@ -97,15 +97,21 @@ training_candidate:
     allow_n_epochs_extension: explicit_flag_only
 
 
-operational_provisional_pending_s4_profiling:
-  sbatch_time: PROVISIONAL
-  sbatch_mem: PROVISIONAL
+operational_from_s4_profiling_candidate:
+  sbatch_time: "06:00:00"
+  sbatch_mem: 64G
   sbatch_gres: gpu:l40s:1
   sbatch_account: mit_amf_advanced_gpu
   sbatch_partition: mit_normal_gpu
   sbatch_qos: mit_amf_advanced_gpu
-  microbatch_size: PROVISIONAL
-  note: Placeholders only; not a scientific freeze.
+  microbatch_size: null
+  profiling_jobs: [29554165, 29554166]
+  profiling_code_sha: 740805f7e5537090a0f08478cdc1587ed6c9c5e3
+  note: >
+    Operational fields resolved from S4 profiling measures (candidate freeze).
+    scientific_training_authorized and s5_submission_authorized remain false.
+    Scheduler wall is not a scientific hour cap; use complete-boundary resume to extend.
+  freeze_record: docs/month2/s4_scientific_freeze_candidate.md
 
 artifacts:
   results_root_engaging: /home/bontempi/orcd/pool/official_thesis_runs

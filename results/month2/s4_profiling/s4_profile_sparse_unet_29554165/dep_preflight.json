@@ -1,0 +1,30 @@
+{
+  "executable": "/home/bontempi/envs/official_thesis/bin/python",
+  "version": "3.11.18 (main, Oct 26 2026, 11:35:17) [GCC 15.3.0]",
+  "family": "sparse_unet",
+  "modules": {
+    "numpy": {
+      "present": true,
+      "version": "2.4.6"
+    },
+    "yaml": {
+      "present": true,
+      "version": "6.0.3"
+    },
+    "torch": {
+      "present": true,
+      "version": "2.8.0+cu128"
+    },
+    "pandas": {
+      "present": true,
+      "version": "3.1.1"
+    },
+    "einops": {
+      "present": true,
+      "version": "0.8.2",
+      "required_for_family": false
+    }
+  },
+  "ok": true,
+  "package_imports": "ok"
+}

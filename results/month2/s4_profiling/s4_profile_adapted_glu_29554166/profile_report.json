@@ -1,0 +1,167 @@
+{
+  "cache_verify": {
+    "actual": {
+      "aggregate_sha256": "d0b1d06805562cda49a86ea9ab1f289ce202562549482533b272efb19a69c725",
+      "cache_root": "/home/bontempi/orcd/pool/official_thesis_data/month2_dense_unet_cache",
+      "files": {
+        "geometry.npz": "97e2e9df79c87a3fbf019fa1d9ac270aafe42319f83425afb5f3fb3be8f36ce7",
+        "manifest.json": "56e988e8b89b436c0e96659e1103359b658ae08a60160a635ec39b1ef2aa36f0",
+        "seen_train_eval/frames.json": "1a3bcd1a2fb672324ad0c695c30ccc052c890d5f3872ef92ea277e16b0f766d1",
+        "seen_train_eval/p_norm.npy": "07f4ba5804f2797fb6a4e8ae5034cac2e9b611105dba23aa53003db5f6b71be4",
+        "seen_train_eval/target_T_K.npy": "3127d94a175aba856314b6427d3770922f51fb4ee4e29dbbef94b396a2b7f2b9",
+        "seen_train_eval/target_T_norm.npy": "7d591951848b197fda5fffc0d05daafe54e03645ddf24661bcc942633d5baa3f",
+        "seen_train_eval/vi_norm.npy": "b406b2b435f95a1910ecf7a09ce05a63979e7cf1bfdd2b1524c1c6541d883d8e",
+        "seen_train_eval/vj_norm.npy": "9b486f9ce42b1dfeeec41ae8e68261bb7e633d5f1e22344ed54bf0642345f40b",
+        "train_fit/frames.json": "5d469c146b9e91edcfe9f94ef73a1010b0333e398ba55054b83317f6fcbc8df7",
+        "train_fit/p_norm.npy": "233b82ecc399c19567a1c8db94404326d292a269dc78d17c73f56647b613c4f4",
+        "train_fit/target_T_K.npy": "0902cc9d0d75902538ef43bde808041aa2643ee91b4068a572ddfd696ea490cb",
+        "train_fit/target_T_norm.npy": "65475dff22732b948db6c596648e6949118ef0b4a5ed6f40e0d523cc1afc86d6",
+        "train_fit/vi_norm.npy": "3ba172568728dc629e7d6e948e1284f7e664ddb74509ff4cc12cea1342c51251",
+        "train_fit/vj_norm.npy": "dec56cf8d6127b9a655e57782b15a6593c44542c0bff3809e0e02829d073dbce",
+        "val_eval/frames.json": "d17fb6a1876d31e52a053c9a3d05f0382b61480578a8d26f51be178ba740a01b",
+        "val_eval/p_norm.npy": "54430dc9a3207e9f2676e2c896b3610caa5e86eaab51436f3cb7c304521ae6b0",
+        "val_eval/target_T_K.npy": "d2b94ac35fc888a2583dcb1df6a5623dbb60f3bd413052b11ffed57ff8543efe",
+        "val_eval/target_T_norm.npy": "a13ae5f7009caefe341cf0e7478fce168c90fca8e4ce9af7cfcf4a4e96a24c25",
+        "val_eval/vi_norm.npy": "79b357b69402c8e01038ff0b46cb000023a51ba1708c3645a4c1c46d6b5281a1",
+        "val_eval/vj_norm.npy": "969634ba374a7963f71b706174d3fd9b82c5db79297e32dfd1ad928e0f0c036f"
+      },
+      "n_files": 20
+    },
+    "actual_aggregate_sha256": "d0b1d06805562cda49a86ea9ab1f289ce202562549482533b272efb19a69c725",
+    "expected_aggregate_sha256": "d0b1d06805562cda49a86ea9ab1f289ce202562549482533b272efb19a69c725",
+    "mismatches": [],
+    "ok": true
+  },
+  "checkpoint_bytes": 13953745,
+  "compute_s": {
+    "checkpoint_write_s": 0.034124260768294334,
+    "measured_train_loop_including_val": 40.70894231181592
+  },
+  "cpu_gpu_compare": {
+    "allclose": true,
+    "atol": 0.0001,
+    "max_abs": 5.8650970458984375e-05,
+    "mean_abs": 1.964138209586963e-05,
+    "n_frames": 4,
+    "note": "No universal CPU/GPU bit-identity claim",
+    "rtol": 0.0001
+  },
+  "cuda": "12.8",
+  "family": "adapted_glu",
+  "git_sha": "740805f7e5537090a0f08478cdc1587ed6c9c5e3",
+  "glu_breakdown": {
+    "chunked_forward_s": 0.030851068906486034,
+    "full_forward_s": 0.019127835519611835,
+    "geometry": {
+      "L": 0.09628158062696457,
+      "L_definition": "max(extent_x, extent_y)",
+      "center": [
+        -9.59755834628595e-06,
+        0.11099359393119812
+      ],
+      "convention": "isotropic_q",
+      "extent_x": 0.07379429042339325,
+      "extent_y": 0.09628158062696457,
+      "formula": "q = 2 * (r - center) / L",
+      "persistent_buffers": [
+        "domain_center",
+        "domain_L",
+        "domain_extent_x",
+        "domain_extent_y"
+      ],
+      "source": "/home/bontempi/orcd/pool/official_thesis_data/month2_dense_unet_cache/geometry.npz",
+      "units": "physical_from_cache"
+    },
+    "neighbor_sort": "topk_distance_then_site_index in ThesisSoftDomainAdaptiveReconstructor",
+    "note": "Coarse timing; encoder/decoder not isolated to separate CUDA graphs"
+  },
+  "gpu_name": "NVIDIA L40S",
+  "inference": {
+    "0.01": {
+      "full_role_s": 4.662318870425224,
+      "latency_batch1_ms": 32.63710532337427,
+      "mean_condition_rmse_K": 194.2709137500789,
+      "note": "rmse is diagnostic only; not for architecture selection"
+    },
+    "0.05": {
+      "full_role_s": 4.708683752454817,
+      "latency_batch1_ms": 32.77033660560846,
+      "mean_condition_rmse_K": 130.84362265457656,
+      "note": "rmse is diagnostic only; not for architecture selection"
+    },
+    "0.2": {
+      "full_role_s": 6.384583990089595,
+      "latency_batch1_ms": 33.94106961786747,
+      "mean_condition_rmse_K": 122.02611258773322,
+      "note": "rmse is diagnostic only; not for architecture selection"
+    }
+  },
+  "mask_manifest_sha256": "2e2d8ff6edabf62ad56702a155140d064c0b4014d06ee96debf52811efa5c75e",
+  "note": "Diagnostic only. VAL/inference RMSE must not select architecture, LR, or variant. No S5 authorization.",
+  "peak_rss_gb": 2.0307235717773438,
+  "peak_vram_gb": 4.330417633056641,
+  "profiling_diagnostic_only": true,
+  "queue_s_external": null,
+  "scientific_training_authorized": false,
+  "setup_s": 3.511085166595876,
+  "status": "completed_diagnostic",
+  "tf32_policy": {
+    "allow_tf32": false,
+    "cuda_matmul_allow_tf32": false,
+    "cudnn_allow_tf32": false
+  },
+  "tolerances": {
+    "cpu_gpu_atol": 0.0001,
+    "cpu_gpu_rtol": 0.0001
+  },
+  "torch": "2.8.0+cu128",
+  "train_summary": {
+    "best_val_epoch": 2,
+    "best_val_metric": 130.21336060183663,
+    "clip_events": 167,
+    "completed": true,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 130.21336060183663,
+    "elapsed_s": 40.691310544498265,
+    "epochs_completed": 2,
+    "family": "adapted_glu",
+    "n_epochs_planned": 2,
+    "samples_seen": 1520,
+    "selection": {
+      "best_val_metric": 130.21336060183663,
+      "early_stop_bad_evals": 0,
+      "early_stop_ref_metric": 130.21336060183663,
+      "epoch": 2,
+      "lr": 0.001,
+      "lr_reduced": false,
+      "mask_epoch": 1,
+      "update": 190,
+      "val_mean_condition_rmse_K": 130.21336060183663,
+      "val_per_replica": [
+        {
+          "mean_condition_rmse_K": 130.84362265457656,
+          "replica_id": 0
+        },
+        {
+          "mean_condition_rmse_K": 131.06032889562096,
+          "replica_id": 1
+        },
+        {
+          "mean_condition_rmse_K": 128.73613025531233,
+          "replica_id": 2
+        }
+      ]
+    },
+    "status": "completed",
+    "stop_reason": "reached_max_epochs",
+    "tf32_policy": {
+      "allow_tf32": false,
+      "cuda_matmul_allow_tf32": false,
+      "cudnn_allow_tf32": false
+    },
+    "total_updates_planned": 190,
+    "updates": 190,
+    "updates_per_epoch": 95
+  },
+  "weights_reusable_for_science": false
+}

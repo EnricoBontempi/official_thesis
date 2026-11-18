@@ -1,0 +1,22 @@
+{
+  "best_val_epoch": 2,
+  "best_val_metric": 115.60007326792372,
+  "early_stop_bad_evals": 0,
+  "early_stop_ref_metric": 115.60007326792372,
+  "elapsed_s": 31.57815971504897,
+  "epoch": 2,
+  "epoch_mean_loss": 0.20897506742100966,
+  "family": "sparse_unet",
+  "last_train_loss": 0.18999332189559937,
+  "lr": 0.001,
+  "mask_epoch": 1,
+  "samples_seen": 1520,
+  "status": "running",
+  "stop_reason": null,
+  "tf32_policy": {
+    "allow_tf32": false,
+    "cuda_matmul_allow_tf32": false,
+    "cudnn_allow_tf32": false
+  },
+  "update": 190
+}

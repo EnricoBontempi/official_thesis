@@ -312,6 +312,16 @@ Questo file è il diario del progetto di tesi in `official_thesis` (ricostruzion
 
 ---
 
+## 2026-11-18 — S4 profiling outcomes + freeze candidate (no S5)
+
+- **Esito:** entrambi COMPLETED `0:0` / `completed_diagnostic` su L40S (`node3008` U-Net, `node3408` GLU); coda≈189 s; compute 68 s / 79 s; SHA `740805f`; env thesis + `einops 0.8.2`.
+- **Misure:** U-Net VRAM 0.60 GB, loop 31.6 s; GLU 4.33 GB, 40.7 s; batch 8; microbatch null; query 16384; inferenza 1/5/20% registrata; CPU/GPU ok; smoke loss/grad finiti. RMSE diagnostici non usati per scelta modello.
+- **Stima tranche 1000 (con incertezza):** U-Net ~2–3 h, GLU ~3–4.5 h; wall scheduler candidato 6:00:00 + resume; non tetto scientifico.
+- **Freeze prereq:** hash cache/stats/mask/geometry ok on-job; resume schedule verificato in test locali (non resume Engaging lungo). GappyPOD 1/20% bloccato (POD fit non persistito); non blocca S5 neurale.
+- **Consegna:** `docs/month2/s4_scientific_freeze_candidate.md`; `results/month2/s4_profiling/`; config S5 campi operativi risolti, auth flags false. **Nessun nuovo job / nessuna submission S5.** STOP.
+
+---
+
 ## 2026-11-18 — Correzioni circoscritte S3 (nuovo STOP B)
 
 - **Tie-break reale:** sostituito `torch.topk` nel decoder thesis con `topk_distance_then_site_index` (distance↑, site_index↑, stable double-argsort); nessun jitter delle distanze; `external/` intatto. Corretta la descrizione precedente che attribuiva a `topk` la preferenza per indici inferiori. Test N>k, surplus equidistanti, indici attesi, permutazioni, controllo distanze non pari; predizioni invarianti a permutazione (CPU, atol=1e-5, rtol=0). Nessuna riproducibilità universale CPU/GPU dichiarata.

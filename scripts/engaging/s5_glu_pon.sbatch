@@ -7,7 +7,7 @@
 #SBATCH --qos=mit_amf_advanced_gpu
 #SBATCH --gres=gpu:l40s:1
 #SBATCH --cpus-per-task=8
-# PROVISIONAL operational resources — replace after S4 profiling review:
+# Operational candidate from S4 profiling (still requires AUTHORIZE_S5_SUBMIT=1):
 #SBATCH --mem=64G
 #SBATCH --time=06:00:00
 set -euo pipefail
@@ -34,7 +34,7 @@ mkdir -p "$OUT"
   echo "GIT_SHA=$SHA"
   echo "CONFIG=$CFG"
   echo "RUN_ID=$RUN_ID"
-  echo "NOTE=operational time/mem/microbatch provisional until S4 freeze"
+  echo "NOTE=operational freeze candidate from S4 profiling; submission still gated"
   date -Is
 } | tee "$OUT/slurm_context.txt"
 

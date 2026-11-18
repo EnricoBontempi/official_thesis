@@ -1,0 +1,48 @@
+{
+  "best_val_epoch": 2,
+  "best_val_metric": 115.60007326792372,
+  "clip_events": 181,
+  "completed": true,
+  "early_stop_bad_evals": 0,
+  "early_stop_ref_metric": 115.60007326792372,
+  "elapsed_s": 31.582452220842242,
+  "epochs_completed": 2,
+  "family": "sparse_unet",
+  "n_epochs_planned": 2,
+  "samples_seen": 1520,
+  "selection": {
+    "best_val_metric": 115.60007326792372,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 115.60007326792372,
+    "epoch": 2,
+    "lr": 0.001,
+    "lr_reduced": false,
+    "mask_epoch": 1,
+    "update": 190,
+    "val_mean_condition_rmse_K": 115.60007326792372,
+    "val_per_replica": [
+      {
+        "mean_condition_rmse_K": 116.11225384965935,
+        "replica_id": 0
+      },
+      {
+        "mean_condition_rmse_K": 116.26399133198761,
+        "replica_id": 1
+      },
+      {
+        "mean_condition_rmse_K": 114.42397462212416,
+        "replica_id": 2
+      }
+    ]
+  },
+  "status": "completed",
+  "stop_reason": "reached_max_epochs",
+  "tf32_policy": {
+    "allow_tf32": false,
+    "cuda_matmul_allow_tf32": false,
+    "cudnn_allow_tf32": false
+  },
+  "total_updates_planned": 190,
+  "updates": 190,
+  "updates_per_epoch": 95
+}

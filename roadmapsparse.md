@@ -3,7 +3,7 @@
 **Progetto:** esclusivamente `EnricoBontempi/official_thesis`, MIT / Deng Lab.  
 **Data:** 2026-11-18, America/New_York.  
 **Base verificata:** `87d1e3f40826a9343c3c2ce19d140d481b911619`, chiusura U7, branch `mission/dense-unet`.  
-**Stato:** S0–S3 chiusi; **S4 IN CORSO** (attempt-1 FAILED `einops`; fix env/import; profiling resubmitted — non concluso; freeze non dichiarato). Candidati S5 preparati in-repo, **non** sottomessi. GappyPOD 1/20% ancora bloccato.  
+**Stato:** S0–S3 chiusi; **S4 profiling COMPLETED** (jobs 29554165/29554166, SHA `740805f`); freeze **candidato** per S5 neurale; GappyPOD 1/20% ancora bloccato. S5 **non** autorizzato/sottomesso.  
 **Piano principale:** [roadmap_month2.md](roadmap_month2.md). Questo documento dettaglia **2.5–2.6 e la sola conferma sparse pertinente di 2.8**; non chiude il Mese 2 e non autorizza assisted o TEST.  
 **Esecutore:** Cursor, per incarichi delimitati successivi. Pubblicare il piano non autorizza a percorrerlo automaticamente.
 
@@ -276,9 +276,9 @@ Estensioni di tranche esplicite, checkpoint completi distinti da partial; no res
 - [x] S1 — Osservazioni persistite + join baseline storico 3309/3309 @5% (hex) + audit GLU documentale.
 - [x] S2 — U-Net sparse/test/overfit/resume diagnostico. STOP A.
 - [x] S3 — GLU adattato deterministico, test e piccolo overfit TRAIN. **STOP B.**
-- [ ] S4 — Baseline/profiling/freeze. **IN CORSO** (FAILED einops→fix→resubmit submitted; attesa Enrico; freeze non fatto). STOP C.
-- [ ] S5 — Screening seed 0 (**candidati preparati, non sottomessi**). STOP D.
+- [ ] S4 — Baseline/profiling/freeze. Profiling **COMPLETED**; freeze neurale **candidato**; GappyPOD 1/20% **aperto**; S5 non lanciato. STOP C (decisione Enrico).
+- [ ] S5 — Screening seed 0 (**config operative candidate; non autorizzato/sottomesso**). STOP D.
 - [ ] S6 — Confronti/coperture/snapshot e scelta finalisti. STOP E.
 - [ ] S7 — Repliche/chiusura con limiti o rinvii dichiarati. STOP F.
 
-**Prossimo incarico previsto:** S4 (baseline matched 1/20%, profiling, freeze scientifico), poi STOP C. Nessun training scientifico da questa chiusura S3.
+**Prossimo incarico previsto:** decisione Enrico su autorizzazione S5 (e/o sblocco GappyPOD 1/20%). Nessun training scientifico da questa consegna outcomes.
