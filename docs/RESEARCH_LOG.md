@@ -229,4 +229,15 @@ Questo file è il diario del progetto di tesi in `official_thesis` (ricostruzion
 - **Eval/swap:** SHA `815bb7a` (fix path symlink dopo fail `29479222`); job `29479532`; replay aligned Δ=0; VAL swap 39.67→102.41 (Δ+62.7).
 - **Confronto:** Δ best VAL p_off−p_on **+12.7 K**; matched U3 riusati (GappyPOD p_off 93.66; GlobalMean 139.70). Bias e Centered-RMSE entrambi peggiorano senza p; dipendenza istantanea resta forte.
 - **Artefatti:** `results/month2_dense_unet/u6_poff_seed0_engaging_v1/` e `.../u6_poff_seed0_snapshot_control_v1/`.
-- **STOP:** nessun altro seed, nuovo p_on, GLU, sparse, sensori T, TEST, cambio architetturale o prolungamento >1000. U7 / Step 2.4 non chiusi automaticamente.
+- **STOP (allora):** nessun altro seed / GLU / sparse in quell’incarico; U7 ancora da chiudere.
+
+---
+
+## 2026-11-17 — Revisione Opus U6 e chiusura U7 (documentale)
+
+- **Evento sperimentale U4–U6:** stesso giorno (America/New_York); **registrazione chiusura U7:** sera del 17 novembre 2026.
+- **Opus su U6 (`a3a4d8f`, riferito da Enrico):** U6 valido; confronto p_on/p_off utilizzabile con riserve; nessun difetto bloccante; pronti per U7 / prep sparse successiva; nessuna nuova verifica sperimentale richiesta. Lettura codice/CSV; senza checkpoint/cache/raw né re-inferenza. **Non** ratifica supervisori.
+- **Correzioni U7:** report 03 non più “U6–U7 not started”; ranking p_off **39.67 K inferiore a GappyPOD p_on 70.46 K** (supera tutte le baseline dense riportate, resta peggiore di U-Net p_on); scomposizione best/last livello–struttura verificata dagli artefatti (`u7_closure_val_level_structure.csv`); provenance `clean:false` = untracked, `dirty_entries` vuoto; swapped senza `src_frame_index` documentato.
+- **Decisione operativa Enrico:** missione densa conclusa nel perimetro U0–U6; U7 = consolidamento; p_on/p_off preliminare (seed 0); seed aggiuntivi rinviati; nessun nuovo training denso in chiusura.
+- **Stato:** Step 2.4 chiuso con limiti; Mese 2 **non** concluso (2.5–2.9 aperti); merge main non eseguito.
+- **Prossimo orientamento (non autorizzazione):** protocollo U-Net sparse (2.6) e audit GLU (2.5); p_on candidato sparse iniziale con confronto p_off previsto; best/last + livello/struttura nei report futuri.

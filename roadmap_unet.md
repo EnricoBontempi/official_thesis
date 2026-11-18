@@ -2,7 +2,7 @@
 
 **Progetto:** esclusivamente `EnricoBontempi/official_thesis`, MIT/Deng Lab.  
 **Preparata:** 2026-11-17, America/New_York.  
-**Stato:** su `mission/dense-unet`, **U0–U6 (p_off seed 0 + snapshot control) eseguiti**; altri seed U6 **rinviati**; U7 / chiusura missione da discussione. Ratifica supervisori **non** documentata/non inventata. Revisione Opus esterna su U4/U5: «utilizzabile con riserve» (non ratifica supervisori).  
+**Stato finale (U7, 2026-11-17 America/New_York):** su `mission/dense-unet`, missione densa **conclusa tecnicamente e sperimentalmente** nel perimetro U0–U6 eseguito; U7 = consolidamento/consegna documentale. Confronto p_on/p_off **preliminare** (sola coppia seed 0); seed aggiuntivi **non** eseguiti, esplicitamente rinviati. Esito: empirico positivo sul denso; **preliminare** per variabilità non misurata; consegna soggetta al controllo di Enrico/ChatGPT. Ratifica supervisori **non** documentata. Revisioni Opus U4/U5/U6: utilizzabili con riserve (non ratifica). **Nessun** nuovo training denso richiesto in chiusura.  
 **Piano principale:** [roadmap_month2.md](roadmap_month2.md), dettaglio dello **Step 2.4**, non roadmap concorrente del Mese 2.  
 **Missione precedente:** [roadmap_missione.md](roadmap_missione.md); consolidamento completato sul branch dedicato, integrazione in main ancora pendente alla ricognizione.  
 **Esecutore:** Cursor IDE, un incarico delimitato alla volta, con restituzione dei risultati a Enrico/ChatGPT.
@@ -229,6 +229,8 @@ Tutti gli step sono inizialmente **[ ] non eseguiti**. Codice presente non equiv
 **Esiti ammessi:** conclusa tecnicamente con risultato positivo/misto/negativo; preliminare per variabilità non misurata; parziale/bloccata con ragione. Nessuna vittoria obbligatoria.  
 **Limite finale:** chiudere questa missione non chiude il Mese 2 e non autorizza training GLU/sparse/assisted.
 
+**Esito U7 registrato (decisione operativa Enrico):** missione densa conclusa nel perimetro eseguito; confronto p_on/p_off preliminare (seed 0); repliche rinviati; report in `docs/month2/03_dense_velocity_diagnostic.md`. Criterio “robustezza multi-seed” **non** soddisfatto (e non spuntato). PR non aperta in questo incarico — compare: `main...mission/dense-unet`.
+
 ## 5. Regole di tracciabilità e limiti
 
 - Versionare config, test, manifest, tabelle compatte e report; non raw/cache/checkpoint o per-frame enormi non compressi. Non sovrascrivere `consolidation_v1`, `results/tables/`, proposal, documenti inviati o `external/GLU_Reconstruction/`.
@@ -245,8 +247,8 @@ Tutti gli step sono inizialmente **[ ] non eseguiti**. Codice presente non equiv
 - [x] U0 — Checkout con roadmap e consolidamento aggiornato. (branch `mission/dense-unet`; evidenza in `docs/month2/03_dense_velocity_diagnostic.md`)
 - [x] U1 — Contratto denso e cache verificati. (760/220/123; payload gitignored; stub `data/manifests/month2_dense_unet_cache_manifest.json`; validazione rafforzata post-STOP A)
 - [x] U2 — Implementazione/test/overfit consegnati. **STOP A.** + correzioni isolamento/grad/YAML; Step 2.4 **non** dichiarato completo
-- [x] U3 — Profiling e GappyPOD denso; budget proposto. **STOP B.** (U4 non avviato)
+- [x] U3 — Profiling e GappyPOD denso; budget proposto. **STOP B.** (alla chiusura STOP B: U4 non ancora avviato)
 - [x] U4 — Primo training p_on seed 0 eseguito su Engaging (job `29465586`, L40S, early stop ep. 730, best VAL 26.93 K @160).
 - [x] U5 — Controllo istantanee (job `29471596`): aligned replay OK; VAL 26.93→96.55 K allo scambio. **STOP C.**
-- [x] U6 — p_off seed 0 + snapshot control eseguiti (best VAL 39.67 K @30; swap VAL +62.7). Altri seed **rinviati**.
-- [ ] U7 — Report finale e scelta del prossimo incarico.
+- [x] U6 — p_off seed 0 + snapshot control eseguiti (best VAL 39.67 K @30; swap VAL +62.7). Altri seed **rinviati** (variabilità non misurata).
+- [x] U7 — Chiusura documentale: report 03 consolidato; roadmap Mese 2 / diario / registro / README aggiornati; nessun nuovo esperimento. **Aperto esplicitamente:** repliche seed; ratifica supervisori; merge main; Step 2.5–2.9.

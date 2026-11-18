@@ -3,7 +3,7 @@
 **Progetto:** Neural Reconstruction of Hidden Temperature Fields from Sparse Observations in Turbulent Combustion  
 **Autore:** Enrico Bontempi — MSc Thesis, Deng Lab, MIT  
 **Preparata:** 2026-11-16, America/New_York (UTC−05:00)  
-**Stato aggiornato 2026-11-17 (sera):** piano autorizzato operativamente da Enrico; 2.1–2.3 eseguiti. Consolidamento tecnico su `mission/baseline-consolidation` (`3cf7bf0`). **Step 2.4** dettagliato in [roadmap_unet.md](roadmap_unet.md): U0–U5 eseguiti su `mission/dense-unet` (U4 Engaging p_on seed 0; U5 snapshot-swap); Engaging GPU/AMF verificati e usati. **U6 p_off seed 0 autorizzato in corso / da registrare a consegna.** Step 2.4 e Mese 2 **non** conclusi. Nessuna ratifica tecnica documentata dei supervisori.  
+**Stato aggiornato 2026-11-17 (chiusura U7):** piano autorizzato operativamente da Enrico; 2.1–2.3 eseguiti. Consolidamento tecnico su `mission/baseline-consolidation` (`3cf7bf0`), integrazione in main ancora pendente. **Step 2.4 (diagnostico U-Net denso):** concluso nel perimetro dichiarato su `mission/dense-unet` (U0–U7; p_on/p_off seed 0 + controlli snapshot; repliche seed rinviate) — dettaglio [roadmap_unet.md](roadmap_unet.md) e report [docs/month2/03_dense_velocity_diagnostic.md](docs/month2/03_dense_velocity_diagnostic.md). Engaging GPU/AMF verificati e usati per U4–U6. **Mese 2 NON concluso** (2.5–2.9 aperti). Nessuna ratifica tecnica documentata dei supervisori; nessun merge su main.  
 **Fonti:** [proposal disponibile](docs/proposal.md), [Mese 1](roadmap_month1.md), [diario](docs/RESEARCH_LOG.md), [report LaTeX aggiornato](overleaf_month1_report/main.tex), [contesto verificato e decisioni](docs/month2/00_context_and_decisions.md).
 
 > **Limite di provenienza:** `documents_thesis/main.tex` è il report del Mese 1 del 15 novembre, identico alla copia sopra, non il proposal inviato il 13 novembre. Non ci sono altri sorgenti inclusi tramite `input/include`; è stata letta la bibliografia. L'identità fra `docs/proposal.md` e l'allegato inviato non è verificata. La ricognizione e le differenze accertabili sono nel [registro](docs/month2/00_context_and_decisions.md#1-provenienza-e-limite-sul-documento-inviato). Non modificare il proposal inviato per adeguarlo al piano.
@@ -79,7 +79,7 @@ Il risultato minimo del Mese 2 è una pipeline riproducibile, baseline qualifica
 
 - **Stato:** `[x] Concretizzato come default operativo (2026-11-16)`; **classe:** I + S.
 - **Cosa è stato chiuso qui:** protocollo frame versionato, contratto pilota versionato, registro D1–D9 aggiornato con autorizzazione Enrico vs assenza di ratifica supervisori, verifica geometrica dei fold, controlli YAML/conteggi.
-- **Cosa resta esplicitamente pendente (non spuntato come “approvato dai supervisori”):** ratifica tecnica Deng Lab; D1 provenienza allegato; lock scientifico finale dei fold; rivalutazione del tetto 24 GPU-ore alla luce del profiling U3 e dei costi U4 misurati; chiusura Step 2.4 / U6–U7.
+- **Cosa resta esplicitamente pendente (non spuntato come “approvato dai supervisori”):** ratifica tecnica Deng Lab; D1 provenienza allegato; lock scientifico finale dei fold; rivalutazione formale del tetto 24 GPU-ore (costi U4/U6 già misurati su L40S); Steps 2.5–2.9; merge main.
 - **Problema:** quali risultati sono affidabili e quali scelte restano ipotesi? Senza questo passaggio gli agenti possono implementare tre architetture “raccomandate” come se fossero approvate.
 - **Motivazione/dipendenze:** chiudere la parte decisionale operativa aperta dello Step 1.6 lato protocollo. Riferimenti e discrepanze sono già raccolti nel registro; non occorre ricominciare l'audit del dataset.
 - **Attività concrete (eseguite in 2.1):**
@@ -125,18 +125,13 @@ Il risultato minimo del Mese 2 è una pipeline riproducibile, baseline qualifica
 
 ### Step 2.4 — Primo neurale: diagnostico da velocità densa single-frame
 
-- **Stato:** `[~] In corso su mission/dense-unet` — U0–U5 eseguiti (STOP A/B/C); U6 p_off seed 0 autorizzato; Step 2.4 **non** dichiarato completo. **Classe:** E + S. Riferimento operativo: [roadmap_unet.md](roadmap_unet.md).
+- **Stato:** `[x] Concluso nel perimetro dichiarato` su `mission/dense-unet` (U0–U7; 2026-11-17). **Limiti espliciti:** una sola coppia seed 0 p_on/p_off; VAL usata per selezione/scheduler; repliche seed rinviate; nessuna ratifica supervisori; merge main non eseguito. **Classe:** E + S. Riferimenti: [roadmap_unet.md](roadmap_unet.md), [docs/month2/03_dense_velocity_diagnostic.md](docs/month2/03_dense_velocity_diagnostic.md).
 - **Problema:** una mappa non lineare spaziale usa la velocità meglio delle baseline, prima di complicare la rappresentazione sparse?
-- **Motivazione/dipendenze:** 2.3 e D4/D8. È lo “Step 0” del report LaTeX, reinterpretato come **baseline empirica ad alta copertura**, non prova di un information ceiling.
-- **Attività concrete:**
-  1. U-Net compatta 2D a risoluzione 128×128: input vi/vj e coordinate coerenti, un output T normalizzato, loss MSE normalizzata. Dimensioni/livelli/parametri dichiarati dopo profiling; nessuna loss PDE, testa di varianza o saturazione fisica imposta all'output iniziale.
-  2. Un solo meccanismo p on/off: **concatenazione di due canali costanti p**, come dettagliato nella roadmap U-Net dopo la proposta Opus del 17 novembre; coordinate x/y esplicite e output T diretto. Stessa rete con canali p a zero in p_off. FiLM e residuo su ParamMean restano varianti successive da motivare, non attive.
-  3. Prima test forward/backward e overfit di pochi sample TRAIN; poi un seed di screening, non una campagna. Confrontare curve train/seen/VAL e mappe nelle regioni di getto/mixing, non solo RMSE media.
-  4. Se il diagnostico resta scarso, escludere bug, mancata convergenza e capacità insufficiente con una sola verifica mirata. Non concludere “informazione fisicamente assente”.
-  5. **Fuori dalla missione U-Net attuale:** eventuali finestre temporali richiedono una decisione D7 separata e associazioni campo-tempo effettivamente verificate. Su tutto `40NH3_1.2` l'associazione non è verificata: non dedurre una timeline fisica dagli indici né usare lì il precedente assunto uniforme 0.25 ms. Restare single-frame.
-- **Output/file:** futuri `src/combustion_recon/models/unet.py`, `training/trainer.py`, `scripts/07_train_reconstructor.py`, `configs/models/unet_small.yaml`; config dense p on/off; `docs/month2/03_dense_velocity_diagnostic.md`, run card e tabelle. Checkpoint fuori Git, con percorso persistente e hash nel run manifest.
-- **Verifiche/completamento:** overfit sanity riuscito, finite loss/gradienti, checkpoint riproducibile, input isolation passata, costo misurato, confronto VAL con ParamMean e GappyPOD denso matched; LocalHGB denso diagnostico secondario; controllo con velocità di un'altra istantanea della stessa condizione. Nessuna soglia di “utilità fisica” inventata dopo aver guardato TEST; se serve una tolleranza ingegneristica, concordarla prima.
-- **Passaggio:** dense→sparse se il modello è tecnicamente valido. Se il guadagno è debole, documentare l'esito e dare priorità al confronto assisted; non promettere che GLU risolva il problema né cancellare il ramo free.
+- **Motivazione/dipendenze:** 2.3 e D4/D8. Diagnostico ad alta copertura, **non** information ceiling.
+- **Attività concrete (eseguite):** U-Net b=32, canali vi/vj+xy+p, T diretto; p_on seed 0 (U4) e p_off seed 0 (U6) su Engaging L40S; snapshot-swap (U5/U6); confronti matched con GlobalMean/ParamMean/GappyPOD denso; report e chiusura U7. FiLM/ParamMean-residual/temporale restano fuori perimetro.
+- **Output/file:** `src/combustion_recon/models/unet.py`, `training/*`, `scripts/07_train_reconstructor.py`, `09_dense_snapshot_control.py`, `10_u6_poff_eval_and_swap.py`, configs dense; `results/month2_dense_unet/u{4,5,6}_*/`; report 03. Checkpoint su Engaging pool con hash versionati.
+- **Verifiche/completamento:** isolation/overfit/profiling; training scientifici e controlli snapshot eseguiti; metriche e figure versionate. **Non** spuntato come robustezza multi-seed.
+- **Passaggio:** verso Step 2.6 sparse e 2.5 audit GLU (orientamento; non autorizzazione automatica). Non promettere che GLU risolva il problema né cancellare il ramo free.
 
 ### Step 2.5 — Audit dell'interfaccia GLU e scelta dell'adattamento minimo
 
@@ -247,9 +242,9 @@ Opus e Astra hanno revisionato indipendentemente `822ed52` e concluso «pronti d
 - [x] 2.1 — Protocollo pilota e default operativi versionati; autorizzazione Enrico registrata; limite proposal e assenza ratifica supervisori espliciti; fold geometricamente verificati (lock scientifico fold ancora aperto). Non implica GPU verificate né stats fit-only già calcolate.
 - [x] 2.2 — Pipeline Month-2 reale verificata in locale (fit-only, isolation, collate, gate TEST) + protezioni API. Engaging/GPU verificati in seguito (preflight + U4/U5); picco RAM locale legato al decode Arrow.
 - [x] 2.3 — Baseline CPU sul protocollo Mese 2 (GlobalMean/ParamMean/GappyPOD 2C ±AO/T-block, Oracle, HGB dense diagnostico); ricerca versionata (preregistrazione cronologica storica non attestabile); report `02_baseline_validation.md`. R=64 non eseguito. Consolidamento e replica completati su `mission/baseline-consolidation` a `3cf7bf0`; integrazione ancora pendente.
-- [ ] 2.4 — [roadmap_unet.md](roadmap_unet.md): U0–U6 p_off seed 0 eseguiti; altri seed e U7 da discussione. Optional temporale fuori missione. Step 2.4 **non** completo.
-- [ ] 2.5 — Audit GLU concluso e adattamento scelto o rinviato con motivazione.
-- [ ] 2.6 — Primo neurale sparse e comparatori matched; confronto GLU presente oppure esplicitamente ancora aperto.
+- [x] 2.4 — Diagnostico denso concluso nel perimetro U0–U7 ([roadmap_unet.md](roadmap_unet.md), report 03). Repliche seed rinviate; optional temporale fuori missione. **Non** implica Mese 2 chiuso né robustezza multi-seed.
+- [ ] 2.5 — Audit GLU concluso e adattamento scelto o rinviato con motivazione (**ancora aperto**).
+- [ ] 2.6 — Primo neurale sparse e comparatori matched; confronto GLU presente oppure esplicitamente ancora aperto (**non eseguito**).
 - [ ] 2.7 — Free/assisted confrontati, almeno AO e GappyPOD con stesse osservazioni; testa appresa non obbligatoria.
 - [ ] 2.8 — Matrice essenziale, variabilità e costo dichiarati; eventuale pilot TEST congelato e qualificato.
 - [ ] 2.9 — Report e scelta successiva registrati; approvazione dei supervisori distinta dalla preparazione/esecuzione.

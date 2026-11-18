@@ -2,7 +2,7 @@
 
 **Data aggiornamento Step 2.1:** 2026-11-16, America/New_York (UTC−05:00)  
 **Ambito:** esclusivamente `EnricoBontempi/official_thesis`; nessuna attività HONF.  
-**Stato aggiornato 2026-11-17:** protocollo, pipeline e baseline 2.1–2.3 eseguiti; consolidamento su `3cf7bf0` integrato in `mission/dense-unet` (non ancora in main). **U0–U3 del piano U-Net eseguiti fino a STOP B** (correzioni, profiling, GappyPOD denso); U4 non avviato; Step 2.4 non completo. Nessuna ratifica tecnica documentata dei supervisori; GPU/Engaging non verificati (profiling CPU).  
+**Stato aggiornato 2026-11-17 (U7):** protocollo, pipeline e baseline 2.1–2.3 eseguiti; consolidamento `3cf7bf0` sul branch dedicato (non ancora in main). **Step 2.4 / missione U-Net densa conclusa** su `mission/dense-unet` (U0–U7; p_on/p_off seed 0 + snapshot controls; repliche seed rinviate) — report [03_dense_velocity_diagnostic.md](03_dense_velocity_diagnostic.md). Engaging AMF/L40S verificati e usati. Steps 2.5–2.9 aperti; Mese 2 **non** concluso. Nessuna ratifica tecnica documentata dei supervisori.  
 **Piano operativo:** [roadmap_month2.md](../../roadmap_month2.md).  
 **Autorizzazione operativa Enrico:** conversazione del 16 novembre 2026 (approvazione roadmap e avvio lavoro). Distinta da qualsiasi approvazione dei supervisori.
 
@@ -25,8 +25,8 @@ Ricognizione precedente del remoto `main` a `6fd0f15` (con diario semplificato p
 | Pipeline dati Month-2 | moduli `month2_*`, report `01_pipeline_validation.md` | **Verificata in locale** (batch reale, isolation, gate TEST). |
 | Baseline Mese 2 (Step 2.3) | `month2_baselines_v1`, report `02_baseline_validation.md` | Eseguite in locale CPU; storico in `results/tables/`. |
 | Consolidamento post-revisione | `consolidation_v1`, report `mission_baseline_consolidation_report.md` | **Completata**: isolation/YAML/timeline corretti; replica identica entro tolleranza; in attesa Enrico/ChatGPT. |
-| Modelli / training neurali Mese 2 | U0–U3 eseguiti; runner U4 pronto | Training scientifico U4 non avviato. |
-| GPU/allocazione Engaging | — | Host previsto; **non verificati**. Tetto 24 GPU-ore = proposta di ceiling, non allocazione disponibile. |
+| Modelli / training neurali Mese 2 | U0–U7 denso chiusi su `mission/dense-unet` | Step 2.4 concluso nel perimetro dichiarato (seed 0; repliche rinviate). Sparse/GLU non avviati. |
+| GPU/allocazione Engaging | preflight + U4–U6 | **Verificati e usati** (AMF / L40S). Tetto 24 GPU-ore resta ceiling di planning, non allocazione formale consumata. |
 
 ## 3. Lettura scientifica dei risultati corretti
 
@@ -84,11 +84,11 @@ Legenda stato: **default operativo** = usato per preparare protocollo/pipeline; 
 | D1 | Identità proposal 13 nov | Scopo da `docs/proposal.md`; identità con allegato inviato **non verificata**; nessuna nuova ricerca estesa in 2.1 | Limite dichiarato; non bloccante | Enrico; aperta come provenienza |
 | D2 | Split, metriche, test | Conservati 20/3/3/4; selezione = media per condizione della RMSE full-field su VAL; TEST esclusi dalla selezione; freeze richiesto per eval test | Default operativo Enrico; **senza ratifica supervisori** | Supervisori + Enrico |
 | D3 | Osservazioni primarie | Single-frame; velocità 2C ch. 11/12; sparse primario 5% siti (~819); controlli eval 1/5/20%; 3C **non attivata** | Default operativo; 3C = estensione rinviata | Supervisori + Enrico |
-| D4 | Primo modello / GLU | Matrice ridotta: U-Net densa diagnostica → U-Net mascherata + GLU deterministico minimale; condizionamento on/off (candidato FiLM) | Default operativo di piano; architettura/adattamento **scelta scientifica aperta** fino a 2.4–2.5 | Supervisori + Enrico |
+| D4 | Primo modello / GLU | Matrice ridotta: U-Net densa diagnostica → U-Net mascherata + GLU deterministico minimale; condizionamento on/off (candidato FiLM) | **U7:** diagnostico denso 2.4 eseguito (p concat on/off, no FiLM). GLU/sparse **ancora aperti** (2.5–2.6). Storico 16 nov resta il default di piano; non ratifica supervisori. | Supervisori + Enrico |
 | D5 | Target e ancore T | Target T ch.10 grezza in K; ancore ideali sincronizzate; outlier da segnalare; nessun clipping silenzioso | Default operativo; **senza ratifica supervisori** | Supervisori + Enrico |
 | D6 | Temperatura assistita | Primario K=9; sweep annidato 0/1/4/9/16/32; prima AO; testa residua appresa **non attivata** | Default operativo; testa = estensione con gate | Supervisori + Enrico |
 | D7 | Finestra temporale | Non attivata nel pilota primario | Estensione rinviata (gate D7) | Supervisori + Enrico |
-| D8 | Risorse e budget | Host previsto Engaging; GPU/allocazione **non verificate**; tetto iniziale proposto **24 GPU-ore** = ceiling da rivalutare col profiling, **non** allocazione disponibile | Default di planning + verifica tecnica pendente | Enrico + referente risorse |
+| D8 | Risorse e budget | Host previsto Engaging; tetto iniziale proposto **24 GPU-ore** = ceiling da rivalutare | **U7:** GPU/AMF verificati; U4≈28.5 min e U6≈24 min su L40S misurati. Ceiling non “consumato” come allocazione formale; rivalutazione formale ancora aperta. Storico 16 nov: GPU non ancora verificate. | Enrico + referente risorse |
 | D9 | Frame seen e fold | `train_fit` vs `seen_train_eval` disgiunti; future stats fit-only solo su `train_fit`; fold interni con refit obbligatorio; candidati geometrici proposti sotto | Default operativo protocollo; stats **non ancora calcolate**; fold **non locked** | Enrico; ratifica D2 ancora aperta |
 
 ## 6. Verifica geometrica dei fold pseudo-extrap (solo metadata TRAIN)
@@ -144,10 +144,11 @@ Hash di riferimento (non autoreferenziali):
 
 Questo aggiornamento prevale sugli stati pendenti storici delle sezioni 5–9 per il solo avanzamento qui descritto; non riscrive quanto fosse stato verificato il 16 novembre.
 
-- **D4:** dopo proposta Opus e discussione con Enrico, primo esperimento = U-Net densa single-frame, output T diretto, coordinate esplicite e concatenazione dei canali NH3/phi. p_on principale; p_off successivo; FiLM e mean prior rinviati. Dettaglio e criteri in [roadmap_unet.md](../../roadmap_unet.md). Piano operativo, non modello già implementato o ratifica supervisori.
-- **D8:** profiling prima di fissare larghezza, epoche e dispositivo; CPU ammessa se fattibile, GPU/Engaging da verificare; 24 GPU-ore restano proposta, non allocazione.
+- **D4:** dopo proposta Opus e discussione con Enrico, primo esperimento = U-Net densa single-frame, output T diretto, coordinate esplicite e concatenazione dei canali NH3/phi. p_on principale; p_off successivo; FiLM e mean prior rinviati. Dettaglio in [roadmap_unet.md](../../roadmap_unet.md). **Chiusura U7:** diagnostico denso eseguito; non ratifica supervisori.
+- **D8 (storico 17 nov mattina):** profiling prima di fissare larghezza/epoche/dispositivo; GPU/Engaging da verificare; 24 GPU-ore proposta. **Aggiornamento U7:** Engaging verificato e usato (L40S); costi U4/U6 misurati.
 - **D9:** stats fit-only già calcolate in 2.2, nessun refit richiesto dalla missione. Fold ancora non attivati.
-- **Consolidamento:** dipendenza remota `3cf7bf0`, ancora fuori main alla preparazione; conserva replica e storia dei risultati. Non lavorare sui neurali da main senza includere quel codice aggiornato.
+- **Consolidamento:** dipendenza remota `3cf7bf0`, ancora fuori main; conserva replica e storia dei risultati.
 - **D7:** single-frame; associazione campo-tempo non verificata su tutto `40NH3_1.2`. Finestre temporali fuori missione.
 - **Confronti densi:** ParamMean e GappyPOD R=32 con medesima velocità completa; controllo di scambio istantanee. Nessuna modifica dei comparatori storici sparse e nessun TEST.
-- **Stato (STOP B):** U0–U3 eseguiti su `mission/dense-unet` — vedi [03_dense_velocity_diagnostic.md](03_dense_velocity_diagnostic.md). U4–U7 non eseguiti. Specifica U-Net revisionata da Opus e discussa con ChatGPT; non revisionata da Astra in questa fase.
+- **Stato (STOP B, storico):** U0–U3 eseguiti; U4–U7 allora non eseguiti.
+- **Stato (U7, 2026-11-17 sera):** U0–U7 chiusi nel perimetro denso dichiarato — [03_dense_velocity_diagnostic.md](03_dense_velocity_diagnostic.md). Prossimo orientamento: 2.5 audit GLU e 2.6 U-Net sparse (non autorizzati da questa chiusura).

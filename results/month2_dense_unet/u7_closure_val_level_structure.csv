@@ -1,0 +1,17 @@
+variant,checkpoint,epoch,sim_id,rmse_K,abs_bias_K,centered_rmse_K,n_frames,source_csv
+p_on,best,160,0NH3_1.05.h5,32.014749716949446,3.303626559542875,31.795518059656924,41,results/month2_dense_unet/u4_pon_seed0_engaging_v1/evals/epoch_0160/val_eval_per_frame.csv.gz
+p_on,best,160,20NH3_1.1.h5,27.609786894750442,5.083345026994211,27.04687770689349,41,results/month2_dense_unet/u4_pon_seed0_engaging_v1/evals/epoch_0160/val_eval_per_frame.csv.gz
+p_on,best,160,40NH3_0.9.h5,21.169833068294903,12.87603867258779,16.610373376362368,41,results/month2_dense_unet/u4_pon_seed0_engaging_v1/evals/epoch_0160/val_eval_per_frame.csv.gz
+p_on,best,160,MACRO_mean_over_conditions,26.931456559998264,7.087670086374959,25.150923047637594,123,results/month2_dense_unet/u4_pon_seed0_engaging_v1/evals/epoch_0160/val_eval_per_frame.csv.gz
+p_on,last,730,0NH3_1.05.h5,32.25416041049625,2.0935996792612976,32.14302352480325,41,results/month2_dense_unet/u4_pon_seed0_engaging_v1/evals/epoch_0730/val_eval_per_frame.csv.gz
+p_on,last,730,20NH3_1.1.h5,26.32676927002009,4.327761339992588,25.862346189278163,41,results/month2_dense_unet/u4_pon_seed0_engaging_v1/evals/epoch_0730/val_eval_per_frame.csv.gz
+p_on,last,730,40NH3_0.9.h5,25.585213983010924,20.31515125980259,15.300609172698076,41,results/month2_dense_unet/u4_pon_seed0_engaging_v1/evals/epoch_0730/val_eval_per_frame.csv.gz
+p_on,last,730,MACRO_mean_over_conditions,28.055381221175754,8.912170759685493,24.43532629559316,123,results/month2_dense_unet/u4_pon_seed0_engaging_v1/evals/epoch_0730/val_eval_per_frame.csv.gz
+p_off,best,30,0NH3_1.05.h5,45.67618435364969,19.314247722735235,39.3879755556806,41,results/month2_dense_unet/u6_poff_seed0_engaging_v1/evals/epoch_0030/val_eval_per_frame.csv.gz
+p_off,best,30,20NH3_1.1.h5,35.64918480209445,8.701301445455718,34.29953975694497,41,results/month2_dense_unet/u6_poff_seed0_engaging_v1/evals/epoch_0030/val_eval_per_frame.csv.gz
+p_off,best,30,40NH3_0.9.h5,37.681322377220326,19.925331638025224,30.022038631425097,41,results/month2_dense_unet/u6_poff_seed0_engaging_v1/evals/epoch_0030/val_eval_per_frame.csv.gz
+p_off,best,30,MACRO_mean_over_conditions,39.66889717765482,15.980293602072058,34.569851314683554,123,results/month2_dense_unet/u6_poff_seed0_engaging_v1/evals/epoch_0030/val_eval_per_frame.csv.gz
+p_off,last,600,0NH3_1.05.h5,58.230405443866125,41.49224881974544,39.02175239344601,41,results/month2_dense_unet/u6_poff_seed0_engaging_v1/evals/epoch_0600/val_eval_per_frame.csv.gz
+p_off,last,600,20NH3_1.1.h5,30.41680899030413,12.305591080915175,26.85659564666851,41,results/month2_dense_unet/u6_poff_seed0_engaging_v1/evals/epoch_0600/val_eval_per_frame.csv.gz
+p_off,last,600,40NH3_0.9.h5,43.65807335087839,37.542145420814556,20.94072432693036,41,results/month2_dense_unet/u6_poff_seed0_engaging_v1/evals/epoch_0600/val_eval_per_frame.csv.gz
+p_off,last,600,MACRO_mean_over_conditions,44.10176259501622,30.44666177382506,28.93969078901496,123,results/month2_dense_unet/u6_poff_seed0_engaging_v1/evals/epoch_0600/val_eval_per_frame.csv.gz
