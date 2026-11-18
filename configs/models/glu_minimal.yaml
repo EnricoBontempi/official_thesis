@@ -12,9 +12,12 @@ geometry:
   L_definition: max_extent_xy
   units: physical_from_cache
   spatial: [128, 128]
+  domain_geometry_path: data/processed/month2_dense_unet_cache/geometry.npz
+  persistence: module_buffers_domain_center_L_extents
   note: >-
-    center = ((xmin+xmax)/2, (ymin+ymax)/2); L = max(xmax-xmin, ymax-ymin).
-    Same map for sparse sensors and dense query grid. Differs from upstream min-max [-1,1].
+    Domain center/L from the full verified cache axes (x,y), independent of selected
+    sensors, query subsets, and other batch samples. Persisted as buffers with the
+    model/checkpoint. Differs from upstream min-max [-1,1].
 
 input:
   T_frames: 1
@@ -73,7 +76,11 @@ decoder:
   retain_cls: true
   retain_lat: false
   use_checkpoint: false
-  topk_tie_break: site_index_after_canonical_sort
+  topk_tie_break: lexicographic_distance_then_site_index_stable_argsort
+  topk_tie_break_note: >-
+    ThesisSoftDomainAdaptiveReconstructor replaces torch.topk with
+    topk_distance_then_site_index (distance↑, site_index↑). Canonical sensor
+    sort alone is not sufficient; torch.topk does not guarantee lower-index ties.
 
 inference:
   phi: uniform_ones

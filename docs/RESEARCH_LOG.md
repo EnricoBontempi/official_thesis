@@ -275,5 +275,14 @@ Questo file è il diario del progetto di tesi in `official_thesis` (ricostruzion
 - **Correzioni S2:** test isolamento sul percorso campione→input; p_off ricostruito da p sorgente mutati; controlli positivi post-apprendimento; tautologie rimosse; resume diagnostico esplicitamente incompleto vs runner scientifico (requisito S4).
 - **S3 GLU:** wrapper `AdaptedDeterministicGLU` (1 154 578 params); `glu_minimal.yaml`; encoder freqs 256 / decoder 64; p additivo bias-free; q isotropo; decoder pubblico; chunk 512 eval max_abs=0; `per_sensor_sigma` risk test eseguito.
 - **Overfit diagnostico (8 frame S2, full grid, CPU):** fixed 1.262→0.367 (64 upd); variable 1.262→0.734 (40 upd). Pesi non scientifici.
-- **Test:** 41 passed (dense+sparse+GLU). Report `05` aggiornato.
+- **Test (prima chiusura):** 41 passed (dense+sparse+GLU). Report `05` aggiornato.
 - **STOP B:** niente S4 profiling/freeze, niente screening, niente training 760.
+
+---
+
+## 2026-11-18 — Correzioni circoscritte S3 (nuovo STOP B)
+
+- **Tie-break reale:** sostituito `torch.topk` nel decoder thesis con `topk_distance_then_site_index` (distance↑, site_index↑, stable double-argsort); nessun jitter delle distanze; `external/` intatto. Corretta la descrizione precedente che attribuiva a `topk` la preferenza per indici inferiori. Test N>k, surplus equidistanti, indici attesi, permutazioni, controllo distanze non pari; predizioni invarianti a permutazione (CPU, atol=1e-5, rtol=0). Nessuna riproducibilità universale CPU/GPU dichiarata.
+- **Geometria di dominio fissa:** center/L da assi completi `geometry.npz` (o assi sintetici espliciti), persistiti come buffer; errore se mancano; niente inferenza silenziosa dal primo batch. Invarianti A–E: max_abs misurati 0 (subset/batch/chunk/reload) con tol dichiarate. Diagnostici full-grid precedenti: sensors∪full queries ≡ mappa dominio (diff 0); chunking già applicava q prima dello split — non invalidare retroattivamente full/chunk. Sottoinsiemi angolo possono differire (L_diff≈0.060). Metriche overfit non riscritte; nessun tuning σ/VAL.
+- **Isolamento T non vacuo:** mutazione T sul campione sorgente + rebuild `build_canonical_observation`; target cambiato, input GLU e predizione identici; firma senza target/G_full; p_off da p sorgente mutati; rtol=0.
+- **Test:** 45 passed. Audit `04` / report `05` / diario aggiornati. **STOP B** — nessun S4.

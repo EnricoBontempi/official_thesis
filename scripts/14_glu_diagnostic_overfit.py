@@ -197,7 +197,11 @@ def main() -> int:
         "tolerances": {"chunk_atol": 1e-5, "perm_atol": 1e-5},
         "fixed_masks": fixed_res,
         "variable_masks": var_res,
-        "note": "Not S4 profiling; not VAL selection.",
+        "note": (
+            "Not S4 profiling; not VAL selection. Geometry from cache axes via "
+            "build_glu_from_config buffers (not call-site sensors∪queries). "
+            "Full-grid queries make prior call-site map numerically identical to domain."
+        ),
     }
     (OUT / "report.json").write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
     print(

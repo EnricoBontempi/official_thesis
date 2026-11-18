@@ -3,7 +3,7 @@
 **Progetto:** esclusivamente `EnricoBontempi/official_thesis`, MIT / Deng Lab.  
 **Data:** 2026-11-18, America/New_York.  
 **Base verificata:** `87d1e3f40826a9343c3c2ce19d140d481b911619`, chiusura U7, branch `mission/dense-unet`.  
-**Stato:** S0–S3 completati su `mission/dense-unet` (maschere+join baseline 3309/3309, audit+wrapper GLU deterministico, U-Net sparse, test/overfit diagnostici). **STOP B.** Nessun training scientifico sparse; S4–S7 aperti.  
+**Stato:** S0–S3 completati su `mission/dense-unet` (maschere+join baseline 3309/3309, audit+wrapper GLU deterministico, U-Net sparse, test/overfit diagnostici) + tre correzioni circoscritte S3 (tie-break lexicografico, geometria di dominio fissa in buffer, isolamento T non vacuo). **STOP B.** Nessun training scientifico sparse; S4–S7 aperti.  
 **Piano principale:** [roadmap_month2.md](roadmap_month2.md). Questo documento dettaglia **2.5–2.6 e la sola conferma sparse pertinente di 2.8**; non chiude il Mese 2 e non autorizza assisted o TEST.  
 **Esecutore:** Cursor, per incarichi delimitati successivi. Pubblicare il piano non autorizza a percorrerlo automaticamente.
 

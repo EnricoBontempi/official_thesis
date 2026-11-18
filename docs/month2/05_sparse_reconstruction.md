@@ -1,6 +1,6 @@
 # Sparse reconstruction — S1–S3 technical status
 
-**Status:** implementazione/verifiche S1–S3, **nessun risultato scientifico sparse**.  
+**Status:** implementazione/verifiche S1–S3 + tre correzioni circoscritte post-S3, **nessun risultato scientifico sparse**.  
 **Branch:** `mission/dense-unet`.  
 **STOP B:** non proseguire a S4 / screening / training scientifici da questo report.
 
@@ -37,7 +37,7 @@ Protocol: `configs/experiments/month2_sparse_protocol.yaml`.
 
 ## 2. S1 — GLU audit + S3 implementation
 
-Audit: [04_glu_release_adaptation.md](04_glu_release_adaptation.md). Upstream tree untouched.  
+Audit: [04_glu_release_adaptation.md](04_glu_release_adaptation.md) (updated for tie-break / fixed domain / non-vacuous T isolation). Upstream tree untouched.  
 Wrapper: `src/combustion_recon/models/glu_reconstructor.py` + `configs/models/glu_minimal.yaml`.
 
 ---
@@ -62,12 +62,29 @@ S2 test hardenings (S3 mission): real sample→input isolation path; p_off rebui
 | Name | GLU adattato — ablation deterministica (not full paper reproduction) |
 | Params | **1 154 578** |
 | Encoder | `ThesisDomainAdaptiveEncoder` (upstream structure + additive `W_p` bias-free) |
-| Decoder | public `SoftDomainAdaptiveReconstructor.forward` only |
+| Decoder | `ThesisSoftDomainAdaptiveReconstructor` — public release `forward` with **one** selection delta |
 | Defaults | d=32, heads=4, layers=4, latents=64, top_k=16, σ=0.05, `per_sensor_sigma=False`, CLS on; encoder `num_freqs=256` (stage-0), decoder `num_freqs=64` (class default) |
-| Geometry | `q=2(r-c)/L`, L=max(extent_x,extent_y); recorded in `geometry_meta` |
+| Geometry | Fixed domain from `month2_dense_unet_cache/geometry.npz` (or explicit synth axes); buffers `domain_center` / `domain_L` / extents; `q=2(r-c)/L`, L=max(extent_x,extent_y) |
 | Chunk eval | 512 queries; full vs chunk **max_abs=0** (atol declared 1e-5); chunked **backward not claimed** |
 
-### Diagnostic overfit (same 8 TRAIN frames as S2, full 16384 queries, CPU)
+### Post-S3 circumscribed corrections (this STOP B delivery)
+
+| # | Problem | Fix |
+|---|---|---|
+| 1 | Comment claimed `torch.topk` prefers lower indices on ties; N=k=2 test never exercised boundary choice | `topk_distance_then_site_index` (distance↑, site_index↑); N>k expected-index + permutation + unequal-distance tests |
+| 2 | `compute_isotropic_geometry` from sensors∪queries (call/batch dependent) | Domain from verified cache axes / explicit geometry; persisted buffers; explicit error if missing |
+| 3 | Vacuous T isolation (discarded `t_mut`, same tensors re-inferred) | Mutate source T; rebuild via `build_canonical_observation`; assert target changed, GLU inputs/pred identical |
+
+**Prior diagnostic full-grid inputs:** sensors∪full 16384 queries → center/L **identical** to domain axes (diff 0). Do not declare all prior full/chunk results wrong: chunking already mapped q before chunks. Subset-only call-site maps **can** differ (corner L_diff≈0.060). **No** re-run of diagnostic overfit metrics; manifests/metrics unchanged.
+
+### Geometry invariants (CPU; rtol=0)
+
+Declared: `ATOL_GEOM_PRED=1e-5`, `ATOL_CHUNK=1e-5`, `ATOL_RELOAD=1e-6`.  
+Measured max_abs: A subset **0**, B batch **0**, D chunk **0**, E reload **0**. Center/L unchanged across layouts. Env: Python 3.13.13, torch 2.15.0+cu132, CUDA unavailable in check — **no** universal CPU/GPU reproducibility claim.
+
+Domain (cache): center ≈ `(-9.60e-6, 0.111)`, L ≈ `0.09628`.
+
+### Diagnostic overfit (same 8 TRAIN frames as S2, full 16384 queries, CPU) — metrics **not rewritten**
 
 | Run | Epochs | Updates | Loss first→last | Wall |
 |---|---:|---:|---|---:|
@@ -80,7 +97,7 @@ Artifacts: `results/month2/sparse_s3_glu_diagnostic_overfit/` (`report.json`, ma
 
 ## 5. Tests
 
-`tests/test_sparse_eval_masks.py` + `test_sparse_unet.py` + `test_glu_adapted.py` + dense regression: **41 passed**.
+`tests/test_sparse_eval_masks.py` + `test_sparse_unet.py` + `test_glu_adapted.py` + dense regression: **45 passed**.
 
 ---
 
@@ -90,3 +107,4 @@ Artifacts: `results/month2/sparse_s3_glu_diagnostic_overfit/` (`report.json`, ma
 - Scientific epoch runner resume (warmup/plateau/VAL counters) **not** verified — required before S4 freeze.
 - Isotropic-q vs upstream [-1,1] σ-semantics sensitivity: documented, not profiled as cost study.
 - Chunked training backward / grad accumulation: **not supported** until verified.
+- Tie-break / geometry / isolation checks are CPU; no bit-identity claim across devices.

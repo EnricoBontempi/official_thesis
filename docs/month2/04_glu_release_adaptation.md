@@ -212,14 +212,14 @@ The following is **approved operationally** in `roadmapsparse.md` §5.1–§5.3;
 | Encoder / decoder modules | Reuse `DomainAdaptiveEncoder` + `SoftDomainAdaptiveReconstructor` classes | As-is in `models.py` | Thin wrapper in thesis package |
 | Wrapper inference signature | **No** `G_full` / targets | `GLU_Bay_DD` requires them | Replace orchestration |
 | Conditioning **p** | Additive `W_p p`, **bias=False**; not repeated at decoder | Not present | Wrapper-only |
-| Coordinates / distances | Isotropic `q=2(r-c)/L`, shared σ=0.05 in **q** | Loader [-1,1] anisotropic min–max; `cdist` on `Y` vs `sensor_coords` | Preprocess in wrapper; document **L, c** |
+| Coordinates / distances | Isotropic `q=2(r-c)/L` from **fixed full-domain** axes (cache/`geometry.npz` or explicit synth); buffers persist center/L | Loader [-1,1] anisotropic min–max; `cdist` on `Y` vs `sensor_coords` | Wrapper maps with module buffers; **no** call-site sensors∪queries geometry; error if missing |
 | Importance | Uniform (φ=1); no propagator, Beta, NLL, learned imp | Stage0 YAML enables adaptive φ + CalRecVar | Strip |
 | `per_sensor_sigma` | **False** | Stage0 YAML **true**; dynamic `nn.Parameter` creation in `forward` if `True` (`models.py` L1780–1784) | Force **False**; S3 torch test on param registration |
 | CLS + top-k | `retain_cls=True`, `top_k=16` | Matches Y0/Y1 | Align factory |
 | Capacity | d=32, 4 heads, 4 layers, 64 latents | Y0 matches; Y1 uses d=64 | Use **32** for matched screening |
 | Value embedding | Keep release `val_linear` + bias + `RMSNorm` initially | `build_pos_value_proj` | Per roadmap §5.2; MLP alt only on evidence |
 | Batches | Homogeneous **N**, **no** padding; refuse mixed | Padding hook in decoder only | Explicit errors in wrapper |
-| Site order | Sort by site index; deterministic tie-break for k-NN | `topk` on `d_scaled` — ties depend on `torch.topk` | S3 invariance tests |
+| Site order | Sort by site index; **lexicographic** k-NN tie-break `(distance↑, site_index↑)` | `torch.topk` on `d_scaled` — **no** guaranteed lower-index preference on ties | Thesis subclass replaces topk; sorting alone insufficient |
 | Temporal stack | None for v0 | Always constructed in `build_model` | Do not instantiate / load |
 | Query eval | Chunk decoder (**512** candidate) | Full `P` in one pass | S3 full vs chunk numerical test |
 | Training loss | MSE normalized **T** full grid (16384) | MSE on `g_f` | Thesis trainer (S5), not upstream |
@@ -246,14 +246,15 @@ At **5%** coverage (`N_s≈819` per roadmap §3.2), `cdist` and encoder attentio
 | ID | Verification | Method | Status |
 |---|---|---|---|
 | S3-V1 | Tensor shapes / finite forward-backward | `tests/test_glu_adapted.py` | **Done** |
-| S3-V2 | **T** absent from inference signature | API + isolation tests | **Done** |
+| S3-V2 | **T** absent from inference signature | API + **non-vacuous** isolation: mutate source **T**, rebuild via `build_canonical_observation`, assert inputs/pred unchanged and target really changed | **Done** (vacuous discarded-`t_mut` test corrected) |
 | S3-V3 | `per_sensor_sigma=False` → no dynamic params; upstream `True` lazy Parameter | Separate torch test (executed) | **Done** (risk confirmed when True; thesis forces False) |
-| S3-V4 | Permutation invariance (sensor order) + query equivariance | Numeric tests, atol=1e-5 | **Done** |
-| S3-V5 | Tie-break at equal k-NN distances | Canonical site sort + `torch.topk` index order; no distance jitter | **Done** (documented) |
+| S3-V4 | Permutation invariance (sensor order) + query equivariance | Numeric tests, atol=1e-5, rtol=0 | **Done** |
+| S3-V5 | Tie-break at equal k-NN distances | `topk_distance_then_site_index` (stable double-argsort); **N>k**, surplus equidistant candidates, expected site indices, sensor permutations, unequal-distance control; CPU env recorded; **no** universal CPU/GPU claim | **Done** (corrected: earlier claim that `torch.topk` prefers lower indices was **false**) |
 | S3-V6 | Full vs chunked decoder (`chunk=512`) | Declared atol=1e-5; measured **max_abs=0** | **Done** (eval); chunked **backward not claimed** |
 | S3-V7 | Collinear (vi,vj) embedding amplitude sensitivity | Torch test (no collapse assumed) | **Done** |
 | S3-V8 | Isotropic **q** vs old [-1,1] map sensitivity | Geometry recorded; σ-semantics cost study | **Open → S4** |
 | S3-V9 | Parameter identity before/after forward+step | Count/names stable; unused MLP may lack grads | **Done** |
+| S3-V10 | Fixed domain geometry invariants A–E | center/L from cache axes as buffers; query-subset / batch / layout / chunk / reload; declared tols; measured max_abs=0 (CPU) | **Done** |
 
 ### 7.3 S4 verifications (roadmap §8 S4 + §5.3)
 
@@ -274,7 +275,7 @@ At **5%** coverage (`N_s≈819` per roadmap §3.2), `cdist` and encoder attentio
 
 | # | Topic | Roadmap / thesis | Upstream release | Resolution |
 |---|---|---|---|---|
-| R1 | **Coordinate map** | Isotropic `q` from geometry **L, c** | Per-file min–max → [-1,1] | Wrapper preprocessing; document both |
+| R1 | **Coordinate map** | Isotropic `q` from **full-domain** **L, c** (cache axes / explicit) | Per-file min–max → [-1,1] | Wrapper buffers; refuse silent first-batch geometry |
 | R2 | **`per_sensor_sigma`** | **False** | Y0 `true`; lazy Parameter in forward | Factory + S3-V3 |
 | R3 | **Uncertainty / φ** | Off | Y0/Y1 `Use_Adaptive_Selection`, `CalRecVar` | Do not instantiate phi MLPs |
 | R4 | **Time in encoder input** | Forbidden in forward features | Last channel of `G_down` | Wrapper strips **t** |
@@ -305,9 +306,19 @@ At **5%** coverage (`N_s≈819` per roadmap §3.2), `cdist` and encoder attentio
 ### Suspected / reviewer-flagged — **not** demonstrated defects here
 
 1. **Optimizer identity** when `log_sigma` is created mid-training (roadmap §5.2) — needs **S3-V3**.
-2. **Tie-breaking** in `torch.topk` for equidistant sensors — needs **S3-V5**.
+2. **Tie-breaking** for equidistant sensors — **addressed in S3-V5** via thesis helper (not `torch.topk`).
 3. **Memory** at `P=16384`, `N_s=819` — needs **S4-V1**.
 4. Whether public `forward` or `_forward` matches published GLU paper — needs paper diff, not in repo.
+
+### S3 post-delivery corrections (same STOP B, no S4)
+
+| Issue | Prior over-strong claim | Correction |
+|---|---|---|
+| Tie-break | Comment/tests implied `torch.topk` prefers lower indices | Implemented `topk_distance_then_site_index`; N>k expected-index tests |
+| Domain geometry | `compute_isotropic_geometry(sensors∪queries)` at call site | Fixed domain from `geometry.npz` / explicit axes; buffers; removed call-site helper |
+| Target isolation | Mutated unused `t_mut` then re-inferred same tensors | Mutate source **T**, rebuild canonical GLU inputs, assert identity |
+
+**Prior full-grid diagnostic limit:** when queries already span full mesh extrema, sensors∪full_queries center/L ≡ domain axes (verified L/c diff=0). Internal chunking that applied the q-map **before** splitting queries remains consistent with that map; do **not** retroactively invalidate prior full/chunk max_abs=0 under full-grid inputs. Subset-only call-site geometry **can** differ (corner example L_diff≈0.060).
 
 ---
 

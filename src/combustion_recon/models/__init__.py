@@ -10,9 +10,12 @@ from combustion_recon.models.baselines import (
 from combustion_recon.models.glu_reconstructor import (
     AdaptedDeterministicGLU,
     build_glu_from_config,
-    compute_isotropic_geometry,
+    domain_geometry_from_axes,
+    domain_geometry_from_center_L,
+    load_domain_geometry_npz,
     load_glu_minimal_config,
     phys_to_isotropic_q,
+    topk_distance_then_site_index,
 )
 from combustion_recon.models.unet import (
     DenseUNet,
@@ -35,5 +38,8 @@ __all__ = [
     "build_glu_from_config",
     "load_glu_minimal_config",
     "phys_to_isotropic_q",
-    "compute_isotropic_geometry",
+    "domain_geometry_from_axes",
+    "domain_geometry_from_center_L",
+    "load_domain_geometry_npz",
+    "topk_distance_then_site_index",
 ]
