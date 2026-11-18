@@ -1,0 +1,20 @@
+{
+  "delta_best_val_rmse_K_poff_minus_pon": 12.737440617656556,
+  "p_off": {
+    "best_epoch": 30,
+    "best_val_rmse_K": 39.66889717765482,
+    "last_epoch": 600,
+    "last_val_rmse_K": 44.10176259501622,
+    "run_id": "u6_poff_seed0_engaging_v1",
+    "status": "stopped_early_plateau",
+    "stop_reason": "stopped_early_plateau"
+  },
+  "p_on": {
+    "best_epoch": 160,
+    "best_val_rmse_K": 26.931456559998264,
+    "last_epoch": 730,
+    "last_val_rmse_K": 28.055381221175754,
+    "run_id": "u4_pon_seed0_engaging_v1",
+    "status": "stopped_early_plateau"
+  }
+}

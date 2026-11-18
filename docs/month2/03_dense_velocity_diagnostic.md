@@ -147,13 +147,31 @@ Full curves, per-frame best/last, and scheduler counters: `auto_report.md`, `eva
 
 **Reading (see `interpretation.md`):** swap hurts; mostly structure (Centered-RMSE), with a much larger hit on `0NH3_1.05`. Evidence that instantaneous velocity–temperature alignment matters for this seed — **not** causality, ceiling, or sparse transfer. VAL remains selection-contaminated.
 
+## U6 — p_off seed 0 + snapshot control (executed)
+
+| Item | Value |
+|---|---|
+| Train commit | `2511280` |
+| Train job | `29476814` · AMF · L40S · `node3202` · ≈24 min |
+| Status | `stopped_early_plateau` @ **600**/1000 |
+| Best / last VAL | **39.669 K @30** / 44.102 K @600 |
+| Δ vs U4 best VAL | **+12.737 K** (p_off − p_on) |
+| Eval commit | `815bb7a` (path-symlink fix after failed `29479222`) |
+| Eval job | `29479532` · L40S · `node3008` |
+| Aligned replay | VAL/seen Δ=0 vs U6 best (atol 0.05 K) |
+| p_off swap VAL | 39.67 → **102.41** (Δ **+62.7**) |
+| Matched VAL refs (U3 reused) | GappyPOD p_off 93.66 · GlobalMean 139.70 · GappyPOD p_on 70.46 |
+| Run dirs | `results/month2_dense_unet/u6_poff_seed0_engaging_v1/` · `.../u6_poff_seed0_snapshot_control_v1/` |
+
+**Reading (see eval `interpretation.md`):** removing explicit NH3/phi hurts this seed (~+13 K VAL) via both bias and structure; snapshot dependence remains large under p_off. Not physical insufficiency of velocity alone, not universal uselessness of parameters, not multi-seed robustness. Other seeds deferred; U7 / Step 2.4 closure not automatic.
+
 ## Checklist
 
 - [x] U0–U2 (STOP A) + corrective A1–A4  
 - [x] U3 profiling + dense GappyPOD — **STOP B**  
 - [x] U4 Engaging p_on seed 0  
 - [x] U5 snapshot-swap control — **STOP C**  
-- [~] U6 p_off seed 0 (+ snapshot control) — this mandate; other seeds deferred  
+- [x] U6 p_off seed 0 + snapshot control (other seeds deferred)  
 - [ ] U7 pending  
 
 ## Explicit non-claims

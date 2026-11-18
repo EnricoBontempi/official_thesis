@@ -1,0 +1,12 @@
+{
+  "best.pt": {
+    "sha256": "8330730817dae5f674d981cdcd006e7cf97fa1d5f90a5365510c20b4099f8e01",
+    "bytes": 59152214,
+    "path": "/home/bontempi/orcd/pool/official_thesis_runs/u6_poff_seed0_engaging_v1/checkpoints/best.pt"
+  },
+  "last.pt": {
+    "sha256": "8bb499743fdd91b4cd2ba114fae160477a2f065411a1029a43258c431d4887cd",
+    "bytes": 63123734,
+    "path": "/home/bontempi/orcd/pool/official_thesis_runs/u6_poff_seed0_engaging_v1/checkpoints/last.pt"
+  }
+}

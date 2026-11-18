@@ -1,0 +1,8 @@
+{
+  "aligned_replay_atol_K": 0.05,
+  "aligned_replay_rtol": 1e-05,
+  "declared_before_replay": true,
+  "u6_best_epoch": 30,
+  "u6_ref_seen_macro_K": 51.02950596327702,
+  "u6_ref_val_macro_K": 39.66889717765482
+}

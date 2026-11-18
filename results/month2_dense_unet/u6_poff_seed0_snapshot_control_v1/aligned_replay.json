@@ -1,0 +1,8 @@
+{
+  "seen_abs_diff_vs_u6_best": 0.0,
+  "seen_macro_rmse_K": 51.02950596327702,
+  "seen_ok": true,
+  "val_abs_diff_vs_u6_best": 0.0,
+  "val_macro_rmse_K": 39.66889717765482,
+  "val_ok": true
+}

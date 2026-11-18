@@ -1,0 +1,10 @@
+{
+  "T_vmax_K": 2716.878836676952,
+  "T_vmin_K": 164.78881647189132,
+  "error_symmetric_limit_K": 1589.0645819085548,
+  "mean_abs_error_vmax_K": 517.5627939883432,
+  "shared_across_pon_poff": true,
+  "tight_error_limit_K": 80.0,
+  "tight_error_saturation": "values outside \u00b1tight limit are clipped visually",
+  "val_frame_index": 1000
+}

@@ -220,3 +220,13 @@ Questo file è il diario del progetto di tesi in `official_thesis` (ricostruzion
 - **Punti confermati:** replay aligned U5 ≡ U4; pairing/transform input corretti; baseline U5 rifittate (scostamento dall’incarico) ma metriche per-frame ≈ U3 entro ~5.5e-12; VAL non indipendente; best 26.931 K @160 e last 28.055 K @730; nessuna indicazione a prolungare U4.
 - **Decisione operativa Enrico:** prima parte di U6 — **un** training denso p_off seed 0 + snapshot-swap sul best, stesso contratto U4 salvo canali p a zero e init fresco. Altri seed rinviati. Engaging autorizzato.
 - **Prep codice:** provenance nel run manifest; test isolamento p_off; candidate `month2_dense_unet_u6_candidate.yaml`; `train-u6`; smoke/train/eval Engaging; eval/swap `scripts/10_u6_poff_eval_and_swap.py` riusando pairing U5 e tabelle U3 (no refit).
+
+---
+
+## 2026-11-17 — U6 p_off seed 0 + snapshot control (STOP)
+
+- **Train:** SHA `2511280`; job `29476814` L40S `node3202`; early-stop @600; best VAL **39.669 K @30**; last 44.102 K; updates 57000; ≈24 min. Best ckpt sha `83307308…`.
+- **Eval/swap:** SHA `815bb7a` (fix path symlink dopo fail `29479222`); job `29479532`; replay aligned Δ=0; VAL swap 39.67→102.41 (Δ+62.7).
+- **Confronto:** Δ best VAL p_off−p_on **+12.7 K**; matched U3 riusati (GappyPOD p_off 93.66; GlobalMean 139.70). Bias e Centered-RMSE entrambi peggiorano senza p; dipendenza istantanea resta forte.
+- **Artefatti:** `results/month2_dense_unet/u6_poff_seed0_engaging_v1/` e `.../u6_poff_seed0_snapshot_control_v1/`.
+- **STOP:** nessun altro seed, nuovo p_on, GLU, sparse, sensori T, TEST, cambio architetturale o prolungamento >1000. U7 / Step 2.4 non chiusi automaticamente.

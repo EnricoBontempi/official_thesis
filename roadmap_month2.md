@@ -247,7 +247,7 @@ Opus e Astra hanno revisionato indipendentemente `822ed52` e concluso «pronti d
 - [x] 2.1 — Protocollo pilota e default operativi versionati; autorizzazione Enrico registrata; limite proposal e assenza ratifica supervisori espliciti; fold geometricamente verificati (lock scientifico fold ancora aperto). Non implica GPU verificate né stats fit-only già calcolate.
 - [x] 2.2 — Pipeline Month-2 reale verificata in locale (fit-only, isolation, collate, gate TEST) + protezioni API. Engaging/GPU verificati in seguito (preflight + U4/U5); picco RAM locale legato al decode Arrow.
 - [x] 2.3 — Baseline CPU sul protocollo Mese 2 (GlobalMean/ParamMean/GappyPOD 2C ±AO/T-block, Oracle, HGB dense diagnostico); ricerca versionata (preregistrazione cronologica storica non attestabile); report `02_baseline_validation.md`. R=64 non eseguito. Consolidamento e replica completati su `mission/baseline-consolidation` a `3cf7bf0`; integrazione ancora pendente.
-- [ ] 2.4 — [roadmap_unet.md](roadmap_unet.md): U0–U5 eseguiti (U4 Engaging p_on seed 0; U5 snapshot-swap). U6 p_off seed 0 in questo incarico; altri seed/U7 da discussione. Optional temporale fuori missione. Step 2.4 **non** completo.
+- [ ] 2.4 — [roadmap_unet.md](roadmap_unet.md): U0–U6 p_off seed 0 eseguiti; altri seed e U7 da discussione. Optional temporale fuori missione. Step 2.4 **non** completo.
 - [ ] 2.5 — Audit GLU concluso e adattamento scelto o rinviato con motivazione.
 - [ ] 2.6 — Primo neurale sparse e comparatori matched; confronto GLU presente oppure esplicitamente ancora aperto.
 - [ ] 2.7 — Free/assisted confrontati, almeno AO e GappyPOD con stesse osservazioni; testa appresa non obbligatoria.

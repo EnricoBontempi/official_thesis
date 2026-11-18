@@ -5,10 +5,10 @@
 
 experiment_id: month2_dense_unet_u6_poff_engaging_v1
 paired_experiment: month2_dense_unet_v1
-status: authorized_poff_seed0_pending_execution
+status: executed_engaging_poff_seed0_and_snapshot_control
 scientific_training_authorized: true
 budget_definitively_approved: true
-u6_executed: false
+u6_executed: true
 
 decision:
   by: Enrico
@@ -21,6 +21,16 @@ decision:
     ratification claimed.
   supervisor_ratification: not_claimed
   paired_u4_run_id: u4_pon_seed0_engaging_v1
+  execution_record:
+    train_run_id: u6_poff_seed0_engaging_v1
+    train_slurm_job_id: "29476814"
+    train_git_commit: 25112807963a86322e98c20a6f1f826806b8b2c5
+    eval_slurm_job_id: "29479532"
+    eval_git_commit: 815bb7a086d8780f743a1c909833b7b9bb1e093f
+    status: stopped_early_plateau
+    best_val_rmse_K: 39.66889717765482
+    best_val_epoch: 30
+    epochs_completed: 600
   opus_u4_u5_review: >
     External Opus review (reported by Enrico): usable with reserves; no
     invalidating defect found. Confirmed aligned replay identity, swap pairing/
