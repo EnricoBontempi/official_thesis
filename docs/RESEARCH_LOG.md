@@ -280,6 +280,17 @@ Questo file è il diario del progetto di tesi in `official_thesis` (ricostruzion
 
 ---
 
+## 2026-11-18 — S4 in corso: runner scientifico + submission profiling
+
+- **Runner:** `sparse_scientific_loop.py` (U-Net/GLU) allinea MSE full-field, AdamW 1e-3/1e-4, clip 1, fp32 no AMP/TF32/compile, batch 8, warmup 950, ReduceLROnPlateau VAL 5%×3 repl, eval/10, first absolute min, early-stop 200/15/0.1% con reset su calo LR, tranche 1000 estendibile, TRAIN/seen diagnostici.
+- **Checkpoint/resume:** complete vs partial; identity lock; mask `set_epoch`; buffer geometria GLU; test sintetici su LR/contatori/RNG/history.
+- **Profiling:** config diagnostica; sbatch U-Net+GLU su AMF normal L40S (no preemptable fallback). **Submitted — non completato.**
+- **GappyPOD 1/20%:** lambdas congelati (p_off 0.001, p_on 0.01); eval **aperta** — mancano artifact POD persistiti; niente refit silenzioso.
+- **Engaging preflight:** QoS AMF `gres/gpu=4`; coda personale solo preemptable HONF pending; headroom AMF libero al check.
+- **STOP submission:** nessun polling; freeze/S5 dopo esiti Enrico.
+
+---
+
 ## 2026-11-18 — Correzioni circoscritte S3 (nuovo STOP B)
 
 - **Tie-break reale:** sostituito `torch.topk` nel decoder thesis con `topk_distance_then_site_index` (distance↑, site_index↑, stable double-argsort); nessun jitter delle distanze; `external/` intatto. Corretta la descrizione precedente che attribuiva a `topk` la preferenza per indici inferiori. Test N>k, surplus equidistanti, indici attesi, permutazioni, controllo distanze non pari; predizioni invarianti a permutazione (CPU, atol=1e-5, rtol=0). Nessuna riproducibilità universale CPU/GPU dichiarata.

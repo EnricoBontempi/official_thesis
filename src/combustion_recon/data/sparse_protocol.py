@@ -15,6 +15,8 @@ ALLOWED_TOP = {
     "roadmap",
     "status",
     "scientific_training_authorized",
+    "s4_profiling_diagnostic_only",
+    "s5_screening_authorized",
     "roles",
     "observation",
     "training_masks",
@@ -23,6 +25,8 @@ ALLOWED_TOP = {
     "cache",
     "unet_sparse",
     "glu",
+    "scientific_runner",
+    "gappypod_nested",
     "forbidden_this_mission",
     "diagnostic_overfit",
 }
@@ -39,6 +43,8 @@ def load_sparse_protocol(path: str | Path | None = None) -> dict[str, Any]:
         raise ValueError(f"sparse protocol has unsupported keys (refused): {unknown}")
     if cfg.get("scientific_training_authorized") is not False:
         raise ValueError("scientific_training_authorized must be false until S5 authorization")
+    if cfg.get("s5_screening_authorized") not in (None, False):
+        raise ValueError("s5_screening_authorized must be false until explicit S5 authorization")
     glu = cfg.get("glu") or {}
     if glu.get("scientific_training_authorized") not in (None, False):
         raise ValueError("glu.scientific_training_authorized must be false")

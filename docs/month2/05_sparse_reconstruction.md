@@ -1,8 +1,7 @@
 # Sparse reconstruction — S1–S3 technical status
 
-**Status:** implementazione/verifiche S1–S3 + tre correzioni circoscritte post-S3, **nessun risultato scientifico sparse**.  
-**Branch:** `mission/dense-unet`.  
-**STOP B:** non proseguire a S4 / screening / training scientifici da questo report.
+**Status:** S4 **IN CORSO** — runner scientifico completato localmente; profiling Engaging **submitted** (non completato). Nessuno screening S5.  
+**Branch:** `mission/dense-unet`.
 
 ---
 
@@ -95,16 +94,30 @@ Artifacts: `results/month2/sparse_s3_glu_diagnostic_overfit/` (`report.json`, ma
 
 ---
 
-## 5. Tests
+## 5. S4 — Scientific runner + profiling submission
 
-`tests/test_sparse_eval_masks.py` + `test_sparse_unet.py` + `test_glu_adapted.py` + dense regression: **45 passed**.
+| Voce | Stato |
+|---|---|
+| Runner | `sparse_scientific_loop.py` riusa schedule/checkpoint U4 (warmup 950, plateau VAL 5%×3 repl, early-stop, tranche 1000, extend esplicita) |
+| Config | `month2_sparse_scientific_candidate.yaml` (S5 **non** autorizzato); profiling `month2_sparse_s4_profiling.yaml` |
+| Resume tests | `tests/test_sparse_scientific_trainer.py` (warmup/plateau/contatori/LR/RNG/mask epoch/GLU buffers) |
+| Profiling jobs | U-Net + GLU su AMF `mit_normal_gpu` / L40S, diagnostici, no S5 |
+| GappyPOD 1/20% | config preparata; **bloccata**: oggetti POD fittati non persistiti da `month2_baselines_v1` (niente refit silenzioso) |
+
+Freeze finale e passaggio a S5: **dopo** che Enrico riporta gli output di profiling.
 
 ---
 
-## 6. Limits / S4 remaining
+## 6. Tests
 
-- No scientific 760 training, VAL tuning, S4 profiling/freeze, S5 screening, 1/20% baseline campaign, TEST.
-- Scientific epoch runner resume (warmup/plateau/VAL counters) **not** verified — required before S4 freeze.
-- Isotropic-q vs upstream [-1,1] σ-semantics sensitivity: documented, not profiled as cost study.
-- Chunked training backward / grad accumulation: **not supported** until verified.
-- Tie-break / geometry / isolation checks are CPU; no bit-identity claim across devices.
+Sparse scientific + GLU/sparse/dense epoch: eseguiti in consegna S4 (vedi diario).  
+
+---
+
+## 7. Limits / aperti
+
+- Profiling Engaging: **submitted**, non dichiarato completato.
+- GappyPOD nested: prerequisito artifact POD mancante.
+- Nessuno screening S5, nessun training 760, nessun tuning VAL, niente TEST.
+- Chunked GLU backward / microbatch: solo se OOM + equivalenza gradienti verificata nel job (niente retry automatici).
+- Compatibilità torch locale vs Engaging: API condivisa; nessun claim bit-identity.

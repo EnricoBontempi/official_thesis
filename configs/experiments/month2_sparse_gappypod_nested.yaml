@@ -1,0 +1,42 @@
+# Nested 1%/20% GappyPOD evaluation with lambdas frozen at 5% selection.
+# No retuning. Historical 5% results untouched (new output directory).
+
+experiment_id: month2_sparse_gappypod_nested_v1
+status: prepared_blocked_until_pod_artifacts
+scientific_training_authorized: false
+retune_lambda: false
+refit_pod_basis_authorized: false
+
+frozen_from_5pct:
+  source_manifest: results/meta/month2_baseline_run_manifest.json
+  free_p_off_lambda: 0.001
+  free_p_on_lambda: 0.01
+  R: 32
+  n_velocity_components: 2
+  K: 0
+  task: temperature_free
+
+evaluation:
+  coverages: [0.01, 0.20]
+  roles: [train_fit, seen_train_eval, val_eval]
+  replicas: [0, 1, 2]
+  layout_id: random_sparse_primary
+  eval_mask_seed: 20261116
+  mask_payload_root: data/processed/month2_sparse_eval_masks
+  use_persisted_nested_sites: true
+  physical_velocity_units: m/s
+  same_frames_fit_stats_as_5pct: true
+
+prerequisites:
+  fitted_pod_artifacts:
+    required: true
+    expected_keys: [pod_p_off, pod_p_on]
+    status: missing_not_persisted_from_month2_baselines_v1
+    action_if_missing: >
+      Leave nested GappyPOD eval open. Do not silently refit POD basis or
+      retune lambda. Enrico may later authorize artifact recovery or an
+      explicit deterministic refit of the train_fit POD basis only.
+
+artifacts:
+  results_root: results/month2/sparse_gappypod_nested_1_20
+  refuse_overwrite_historical_5pct: true

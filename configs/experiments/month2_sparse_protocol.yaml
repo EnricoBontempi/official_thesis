@@ -1,8 +1,10 @@
 # Executable sparse protocol contract (S1–S2). Unknown scientific keys are refused.
 protocol_id: month2_sparse_v1
 roadmap: roadmapsparse.md
-status: s1_s2_s3_implementation
+status: s4_in_progress_profiling_submitted
 scientific_training_authorized: false
+s4_profiling_diagnostic_only: true
+s5_screening_authorized: false
 
 roles:
   train_fit: 760
@@ -65,26 +67,40 @@ unet_sparse:
   warm_start_dense: false
 
 glu:
-  implementation_phase: S3_done_stop_b
+  implementation_phase: S3_done_s4_profiling
   audit: docs/month2/04_glu_release_adaptation.md
   config: configs/models/glu_minimal.yaml
   wrapper: src/combustion_recon/models/glu_reconstructor.py
   wrapper_authorized_this_mission: true
   scientific_training_authorized: false
 
+scientific_runner:
+  module: src/combustion_recon/training/sparse_scientific_loop.py
+  candidate: configs/experiments/month2_sparse_scientific_candidate.yaml
+  schedule: warmup_950_then_reduce_on_plateau_val5pct_3replicas
+  selection: first_absolute_minimum_val_mean_condition_rmse_K
+  early_stop: min_200_epochs_15_evals_rel_0.001_reset_on_lr_reduce
+  tranche_epochs: 1000
+  profiling: configs/experiments/month2_sparse_s4_profiling.yaml
+
+gappypod_nested:
+  config: configs/experiments/month2_sparse_gappypod_nested.yaml
+  frozen_lambdas_from_5pct: true
+  status: blocked_missing_fitted_pod_artifacts
+
 forbidden_this_mission:
   - scientific_training_760
   - val_tuning
-  - glu_wrapper_implementation
-  - s4_profiling_freeze
   - s5_screening
-  - comparative_baseline_eval_1_20
   - scientific_snapshot_control
   - test_payloads
   - new_raw_downloads
   - modify_HONF
   - modify_external_GLU_Reconstruction
   - reopen_dense_U0_U7
+  - silent_pod_refit
+  - silent_lambda_retune
+  - preemptable_fallback_for_s4
 
 diagnostic_overfit:
   n_frames: 8

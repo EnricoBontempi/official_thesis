@@ -1,0 +1,75 @@
+# S4 diagnostic GPU profiling for sparse U-Net and adapted GLU.
+# NOT a scientific training authorization. Weights must not be reused for S5.
+
+experiment_id: month2_sparse_s4_profiling_v1
+status: diagnostic_profiling_only
+scientific_training_authorized: false
+profiling_diagnostic_only: true
+s5_auto_authorize: false
+
+decision:
+  by: Enrico
+  date: "2026-11-18"
+  summary: >
+    Delimited Engaging profiling: fresh diagnostic init, p_on seed 0, 5% train,
+    2 measured TRAIN epochs, VAL 5% timing over 3 replicas, inference 1/5/20%,
+    VRAM/RAM/checkpoint cost. VAL numbers must not select architecture/LR/variant.
+
+inherits_protocol:
+  path: configs/experiments/month2_sparse_protocol.yaml
+scientific_contract_reference:
+  path: configs/experiments/month2_sparse_scientific_candidate.yaml
+  note: Profiling reuses the same precision/batch/schedule field names for cost fidelity;
+    reduced epochs/warmup are diagnostic overrides only.
+
+families:
+  - sparse_unet
+  - adapted_glu
+
+profiling:
+  p_conditioning: true
+  seed: 0
+  init: fresh_diagnostic_not_for_science
+  site_fraction_train: 0.05
+  train_mask_seed: 20261118
+  eval_mask_seed: 20261116
+  layout_id: random_sparse_primary
+  val_replicas: [0, 1, 2]
+  precision: fp32
+  allow_tf32: false
+  allow_amp: false
+  allow_compile: false
+  batch_size: 8
+  technical_warmup_steps: 4
+  measured_train_epochs: 2
+  lr: 1.0e-3
+  weight_decay: 1.0e-4
+  grad_clip_norm: 1.0
+  decode_chunk_size: 512
+  decode_chunked_eval: true
+  microbatch_size: null
+  inference_coverages: [0.01, 0.05, 0.20]
+  cpu_gpu_compare:
+    n_frames: 4
+    atol: 1.0e-4
+    rtol: 1.0e-4
+    note: No universal bit-identity claim
+  record_separately: [setup_s, queue_s_external, compute_s]
+  glu_breakdown: [encoder, decoder, neighbor_sort]
+  on_oom: save_diagnostic_and_exit_nonzero
+  no_automatic_retries: true
+  no_val_based_model_selection: true
+
+scheduler_constraints:
+  partition: mit_normal_gpu
+  account: mit_amf_advanced_gpu
+  qos: mit_amf_advanced_gpu
+  gres: gpu:l40s:1
+  prefer_gpu: L40S
+  preemptable_fallback: false
+  walltime_request: 2:00:00
+  note: Partition MaxTime 6:00:00; walltime is scheduler limit, not a scientific hour cap
+
+artifacts:
+  results_root_engaging: /home/bontempi/orcd/pool/official_thesis_runs
+  run_id_pattern: s4_profile_<family>_$SLURM_JOB_ID
