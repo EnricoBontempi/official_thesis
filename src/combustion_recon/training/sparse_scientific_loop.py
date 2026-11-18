@@ -30,10 +30,6 @@ from combustion_recon.evaluation.month2_evaluator import (
     denormalize_temperature,
     evaluate_frame_prediction,
 )
-from combustion_recon.models.glu_reconstructor import (
-    AdaptedDeterministicGLU,
-    make_synthetic_query_grid,
-)
 from combustion_recon.training.epoch_loop import (
     EpochTrainConfig,
     EpochTrainState,
@@ -53,6 +49,16 @@ Family = Literal["sparse_unet", "adapted_glu"]
 
 CHECKPOINT_KIND_COMPLETE = "sparse_scientific_epoch_complete_v1"
 CHECKPOINT_KIND_PARTIAL = "sparse_scientific_epoch_partial_v1"
+
+
+def _adapted_glu_cls():
+    from combustion_recon.models.glu_reconstructor import AdaptedDeterministicGLU
+
+    return AdaptedDeterministicGLU
+
+
+def _is_adapted_glu(model: nn.Module) -> bool:
+    return isinstance(model, _adapted_glu_cls())
 
 _RESUME_LOCKED_CFG_KEYS = (
     "batch_size",
@@ -155,7 +161,7 @@ def save_sparse_scientific_checkpoint(
         payload["cuda_rng_state_all"] = torch.cuda.get_rng_state_all()
     if loader_generator is not None:
         payload["dataloader_generator_state"] = loader_generator.get_state()
-    if isinstance(model, AdaptedDeterministicGLU):
+    if _is_adapted_glu(model):
         payload["glu_geometry_meta"] = dict(model.geometry_meta)
     torch.save(payload, path)
 
@@ -499,9 +505,9 @@ class SparseScientificTrainer:
             raise ValueError(f"unsupported schedule_kind: {cfg.schedule_kind}")
         if cfg.allow_lr_fallback_3e4:
             raise ValueError("allow_lr_fallback_3e4 must be False")
-        if cfg.family == "adapted_glu" and not isinstance(model, AdaptedDeterministicGLU):
+        if cfg.family == "adapted_glu" and not _is_adapted_glu(model):
             raise TypeError("adapted_glu family requires AdaptedDeterministicGLU")
-        if cfg.family == "sparse_unet" and isinstance(model, AdaptedDeterministicGLU):
+        if cfg.family == "sparse_unet" and _is_adapted_glu(model):
             raise TypeError("sparse_unet family cannot use AdaptedDeterministicGLU")
 
         self.model = model
@@ -848,6 +854,8 @@ class SparseScientificTrainer:
             raise ValueError("train_ds.mask_mode must be 'training'")
 
         if self.cfg.family == "adapted_glu" and self.query_coords_phys is None:
+            from combustion_recon.models.glu_reconstructor import make_synthetic_query_grid
+
             self.query_coords_phys = make_synthetic_query_grid(train_ds.x, train_ds.y).to(
                 self.device
             )

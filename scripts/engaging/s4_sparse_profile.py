@@ -24,11 +24,6 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from combustion_recon.data.month2_normalizer import Month2FitOnlyNormalizer  # noqa: E402
 from combustion_recon.data.month2_protocol import sha256_file  # noqa: E402
-from combustion_recon.models.glu_reconstructor import (  # noqa: E402
-    AdaptedDeterministicGLU,
-    build_glu_from_config,
-    make_synthetic_query_grid,
-)
 from combustion_recon.models.unet import build_sparse_unet_from_config  # noqa: E402
 from combustion_recon.training.dense_cache import (  # noqa: E402
     DEFAULT_CACHE_ROOT,
@@ -131,6 +126,21 @@ def main() -> int:
         set_seed(int(prof["seed"]))
         normalizer = Month2FitOnlyNormalizer(args.stats)
 
+        # Import GLU only for the GLU family (avoids einops on U-Net-only path).
+        build_glu_from_config = None
+        make_synthetic_query_grid = None
+        AdaptedDeterministicGLU = None
+        if args.family == "adapted_glu":
+            from combustion_recon.models.glu_reconstructor import (  # noqa: E402
+                AdaptedDeterministicGLU as _AdaptedDeterministicGLU,
+                build_glu_from_config as _build_glu_from_config,
+                make_synthetic_query_grid as _make_synthetic_query_grid,
+            )
+
+            AdaptedDeterministicGLU = _AdaptedDeterministicGLU
+            build_glu_from_config = _build_glu_from_config
+            make_synthetic_query_grid = _make_synthetic_query_grid
+
         if args.family == "sparse_unet":
             model = build_sparse_unet_from_config(init_seed=int(prof["seed"]))
         else:
@@ -164,7 +174,11 @@ def main() -> int:
         ]
         batch["p_norm_tensor"] = torch.tensor(p_rows, dtype=torch.float32)
 
-        queries = make_synthetic_query_grid(train_ds.x, train_ds.y)
+        queries = (
+            make_synthetic_query_grid(train_ds.x, train_ds.y)
+            if args.family == "adapted_glu"
+            else None
+        )
 
         def forward_unet(m, b, dev):
             return m(b["input_tensor"].to(dev))

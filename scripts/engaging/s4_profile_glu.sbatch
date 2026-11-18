@@ -18,7 +18,9 @@ CACHE="${CACHE:-$HOME/orcd/pool/official_thesis_data/month2_dense_unet_cache}"
 HASHES="${HASHES:-$HOME/orcd/pool/official_thesis_data/cache_payload_hashes.json}"
 MASKS="${MASKS:-$HOME/orcd/pool/official_thesis_data/month2_sparse_eval_masks}"
 OUT_ROOT="${OUT_ROOT:-$HOME/orcd/pool/official_thesis_runs}"
+# New directory per attempt; do not reuse failed attempt dirs.
 OUT="${OUT:-$OUT_ROOT/s4_profile_adapted_glu_${SLURM_JOB_ID}}"
+PREV_FAILED_REF="${PREV_FAILED_REF:-$OUT_ROOT/s4_profile_adapted_glu_29552532}"
 
 export PYTHONUNBUFFERED=1
 export PYTHONDONTWRITEBYTECODE=1
@@ -39,11 +41,18 @@ SHA="$(cat .git_commit 2>/dev/null || git rev-parse HEAD)"
   echo "SLURM_GPUS_ON_NODE=${SLURM_GPUS_ON_NODE:-}"
   echo "CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-}"
   echo "GIT_SHA=$SHA"
+  echo "PY=$PY"
+  echo "PREV_FAILED_REF=$PREV_FAILED_REF"
   date -Is
 } | tee "$OUT/slurm_context.txt"
 
 echo "host=$(hostname) job=$SLURM_JOB_ID"
 "$PY" -c "import torch; print('torch', torch.__version__, 'cuda', torch.version.cuda, 'avail', torch.cuda.is_available()); print(torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'no-gpu')"
+
+# Light import/interpreter preflight (no CUDA kernels / no profiling on login).
+"$PY" scripts/engaging/s4_dep_preflight.py \
+  --family adapted_glu \
+  --out-json "$OUT/dep_preflight.json"
 
 "$PY" scripts/engaging/s4_sparse_profile.py \
   --family adapted_glu \

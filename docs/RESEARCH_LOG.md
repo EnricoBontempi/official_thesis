@@ -302,6 +302,16 @@ Questo file è il diario del progetto di tesi in `official_thesis` (ricostruzion
 
 ---
 
+## 2026-11-18 — S4 dep fix + profiling resubmit (STOP after IDs)
+
+- **Diagnosi attempt-1:** entrambi i job (`29552531`/`29552532`) FAILED in ~14 s su L40S prima di qualsiasi misura; traceback `ModuleNotFoundError: einops` da `external/GLU_Reconstruction/src/models.py` via eager import in `models/__init__.py` (anche il path U-Net). Interprete: `~/envs/official_thesis` (torch `2.8.0+cu128`).
+- **Fix env (solo thesis):** `pip install einops==0.8.2` in `/home/bontempi/envs/official_thesis`; HONF/`~/envs/honf` non toccato; torch/CUDA non aggiornati.
+- **Fix import:** lazy GLU in `models/__init__.py`; import GLU condizionale in `s4_sparse_profile.py`; helper lazy in `sparse_scientific_loop.py`; preflight `s4_dep_preflight.py` nei launcher.
+- **Test locali:** 30 passed (sparse scientific + GLU + sparse U-Net).
+- **Resubmit solo profiling** (nuove directory; attempt-1 preservato; no preemptable; no S5/afterok; no auto-requeue). Record: `docs/month2/s4_profiling_submission_record.md` stato **submitted**. S4 non concluso; freeze non dichiarato.
+
+---
+
 ## 2026-11-18 — Correzioni circoscritte S3 (nuovo STOP B)
 
 - **Tie-break reale:** sostituito `torch.topk` nel decoder thesis con `topk_distance_then_site_index` (distance↑, site_index↑, stable double-argsort); nessun jitter delle distanze; `external/` intatto. Corretta la descrizione precedente che attribuiva a `topk` la preferenza per indici inferiori. Test N>k, surplus equidistanti, indici attesi, permutazioni, controllo distanze non pari; predizioni invarianti a permutazione (CPU, atol=1e-5, rtol=0). Nessuna riproducibilità universale CPU/GPU dichiarata.

@@ -1,6 +1,6 @@
 # Sparse reconstruction — S1–S3 technical status
 
-**Status:** S4 **IN CORSO** (non concluso, config scientifiche **non** congelate). Profiling jobs submitted poi **FAILED** (`einops` mancante). Candidati S5 **preparati**, **non** sottomessi.  
+**Status:** S4 **IN CORSO** (non concluso, config scientifiche **non** congelate). Attempt-1 profiling **FAILED** (`einops`); fix dipendenze/import; **resubmit** profiling (stato **submitted**, non dichiarato riuscito). Candidati S5 **preparati**, **non** sottomessi.  
 **Branch:** `mission/dense-unet`.  
 **Record submission:** [s4_profiling_submission_record.md](s4_profiling_submission_record.md).
 
@@ -102,8 +102,8 @@ Artifacts: `results/month2/sparse_s3_glu_diagnostic_overfit/` (`report.json`, ma
 | Runner | `sparse_scientific_loop.py` riusa schedule/checkpoint U4 (warmup 950, plateau VAL 5%×3 repl, early-stop, tranche 1000, extend esplicita) |
 | Config | `month2_sparse_scientific_candidate.yaml` (S5 **non** autorizzato); profiling `month2_sparse_s4_profiling.yaml` |
 | Resume tests | `tests/test_sparse_scientific_trainer.py` (warmup/plateau/contatori/LR/RNG/mask epoch/GLU buffers) |
-| Profiling jobs | U-Net **29552531** (`node3504` L40S), GLU **29552532** (`node3507` L40S); SHA `b844944`; one-shot state **FAILED** (`einops` missing). Nessun rilancio automatico. |
-| Log assoluti | `.../official_thesis/slurm-29552531.out`, `.../slurm-29552532.out`; run dirs sotto `.../official_thesis_runs/s4_profile_*_<jobid>/` |
+| Profiling jobs | Attempt-1 **FAILED**: U-Net **29552531**, GLU **29552532** (SHA `b844944`, `einops` missing; dirs preservate). Attempt-2 **submitted** dopo fix `einops==0.8.2` + lazy imports + preflight; vedi record. Nessun auto-requeue. |
+| Log assoluti | Attempt-1: `…/slurm-29552531.out`, `…/slurm-29552532.out`. Attempt-2: nuove run dirs `…/s4_profile_*_<newjobid>/` + `slurm-<newjobid>.out` |
 | S5 prep | Quattro YAML + quattro sbatch + `scripts/16_train_sparse_scientific.py`; auth gates; walltime/mem/microbatch **PROVISIONAL**; **nessuna** submission / afterok |
 | GappyPOD 1/20% | ancora **bloccata** (artifact POD mancanti) |
 
@@ -119,7 +119,7 @@ Sparse scientific + GLU/sparse/dense epoch: eseguiti in consegna S4 (vedi diario
 
 ## 7. Limits / aperti
 
-- Profiling Engaging: **submitted**, non dichiarato completato.
+- Profiling Engaging: attempt-2 **submitted** post-fix deps; non dichiarato riuscito/completato.
 - GappyPOD nested: prerequisito artifact POD mancante.
 - Nessuno screening S5, nessun training 760, nessun tuning VAL, niente TEST.
 - Chunked GLU backward / microbatch: solo se OOM + equivalenza gradienti verificata nel job (niente retry automatici).
