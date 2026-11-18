@@ -8,6 +8,7 @@
 **Month 2 Protocol:** [configs/splits/month2_frame_protocol.yaml](configs/splits/month2_frame_protocol.yaml), [configs/experiments/month2_pilot.yaml](configs/experiments/month2_pilot.yaml)  
 **Baseline Consolidation Mission:** [roadmap_missione.md](roadmap_missione.md) — completed on `mission/baseline-consolidation` at `3cf7bf0`; report [docs/month2/mission_baseline_consolidation_report.md](docs/month2/mission_baseline_consolidation_report.md); integration pending  
 **U-Net dense mission (Step 2.4):** [roadmap_unet.md](roadmap_unet.md) — **U0–U7 closed** on `mission/dense-unet` (p_on/p_off seed 0 + snapshot controls; further seeds deferred). Report: [docs/month2/03_dense_velocity_diagnostic.md](docs/month2/03_dense_velocity_diagnostic.md). Results: `results/month2_dense_unet/`. Month 2 **not** complete (2.5–2.9 open).  
+**Sparse mission (Steps 2.5–2.6):** [roadmapsparse.md](roadmapsparse.md) — plan approved by Enrico on 2026-11-18 after independent Opus/Astra proposals. U-Net/GLU on/off screening, shared masks, profiling and explicit STOPs; only planning completed. No arbitrary training/campaign hour cap; scheduler walltime remains a separate constraint. No sparse run started.  
 **Research Log:** [docs/RESEARCH_LOG.md](docs/RESEARCH_LOG.md)  
 **Current Evidence & Open Decisions:** [docs/month2/00_context_and_decisions.md](docs/month2/00_context_and_decisions.md)
 

@@ -241,3 +241,15 @@ Questo file è il diario del progetto di tesi in `official_thesis` (ricostruzion
 - **Decisione operativa Enrico:** missione densa conclusa nel perimetro U0–U6; U7 = consolidamento; p_on/p_off preliminare (seed 0); seed aggiuntivi rinviati; nessun nuovo training denso in chiusura.
 - **Stato:** Step 2.4 chiuso con limiti; Mese 2 **non** concluso (2.5–2.9 aperti); merge main non eseguito.
 - **Prossimo orientamento (non autorizzazione):** protocollo U-Net sparse (2.6) e audit GLU (2.5); p_on candidato sparse iniziale con confronto p_off previsto; best/last + livello/struttura nei report futuri.
+
+
+---
+
+## 2026-11-18 — Proposte indipendenti Opus/Astra e roadmap sparse (solo piano)
+
+- **Base:** `87d1e3f40826a9343c3c2ce19d140d481b911619`, missione U-Net densa U0–U7 chiusa; nessun nuovo esperimento in questa attività.
+- **Discussione:** lette separatamente le due proposte, poi confrontate con Enrico. Nessun rilievo riferito impone di riaprire il denso; maschere e adattamento GLU richiedono verifiche implementative future. I revisori non avevano raw/cache/checkpoint e non hanno riprodotto l'inferenza.
+- **Decisione operativa Enrico:** unica [roadmapsparse.md](../roadmapsparse.md), dettaglio di 2.5–2.6 e conferma sparse pertinente di 2.8. U-Net da zero a 7 canali; primo training al 5%, controlli a 1/20%; maschere condivise persistite e annidate conservando il 5% storico; quattro screening U-Net/GLU p_on/off se fattibili; GLU deterministico p additivo, geometria isotropa, batch omogenei senza padding iniziale. Repliche dei soli contrasti scelti dopo screening.
+- **Risorse:** Enrico richiede esplicitamente nessun tetto arbitrario di ore per training/campagna; precedente ceiling proposto 24 GPU-h superato per la missione sparse. Profiling e costo visibile, plateau operativo e tranche iniziale 1000 epoche riesaminabile dalle curve; walltime scheduler distinto, checkpoint/resume. Fino a quattro run concorrenti dopo validazione e verifica degli slot effettivi. Nessun training avviato da questo mandato documentale.
+- **Output:** roadmap sparse, riferimenti e stato in roadmap Mese 2/README/registro D4-D8. Documenti e fonti preesistenti letti; controlli documentali, nessuna prova torch/GPU/raw.
+- **Stato/STOP:** soltanto S0 pubblicazione; S1–S7 non eseguiti. Prossimo incarico Cursor previsto S1–S2 (osservazioni/audit + U-Net piccola verificata), STOP A prima dei run scientifici. Mese 2 ancora aperto, niente GLU/sparse/assisted/TEST avviati; nessuna ratifica supervisori o merge main.

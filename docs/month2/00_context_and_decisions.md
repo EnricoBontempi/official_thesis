@@ -3,6 +3,7 @@
 **Data aggiornamento Step 2.1:** 2026-11-16, America/New_York (UTC−05:00)  
 **Ambito:** esclusivamente `EnricoBontempi/official_thesis`; nessuna attività HONF.  
 **Stato aggiornato 2026-11-17 (U7):** protocollo, pipeline e baseline 2.1–2.3 eseguiti; consolidamento `3cf7bf0` sul branch dedicato (non ancora in main). **Step 2.4 / missione U-Net densa conclusa** su `mission/dense-unet` (U0–U7; p_on/p_off seed 0 + snapshot controls; repliche seed rinviate) — report [03_dense_velocity_diagnostic.md](03_dense_velocity_diagnostic.md). Engaging AMF/L40S verificati e usati. Steps 2.5–2.9 aperti; Mese 2 **non** concluso. Nessuna ratifica tecnica documentata dei supervisori.  
+**Aggiornamento 2026-11-18:** approvata operativamente e pubblicata [roadmapsparse.md](../../roadmapsparse.md). S0 documentale soltanto; audit implementativo, maschere persistite e training sparse ancora da eseguire per incarichi delimitati.  
 **Piano operativo:** [roadmap_month2.md](../../roadmap_month2.md).  
 **Autorizzazione operativa Enrico:** conversazione del 16 novembre 2026 (approvazione roadmap e avvio lavoro). Distinta da qualsiasi approvazione dei supervisori.
 
@@ -26,7 +27,7 @@ Ricognizione precedente del remoto `main` a `6fd0f15` (con diario semplificato p
 | Baseline Mese 2 (Step 2.3) | `month2_baselines_v1`, report `02_baseline_validation.md` | Eseguite in locale CPU; storico in `results/tables/`. |
 | Consolidamento post-revisione | `consolidation_v1`, report `mission_baseline_consolidation_report.md` | **Completata**: isolation/YAML/timeline corretti; replica identica entro tolleranza; in attesa Enrico/ChatGPT. |
 | Modelli / training neurali Mese 2 | U0–U7 denso chiusi su `mission/dense-unet` | Step 2.4 concluso nel perimetro dichiarato (seed 0; repliche rinviate). Sparse/GLU non avviati. |
-| GPU/allocazione Engaging | preflight + U4–U6 | **Verificati e usati** (AMF / L40S). Tetto 24 GPU-ore resta ceiling di planning, non allocazione formale consumata. |
+| GPU/allocazione Engaging | preflight + U4–U6 | **Verificati e usati** (AMF / L40S). Il ceiling storico proposto 24 GPU-ore è superato per la missione sparse (Enrico, 18 novembre): nessun tetto arbitrario in ore; profiling/plateau e walltime scheduler distinti. |
 
 ## 3. Lettura scientifica dei risultati corretti
 
@@ -84,11 +85,11 @@ Legenda stato: **default operativo** = usato per preparare protocollo/pipeline; 
 | D1 | Identità proposal 13 nov | Scopo da `docs/proposal.md`; identità con allegato inviato **non verificata**; nessuna nuova ricerca estesa in 2.1 | Limite dichiarato; non bloccante | Enrico; aperta come provenienza |
 | D2 | Split, metriche, test | Conservati 20/3/3/4; selezione = media per condizione della RMSE full-field su VAL; TEST esclusi dalla selezione; freeze richiesto per eval test | Default operativo Enrico; **senza ratifica supervisori** | Supervisori + Enrico |
 | D3 | Osservazioni primarie | Single-frame; velocità 2C ch. 11/12; sparse primario 5% siti (~819); controlli eval 1/5/20%; 3C **non attivata** | Default operativo; 3C = estensione rinviata | Supervisori + Enrico |
-| D4 | Primo modello / GLU | Matrice ridotta: U-Net densa diagnostica → U-Net mascherata + GLU deterministico minimale; condizionamento on/off (candidato FiLM) | **U7:** diagnostico denso 2.4 eseguito (p concat on/off, no FiLM). GLU/sparse **ancora aperti** (2.5–2.6). Storico 16 nov resta il default di piano; non ratifica supervisori. | Supervisori + Enrico |
+| D4 | Primo modello / GLU | Matrice ridotta: U-Net densa diagnostica → U-Net mascherata + GLU deterministico minimale; condizionamento on/off (candidato FiLM) | **U7:** diagnostico denso chiuso. **18 novembre:** sintesi Opus/Astra approvata da Enrico in roadmapsparse.md: U-Net a 7 canali, GLU deterministico p additivo, quattro screening on/off, maschere condivise/annidate; implementazione e run ancora aperti. Nessuna ratifica supervisori. | Supervisori + Enrico |
 | D5 | Target e ancore T | Target T ch.10 grezza in K; ancore ideali sincronizzate; outlier da segnalare; nessun clipping silenzioso | Default operativo; **senza ratifica supervisori** | Supervisori + Enrico |
 | D6 | Temperatura assistita | Primario K=9; sweep annidato 0/1/4/9/16/32; prima AO; testa residua appresa **non attivata** | Default operativo; testa = estensione con gate | Supervisori + Enrico |
 | D7 | Finestra temporale | Non attivata nel pilota primario | Estensione rinviata (gate D7) | Supervisori + Enrico |
-| D8 | Risorse e budget | Host previsto Engaging; tetto iniziale proposto **24 GPU-ore** = ceiling da rivalutare | **U7:** GPU/AMF verificati; U4≈28.5 min e U6≈24 min su L40S misurati. Ceiling non “consumato” come allocazione formale; rivalutazione formale ancora aperta. Storico 16 nov: GPU non ancora verificate. | Enrico + referente risorse |
+| D8 | Risorse e budget | Host previsto Engaging; tetto iniziale proposto **24 GPU-ore** = ceiling da rivalutare | **18 novembre, Enrico:** nessun tetto arbitrario di ore per run/campagna sparse; ceiling 24 GPU-h proposto superato per questa missione. Profiling, plateau, tranche iniziale 1000 epoche riesaminabile e resume; walltime scheduler separato. Fino a 4 run concorrenti solo dopo validazione e verifica slot reali. U4/U6≈28.5/24 min L40S restano misure storiche. | Enrico + referente risorse |
 | D9 | Frame seen e fold | `train_fit` vs `seen_train_eval` disgiunti; future stats fit-only solo su `train_fit`; fold interni con refit obbligatorio; candidati geometrici proposti sotto | Default operativo protocollo; stats **non ancora calcolate**; fold **non locked** | Enrico; ratifica D2 ancora aperta |
 
 ## 6. Verifica geometrica dei fold pseudo-extrap (solo metadata TRAIN)
@@ -152,3 +153,11 @@ Questo aggiornamento prevale sugli stati pendenti storici delle sezioni 5–9 pe
 - **Confronti densi:** ParamMean e GappyPOD R=32 con medesima velocità completa; controllo di scambio istantanee. Nessuna modifica dei comparatori storici sparse e nessun TEST.
 - **Stato (STOP B, storico):** U0–U3 eseguiti; U4–U7 allora non eseguiti.
 - **Stato (U7, 2026-11-17 sera):** U0–U7 chiusi nel perimetro denso dichiarato — [03_dense_velocity_diagnostic.md](03_dense_velocity_diagnostic.md). Prossimo orientamento: 2.5 audit GLU e 2.6 U-Net sparse (non autorizzati da questa chiusura).
+
+
+## 9. Decisione sparse — 2026-11-18 (America/New_York)
+
+- **Fonte/decisore:** discussione con Enrico dopo due proposte indipendenti Opus/Astra, approvazione della sintesi e richiesta esplicita di scrittura/push. Non ratifica del laboratorio.
+- **D3/D4:** [roadmapsparse.md](../../roadmapsparse.md) dettaglia 2.5–2.6: training solo 5%, eval 1/5/20% con maschere condivise/persistite e annidate mantenendo il 5% storico; U-Net nuova a 7 canali; GLU adattato deterministico, p con proiezione additiva senza bias, coordinate isotrope e sigma condivisa; batch omogenei senza padding iniziale e rifiuto esplicito dei casi non supportati. Quattro screening seed 0, poi due configurazioni da confermare con seed 1/2. Decisioni numeriche/config da verificare e congelare prima dei run, senza tuning occulto.
+- **D8:** Enrico esclude tetti arbitrari di ore, anche di campagna. Costo misurato e comunicato; plateau operativo e tranche riesaminabile, non termine orario scientifico. Il walltime reale dello scheduler si rispetta con checkpoint/resume. Quattro slot normal riferiti consentono concorrenza potenziale, da verificare sul momento; nessun job lanciato qui.
+- **Stato:** solo S0 piano; prossimo incarico previsto S1–S2 con STOP A. Steps 2.5–2.9 e Mese 2 restano aperti. Nessun training, raw download o modifica upstream per questa pubblicazione.

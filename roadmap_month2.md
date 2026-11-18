@@ -4,6 +4,7 @@
 **Autore:** Enrico Bontempi — MSc Thesis, Deng Lab, MIT  
 **Preparata:** 2026-11-16, America/New_York (UTC−05:00)  
 **Stato aggiornato 2026-11-17 (chiusura U7):** piano autorizzato operativamente da Enrico; 2.1–2.3 eseguiti. Consolidamento tecnico su `mission/baseline-consolidation` (`3cf7bf0`), integrazione in main ancora pendente. **Step 2.4 (diagnostico U-Net denso):** concluso nel perimetro dichiarato su `mission/dense-unet` (U0–U7; p_on/p_off seed 0 + controlli snapshot; repliche seed rinviate) — dettaglio [roadmap_unet.md](roadmap_unet.md) e report [docs/month2/03_dense_velocity_diagnostic.md](docs/month2/03_dense_velocity_diagnostic.md). Engaging GPU/AMF verificati e usati per U4–U6. **Mese 2 NON concluso** (2.5–2.9 aperti). Nessuna ratifica tecnica documentata dei supervisori; nessun merge su main.  
+**Aggiornamento 2026-11-18:** pubblicata [roadmapsparse.md](roadmapsparse.md), piano operativo approvato da Enrico per 2.5–2.6 e conferma sparse pertinente di 2.8. Solo pianificazione eseguita, nessun codice/run sparse. Nessun tetto arbitrario in ore per training o campagna: il ceiling proposto 24 GPU-ore è superato per questa missione; profiling, plateau, tranche riesaminabili e walltime scheduler distinti (§6.2 della roadmap sparse). Esecuzione futura a piccoli passi con Cursor.  
 **Fonti:** [proposal disponibile](docs/proposal.md), [Mese 1](roadmap_month1.md), [diario](docs/RESEARCH_LOG.md), [report LaTeX aggiornato](overleaf_month1_report/main.tex), [contesto verificato e decisioni](docs/month2/00_context_and_decisions.md).
 
 > **Limite di provenienza:** `documents_thesis/main.tex` è il report del Mese 1 del 15 novembre, identico alla copia sopra, non il proposal inviato il 13 novembre. Non ci sono altri sorgenti inclusi tramite `input/include`; è stata letta la bibliografia. L'identità fra `docs/proposal.md` e l'allegato inviato non è verificata. La ricognizione e le differenze accertabili sono nel [registro](docs/month2/00_context_and_decisions.md#1-provenienza-e-limite-sul-documento-inviato). Non modificare il proposal inviato per adeguarlo al piano.
@@ -12,7 +13,7 @@
 
 **Domanda operativa:** un modello non lineare ricava dalle osservazioni di velocità informazioni utili sulle fluttuazioni istantanee di T oltre la media parametrica e GappyPOD? Che cosa migliora aggiungendo poche misure T, separando errore di livello, struttura e cambio di condizione?
 
-Il Mese 1 ha prodotto audit, split, normalizzatori, metriche e baseline corrette. Il diario e il report più recente identificano soprattutto un **gap di stima** fra GappyPOD e la proiezione oracle della T vera sulla base POD; non dimostrano impossibilità fisica della ricostruzione o incapacità generale delle basi lineari. Baseline e documenti sono disponibili; l'accordo tecnico con i supervisori richiesto dallo Step 1.6 è ancora aperto. È disponibile il codice GLU originale, ma non ci sono ancora modelli neurali di tesi implementati o allenati.
+Il Mese 1 ha prodotto audit, split, normalizzatori, metriche e baseline corrette. Il diario e il report più recente identificano soprattutto un **gap di stima** fra GappyPOD e la proiezione oracle della T vera sulla base POD; non dimostrano impossibilità fisica della ricostruzione o incapacità generale delle basi lineari. Baseline e documenti sono disponibili; l'accordo tecnico con i supervisori richiesto dallo Step 1.6 è ancora aperto. È disponibile il codice GLU originale. Il diagnostico U-Net denso è stato implementato, allenato e chiuso in 2.4; i neurali sparse e l'adattamento GLU restano da eseguire secondo [roadmapsparse.md](roadmapsparse.md).
 
 Il risultato minimo del Mese 2 è una pipeline riproducibile, baseline qualificate sullo stesso protocollo e un primo ricostruttore neurale con confronto temperature-free/assisted su condizioni viste ma temporalmente separate e su VAL. Un pilot controllato sulle condizioni escluse, dopo congelamento, prepara i mesi successivi; non anticipa un'intera campagna di generalizzazione. “Mese” significa fase: si procede appena i criteri sono soddisfatti, senza attese artificiali e senza spunte basate solo su codice scritto.
 
@@ -79,14 +80,14 @@ Il risultato minimo del Mese 2 è una pipeline riproducibile, baseline qualifica
 
 - **Stato:** `[x] Concretizzato come default operativo (2026-11-16)`; **classe:** I + S.
 - **Cosa è stato chiuso qui:** protocollo frame versionato, contratto pilota versionato, registro D1–D9 aggiornato con autorizzazione Enrico vs assenza di ratifica supervisori, verifica geometrica dei fold, controlli YAML/conteggi.
-- **Cosa resta esplicitamente pendente (non spuntato come “approvato dai supervisori”):** ratifica tecnica Deng Lab; D1 provenienza allegato; lock scientifico finale dei fold; rivalutazione formale del tetto 24 GPU-ore (costi U4/U6 già misurati su L40S); Steps 2.5–2.9; merge main.
+- **Cosa resta esplicitamente pendente (non spuntato come “approvato dai supervisori”):** ratifica tecnica Deng Lab; D1 provenienza allegato; lock scientifico finale dei fold; definizione operativa delle risorse dei prossimi run (il ceiling proposto 24 GPU-ore è superato per la missione sparse, decisione Enrico 18 novembre; costi U4/U6 già misurati su L40S); Steps 2.5–2.9; merge main.
 - **Problema:** quali risultati sono affidabili e quali scelte restano ipotesi? Senza questo passaggio gli agenti possono implementare tre architetture “raccomandate” come se fossero approvate.
 - **Motivazione/dipendenze:** chiudere la parte decisionale operativa aperta dello Step 1.6 lato protocollo. Riferimenti e discrepanze sono già raccolti nel registro; non occorre ricominciare l'audit del dataset.
 - **Attività concrete (eseguite in 2.1):**
   1. Registrati D1–D9 distinguendo autorizzazione Enrico, default operativi, verifiche tecniche pendenti ed estensioni rinviate; conservata l’assenza di ratifica supervisori documentata. Provenienza proposal lasciata come limite dichiarato, non bloccante.
   2. Creati `configs/splits/month2_frame_protocol.yaml` (`month2_frame_protocol_v1`) e `configs/experiments/month2_pilot.yaml` (`month2_pilot_v1`).
   3. Verificati gli esempi fold: `20NH3_0.85.h5` è **on_boundary** (non estrapolazione geometrica); `80NH3_1.2.h5` è **outside**. Proposta alternativa lean `40NH3_0.85.h5` + `80NH3_1.2.h5` (non locked). Nessun fitting sui fold.
-  4. Budget: tetto **24 GPU-ore** registrato come ceiling proposto da rivalutare col profiling; Engaging host previsto; GPU/allocazione non verificate.
+  4. Budget **storico Step 2.1:** tetto **24 GPU-ore** allora proposto, Engaging allora non verificato. **Aggiornamento 18 novembre:** questo ceiling non si applica alla missione sparse; nessun tetto arbitrario in ore, profiling e plateau secondo roadmapsparse.md.
 - **Output:** `docs/month2/00_context_and_decisions.md` aggiornato; YAML sopra; entry nel diario.
 - **Verifiche/completamento:** parsing YAML OK; conteggi frame e disgiunzione fit/seen OK; nessun claim di normalizzazione Mese 2 già calcolata; nessun “approved supervisori” inventato.
 - **Passaggio:** protocollo tecnico sufficiente per 2.2; i run scientifici 2.3–2.8 restano subordinati a risorse verificate e alle decisioni applicabili ancora aperte.
@@ -135,7 +136,7 @@ Il risultato minimo del Mese 2 è una pipeline riproducibile, baseline qualifica
 
 ### Step 2.5 — Audit dell'interfaccia GLU e scelta dell'adattamento minimo
 
-- **Stato:** `[ ] Da completare`; **classe:** I + S; eseguibile mentre si prepara 2.2–2.4.
+- **Stato:** `[ ] Da completare`; **classe:** I + S. Piano operativo ora in [roadmapsparse.md](roadmapsparse.md), S1/S3/S4; audit prima del confronto GLU, nessuna implementazione sparse già dichiarata.
 - **Problema:** come riusare la release effettiva senza assumere che paper, codice e nostro task abbiano input/loss identici?
 - **Motivazione/dipendenze:** sorgenti già acquisiti in `external/GLU_Reconstruction/`; tutti gli adattamenti devono vivere nel pacchetto di tesi. Non lanciare il trainer upstream con split temporale e preprocessing propri come se implementasse il nostro protocollo.
 - **Attività concrete:**
@@ -145,12 +146,12 @@ Il risultato minimo del Mese 2 è una pipeline riproducibile, baseline qualifica
   4. Primo candidato: backbone globale/locale deterministico, distanza geometrica uniforme (importance=1), niente varianza/Beta o propagatore. Denominarlo **GLU adattato, ablation deterministica**, non riproduzione integrale del paper. Condizionamento semplice confrontabile con 2.4; nessuna aggiunta simultanea di FiLM + prior ParamMean + importance condizionata.
   5. Profilare numero token, self-attention e decoder; chunking delle query con equivalenza numerica. Se il costo a 20% è eccessivo, registrare il limite e ridurre batch/ottimizzare a parità di input; non togliere silenziosamente sensori solo a un concorrente.
 - **Output/file:** futuro `docs/month2/04_glu_release_adaptation.md` con tabella modulo→riuso/modifica/esclusione, hash dei sorgenti; `configs/models/glu_minimal.yaml`; test d'interfaccia in `tests/test_glu_adapter.py` prima dei run.
-- **Verifiche/completamento:** forme, gradienti, maschere padding, input isolation, input permutati, chunked/full equivalenti in eval; nessuna dipendenza da tempo futuro o T target; `external/` identico alla base. Le 100000 epoche e batch=256 della config upstream non vengono copiate come budget ragionevole.
+- **Verifiche/completamento:** forme, gradienti, input isolation, input permutati, chunked/full equivalenti in eval; primo protocollo GLU con batch omogenei senza padding e rifiuto esplicito degli input padded, come delimitato in [roadmapsparse.md](roadmapsparse.md); test validità end-to-end obbligatori prima di qualunque futuro supporto padding; nessuna dipendenza da tempo futuro o T target; `external/` identico alla base. Le 100000 epoche e batch=256 della config upstream non vengono copiate come budget ragionevole.
 - **Passaggio:** D4 registra quale adattamento implementare. Se l'audit scopre un costo incompatibile, proseguire con U-Net mascherata e registrare GLU rinviato; non considerare completato il confronto GLU.
 
 ### Step 2.6 — Ricostruzione temperature-free da velocità sparsa
 
-- **Stato:** `[ ] Da implementare e confrontare`; **classe:** I + E.
+- **Stato:** `[ ] Da implementare e confrontare`; **classe:** I + E. [roadmapsparse.md](roadmapsparse.md) definisce osservazioni persistite, quattro screening, conferma mirata e STOP; nessun training autorizzato dalla sola pubblicazione.
 - **Problema:** quanto errore aggiungono osservazioni incomplete e rappresentazione/architettura, rispetto al diagnostico denso?
 - **Motivazione/dipendenze:** 2.4, e 2.5 per GLU. Serve prima una baseline sparse neurale semplice, poi il candidato del laboratorio con gli stessi input.
 - **Attività concrete:**
@@ -231,7 +232,7 @@ Opus e Astra hanno revisionato indipendentemente `822ed52` e concluso «pronti d
 1. Prima di ogni task leggere istruzioni correnti, `git status`, remoto aggiornato, diario, questa roadmap e decisioni applicabili. Non importare esperimenti o diario di `thesis-research`/HONF.
 2. Prendere un solo step o un sotto-obiettivo esplicito con criterio d'uscita. I percorsi futuri sopra sono proposti, non file già esistenti né autorizzazione a eseguire l'intera fase in autonomia.
 3. Prima della modifica cercare moduli/config esistenti e riusarli. Conservare `external/GLU_Reconstruction/` intatto. Code/config/test di tesi sotto `src/`, `configs/`, `scripts/`, `tests/`.
-4. Un run parte soltanto dopo smoke CPU, validazione protocollo, dispositivo e tetto di costo verificati e registrati. CPU locale ammessa se fattibile; GPU/Engaging richiedono verifica effettiva quando usati. Un pilot breve può profilare il costo prima del run completo; mai lanciare il default upstream da 100000 epoche.
+4. Un run parte soltanto dopo smoke CPU, validazione protocollo, dispositivo, costo previsto e regole di arresto verificati e registrati. Per la missione sparse Enrico ha escluso tetti arbitrari di ore (18 novembre): applicare profiling, plateau e tranche riesaminabili di [roadmapsparse.md](roadmapsparse.md), rispettando separatamente il walltime scheduler. CPU locale ammessa se fattibile; GPU/Engaging richiedono verifica effettiva quando usati. Un pilot breve può profilare il costo prima del run completo; mai lanciare il default upstream da 100000 epoche.
 5. Run manifest minimo: commit, config/hash, dataset/shard e frame ID/hash, normalizer/prior/POD hash, input ammessi, p/K/2C/3C/tempo, seed training e maschere, device/versioni, ottimizzazioni/query, criterio checkpoint, tempo/RAM/VRAM, output persistenti e stato esito.
 6. Non versionare raw, cache o checkpoint pesanti; versionare configurazioni, manifest, tabelle compatte e report. Non far riscrivere gli artefatti Mese 1 agli script Mese 2.
 7. Diario: distinguere ispezionato, implementato, eseguito, verificato, proposto e approvato. Spuntare lo step solo con tutti i suoi criteri; annotare esplicitamente optional non eseguiti e motivazione.
