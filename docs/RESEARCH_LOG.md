@@ -284,13 +284,21 @@ Questo file è il diario del progetto di tesi in `official_thesis` (ricostruzion
 
 - **Runner:** `sparse_scientific_loop.py` (U-Net/GLU) allinea MSE full-field, AdamW 1e-3/1e-4, clip 1, fp32 no AMP/TF32/compile, batch 8, warmup 950, ReduceLROnPlateau VAL 5%×3 repl, eval/10, first absolute min, early-stop 200/15/0.1% con reset su calo LR, tranche 1000 estendibile, TRAIN/seen diagnostici.
 - **Checkpoint/resume:** complete vs partial; identity lock; mask `set_epoch`; buffer geometria GLU; test sintetici su LR/contatori/RNG/history.
-- **Profiling:** config diagnostica; sbatch U-Net+GLU su AMF normal L40S (no preemptable fallback). **Submitted — non completato.**
-  - SHA eseguito: `b844944abc17ecbcdf83d044fc4b8f5ccf8db520`
-  - U-Net job **29552531** → `/home/bontempi/orcd/pool/official_thesis_runs/s4_profile_sparse_unet_29552531`
-  - GLU job **29552532** → `/home/bontempi/orcd/pool/official_thesis_runs/s4_profile_adapted_glu_29552532`
-- **GappyPOD 1/20%:** lambdas congelati (p_off 0.001, p_on 0.01); eval **aperta** — mancano artifact POD persistiti; niente refit silenzioso.
-- **Engaging preflight:** QoS AMF `gres/gpu=4`; coda personale solo preemptable HONF pending; headroom AMF libero al check.
-- **STOP submission:** nessun polling; freeze/S5 dopo esiti Enrico.
+- **Profiling submitted (SHA `b844944`):** record in `docs/month2/s4_profiling_submission_record.md`.
+  - U-Net **29552531** @ `node3504` L40S → runs `.../s4_profile_sparse_unet_29552531/` + `.../official_thesis/slurm-29552531.out`
+  - GLU **29552532** @ `node3507` L40S → runs `.../s4_profile_adapted_glu_29552532/` + `.../slurm-29552532.out`
+  - One-shot: entrambi **FAILED** (`ExitCode=1`, `ModuleNotFoundError: einops`). Nessun rilancio/auto-fix in questa turno. HONF 29547931/32 non toccati.
+- **S5 preparazione (solo):** quattro candidati YAML + quattro sbatch + `scripts/16_train_sparse_scientific.py`; `scientific_training_authorized: false`; walltime/mem/microbatch **PROVISIONAL**; nessuna submission, nessun afterok.
+- **GappyPOD 1/20%:** ancora aperta (artifact POD mancanti).
+- **S4 non concluso; freeze scientifico non dichiarato.**
+
+---
+
+## 2026-11-18 — S5 candidates prepared (no submit)
+
+- Index `configs/experiments/month2_sparse_s5_screening.yaml`.
+- U-Net/GLU × p_on/p_off seed 0; run-id e directory separati; init fresca; gate `AUTHORIZE_S5_SUBMIT` + CLI `--authorize-scientific-s5`.
+- STOP: attesa decisione Enrico su profiling.
 
 ---
 

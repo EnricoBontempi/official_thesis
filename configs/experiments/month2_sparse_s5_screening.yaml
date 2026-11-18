@@ -1,0 +1,43 @@
+# S5 four-way screening index (PREPARED ONLY — not authorized, not submitted).
+# Depends on S4 profiling outputs before operational walltime/mem/microbatch freeze.
+
+experiment_id: month2_sparse_s5_screening_v1
+status: prepared_awaiting_s4_profiling_decision
+scientific_training_authorized: false
+s5_submission_authorized: false
+auto_launch_after_profiling: false
+afterok_dependencies: false
+
+inherits:
+  protocol: configs/experiments/month2_sparse_protocol.yaml
+  scientific_contract: configs/experiments/month2_sparse_scientific_candidate.yaml
+  runner: src/combustion_recon/training/sparse_scientific_loop.py
+
+candidates:
+  - configs/experiments/s5_sparse_unet_pon_seed0.yaml
+  - configs/experiments/s5_sparse_unet_poff_seed0.yaml
+  - configs/experiments/s5_adapted_glu_pon_seed0.yaml
+  - configs/experiments/s5_adapted_glu_poff_seed0.yaml
+
+launchers_prepared_not_submitted:
+  - scripts/engaging/s5_unet_pon.sbatch
+  - scripts/engaging/s5_unet_poff.sbatch
+  - scripts/engaging/s5_glu_pon.sbatch
+  - scripts/engaging/s5_glu_poff.sbatch
+
+shared_rules:
+  seed: 0
+  site_fraction: 0.05
+  K: 0
+  init: fresh_seed0_no_profile_or_overfit_weights
+  refuse_reuse_s4_profiling_checkpoints: true
+  separate_run_directories: true
+  observations_architecture_supervision: frozen_from_protocol_unchanged
+
+operational_provisional_pending_s4_profiling:
+  sbatch_time: PROVISIONAL
+  sbatch_mem: PROVISIONAL
+  microbatch_size: PROVISIONAL
+  note: >
+    Fill only after Enrico reviews S4 profiling outputs. Do not treat YAML
+    placeholders or partition MaxTime as a scientific hour cap freeze.

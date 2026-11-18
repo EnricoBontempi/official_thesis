@@ -277,7 +277,17 @@ def assert_sparse_scientific_candidate_contract(cand: dict[str, Any]) -> dict[st
         "artifacts",
         "decision",
     }
-    unknown_top = sorted(set(cand) - required_top - {"command_template", "notes", "family"})
+    unknown_top = sorted(
+        set(cand)
+        - required_top
+        - {
+            "command_template",
+            "notes",
+            "family",
+            "s5_submission_authorized",
+            "operational_provisional_pending_s4_profiling",
+        }
+    )
     if unknown_top:
         raise ValueError(f"unknown sparse scientific top-level keys: {unknown_top}")
 

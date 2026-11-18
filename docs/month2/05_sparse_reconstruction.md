@@ -1,7 +1,8 @@
 # Sparse reconstruction — S1–S3 technical status
 
-**Status:** S4 **IN CORSO** — runner scientifico completato localmente; profiling Engaging **submitted** (non completato). Nessuno screening S5.  
-**Branch:** `mission/dense-unet`.
+**Status:** S4 **IN CORSO** (non concluso, config scientifiche **non** congelate). Profiling jobs submitted poi **FAILED** (`einops` mancante). Candidati S5 **preparati**, **non** sottomessi.  
+**Branch:** `mission/dense-unet`.  
+**Record submission:** [s4_profiling_submission_record.md](s4_profiling_submission_record.md).
 
 ---
 
@@ -101,11 +102,12 @@ Artifacts: `results/month2/sparse_s3_glu_diagnostic_overfit/` (`report.json`, ma
 | Runner | `sparse_scientific_loop.py` riusa schedule/checkpoint U4 (warmup 950, plateau VAL 5%×3 repl, early-stop, tranche 1000, extend esplicita) |
 | Config | `month2_sparse_scientific_candidate.yaml` (S5 **non** autorizzato); profiling `month2_sparse_s4_profiling.yaml` |
 | Resume tests | `tests/test_sparse_scientific_trainer.py` (warmup/plateau/contatori/LR/RNG/mask epoch/GLU buffers) |
-| Profiling jobs | **submitted** (non completati): U-Net `29552531`, GLU `29552532`; SHA `b844944`; AMF `mit_normal_gpu` / L40S |
-| Output attesi | `/home/bontempi/orcd/pool/official_thesis_runs/s4_profile_sparse_unet_29552531/` e `.../s4_profile_adapted_glu_29552532/` |
-| GappyPOD 1/20% | config preparata; **bloccata**: oggetti POD fittati non persistiti da `month2_baselines_v1` (niente refit silenzioso) |
+| Profiling jobs | U-Net **29552531** (`node3504` L40S), GLU **29552532** (`node3507` L40S); SHA `b844944`; one-shot state **FAILED** (`einops` missing). Nessun rilancio automatico. |
+| Log assoluti | `.../official_thesis/slurm-29552531.out`, `.../slurm-29552532.out`; run dirs sotto `.../official_thesis_runs/s4_profile_*_<jobid>/` |
+| S5 prep | Quattro YAML + quattro sbatch + `scripts/16_train_sparse_scientific.py`; auth gates; walltime/mem/microbatch **PROVISIONAL**; **nessuna** submission / afterok |
+| GappyPOD 1/20% | ancora **bloccata** (artifact POD mancanti) |
 
-Freeze finale e passaggio a S5: **dopo** che Enrico riporta gli output di profiling.
+S4 non dichiarato concluso. Lancio S5 solo dopo decisione Enrico sugli output profiling.
 
 ---
 

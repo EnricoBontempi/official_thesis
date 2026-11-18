@@ -1,10 +1,12 @@
 # Executable sparse protocol contract (S1–S2). Unknown scientific keys are refused.
 protocol_id: month2_sparse_v1
 roadmap: roadmapsparse.md
-status: s4_in_progress_profiling_submitted
+status: s4_in_progress_profiling_jobs_failed_einops_s5_prepared_not_submitted
 scientific_training_authorized: false
 s4_profiling_diagnostic_only: true
 s5_screening_authorized: false
+s5_candidates_prepared: true
+s5_auto_launch: false
 
 roles:
   train_fit: 760
@@ -87,6 +89,21 @@ gappypod_nested:
   config: configs/experiments/month2_sparse_gappypod_nested.yaml
   frozen_lambdas_from_5pct: true
   status: blocked_missing_fitted_pod_artifacts
+
+s5_screening_prepared:
+  index: configs/experiments/month2_sparse_s5_screening.yaml
+  candidates:
+    - configs/experiments/s5_sparse_unet_pon_seed0.yaml
+    - configs/experiments/s5_sparse_unet_poff_seed0.yaml
+    - configs/experiments/s5_adapted_glu_pon_seed0.yaml
+    - configs/experiments/s5_adapted_glu_poff_seed0.yaml
+  launchers_not_submitted:
+    - scripts/engaging/s5_unet_pon.sbatch
+    - scripts/engaging/s5_unet_poff.sbatch
+    - scripts/engaging/s5_glu_pon.sbatch
+    - scripts/engaging/s5_glu_poff.sbatch
+  train_entrypoint: scripts/16_train_sparse_scientific.py
+  note: scientific_training_authorized remains false; no afterok; no auto-launch
 
 forbidden_this_mission:
   - scientific_training_760

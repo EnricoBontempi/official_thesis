@@ -3,7 +3,7 @@
 **Progetto:** esclusivamente `EnricoBontempi/official_thesis`, MIT / Deng Lab.  
 **Data:** 2026-11-18, America/New_York.  
 **Base verificata:** `87d1e3f40826a9343c3c2ce19d140d481b911619`, chiusura U7, branch `mission/dense-unet`.  
-**Stato:** S0–S3 chiusi; **S4 IN CORSO** su `mission/dense-unet` (runner scientifico locale pronto; profiling Engaging submitted, non completato; GappyPOD 1/20% bloccato da artifact POD mancanti). Nessuno screening S5.  
+**Stato:** S0–S3 chiusi; **S4 IN CORSO** (profiling jobs 29552531/29552532 FAILED su `einops`; non concluso; freeze non dichiarato). Candidati S5 preparati in-repo, **non** sottomessi. GappyPOD 1/20% ancora bloccato.  
 **Piano principale:** [roadmap_month2.md](roadmap_month2.md). Questo documento dettaglia **2.5–2.6 e la sola conferma sparse pertinente di 2.8**; non chiude il Mese 2 e non autorizza assisted o TEST.  
 **Esecutore:** Cursor, per incarichi delimitati successivi. Pubblicare il piano non autorizza a percorrerlo automaticamente.
 
@@ -276,8 +276,8 @@ Estensioni di tranche esplicite, checkpoint completi distinti da partial; no res
 - [x] S1 — Osservazioni persistite + join baseline storico 3309/3309 @5% (hex) + audit GLU documentale.
 - [x] S2 — U-Net sparse/test/overfit/resume diagnostico. STOP A.
 - [x] S3 — GLU adattato deterministico, test e piccolo overfit TRAIN. **STOP B.**
-- [ ] S4 — Baseline/profiling/freeze. **IN CORSO** (runner+submission; attesa output Enrico). STOP C.
-- [ ] S5 — Screening seed 0. STOP D.
+- [ ] S4 — Baseline/profiling/freeze. **IN CORSO** (submitted→FAILED einops; attesa decisione Enrico; freeze non fatto). STOP C.
+- [ ] S5 — Screening seed 0 (**candidati preparati, non sottomessi**). STOP D.
 - [ ] S6 — Confronti/coperture/snapshot e scelta finalisti. STOP E.
 - [ ] S7 — Repliche/chiusura con limiti o rinvii dichiarati. STOP F.
 
