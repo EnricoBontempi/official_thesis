@@ -553,14 +553,15 @@ def _run_scientific_epoch_training(
             *extra_sources,
         ]
     )
-    if not provenance["working_tree"]["clean"]:
-        # Allow only if caller explicitly opts in; scientific default is clean tree.
-        if not getattr(args, "allow_dirty_tree", False):
-            raise SystemExit(
-                "Refusing scientific run with dirty/untracked working tree. "
-                "Commit scientific code/config first, or pass --allow-dirty-tree "
-                f"after review. status={provenance['working_tree']['status_porcelain']}"
-            )
+    dirty_tracked = list(provenance["working_tree"].get("dirty_entries") or [])
+    if dirty_tracked and not getattr(args, "allow_dirty_tree", False):
+        raise SystemExit(
+            "Refusing scientific run with dirty tracked files. "
+            "Commit scientific code/config first, or pass --allow-dirty-tree "
+            f"after review. dirty={dirty_tracked}"
+        )
+    # Untracked entries (e.g. prior run outputs under results/) are recorded in
+    # provenance but do not block when tracked scientific sources are clean.
 
     cache_root = Path(args.cache_root)
     manifest = json.loads((cache_root / "manifest.json").read_text())
