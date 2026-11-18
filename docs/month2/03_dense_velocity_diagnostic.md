@@ -3,7 +3,9 @@
 **Project:** `EnricoBontempi/official_thesis` only (MIT/Deng Lab).  
 **Roadmap:** [roadmap_unet.md](../../roadmap_unet.md)  
 **Phases:** U0–U5 **executed** (U5 = snapshot-swap control on U4 best). U6–U7 not started.  
-**Not claimed:** Step 2.4 / mission complete; supervisor ratification; p_off/other seeds; GLU; sparse success.
+**Not claimed:** Step 2.4 / mission complete; supervisor ratification; other seeds beyond U6 p_off seed 0; GLU; sparse success.
+
+**Opus external review (U4/U5, reported by Enrico):** usable with reserves; no invalidating defect; CSV metrics recomputed; no checkpoint/cache/raw re-inference. Confirmed aligned replay, swap pairing/transform, VAL non-independence, best 26.931 K @160 / last 28.055 K @730. U5 baseline refit noted as mandate deviation but per-frame ≈ U3 (~5.5e-12). Not supervisor ratification.
 
 ## Status legend
 
@@ -150,12 +152,13 @@ Full curves, per-frame best/last, and scheduler counters: `auto_report.md`, `eva
 - [x] U0–U2 (STOP A) + corrective A1–A4  
 - [x] U3 profiling + dense GappyPOD — **STOP B**  
 - [x] U4 Engaging p_on seed 0  
-- [x] U5 snapshot-swap control — **STOP C (discuss before U6)**  
-- [ ] U6–U7 pending  
+- [x] U5 snapshot-swap control — **STOP C**  
+- [~] U6 p_off seed 0 (+ snapshot control) — this mandate; other seeds deferred  
+- [ ] U7 pending  
 
 ## Explicit non-claims
 
 - Step 2.4 / Month-2 not complete.  
-- Single seed; VAL used for U4 selection/scheduler/stop.  
-- No p_off/other seeds/GLU/sparse/T-sensors/TEST in this mandate.  
-- Swap result ≠ physical mechanism proof or information ceiling.
+- Single paired seed 0 for p_on/p_off; VAL used for selection/scheduler/stop.  
+- No other seeds / GLU / sparse / T-sensors / TEST in this mandate.  
+- Swap or p_off gap ≠ physical mechanism proof, information ceiling, or universal uselessness of parameters.

@@ -2,7 +2,7 @@
 
 **Progetto:** esclusivamente `EnricoBontempi/official_thesis`, MIT/Deng Lab.  
 **Preparata:** 2026-11-17, America/New_York.  
-**Stato:** su `mission/dense-unet`, **U0–U5 eseguiti** (U4 Engaging p_on seed 0; U5 snapshot-swap su best@160). **STOP C** per discussione prima di U6. Ratifica supervisori **non** documentata/non inventata.  
+**Stato:** su `mission/dense-unet`, **U0–U5 eseguiti**; **U6 p_off seed 0** (training + snapshot-swap) autorizzato/in consegna — altri seed ancora rinviati. Ratifica supervisori **non** documentata/non inventata. Revisione Opus esterna su U4/U5: «utilizzabile con riserve» (non ratifica supervisori).  
 **Piano principale:** [roadmap_month2.md](roadmap_month2.md), dettaglio dello **Step 2.4**, non roadmap concorrente del Mese 2.  
 **Missione precedente:** [roadmap_missione.md](roadmap_missione.md); consolidamento completato sul branch dedicato, integrazione in main ancora pendente alla ricognizione.  
 **Esecutore:** Cursor IDE, un incarico delimitato alla volta, con restituzione dei risultati a Enrico/ChatGPT.
@@ -248,5 +248,5 @@ Tutti gli step sono inizialmente **[ ] non eseguiti**. Codice presente non equiv
 - [x] U3 — Profiling e GappyPOD denso; budget proposto. **STOP B.** (U4 non avviato)
 - [x] U4 — Primo training p_on seed 0 eseguito su Engaging (job `29465586`, L40S, early stop ep. 730, best VAL 26.93 K @160).
 - [x] U5 — Controllo istantanee (job `29471596`): aligned replay OK; VAL 26.93→96.55 K allo scambio. **STOP C.**
-- [ ] U6 — p_off/seed eseguiti oppure rinvii registrati.
+- [~] U6 — p_off seed 0 (+ snapshot control) in questo incarico; altri seed **rinviati** alla discussione.
 - [ ] U7 — Report finale e scelta del prossimo incarico.

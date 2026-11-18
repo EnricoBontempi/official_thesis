@@ -45,8 +45,10 @@ from combustion_recon.training.epoch_loop import (
     EpochDenseTrainer,
     EpochTrainConfig,
     assert_u4_candidate_contract,
+    assert_u6_candidate_contract,
     make_epoch_loader,
 )
+from combustion_recon.training.run_provenance import collect_run_provenance
 from combustion_recon.training.trainer import (
     DenseUNetTrainer,
     TrainConfig,
@@ -58,6 +60,7 @@ from combustion_recon.training.trainer import (
 )
 
 U4_CANDIDATE_CFG = ROOT / "configs" / "experiments" / "month2_dense_unet_u4_candidate.yaml"
+U6_CANDIDATE_CFG = ROOT / "configs" / "experiments" / "month2_dense_unet_u6_candidate.yaml"
 
 
 def _rss_gb() -> float:
@@ -465,26 +468,24 @@ def cmd_hash_cache(args: argparse.Namespace) -> int:
     return 0
 
 
-def cmd_train_u4(args: argparse.Namespace) -> int:
-    """U4 scientific epoch training — refused unless explicitly authorized."""
-    if not args.authorize_scientific_u4:
-        raise SystemExit(
-            "Refusing U4 scientific training: pass --authorize-scientific-u4 only after "
-            "explicit Enrico authorization for the Engaging single p_on seed-0 run."
-        )
-    if args.auto_lr_fallback_3e4:
+def _run_scientific_epoch_training(
+    args: argparse.Namespace,
+    *,
+    cand: dict[str, Any],
+    contract_payload: dict[str, Any],
+    p_conditioning: bool,
+    authorize_flag_name: str,
+    candidate_sha_key: str,
+    init_policy: str,
+    provenance_note: str,
+    extra_sources: list[str],
+) -> int:
+    """Shared U4/U6 epoch-training path; only experimental knob is p_conditioning."""
+    if getattr(args, "auto_lr_fallback_3e4", False):
         raise SystemExit(
             "Automatic lr=3e-4 fallback is disabled; "
             "do not pass --auto-lr-fallback-3e4 without a separate decision."
         )
-    if args.p_off:
-        raise SystemExit("Only p_on seed 0 is authorized for this U4 Engaging run.")
-
-    cand = load_yaml(args.config)
-    try:
-        u4_contract = assert_u4_candidate_contract(cand)
-    except ValueError as exc:
-        raise SystemExit(f"U4 candidate contract rejected: {exc}") from exc
     if not cand.get("scientific_training_authorized"):
         raise SystemExit("candidate YAML scientific_training_authorized must be true")
     if not cand.get("budget_definitively_approved"):
@@ -521,7 +522,7 @@ def cmd_train_u4(args: argparse.Namespace) -> int:
         else int(model_cfg.get("base_channels", 32)),
         "device": device,
         "wall_time_cap_hours": wall_hours,
-        "p_conditioning": True,
+        "p_conditioning": bool(p_conditioning),
         "eval_every_epochs": int(tc["eval_every_epochs"]),
         "early_stop_min_epochs": int(early["min_epochs"]),
         "early_stop_patience_evals": int(early["patience_evals"]),
@@ -531,13 +532,35 @@ def cmd_train_u4(args: argparse.Namespace) -> int:
         "eval_train_fit": True,
     }
     if int(overrides["seed"]) != 0:
-        raise SystemExit("Only seed 0 is authorized for this U4 Engaging run.")
+        raise SystemExit("Only seed 0 is authorized for this Engaging scientific run.")
     if float(overrides["lr"]) != 1e-3 and not args.allow_nondefault_lr:
         raise SystemExit("Non-default lr requires --allow-nondefault-lr (no silent fallback)")
     if int(overrides["n_epochs"]) > 1000 and not args.allow_extend_max_epochs:
         raise SystemExit(
             "n_epochs > 1000 requires --allow-extend-max-epochs and an explicit decision"
         )
+    if bool(tc.get("p_conditioning", True)) != bool(p_conditioning):
+        raise SystemExit(
+            f"CLI/path p_conditioning={p_conditioning} disagrees with candidate YAML "
+            f"p_conditioning={tc.get('p_conditioning')}"
+        )
+
+    provenance = collect_run_provenance(
+        extra_sources=[
+            str(Path(args.config).resolve().relative_to(ROOT))
+            if Path(args.config).resolve().is_relative_to(ROOT)
+            else str(args.config),
+            *extra_sources,
+        ]
+    )
+    if not provenance["working_tree"]["clean"]:
+        # Allow only if caller explicitly opts in; scientific default is clean tree.
+        if not getattr(args, "allow_dirty_tree", False):
+            raise SystemExit(
+                "Refusing scientific run with dirty/untracked working tree. "
+                "Commit scientific code/config first, or pass --allow-dirty-tree "
+                f"after review. status={provenance['working_tree']['status_porcelain']}"
+            )
 
     cache_root = Path(args.cache_root)
     manifest = json.loads((cache_root / "manifest.json").read_text())
@@ -566,22 +589,30 @@ def cmd_train_u4(args: argparse.Namespace) -> int:
         )
     out_dir.mkdir(parents=True, exist_ok=True)
     write_json(out_dir / "cache_payload_hashes.json", payload_hashes)
+    write_json(out_dir / "run_provenance.json", provenance)
 
     set_seed(overrides["seed"])
     model = build_dense_unet_from_config(
         init_seed=overrides["seed"], base_channels=overrides["base_channels"]
     )
     train_ds = DenseUNetCacheDataset(
-        "train_fit", cache_root=cache_root, p_conditioning=True
+        "train_fit", cache_root=cache_root, p_conditioning=p_conditioning
     )
     seen_ds = DenseUNetCacheDataset(
-        "seen_train_eval", cache_root=cache_root, p_conditioning=True
+        "seen_train_eval", cache_root=cache_root, p_conditioning=p_conditioning
     )
     val_ds = DenseUNetCacheDataset(
-        "val_eval", cache_root=cache_root, p_conditioning=True
+        "val_eval", cache_root=cache_root, p_conditioning=p_conditioning
     )
     if len(train_ds) != 760:
         raise SystemExit(f"train_fit must have 760 frames, got {len(train_ds)}")
+    # Hard isolation check before any update: p_off channels must be exactly zero.
+    if not p_conditioning:
+        probe = train_ds[0]["model_inputs"]["input_tensor"]
+        if int(torch.count_nonzero(probe[4])) != 0 or int(torch.count_nonzero(probe[5])) != 0:
+            raise SystemExit("p_off isolation failed: parameter channels are not zero")
+        if "op_params" in train_ds[0]["model_inputs"]:
+            raise SystemExit("p_off isolation failed: op_params present in model_inputs")
 
     ecfg = EpochTrainConfig(
         n_epochs=overrides["n_epochs"],
@@ -598,7 +629,7 @@ def cmd_train_u4(args: argparse.Namespace) -> int:
         device=overrides["device"],
         eval_every_epochs=overrides["eval_every_epochs"],
         wall_time_cap_s=wall_hours * 3600.0,
-        p_conditioning=True,
+        p_conditioning=bool(p_conditioning),
         base_channels=overrides["base_channels"],
         allow_lr_fallback_3e4=False,
         early_stop_min_epochs=overrides["early_stop_min_epochs"],
@@ -627,10 +658,10 @@ def cmd_train_u4(args: argparse.Namespace) -> int:
         "experiment_id": cand["experiment_id"],
         "paired_experiment": cand.get("paired_experiment"),
         "decision": cand.get("decision"),
-        "u4_contract": u4_contract,
-        "git_commit": _git_head(),
+        "contract": contract_payload,
+        "git_commit": provenance["git_commit"] or _git_head(),
         "dense_config_sha256": sha256_file(Path(args.dense_config)),
-        "u4_candidate_sha256": sha256_file(Path(args.config)),
+        candidate_sha_key: sha256_file(Path(args.config)),
         "model_config_sha256": sha256_file(ROOT / "configs/models/unet_small.yaml"),
         "stats_sha256": contract["stats_sha256"],
         "cache_data_fingerprints": manifest.get("data_fingerprints")
@@ -642,23 +673,35 @@ def cmd_train_u4(args: argparse.Namespace) -> int:
             "n_params": model.count_parameters(),
         },
         "seed": overrides["seed"],
-        "p_conditioning": True,
+        "p_conditioning": bool(p_conditioning),
+        "variant": "p_on" if p_conditioning else "p_off",
         "device": overrides["device"],
         "precision": "fp32",
         "allow_tf32": overrides["allow_tf32"],
         "torch_version": torch.__version__,
         "cuda_version": getattr(torch.version, "cuda", None),
         "gpu_name": (
-            torch.cuda.get_device_name(0) if device.startswith("cuda") and torch.cuda.is_available() else None
+            torch.cuda.get_device_name(0)
+            if device.startswith("cuda") and torch.cuda.is_available()
+            else None
         ),
         "effective_epoch_config": ecfg.__dict__,
         "overrides": overrides,
         "budget_definitively_approved": True,
-        "init_policy": "fresh_seed_no_overfit_or_profile_weights",
-        "authorize_scientific_u4": True,
-        "provenance": "configs consumed via assert_u4_candidate_contract + assert_dense_scientific_contract",
+        "init_policy": init_policy,
+        authorize_flag_name: True,
+        "provenance": provenance_note,
+        "run_provenance": provenance,
     }
+    # Backward-compatible alias used by U4 artifacts / resume identity checks.
+    if p_conditioning:
+        run_identity["u4_contract"] = contract_payload
+        run_identity["u4_candidate_sha256"] = run_identity[candidate_sha_key]
+    else:
+        run_identity["u6_contract"] = contract_payload
+        run_identity["u6_candidate_sha256"] = run_identity[candidate_sha_key]
     write_json(out_dir / "effective_config.json", run_identity)
+    write_json(out_dir / "run_manifest.json", run_identity)
 
     summary = trainer.fit(
         train_ds,
@@ -671,9 +714,76 @@ def cmd_train_u4(args: argparse.Namespace) -> int:
         allow_extend_max_epochs=bool(args.allow_extend_max_epochs),
     )
     print(json.dumps(summary, indent=2, default=str))
-    # completed OR early-stop are acceptable scientific endings
     ok_statuses = {"completed", "stopped_early_plateau"}
     return 0 if summary.get("status") in ok_statuses else 2
+
+
+def cmd_train_u4(args: argparse.Namespace) -> int:
+    """U4 scientific epoch training — refused unless explicitly authorized."""
+    if not args.authorize_scientific_u4:
+        raise SystemExit(
+            "Refusing U4 scientific training: pass --authorize-scientific-u4 only after "
+            "explicit Enrico authorization for the Engaging single p_on seed-0 run."
+        )
+    if args.p_off:
+        raise SystemExit("Only p_on seed 0 is authorized for this U4 Engaging run.")
+
+    cand = load_yaml(args.config)
+    try:
+        u4_contract = assert_u4_candidate_contract(cand)
+    except ValueError as exc:
+        raise SystemExit(f"U4 candidate contract rejected: {exc}") from exc
+
+    return _run_scientific_epoch_training(
+        args,
+        cand=cand,
+        contract_payload=u4_contract,
+        p_conditioning=True,
+        authorize_flag_name="authorize_scientific_u4",
+        candidate_sha_key="u4_candidate_sha256",
+        init_policy="fresh_seed_no_overfit_or_profile_weights",
+        provenance_note=(
+            "configs consumed via assert_u4_candidate_contract + "
+            "assert_dense_scientific_contract; provenance recorded"
+        ),
+        extra_sources=[],
+    )
+
+
+def cmd_train_u6(args: argparse.Namespace) -> int:
+    """U6 scientific p_off epoch training — refused unless explicitly authorized."""
+    if not args.authorize_scientific_u6:
+        raise SystemExit(
+            "Refusing U6 scientific training: pass --authorize-scientific-u6 only after "
+            "explicit Enrico authorization for the Engaging single p_off seed-0 run."
+        )
+    if args.p_on:
+        raise SystemExit("Only p_off seed 0 is authorized for this U6 Engaging run.")
+
+    cand = load_yaml(args.config)
+    try:
+        u6_contract = assert_u6_candidate_contract(cand)
+    except ValueError as exc:
+        raise SystemExit(f"U6 candidate contract rejected: {exc}") from exc
+
+    return _run_scientific_epoch_training(
+        args,
+        cand=cand,
+        contract_payload=u6_contract,
+        p_conditioning=False,
+        authorize_flag_name="authorize_scientific_u6",
+        candidate_sha_key="u6_candidate_sha256",
+        init_policy="fresh_seed_no_overfit_or_profile_or_pon_weights",
+        provenance_note=(
+            "configs consumed via assert_u6_candidate_contract + "
+            "assert_dense_scientific_contract; p channels forced to zero; "
+            "fresh init (no p_on weight reuse)"
+        ),
+        extra_sources=[
+            "scripts/engaging/u6_train.sbatch",
+            "scripts/10_u6_poff_eval_and_swap.py",
+        ],
+    )
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -729,6 +839,43 @@ def build_parser() -> argparse.ArgumentParser:
     pr.add_argument("--scientific", action="store_true")
     pr.set_defaults(func=cmd_profile)
 
+    def _add_scientific_train_args(sp: argparse.ArgumentParser, *, default_config: Path) -> None:
+        sp.add_argument("--config", type=Path, default=default_config)
+        sp.add_argument("--dense-config", type=Path, default=DEFAULT_DENSE_CFG)
+        sp.add_argument("--cache-root", type=Path, default=DEFAULT_CACHE_ROOT)
+        sp.add_argument("--out-root", type=Path, default=ROOT / "results" / "month2_dense_unet")
+        sp.add_argument("--run-id", type=str, required=True)
+        sp.add_argument("--epochs", type=int, default=None)
+        sp.add_argument("--batch-size", type=int, default=None)
+        sp.add_argument("--lr", type=float, default=None)
+        sp.add_argument("--seed", type=int, default=None)
+        sp.add_argument("--base-channels", type=int, default=None)
+        sp.add_argument("--device", type=str, default="auto")
+        sp.add_argument("--wall-hours", type=float, default=None)
+        sp.add_argument("--resume", type=Path, default=None)
+        sp.add_argument("--allow-nondefault-lr", action="store_true")
+        sp.add_argument(
+            "--allow-extend-max-epochs",
+            action="store_true",
+            help="Explicitly allow raising n_epochs above checkpoint/budget when resuming",
+        )
+        sp.add_argument(
+            "--expect-cache-hashes",
+            type=Path,
+            default=None,
+            help="JSON from compute_cache_payload_hashes; verify after transfer",
+        )
+        sp.add_argument(
+            "--auto-lr-fallback-3e4",
+            action="store_true",
+            help="Refused: no automatic lr fallback",
+        )
+        sp.add_argument(
+            "--allow-dirty-tree",
+            action="store_true",
+            help="Allow run with dirty/untracked tree after explicit review",
+        )
+
     tr = sub.add_parser(
         "train-u4",
         help="U4 scientific epoch training (requires --authorize-scientific-u4)",
@@ -738,38 +885,22 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Required explicit authorization after STOP B review",
     )
-    tr.add_argument("--config", type=Path, default=U4_CANDIDATE_CFG)
-    tr.add_argument("--dense-config", type=Path, default=DEFAULT_DENSE_CFG)
-    tr.add_argument("--cache-root", type=Path, default=DEFAULT_CACHE_ROOT)
-    tr.add_argument("--out-root", type=Path, default=ROOT / "results" / "month2_dense_unet")
-    tr.add_argument("--run-id", type=str, required=True)
-    tr.add_argument("--epochs", type=int, default=None)
-    tr.add_argument("--batch-size", type=int, default=None)
-    tr.add_argument("--lr", type=float, default=None)
-    tr.add_argument("--seed", type=int, default=None)
-    tr.add_argument("--base-channels", type=int, default=None)
-    tr.add_argument("--device", type=str, default="auto")
-    tr.add_argument("--wall-hours", type=float, default=None)
     tr.add_argument("--p-off", action="store_true", help="Refused for this authorized run")
-    tr.add_argument("--resume", type=Path, default=None)
-    tr.add_argument("--allow-nondefault-lr", action="store_true")
-    tr.add_argument(
-        "--allow-extend-max-epochs",
-        action="store_true",
-        help="Explicitly allow raising n_epochs above checkpoint/budget when resuming",
-    )
-    tr.add_argument(
-        "--expect-cache-hashes",
-        type=Path,
-        default=None,
-        help="JSON from compute_cache_payload_hashes; verify after transfer",
-    )
-    tr.add_argument(
-        "--auto-lr-fallback-3e4",
-        action="store_true",
-        help="Refused: no automatic lr fallback",
-    )
+    _add_scientific_train_args(tr, default_config=U4_CANDIDATE_CFG)
     tr.set_defaults(func=cmd_train_u4)
+
+    tr6 = sub.add_parser(
+        "train-u6",
+        help="U6 scientific p_off epoch training (requires --authorize-scientific-u6)",
+    )
+    tr6.add_argument(
+        "--authorize-scientific-u6",
+        action="store_true",
+        help="Required explicit authorization for U6 p_off seed-0 Engaging run",
+    )
+    tr6.add_argument("--p-on", action="store_true", help="Refused for this authorized U6 run")
+    _add_scientific_train_args(tr6, default_config=U6_CANDIDATE_CFG)
+    tr6.set_defaults(func=cmd_train_u6)
 
     ch = sub.add_parser("hash-cache", help="Compute dense cache payload SHA256 map")
     ch.add_argument("--cache-root", type=Path, default=DEFAULT_CACHE_ROOT)

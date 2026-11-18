@@ -211,3 +211,12 @@ Questo file è il diario del progetto di tesi in `official_thesis` (ricostruzion
 - **Risultato numerico:** VAL macro 26.93→96.55 K (Δ+69.6); seen 37.68→150.30 (Δ+112.6). Peggioramento soprattutto strutturale; `0NH3_1.05` molto più sensibile. Matched VAL: GappyPOD 70.46, ParamMean 88.01, GlobalMean 139.70.
 - **Artefatti:** `results/month2_dense_unet/u5_pon_seed0_snapshot_control_v1/` (pairing, tabelle, figure, `auto_report.md`, `interpretation.md`).
 - **Limiti:** VAL contaminata da selezione U4; un seed; niente causalità/ceiling/sparse. **STOP** prima di U6/p_off/altri seed.
+
+---
+
+## 2026-11-17 — Revisione Opus U4/U5 (registrata) e avvio U6 p_off seed 0
+
+- **Revisione esterna (riferita da Enrico, non ratifica supervisori):** «utilizzabile con riserve»; nessun difetto invalidante. Opus ha letto codice/artefatti e ricalcolato metriche dai CSV; senza checkpoint/cache/raw e senza rieseguire l’inferenza.
+- **Punti confermati:** replay aligned U5 ≡ U4; pairing/transform input corretti; baseline U5 rifittate (scostamento dall’incarico) ma metriche per-frame ≈ U3 entro ~5.5e-12; VAL non indipendente; best 26.931 K @160 e last 28.055 K @730; nessuna indicazione a prolungare U4.
+- **Decisione operativa Enrico:** prima parte di U6 — **un** training denso p_off seed 0 + snapshot-swap sul best, stesso contratto U4 salvo canali p a zero e init fresco. Altri seed rinviati. Engaging autorizzato.
+- **Prep codice:** provenance nel run manifest; test isolamento p_off; candidate `month2_dense_unet_u6_candidate.yaml`; `train-u6`; smoke/train/eval Engaging; eval/swap `scripts/10_u6_poff_eval_and_swap.py` riusando pairing U5 e tabelle U3 (no refit).

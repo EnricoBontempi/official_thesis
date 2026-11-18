@@ -3,7 +3,7 @@
 **Progetto:** Neural Reconstruction of Hidden Temperature Fields from Sparse Observations in Turbulent Combustion  
 **Autore:** Enrico Bontempi — MSc Thesis, Deng Lab, MIT  
 **Preparata:** 2026-11-16, America/New_York (UTC−05:00)  
-**Stato aggiornato 2026-11-17:** piano autorizzato operativamente da Enrico; 2.1–2.3 eseguiti. Consolidamento tecnico completato sul branch `mission/baseline-consolidation` (`3cf7bf0`), non ancora integrato alla preparazione di questo aggiornamento. **Step 2.4 dettagliato in [roadmap_unet.md](roadmap_unet.md), non implementato né eseguito.** Stats fit-only calcolate in 2.2; GPU/allocazione Engaging non verificate; nessuna ratifica tecnica documentata dei supervisori.  
+**Stato aggiornato 2026-11-17 (sera):** piano autorizzato operativamente da Enrico; 2.1–2.3 eseguiti. Consolidamento tecnico su `mission/baseline-consolidation` (`3cf7bf0`). **Step 2.4** dettagliato in [roadmap_unet.md](roadmap_unet.md): U0–U5 eseguiti su `mission/dense-unet` (U4 Engaging p_on seed 0; U5 snapshot-swap); Engaging GPU/AMF verificati e usati. **U6 p_off seed 0 autorizzato in corso / da registrare a consegna.** Step 2.4 e Mese 2 **non** conclusi. Nessuna ratifica tecnica documentata dei supervisori.  
 **Fonti:** [proposal disponibile](docs/proposal.md), [Mese 1](roadmap_month1.md), [diario](docs/RESEARCH_LOG.md), [report LaTeX aggiornato](overleaf_month1_report/main.tex), [contesto verificato e decisioni](docs/month2/00_context_and_decisions.md).
 
 > **Limite di provenienza:** `documents_thesis/main.tex` è il report del Mese 1 del 15 novembre, identico alla copia sopra, non il proposal inviato il 13 novembre. Non ci sono altri sorgenti inclusi tramite `input/include`; è stata letta la bibliografia. L'identità fra `docs/proposal.md` e l'allegato inviato non è verificata. La ricognizione e le differenze accertabili sono nel [registro](docs/month2/00_context_and_decisions.md#1-provenienza-e-limite-sul-documento-inviato). Non modificare il proposal inviato per adeguarlo al piano.
@@ -79,7 +79,7 @@ Il risultato minimo del Mese 2 è una pipeline riproducibile, baseline qualifica
 
 - **Stato:** `[x] Concretizzato come default operativo (2026-11-16)`; **classe:** I + S.
 - **Cosa è stato chiuso qui:** protocollo frame versionato, contratto pilota versionato, registro D1–D9 aggiornato con autorizzazione Enrico vs assenza di ratifica supervisori, verifica geometrica dei fold, controlli YAML/conteggi.
-- **Cosa resta esplicitamente pendente (non spuntato come “approvato dai supervisori”):** ratifica tecnica Deng Lab; D1 provenienza allegato; lock scientifico finale dei fold; verifica GPU/allocazione Engaging; rivalutazione del tetto 24 GPU-ore dopo profiling; calcolo stats fit-only (Step 2.2).
+- **Cosa resta esplicitamente pendente (non spuntato come “approvato dai supervisori”):** ratifica tecnica Deng Lab; D1 provenienza allegato; lock scientifico finale dei fold; rivalutazione del tetto 24 GPU-ore alla luce del profiling U3 e dei costi U4 misurati; chiusura Step 2.4 / U6–U7.
 - **Problema:** quali risultati sono affidabili e quali scelte restano ipotesi? Senza questo passaggio gli agenti possono implementare tre architetture “raccomandate” come se fossero approvate.
 - **Motivazione/dipendenze:** chiudere la parte decisionale operativa aperta dello Step 1.6 lato protocollo. Riferimenti e discrepanze sono già raccolti nel registro; non occorre ricominciare l'audit del dataset.
 - **Attività concrete (eseguite in 2.1):**
@@ -95,7 +95,7 @@ Il risultato minimo del Mese 2 è una pipeline riproducibile, baseline qualifica
 
 - **Stato:** `[x] Implementato, verificato su dati reali locali, e correttivo API completato (2026-11-16)`; **classe:** I.
 - **Cosa è chiuso qui:** percorso Month-2 isolato (`Month2ReconDataset` + `ShardStore` compact LRU), frame roles, stats fit-only, manifest, collate, evaluator Kelvin, gate TEST, test di isolamento + batch reale CPU; **poi** membership ruoli, provenance stats (scientific hash), aggregazione omogenea, prefetch I/O documentato.
-- **Cosa resta pendente / non spuntato:** Engaging GPU/allocazione non verificati; picco RSS locale dominato dal decode Arrow (~2 GiB/shard, ~6.5 GiB osservati con DataLoader workers); fold non fitted; U-Net/GLU ancora assenti (probe ≠ validazione forward modelli).
+- **Cosa resta pendente / non spuntato (storico 2.2):** picco RSS locale dominato dal decode Arrow (~2 GiB/shard, ~6.5 GiB osservati con DataLoader workers). **Aggiornamento successivo:** Engaging GPU/AMF verificati (preflight + U4/U5); U-Net densa U0–U5 eseguiti — vedi [roadmap_unet.md](roadmap_unet.md).
 - **Problema:** il loader Month-1 indicizza/carica in modo non adatto al training sicuro. Il percorso Month-2 lo sostituisce per il lavoro successivo senza alterare gli artefatti storici.
 - **Motivazione/dipendenze:** contratto 2.1; non richiede scegliere GLU.
 - **Attività concrete (eseguite):**
@@ -125,7 +125,7 @@ Il risultato minimo del Mese 2 è una pipeline riproducibile, baseline qualifica
 
 ### Step 2.4 — Primo neurale: diagnostico da velocità densa single-frame
 
-- **Stato:** `[ ] Piano dettagliato, non eseguito`; **classe:** E + S. [roadmap_unet.md](roadmap_unet.md) specifica contratto, U0–U7 e STOP A/B/C; è il riferimento operativo del solo Step 2.4.
+- **Stato:** `[~] In corso su mission/dense-unet` — U0–U5 eseguiti (STOP A/B/C); U6 p_off seed 0 autorizzato; Step 2.4 **non** dichiarato completo. **Classe:** E + S. Riferimento operativo: [roadmap_unet.md](roadmap_unet.md).
 - **Problema:** una mappa non lineare spaziale usa la velocità meglio delle baseline, prima di complicare la rappresentazione sparse?
 - **Motivazione/dipendenze:** 2.3 e D4/D8. È lo “Step 0” del report LaTeX, reinterpretato come **baseline empirica ad alta copertura**, non prova di un information ceiling.
 - **Attività concrete:**
@@ -245,9 +245,9 @@ Opus e Astra hanno revisionato indipendentemente `822ed52` e concluso «pronti d
 ## Checklist di completamento della fase
 
 - [x] 2.1 — Protocollo pilota e default operativi versionati; autorizzazione Enrico registrata; limite proposal e assenza ratifica supervisori espliciti; fold geometricamente verificati (lock scientifico fold ancora aperto). Non implica GPU verificate né stats fit-only già calcolate.
-- [x] 2.2 — Pipeline Month-2 reale verificata in locale (fit-only, isolation, collate, gate TEST) + protezioni API (membership, provenance, aggregazione, prefetch). Engaging/GPU ancora non verificati; picco RAM legato al decode Arrow.
+- [x] 2.2 — Pipeline Month-2 reale verificata in locale (fit-only, isolation, collate, gate TEST) + protezioni API. Engaging/GPU verificati in seguito (preflight + U4/U5); picco RAM locale legato al decode Arrow.
 - [x] 2.3 — Baseline CPU sul protocollo Mese 2 (GlobalMean/ParamMean/GappyPOD 2C ±AO/T-block, Oracle, HGB dense diagnostico); ricerca versionata (preregistrazione cronologica storica non attestabile); report `02_baseline_validation.md`. R=64 non eseguito. Consolidamento e replica completati su `mission/baseline-consolidation` a `3cf7bf0`; integrazione ancora pendente.
-- [ ] 2.4 — Piano [roadmap_unet.md](roadmap_unet.md); U0–U3 eseguiti; runner U4 preparato su `mission/dense-unet` (report `docs/month2/03_dense_velocity_diagnostic.md`). Training scientifico U4 **non** avviato. Optional temporale fuori missione. Step 2.4 **non** completo.
+- [ ] 2.4 — [roadmap_unet.md](roadmap_unet.md): U0–U5 eseguiti (U4 Engaging p_on seed 0; U5 snapshot-swap). U6 p_off seed 0 in questo incarico; altri seed/U7 da discussione. Optional temporale fuori missione. Step 2.4 **non** completo.
 - [ ] 2.5 — Audit GLU concluso e adattamento scelto o rinviato con motivazione.
 - [ ] 2.6 — Primo neurale sparse e comparatori matched; confronto GLU presente oppure esplicitamente ancora aperto.
 - [ ] 2.7 — Free/assisted confrontati, almeno AO e GappyPOD con stesse osservazioni; testa appresa non obbligatoria.

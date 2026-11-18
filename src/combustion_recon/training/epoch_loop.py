@@ -482,6 +482,9 @@ def assert_u4_candidate_contract(cand: dict[str, Any]) -> dict[str, Any]:
     if ckpt.get("partial_overwrite_last") is not False:
         raise ValueError("checkpoint.partial_overwrite_last must be false")
 
+    if tc.get("p_conditioning") is not True:
+        raise ValueError("U4 candidate requires p_conditioning true (p_on)")
+
     return {
         "experiment_id": cand["experiment_id"],
         "consumed_training_candidate_keys": sorted(tc.keys()),
@@ -490,6 +493,61 @@ def assert_u4_candidate_contract(cand: dict[str, Any]) -> dict[str, Any]:
         "warmup_updates": int(tc["warmup_updates"]),
         "early_stopping": dict(early),
         "plateau": dict(plateau),
+        "p_conditioning": True,
+    }
+
+
+def assert_u6_candidate_contract(cand: dict[str, Any]) -> dict[str, Any]:
+    """Consume required U6 p_off candidate fields (same schedule as U4; p channels zero)."""
+    required_top = {
+        "experiment_id",
+        "paired_experiment",
+        "status",
+        "scientific_training_authorized",
+        "budget_definitively_approved",
+        "u6_executed",
+        "inherits_scientific_contract",
+        "model",
+        "training_candidate",
+        "artifacts",
+        "decision",
+    }
+    unknown_top = sorted(set(cand) - required_top - {"command_template", "notes"})
+    if unknown_top:
+        raise ValueError(f"unknown U6 candidate top-level keys: {unknown_top}")
+
+    if cand.get("experiment_id") != "month2_dense_unet_u6_poff_engaging_v1":
+        raise ValueError(f"unexpected experiment_id: {cand.get('experiment_id')!r}")
+
+    tc = cand.get("training_candidate")
+    if not isinstance(tc, dict):
+        raise ValueError("training_candidate must be a mapping")
+
+    # Reuse U4 schedule validation by temporarily tagging as U4 contract shape,
+    # then enforcing p_off. Build a shallow copy with U4 experiment_id/flag names.
+    u4_like = {
+        **cand,
+        "experiment_id": "month2_dense_unet_u4_engaging_v1",
+        "u4_executed": cand.get("u6_executed", False),
+        "training_candidate": {**tc, "p_conditioning": True},
+    }
+    # Drop U6-only keys that U4 reject would flag.
+    u4_like.pop("u6_executed", None)
+    try:
+        base = assert_u4_candidate_contract(u4_like)
+    except ValueError as exc:
+        raise ValueError(f"U6 schedule/contract failed U4 parity checks: {exc}") from exc
+
+    if tc.get("p_conditioning") is not False:
+        raise ValueError("U6 candidate requires p_conditioning false (p_off)")
+    if int(tc.get("seed", -1)) != 0:
+        raise ValueError("U6 first authorized run is seed 0 only")
+
+    return {
+        **base,
+        "experiment_id": cand["experiment_id"],
+        "p_conditioning": False,
+        "variant": "p_off",
     }
 
 
