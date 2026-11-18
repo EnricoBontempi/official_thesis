@@ -1,7 +1,7 @@
 # Executable sparse protocol contract (S1–S2). Unknown scientific keys are refused.
 protocol_id: month2_sparse_v1
 roadmap: roadmapsparse.md
-status: s1_s2_implementation
+status: s1_s2_s3_implementation
 scientific_training_authorized: false
 
 roles:
@@ -65,9 +65,12 @@ unet_sparse:
   warm_start_dense: false
 
 glu:
-  implementation_phase: S3
+  implementation_phase: S3_done_stop_b
   audit: docs/month2/04_glu_release_adaptation.md
-  wrapper_authorized_this_mission: false
+  config: configs/models/glu_minimal.yaml
+  wrapper: src/combustion_recon/models/glu_reconstructor.py
+  wrapper_authorized_this_mission: true
+  scientific_training_authorized: false
 
 forbidden_this_mission:
   - scientific_training_760

@@ -205,7 +205,7 @@ Factory always builds temporal module even for stage 0; weights frozen in `freez
 
 ## 6. Approved candidate registry (roadmap §5 — design contract for S3+)
 
-The following is **approved operationally** in `roadmapsparse.md` §5.1–§5.3; this audit **registers** it against upstream capabilities. Implementation status: **not started** (S3).
+The following is **approved operationally** in `roadmapsparse.md` §5.1–§5.3; this audit **registers** it against upstream capabilities. Implementation status: **S3 wrapper delivered** (`models/glu_reconstructor.py`, `configs/models/glu_minimal.yaml`); not a full paper reproduction.
 
 | Decision | Approved candidate | Upstream baseline | Action |
 |---|---|---|---|
@@ -245,15 +245,15 @@ At **5%** coverage (`N_s≈819` per roadmap §3.2), `cdist` and encoder attentio
 
 | ID | Verification | Method | Status |
 |---|---|---|---|
-| S3-V1 | Tensor shapes / finite forward-backward | Torch on thesis batch | **Open** |
-| S3-V2 | **T** absent from inference signature | API review + test | **Open** |
-| S3-V3 | `per_sensor_sigma=False` → no dynamic params in `forward` | Torch module param count before/after step | **Open** (roadmap flags **risk** L1780–1784) |
-| S3-V4 | Permutation invariance (sensor order) + query equivariance | Numeric tests | **Open** |
-| S3-V5 | Tie-break at equal k-NN distances | Document `topk` behavior + custom tie-break if needed | **Open** |
-| S3-V6 | Full-field vs chunked decoder (`P` vs `512`) | max abs diff tolerance | **Open** |
-| S3-V7 | Collinear (vi,vj) embedding sanity | Small overfit TRAIN | **Open** |
-| S3-V8 | Isotropic **q** vs old [-1,1] map sensitivity | Compare σ-kernel semantics | **Open** (document **L,c**) |
-| S3-V9 | All parameters visible before `optimizer.step` | Trainer hook | **Open** |
+| S3-V1 | Tensor shapes / finite forward-backward | `tests/test_glu_adapted.py` | **Done** |
+| S3-V2 | **T** absent from inference signature | API + isolation tests | **Done** |
+| S3-V3 | `per_sensor_sigma=False` → no dynamic params; upstream `True` lazy Parameter | Separate torch test (executed) | **Done** (risk confirmed when True; thesis forces False) |
+| S3-V4 | Permutation invariance (sensor order) + query equivariance | Numeric tests, atol=1e-5 | **Done** |
+| S3-V5 | Tie-break at equal k-NN distances | Canonical site sort + `torch.topk` index order; no distance jitter | **Done** (documented) |
+| S3-V6 | Full vs chunked decoder (`chunk=512`) | Declared atol=1e-5; measured **max_abs=0** | **Done** (eval); chunked **backward not claimed** |
+| S3-V7 | Collinear (vi,vj) embedding amplitude sensitivity | Torch test (no collapse assumed) | **Done** |
+| S3-V8 | Isotropic **q** vs old [-1,1] map sensitivity | Geometry recorded; σ-semantics cost study | **Open → S4** |
+| S3-V9 | Parameter identity before/after forward+step | Count/names stable; unused MLP may lack grads | **Done** |
 
 ### 7.3 S4 verifications (roadmap §8 S4 + §5.3)
 

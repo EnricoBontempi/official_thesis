@@ -1,7 +1,13 @@
-"""Minimal epoch trainer for sparse U-Net diagnostics (S2).
+"""Minimal epoch trainer for sparse U-Net / GLU *diagnostics* (S2/S3).
 
 Calls ``dataset.set_epoch`` every epoch (including after resume).
 Complete-epoch checkpoints are distinct from partial dumps.
+
+This trainer is intentionally incomplete for scientific screening:
+it does **not** implement warmup, ReduceLROnPlateau, VAL eval cadence,
+early-stop counters, or the full resume identity lock required before S4
+freeze. Those remain an S4 requirement; do not treat diagnostic resume
+tests here as scientific runner verification.
 """
 
 from __future__ import annotations

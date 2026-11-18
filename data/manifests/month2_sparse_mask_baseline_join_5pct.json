@@ -1,0 +1,33 @@
+{
+  "gappy_pod_free_keys": 3309,
+  "gappy_pod_free_matched_keys": 3309,
+  "mismatch_samples": [],
+  "n_baseline_rows_5pct_K0": 26472,
+  "n_hex_rows": 19854,
+  "n_keys_inconsistent_hex": 0,
+  "n_matched": 3309,
+  "n_mismatched": 0,
+  "n_missing_persisted": 0,
+  "n_nonhex_rows": 6618,
+  "n_unique_keys_hex": 3309,
+  "note": "This join is the historical baseline equivalence check. The earlier 3309/3309 seed\u2194payload self-check remains necessary but is not by itself full historical baseline equivalence.",
+  "ok": true,
+  "scope": {
+    "K": 0,
+    "baseline_csv": "/home/enric/projects/official_thesis/results/baseline_consolidation/consolidation_v1/month2_baseline_per_frame.csv.gz",
+    "layout_id": "random_sparse_primary",
+    "payload_root": "/home/enric/projects/official_thesis/data/processed/month2_sparse_eval_masks",
+    "site_fraction": 0.05
+  },
+  "seed_regeneration_only_is_not_historical_join": true,
+  "semantics": {
+    "baseline_field": "observation_hash",
+    "equivalence_at_K0": "SHA256 of uint8 HxW boolean velocity mask bytes (month2_observations.mask_hash)",
+    "filter_note": "Sentinel values such as dense_full_velocity are excluded from the equality join but counted explicitly; they are not silently dropped from the audit trail.",
+    "filtered_non_hex": {
+      "dense_full_velocity": 6618
+    },
+    "persisted_field": "mask_hash_5pct / hash_5pct"
+  },
+  "status": "joined"
+}

@@ -1,8 +1,8 @@
-# Sparse reconstruction — S1–S2 implementation & verification
+# Sparse reconstruction — S1–S3 technical status
 
-**Status:** implementazione/verifiche S1–S2, **nessun risultato scientifico sparse**.  
+**Status:** implementazione/verifiche S1–S3, **nessun risultato scientifico sparse**.  
 **Branch:** `mission/dense-unet`.  
-**STOP A:** non proseguire a S3 / profiling / training scientifici da questo report.
+**STOP B:** non proseguire a S4 / screening / training scientifici da questo report.
 
 ---
 
@@ -13,83 +13,80 @@
 | Format | `month2_sparse_eval_masks_v1` / algoritmo `nested_subset_extension_v1` |
 | Contratto | train_fit 760 + seen_train_eval 220 + val_eval 123; **no TEST**; K=0; 2C; coverages 1/5/20%; replicas 0/1/2 |
 | Seed eval | `mask_seed=20261116`, `layout_id=random_sparse_primary` |
-| Join 5% | **3309/3309** matched (seed regeneration ↔ persisted sites → same `mask_hash`) |
+| Self-check 5% | **3309/3309** seed regeneration ↔ persisted sites (same `mask_hash`) — **not** by itself full historical baseline equivalence |
 | Verified examples @5% | 3/3 match `month2_observations.json` |
+| **Baseline join @5%** | **3309/3309** hex `observation_hash` ↔ persisted `hash_5pct` (`scripts/13_join_sparse_masks_vs_baseline.py`); sentinel `dense_full_velocity` rows **6618** counted separately |
 | Nesting | 164 ⊂ 819 ⊂ 3277 verified per instance |
 | Manifest (Git) | `data/manifests/month2_sparse_eval_masks_manifest.json` |
+| Join report (Git) | `data/manifests/month2_sparse_mask_baseline_join_5pct.json` |
 | Payload (out of Git) | `data/processed/month2_sparse_eval_masks/` |
 | Aggregate SHA256 | `7be78f35ffea2ebc598adce8cec39dc719339aac17ecadde3137f2064891ffeb` |
 
-**Hash semantics:** `mask_hash` = SHA256 of uint8 HxW boolean mask bytes (`month2_observations.mask_hash`). Do **not** compare against unrelated `observation_hash` objects. Nested 1%/20% are **new** artifacts; historical independent 1%/20% draws in `verified_examples` are intentionally not overwritten.
+**Hash semantics:** at K=0, baseline `observation_hash` for sparse methods equals `mask_hash` (SHA256 of uint8 HxW velocity mask). Nested 1%/20% remain **new** artifacts.
 
 ### Regeneration / load / verify
 
 ```bash
-# Materialize (overwrite only when intentional)
 .venv/bin/python scripts/11_materialize_sparse_eval_masks.py --overwrite
-
-# Load one packet
-.venv/bin/python -c "
-from combustion_recon.data.sparse_eval_masks import load_nested_sites, verify_payload_against_manifest
-print(verify_payload_against_manifest())
-print(load_nested_sites(role='train_fit', sim_id='0NH3_1.h5', frame_index=0, replica_id=0)['hash_5pct'])
-"
+.venv/bin/python scripts/13_join_sparse_masks_vs_baseline.py
 ```
 
-Protocol config: `configs/experiments/month2_sparse_protocol.yaml` (unknown scientific keys refused; `scientific_training_authorized: false`).
+Protocol: `configs/experiments/month2_sparse_protocol.yaml`.
 
 ---
 
-## 2. S1 — GLU audit (documental only)
+## 2. S1 — GLU audit + S3 implementation
 
-See [04_glu_release_adaptation.md](04_glu_release_adaptation.md). Upstream tree `252f0ec5…` at parent `5de0d7be…`; **no** wrapper implementation; `external/` untouched. Approved candidate registered; conflicts R1–R13 and S3/S4 checks listed there.
+Audit: [04_glu_release_adaptation.md](04_glu_release_adaptation.md). Upstream tree untouched.  
+Wrapper: `src/combustion_recon/models/glu_reconstructor.py` + `configs/models/glu_minimal.yaml`.
 
 ---
 
-## 3. S2 — Sparse U-Net
+## 3. S2 — Sparse U-Net (unchanged capacity)
 
 | Voce | Valore |
 |---|---|
-| Config | `configs/models/unet_sparse.yaml` |
-| Channels (exact order) | `[vi_obs_norm, vj_obs_norm, Mv, x_scaled, y_scaled, nh3_norm, phi_norm]` |
-| Backbone | b=32, GroupNorm/SiLU, 4 down, bilinear decoder, linear T head |
-| Parameters (trainable) | **4 903 041** |
-| Dense API | preserved (`DenseUNet` still asserts 6 channels) |
-| Cache | reused `data/processed/month2_dense_unet_cache` after fingerprint validation |
-| Train masks | `train_mask_seed=20261118`; `set_epoch` called every epoch and after resume |
-| Eval masks | historical seed + persisted nested payload |
+| Channels | `[vi_obs_norm, vj_obs_norm, Mv, x_scaled, y_scaled, nh3_norm, phi_norm]` |
+| Parameters b=32 | **4 903 041** |
+| Train masks | `train_mask_seed=20261118` + `set_epoch` |
+| Diagnostic trainer | **Incomplete** for science: no warmup/plateau/VAL counters; full scientific resume = **S4 freeze requirement** |
 
-Canonical observation (`training/sparse_view.py`) derives U-Net grid, future GLU tokens, and physical m/s baseline packet from the same sites.
+S2 test hardenings (S3 mission): real sample→input isolation path; p_off rebuild from mutated source p; positive controls after learning; tautologies removed; `rtol=0` for absolute equality.
 
 ---
 
-## 4. Tests & diagnostic overfit (measured)
+## 4. S3 — Adapted deterministic GLU
 
-**Tests:** `tests/test_sparse_eval_masks.py` + `tests/test_sparse_unet.py` → **14 passed** (~36 s, local CPU `.venv`).
-
-Declared tolerances: bit identity `atol=0`; prediction `atol=1e-6`; resume weight `max_diff < 1e-4`.
-
-| Check | Result |
+| Voce | Valore |
 |---|---|
-| Hidden-velocity mutation | input bit-identical; pred unchanged |
-| T / forbidden metadata | no forward effect |
-| p_off zeros | enforced per batch |
-| set_epoch mask variation | epoch 0 ≠ 1 on example; reproducible |
-| Resume complete vs continuous | matched within tolerance; partial refused |
-| Fixed-mask overfit (8 frames, 40 ep) | loss **1.0015 → 0.1287** (80 updates, ~22 s CPU) |
-| Variable-mask brief (15 ep) | loss **1.0015 → 0.3828** (finite; no near-zero claim) |
+| Name | GLU adattato — ablation deterministica (not full paper reproduction) |
+| Params | **1 154 578** |
+| Encoder | `ThesisDomainAdaptiveEncoder` (upstream structure + additive `W_p` bias-free) |
+| Decoder | public `SoftDomainAdaptiveReconstructor.forward` only |
+| Defaults | d=32, heads=4, layers=4, latents=64, top_k=16, σ=0.05, `per_sensor_sigma=False`, CLS on; encoder `num_freqs=256` (stage-0), decoder `num_freqs=64` (class default) |
+| Geometry | `q=2(r-c)/L`, L=max(extent_x,extent_y); recorded in `geometry_meta` |
+| Chunk eval | 512 queries; full vs chunk **max_abs=0** (atol declared 1e-5); chunked **backward not claimed** |
 
-**Frames (seed=7 subset):**  
-`20NH3_1.2` {800,1200}, `20NH3_1.25` {360,920}, `40NH3_0.85` {200,1000}, `80NH3_1.05` {1200,1320}.
+### Diagnostic overfit (same 8 TRAIN frames as S2, full 16384 queries, CPU)
 
-Artifacts: `results/month2/sparse_s2_diagnostic_overfit/` (`report.json`, `diag_maps_frame0.npz`; checkpoints local, not for science).
+| Run | Epochs | Updates | Loss first→last | Wall |
+|---|---:|---:|---|---:|
+| Fixed masks | 8 | 64 | **1.262 → 0.367** | ~17 s |
+| Variable masks | 5 | 40 | **1.262 → 0.734** | ~19 s |
 
-Weights from these runs **must not** be reused in future scientific trainings.
+Artifacts: `results/month2/sparse_s3_glu_diagnostic_overfit/` (`report.json`, maps; `.pt` gitignored with SHA in report). Weights **not** for science.
 
 ---
 
-## 5. Limits / not done
+## 5. Tests
 
-- No scientific training on 760 frames; no VAL tuning; no GLU wrapper (S3); no S4/S5; no 1/20% baseline re-eval campaign; U4–U7 artifacts untouched.
-- Engaging not required for this delivery (CPU sufficient for diagnostic overfit).
-- Nested 1%/20% baseline matched evals remain future work (S4/S6).
+`tests/test_sparse_eval_masks.py` + `test_sparse_unet.py` + `test_glu_adapted.py` + dense regression: **41 passed**.
+
+---
+
+## 6. Limits / S4 remaining
+
+- No scientific 760 training, VAL tuning, S4 profiling/freeze, S5 screening, 1/20% baseline campaign, TEST.
+- Scientific epoch runner resume (warmup/plateau/VAL counters) **not** verified — required before S4 freeze.
+- Isotropic-q vs upstream [-1,1] σ-semantics sensitivity: documented, not profiled as cost study.
+- Chunked training backward / grad accumulation: **not supported** until verified.

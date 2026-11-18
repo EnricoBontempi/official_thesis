@@ -79,3 +79,24 @@ def test_verified_examples_5pct_match():
             replica_id=int(ex["replica_id"]),
         )
         assert h5 == ex["velocity_mask_hash"]
+
+
+def test_baseline_consolidation_join_5pct():
+    """Historical join vs consolidated baseline observation_hash (hex only)."""
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "join_masks",
+        ROOT / "scripts/13_join_sparse_masks_vs_baseline.py",
+    )
+    mod = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(mod)
+    report = mod.join_baseline()
+    if report.get("status") == "missing_baseline_artifact":
+        pytest.skip(report["missing"])
+    assert report["ok"] is True
+    assert report["n_matched"] == 3309
+    assert report["n_mismatched"] == 0
+    assert report["n_nonhex_rows"] == 6618  # dense_full_velocity sentinel rows
+    assert report["gappy_pod_free_matched_keys"] == 3309

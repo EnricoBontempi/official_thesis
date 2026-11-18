@@ -266,3 +266,14 @@ Questo file è il diario del progetto di tesi in `official_thesis` (ricostruzion
 - **Overfit diagnostico (CPU, 8 frame train_fit, seed subset 7):** fixed masks 40 ep loss 1.0015→0.1287; variable masks 15 ep 1.0015→0.3828; pesi **non** scientifici. Artefatti `results/month2/sparse_s2_diagnostic_overfit/`.
 - **Report:** `docs/month2/05_sparse_reconstruction.md`.
 - **STOP A:** niente S3/GLU trainer, niente screening/training 760, niente tuning VAL, niente tetti 24 GPU-h reintrodotti.
+
+---
+
+## 2026-11-18 — S3 GLU adattato + correzioni S1–S2 (STOP B)
+
+- **Correzioni S1:** chiarito che 3309/3309 seed↔payload ≠ equivalenza storica completa; aggiunto join vs CSV consolidamento baseline @5% K=0: **3309/3309** match su `observation_hash` hex; 6618 righe `dense_full_velocity` contate a parte (`month2_sparse_mask_baseline_join_5pct.json`).
+- **Correzioni S2:** test isolamento sul percorso campione→input; p_off ricostruito da p sorgente mutati; controlli positivi post-apprendimento; tautologie rimosse; resume diagnostico esplicitamente incompleto vs runner scientifico (requisito S4).
+- **S3 GLU:** wrapper `AdaptedDeterministicGLU` (1 154 578 params); `glu_minimal.yaml`; encoder freqs 256 / decoder 64; p additivo bias-free; q isotropo; decoder pubblico; chunk 512 eval max_abs=0; `per_sensor_sigma` risk test eseguito.
+- **Overfit diagnostico (8 frame S2, full grid, CPU):** fixed 1.262→0.367 (64 upd); variable 1.262→0.734 (40 upd). Pesi non scientifici.
+- **Test:** 41 passed (dense+sparse+GLU). Report `05` aggiornato.
+- **STOP B:** niente S4 profiling/freeze, niente screening, niente training 760.

@@ -33,6 +33,7 @@ dependencies = [
   "pyarrow",
   "datasets",
   "pandas",
+  "einops",  # required to import vendored external/GLU_Reconstruction/src/models.py
 ]
 
 [project.optional-dependencies]

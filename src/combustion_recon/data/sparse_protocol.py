@@ -38,9 +38,11 @@ def load_sparse_protocol(path: str | Path | None = None) -> dict[str, Any]:
     if unknown:
         raise ValueError(f"sparse protocol has unsupported keys (refused): {unknown}")
     if cfg.get("scientific_training_authorized") is not False:
-        raise ValueError("scientific_training_authorized must be false for S1–S2 delivery")
-    if cfg.get("glu", {}).get("wrapper_authorized_this_mission") is not False:
-        raise ValueError("GLU wrapper not authorized in this mission")
+        raise ValueError("scientific_training_authorized must be false until S5 authorization")
+    glu = cfg.get("glu") or {}
+    if glu.get("scientific_training_authorized") not in (None, False):
+        raise ValueError("glu.scientific_training_authorized must be false")
+    # Wrapper may be true after S3; still refuse if scientific flag flipped.
     roles = cfg.get("roles") or {}
     if roles.get("test_payloads") not in (None, "none", False):
         raise ValueError("test_payloads must be none")

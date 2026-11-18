@@ -1,0 +1,211 @@
+{
+  "artifact_sha256": {
+    "fixed_masks/diag_maps_frame0.npz": "148b51429cc2fae1f8b1a788f3a3b6b5aec874be17893fb11ddc1c7ba63c0959",
+    "fixed_masks/last.pt": "431a3b41a554f612a7ac2bafe88c5f4421d8ca19fc9c63726443af846edfad8b",
+    "variable_masks/diag_maps_frame0.npz": "44aca3ad8a303e96f89e7c65d6622be6660a07fa89450d2fbd1c0a9992b8bc3c",
+    "variable_masks/last.pt": "6884130b4ee45eac659ef766aadf2eb8f7d2a796dfe8a5603779beb4be552000"
+  },
+  "config": "configs/models/glu_minimal.yaml",
+  "decode_chunk_size": 512,
+  "device": "cpu",
+  "fixed_masks": {
+    "ckpt_path": "/home/enric/projects/official_thesis/results/month2/sparse_s3_glu_diagnostic_overfit/fixed_masks/last.pt",
+    "ckpt_sha256": "431a3b41a554f612a7ac2bafe88c5f4421d8ca19fc9c63726443af846edfad8b",
+    "elapsed_s": 17.043343112000002,
+    "first_loss": 1.2618737891316414,
+    "geometry_meta": {
+      "L": 0.09628158062696457,
+      "L_definition": "max(extent_x, extent_y)",
+      "center": [
+        -9.598210453987122e-06,
+        0.11099359393119812
+      ],
+      "convention": "isotropic_q",
+      "extent_x": 0.07379429042339325,
+      "extent_y": 0.09628158062696457,
+      "formula": "q = 2 * (r - center) / L",
+      "units": "physical_from_cache"
+    },
+    "history": [
+      {
+        "epoch": 1,
+        "mask_epoch_used": 0,
+        "mean_grad_norm": 127.94841349124908,
+        "mean_train_loss": 1.2618737891316414
+      },
+      {
+        "epoch": 2,
+        "mask_epoch_used": 0,
+        "mean_grad_norm": 5.838180743157864,
+        "mean_train_loss": 0.8700226321816444
+      },
+      {
+        "epoch": 3,
+        "mask_epoch_used": 0,
+        "mean_grad_norm": 8.74587456882,
+        "mean_train_loss": 0.8305839225649834
+      },
+      {
+        "epoch": 4,
+        "mask_epoch_used": 0,
+        "mean_grad_norm": 10.703134894371033,
+        "mean_train_loss": 0.7064984142780304
+      },
+      {
+        "epoch": 5,
+        "mask_epoch_used": 0,
+        "mean_grad_norm": 9.930522382259369,
+        "mean_train_loss": 0.7841488793492317
+      },
+      {
+        "epoch": 6,
+        "mask_epoch_used": 0,
+        "mean_grad_norm": 6.457669720053673,
+        "mean_train_loss": 0.5719123482704163
+      },
+      {
+        "epoch": 7,
+        "mask_epoch_used": 0,
+        "mean_grad_norm": 3.212630271911621,
+        "mean_train_loss": 0.429739149287343
+      },
+      {
+        "epoch": 8,
+        "mask_epoch_used": 0,
+        "mean_grad_norm": 3.834811434149742,
+        "mean_train_loss": 0.3672827687114477
+      }
+    ],
+    "last_loss": 0.3672827687114477,
+    "n_params": 1154578,
+    "updates": 64
+  },
+  "frames": [
+    {
+      "cache_index": 400,
+      "frame_index": 800,
+      "mask_hash": "8185ba5997c68c956dadd8f65b63e5d29b1402e66a78a22569cadc23fb391737",
+      "n_sites": 819,
+      "sim_id": "20NH3_1.2.h5",
+      "velocity_mask_seed": 3390753534
+    },
+    {
+      "cache_index": 410,
+      "frame_index": 1200,
+      "mask_hash": "4963700d55fe9613e7391445467ae205717d11a3b310bff080b932888f86a3d6",
+      "n_sites": 819,
+      "sim_id": "20NH3_1.2.h5",
+      "velocity_mask_seed": 1283811588
+    },
+    {
+      "cache_index": 427,
+      "frame_index": 360,
+      "mask_hash": "13d0d58316ff4615954f31fd0c00955235074cd7a7de7ea326d9acc29844a803",
+      "n_sites": 819,
+      "sim_id": "20NH3_1.25.h5",
+      "velocity_mask_seed": 2632067350
+    },
+    {
+      "cache_index": 441,
+      "frame_index": 920,
+      "mask_hash": "344c5ea7ad788c2d637c8d7706eedeb7b774ecd1bcd8ee9cc66b3a64b56b23c5",
+      "n_sites": 819,
+      "sim_id": "20NH3_1.25.h5",
+      "velocity_mask_seed": 1233715875
+    },
+    {
+      "cache_index": 461,
+      "frame_index": 200,
+      "mask_hash": "ee09aa84de04fdc8638b8319d74521c0c64d4fff4185681a254377f77ac1f75b",
+      "n_sites": 819,
+      "sim_id": "40NH3_0.85.h5",
+      "velocity_mask_seed": 2836517670
+    },
+    {
+      "cache_index": 481,
+      "frame_index": 1000,
+      "mask_hash": "6ecb5066a28f8dabd42988b84bac038d821268dfe6f5dec6cf580ccb5be5f27f",
+      "n_sites": 819,
+      "sim_id": "40NH3_0.85.h5",
+      "velocity_mask_seed": 350976117
+    },
+    {
+      "cache_index": 676,
+      "frame_index": 1200,
+      "mask_hash": "b21aec3bc631e2052e01ad79c756cc618301f2f311444e967e9922b163ad5ae4",
+      "n_sites": 819,
+      "sim_id": "80NH3_1.05.h5",
+      "velocity_mask_seed": 3924425066
+    },
+    {
+      "cache_index": 679,
+      "frame_index": 1320,
+      "mask_hash": "d57bff74dcce2e3d7e9d893ca5ccac75edfafdca85931a7b1f836fb2d8114c4c",
+      "n_sites": 819,
+      "sim_id": "80NH3_1.05.h5",
+      "velocity_mask_seed": 2505680235
+    }
+  ],
+  "full_queries": 16384,
+  "note": "Not S4 profiling; not VAL selection.",
+  "status": "diagnostic_only",
+  "tolerances": {
+    "chunk_atol": 1e-05,
+    "perm_atol": 1e-05
+  },
+  "variable_masks": {
+    "ckpt_path": "/home/enric/projects/official_thesis/results/month2/sparse_s3_glu_diagnostic_overfit/variable_masks/last.pt",
+    "ckpt_sha256": "6884130b4ee45eac659ef766aadf2eb8f7d2a796dfe8a5603779beb4be552000",
+    "elapsed_s": 18.742670951000036,
+    "first_loss": 1.2618737891316414,
+    "geometry_meta": {
+      "L": 0.09628158062696457,
+      "L_definition": "max(extent_x, extent_y)",
+      "center": [
+        -9.598210453987122e-06,
+        0.11099359393119812
+      ],
+      "convention": "isotropic_q",
+      "extent_x": 0.07379429042339325,
+      "extent_y": 0.09628158062696457,
+      "formula": "q = 2 * (r - center) / L",
+      "units": "physical_from_cache"
+    },
+    "history": [
+      {
+        "epoch": 1,
+        "mask_epoch_used": 0,
+        "mean_grad_norm": 127.94841349124908,
+        "mean_train_loss": 1.2618737891316414
+      },
+      {
+        "epoch": 2,
+        "mask_epoch_used": 1,
+        "mean_grad_norm": 5.727396994829178,
+        "mean_train_loss": 0.8853553161025047
+      },
+      {
+        "epoch": 3,
+        "mask_epoch_used": 2,
+        "mean_grad_norm": 5.841557800769806,
+        "mean_train_loss": 0.7869937121868134
+      },
+      {
+        "epoch": 4,
+        "mask_epoch_used": 3,
+        "mean_grad_norm": 12.689761698246002,
+        "mean_train_loss": 0.9647344723343849
+      },
+      {
+        "epoch": 5,
+        "mask_epoch_used": 4,
+        "mean_grad_norm": 6.969866961240768,
+        "mean_train_loss": 0.7343330532312393
+      }
+    ],
+    "last_loss": 0.7343330532312393,
+    "n_params": 1154578,
+    "updates": 40
+  },
+  "weights_reusable_for_science": false
+}

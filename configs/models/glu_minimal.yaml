@@ -1,0 +1,91 @@
+# GLU adattato — ablation deterministica (thesis sparse T recon).
+# Consumed by combustion_recon.models.glu_reconstructor.{load_glu_minimal_config, build_glu_from_config}.
+# Upstream reference: external/GLU_Reconstruction/configs/collinear_re40_stage0.yaml (not copied verbatim).
+
+model_id: glu_adapted_deterministic_v1
+architecture: adapted_deterministic_glu
+task: temperature_free_sparse_velocity_to_T
+
+geometry:
+  convention: isotropic_q
+  formula: "q = 2 * (r - center) / L"
+  L_definition: max_extent_xy
+  units: physical_from_cache
+  spatial: [128, 128]
+  note: >-
+    center = ((xmin+xmax)/2, (ymin+ymax)/2); L = max(xmax-xmin, ymax-ymin).
+    Same map for sparse sensors and dense query grid. Differs from upstream min-max [-1,1].
+
+input:
+  T_frames: 1
+  sensor_value_channels:
+    - vi_norm
+    - vj_norm
+  token_layout: [qx, qy, vi_norm, vj_norm]
+  conditioning:
+    mode: additive_token_embedding
+    p_channels: [nh3_norm, phi_norm]
+    p_dim: 2
+  forbidden:
+    - temperature_in_encoder_input
+    - timestamp_in_encoder_input
+    - sim_id_in_encoder_input
+    - vk_in_encoder_input
+    - padding_mask
+    - heterogeneous_N_per_batch
+    - padded_zero_sensors
+    - GLU_Bay_DD_forward
+    - temporal_decoder
+    - adaptive_phi_mlp
+    - target_G_full_in_forward
+
+output:
+  channels: 1
+  field: temperature_normalized
+  layout: BCHW_default
+  flat_option: return_flat
+
+encoder:
+  All_dim: 32
+  num_heads: 4
+  latent_layers: 4
+  N_channels: 2
+  num_freqs: 256
+  latent_tokens: 64
+  pooling: none
+  retain_cls: true
+  retain_lat: false
+  channel_to_encode: null
+  class: ThesisDomainAdaptiveEncoder
+
+decoder:
+  N_channels: 1
+  num_freqs: 64
+  dropout: 0.0
+  top_k: 16
+  bandwidth_init: 0.05
+  per_sensor_sigma: false
+  CalRecVar: false
+  USE_FINAL_MLP: false
+  importance_scale: 0.50
+  overlap_ratio: 0.02
+  use_weighted_fusion: false
+  retain_cls: true
+  retain_lat: false
+  use_checkpoint: false
+  topk_tie_break: site_index_after_canonical_sort
+
+inference:
+  phi: uniform_ones
+  decode_chunked_default: true
+  decode_chunk_size: 512
+  single_frame: true
+
+provenance:
+  encoder_num_freqs: "GLU stage-0 YAML (collinear_re40_stage0.yaml num_freqs: 256)"
+  decoder_num_freqs: "SoftDomainAdaptiveReconstructor class default (64); upstream build_model does not pass num_freqs"
+  importance_scale: "0.50 class default; stage-0 YAML 0.25 unused because adaptive phi is off"
+  F_dim_heads_layers: "aligned with approved sparse candidate (32, 4, 4) not stage-1 F_dim=64"
+  per_sensor_sigma: "false per roadmap; stage-0 YAML true"
+  CalRecVar: "false per roadmap; stage-0 YAML true"
+  bandwidth_init: "0.05 shared (q-space with thesis isotropic map)"
