@@ -18,12 +18,12 @@ if [[ "${AUTHORIZE_S5_SUBMIT:-0}" != "1" ]]; then
 fi
 
 # Common env inlined: under sbatch $0 is the Slurm spool copy, so a relative source fails.
-TIP="${TIP:-$HOME/orcd/pool/official_thesis}"
+TIP="${TIP:-$HOME/projects/official_thesis_s5}"
 PY="${PY:-$HOME/envs/official_thesis/bin/python}"
-CACHE="${CACHE:-$HOME/orcd/pool/official_thesis_data/month2_dense_unet_cache}"
-HASHES="${HASHES:-$HOME/orcd/pool/official_thesis_data/cache_payload_hashes.json}"
-MASKS="${MASKS:-$HOME/orcd/pool/official_thesis_data/month2_sparse_eval_masks}"
-OUT_ROOT="${OUT_ROOT:-$HOME/orcd/pool/official_thesis_runs}"
+CACHE="${CACHE:-$TIP/data/processed/month2_dense_unet_cache}"
+HASHES="${HASHES:-$TIP/data/manifests/month2_dense_unet_cache_payload_hashes_s5_homecopy.json}"
+MASKS="${MASKS:-$TIP/data/processed/month2_sparse_eval_masks}"
+OUT_ROOT="${OUT_ROOT:-$HOME/official_thesis_s5_runs}"
 export PYTHONUNBUFFERED=1
 export PYTHONDONTWRITEBYTECODE=1
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-8}"
