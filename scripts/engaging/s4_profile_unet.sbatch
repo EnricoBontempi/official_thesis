@@ -9,7 +9,7 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=64G
 #SBATCH --time=2:00:00
-#SBATCH --requeue=0
+# No automatic requeue/restart on this diagnostic job.
 set -euo pipefail
 
 TIP="${TIP:-$HOME/orcd/pool/official_thesis}"
