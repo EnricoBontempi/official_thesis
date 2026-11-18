@@ -80,3 +80,16 @@ S4 **estimates** (not measured S5 runtime): U-Net ~2–3 h/run, GLU ~3–4.5 h/r
   - **Limit:** the original pool `manifest.json` could not be recovered, so keys absent from the tracked copy (shard_provenance, created_unix, build_wall_s, git_commit, etc.) were not diffed against it.
 - **Hash files:** frozen `data/manifests/month2_dense_unet_cache_payload_hashes.json` (aggregate `d0b1d068…`) preserved. New `data/manifests/month2_dense_unet_cache_payload_hashes_s5_homecopy.json` (aggregate `710bab909a0efb6cc1b4b4a0d7f7dcc4889472b7adc8076abb94fd529576ab5d`; only `manifest.json` differs). Integrity check on the manifest stays active; launchers point to the new file.
 - Launcher defaults changed (operational paths only): TIP, CACHE, HASHES, MASKS, OUT_ROOT. Mask manifest sha `2e2d8ff6…` and stats sha `678263fb…` unchanged. Protocol/configs unchanged.
+
+## Relaunch submission (2026-11-18, from HOME copy; execution SHA `38ac7fe40178982ac1bd33c5d5602a5e7d928d3b`)
+
+Submitted (all PENDING on `mit_normal_gpu`, L40S, at submit time; completion NOT claimed). Previous failed attempts 29555700–29555703 preserved.
+
+| Job ID | run_id |
+|---|---|
+| 29567988 | s5_sparse_unet_pon_seed0 |
+| 29567990 | s5_sparse_unet_poff_seed0 |
+| 29567992 | s5_adapted_glu_pon_seed0 |
+| 29567994 | s5_adapted_glu_poff_seed0 |
+
+Run dirs: `/home/bontempi/official_thesis_s5_runs/<run_id>/`. Slurm logs: `/home/bontempi/projects/official_thesis_s5/slurm-<jobid>.out`. Post-transfer sha256 check: all cache/mask/stats files OK. Config `artifacts.results_root_engaging` still names the pool path but is not read by code. The record commit itself follows the execution SHA (docs only).
