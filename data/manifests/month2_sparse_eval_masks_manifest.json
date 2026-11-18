@@ -1,0 +1,54 @@
+{
+  "aggregate_payload_sha256": "7be78f35ffea2ebc598adce8cec39dc719339aac17ecadde3137f2064891ffeb",
+  "algorithm_id": "nested_subset_extension_v1",
+  "depends_on_target_T": false,
+  "format_id": "month2_sparse_eval_masks_v1",
+  "grid_hw": [
+    128,
+    128
+  ],
+  "hash_semantics": {
+    "mask_hash": "sha256 of uint8 HxW boolean mask bytes (month2_observations.mask_hash)",
+    "not_observation_hash": "Baseline observation_hash may equal velocity_mask_hash at K=0; compare only objects with the same semantics."
+  },
+  "historical_5pct_join": {
+    "mismatches_sample": [],
+    "n_checked": 3309,
+    "n_matched": 3309,
+    "n_mismatched": 0,
+    "ok": true
+  },
+  "layout_id": "random_sparse_primary",
+  "mask_seed": 20261116,
+  "n_frames": 1103,
+  "n_instances": 3309,
+  "n_sites": {
+    "0.01": 164,
+    "0.05": 819,
+    "0.2": 3277
+  },
+  "nested_policy": {
+    "note": "1/20% nested are new artifacts; do not overwrite historical layouts",
+    "pct_1": "subset of 5% via RNG namespace nested_1pct_subset_v1",
+    "pct_20": "5% union extension from complement via nested_20pct_extension_v1",
+    "pct_5": "historical random_sparse_mask(0.05, seed=observation_mask_seed(...))"
+  },
+  "payload_files_sha256": {
+    "index_records.jsonl": "f933ebcbdcfc19d7e43a2b79093426d828947a55901dd5ea45e36bbd9017c630",
+    "seen_train_eval_nested_sites.npz": "2465847a8d001ab63bbe37bdef80ad495e3d9df4889cfb489024a95633e4501c",
+    "train_fit_nested_sites.npz": "dcc96cfc32c8eb9b941e26138ef6add94f9981a6aa965cf013ba73347205af3e",
+    "val_eval_nested_sites.npz": "c2e3e3ed804df18493af5372138c55707c34a6b8d14ea034bdac9d4ddfdd05d0"
+  },
+  "payload_root": "/home/enric/projects/official_thesis/data/processed/month2_sparse_eval_masks",
+  "replica_ids": [
+    0,
+    1,
+    2
+  ],
+  "roles": [
+    "train_fit",
+    "seen_train_eval",
+    "val_eval"
+  ],
+  "test_payloads": "none"
+}

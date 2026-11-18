@@ -3,7 +3,7 @@
 **Data aggiornamento Step 2.1:** 2026-11-16, America/New_York (UTC−05:00)  
 **Ambito:** esclusivamente `EnricoBontempi/official_thesis`; nessuna attività HONF.  
 **Stato aggiornato 2026-11-17 (U7):** protocollo, pipeline e baseline 2.1–2.3 eseguiti; consolidamento `3cf7bf0` sul branch dedicato (non ancora in main). **Step 2.4 / missione U-Net densa conclusa** su `mission/dense-unet` (U0–U7; p_on/p_off seed 0 + snapshot controls; repliche seed rinviate) — report [03_dense_velocity_diagnostic.md](03_dense_velocity_diagnostic.md). Engaging AMF/L40S verificati e usati. Steps 2.5–2.9 aperti; Mese 2 **non** concluso. Nessuna ratifica tecnica documentata dei supervisori.  
-**Aggiornamento 2026-11-18:** approvata operativamente e pubblicata [roadmapsparse.md](../../roadmapsparse.md). S0 documentale soltanto; audit implementativo, maschere persistite e training sparse ancora da eseguire per incarichi delimitati.  
+**Aggiornamento 2026-11-18:** approvata operativamente e pubblicata [roadmapsparse.md](../../roadmapsparse.md). **S1–S2 eseguiti e verificati** (maschere nested + join 3309/3309, audit GLU documentale, U-Net sparse 7ch + test/overfit diagnostico); report [05_sparse_reconstruction.md](05_sparse_reconstruction.md). **STOP A** — nessun training scientifico sparse; S3–S7 aperti.  
 **Piano operativo:** [roadmap_month2.md](../../roadmap_month2.md).  
 **Autorizzazione operativa Enrico:** conversazione del 16 novembre 2026 (approvazione roadmap e avvio lavoro). Distinta da qualsiasi approvazione dei supervisori.
 
@@ -26,7 +26,7 @@ Ricognizione precedente del remoto `main` a `6fd0f15` (con diario semplificato p
 | Pipeline dati Month-2 | moduli `month2_*`, report `01_pipeline_validation.md` | **Verificata in locale** (batch reale, isolation, gate TEST). |
 | Baseline Mese 2 (Step 2.3) | `month2_baselines_v1`, report `02_baseline_validation.md` | Eseguite in locale CPU; storico in `results/tables/`. |
 | Consolidamento post-revisione | `consolidation_v1`, report `mission_baseline_consolidation_report.md` | **Completata**: isolation/YAML/timeline corretti; replica identica entro tolleranza; in attesa Enrico/ChatGPT. |
-| Modelli / training neurali Mese 2 | U0–U7 denso chiusi su `mission/dense-unet` | Step 2.4 concluso nel perimetro dichiarato (seed 0; repliche rinviate). Sparse/GLU non avviati. |
+| Modelli / training neurali Mese 2 | U0–U7 denso chiusi; S1–S2 sparse su `mission/dense-unet` | Step 2.4 concluso. Sparse: infrastruttura + overfit diagnostico (STOP A); screening/GLU wrapper non avviati. |
 | GPU/allocazione Engaging | preflight + U4–U6 | **Verificati e usati** (AMF / L40S). Il ceiling storico proposto 24 GPU-ore è superato per la missione sparse (Enrico, 18 novembre): nessun tetto arbitrario in ore; profiling/plateau e walltime scheduler distinti. |
 
 ## 3. Lettura scientifica dei risultati corretti

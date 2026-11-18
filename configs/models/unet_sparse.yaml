@@ -1,0 +1,65 @@
+# Sparse U-Net for Month-2 sparse reconstruction (S2).
+# Consumed by combustion_recon.models.unet.SparseUNet / build_sparse_unet_from_config.
+# Dense unet_small.yaml and DenseUNet(assert in_channels==6) remain unchanged.
+
+model_id: unet_sparse_v1
+architecture: sparse_unet_concat_p_mask
+task: temperature_free_sparse_velocity_to_T
+
+input:
+  channels: 7
+  channel_order:
+    - vi_obs_norm
+    - vj_obs_norm
+    - Mv
+    - x_scaled
+    - y_scaled
+    - nh3_norm
+    - phi_norm
+  spatial: [128, 128]
+  conditioning: channel_concatenation_only
+  hidden_velocity_fill: zero_normalized
+  mask_channel: Mv_binary_co_located
+  forbidden:
+    - FiLM
+    - ParamMean_prior_in_forward
+    - temperature_in_input
+    - velocity_k
+    - interpolation_of_hidden_velocities
+    - warm_start_from_dense
+
+output:
+  channels: 1
+  representation: temperature_normalized_fit_only
+  head: conv1x1_linear
+
+encoder:
+  base_channels: 32
+  stage_multipliers: [1, 2, 4, 8]
+  bottleneck_multiplier: 8
+
+block:
+  convs_per_block: 2
+  kernel_size: 3
+  padding: 1
+  norm: group_norm
+  groups: 8
+  activation: silu
+  bias: true
+
+decoder:
+  n_upsamples: 4
+  upsample: bilinear
+  align_corners: false
+  skip: concatenate
+  out_multipliers: [8, 4, 2, 1]
+
+init:
+  body: kaiming_normal_fan_out_relu_compatible
+  head_weight_std: 1.0e-3
+  head_bias: 0.0
+  note: Fresh initialization; no dense warm-start.
+
+regularization_initial:
+  dropout: 0.0
+  augmentation: none

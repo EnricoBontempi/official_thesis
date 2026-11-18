@@ -1,0 +1,102 @@
+{
+  "history": [
+    {
+      "epoch": 1,
+      "mean_train_loss": 1.0015190243721008,
+      "update": 2,
+      "mask_epoch_used": 0
+    },
+    {
+      "epoch": 2,
+      "mean_train_loss": 0.9839464128017426,
+      "update": 4,
+      "mask_epoch_used": 1
+    },
+    {
+      "epoch": 3,
+      "mean_train_loss": 0.9335749745368958,
+      "update": 6,
+      "mask_epoch_used": 2
+    },
+    {
+      "epoch": 4,
+      "mean_train_loss": 0.8751961588859558,
+      "update": 8,
+      "mask_epoch_used": 3
+    },
+    {
+      "epoch": 5,
+      "mean_train_loss": 0.8257172405719757,
+      "update": 10,
+      "mask_epoch_used": 4
+    },
+    {
+      "epoch": 6,
+      "mean_train_loss": 0.7686465382575989,
+      "update": 12,
+      "mask_epoch_used": 5
+    },
+    {
+      "epoch": 7,
+      "mean_train_loss": 0.7132156193256378,
+      "update": 14,
+      "mask_epoch_used": 6
+    },
+    {
+      "epoch": 8,
+      "mean_train_loss": 0.6316481530666351,
+      "update": 16,
+      "mask_epoch_used": 7
+    },
+    {
+      "epoch": 9,
+      "mean_train_loss": 0.6067594736814499,
+      "update": 18,
+      "mask_epoch_used": 8
+    },
+    {
+      "epoch": 10,
+      "mean_train_loss": 0.5638025999069214,
+      "update": 20,
+      "mask_epoch_used": 9
+    },
+    {
+      "epoch": 11,
+      "mean_train_loss": 0.5053924322128296,
+      "update": 22,
+      "mask_epoch_used": 10
+    },
+    {
+      "epoch": 12,
+      "mean_train_loss": 0.5155120193958282,
+      "update": 24,
+      "mask_epoch_used": 11
+    },
+    {
+      "epoch": 13,
+      "mean_train_loss": 0.4384264349937439,
+      "update": 26,
+      "mask_epoch_used": 12
+    },
+    {
+      "epoch": 14,
+      "mean_train_loss": 0.4058615565299988,
+      "update": 28,
+      "mask_epoch_used": 13
+    },
+    {
+      "epoch": 15,
+      "mean_train_loss": 0.38284097611904144,
+      "update": 30,
+      "mask_epoch_used": 14
+    }
+  ],
+  "state": {
+    "epoch": 15,
+    "update": 30,
+    "samples_seen": 120,
+    "best_train_loss": 0.38284097611904144,
+    "status": "completed",
+    "stop_reason": "n_epochs"
+  }
+}

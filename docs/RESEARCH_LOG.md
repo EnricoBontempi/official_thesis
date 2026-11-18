@@ -253,3 +253,16 @@ Questo file è il diario del progetto di tesi in `official_thesis` (ricostruzion
 - **Risorse:** Enrico richiede esplicitamente nessun tetto arbitrario di ore per training/campagna; precedente ceiling proposto 24 GPU-h superato per la missione sparse. Profiling e costo visibile, plateau operativo e tranche iniziale 1000 epoche riesaminabile dalle curve; walltime scheduler distinto, checkpoint/resume. Fino a quattro run concorrenti dopo validazione e verifica degli slot effettivi. Nessun training avviato da questo mandato documentale.
 - **Output:** roadmap sparse, riferimenti e stato in roadmap Mese 2/README/registro D4-D8. Documenti e fonti preesistenti letti; controlli documentali, nessuna prova torch/GPU/raw.
 - **Stato/STOP:** soltanto S0 pubblicazione; S1–S7 non eseguiti. Prossimo incarico Cursor previsto S1–S2 (osservazioni/audit + U-Net piccola verificata), STOP A prima dei run scientifici. Mese 2 ancora aperto, niente GLU/sparse/assisted/TEST avviati; nessuna ratifica supervisori o merge main.
+
+---
+
+## 2026-11-18 — S1–S2 sparse: maschere persistite, audit GLU, U-Net 7ch (STOP A)
+
+- **Base:** roadmap `5de0d7be…`; branch `mission/dense-unet`; denso U0–U7 non riaperto.
+- **S1 maschere:** materializzate 1%⊂5%⊂20% (164/819/3277) per 1103×3=**3309** istanze; join storico 5% **3309/3309**; verified_examples @5% 3/3; payload `data/processed/month2_sparse_eval_masks/` (aggregate SHA `7be78f35…`); manifest versionato; nessun TEST.
+- **S1 GLU:** solo audit in `docs/month2/04_glu_release_adaptation.md`; `external/` invariato; wrapper non implementato.
+- **S2:** `SparseUNet` 7 canali, **4 903 041** parametri (b=32); cache densa riusata dopo fingerprint; train_mask_seed=20261118 con `set_epoch`; protocollo `month2_sparse_protocol.yaml` rifiuta chiavi sconosciute.
+- **Test:** 14 pytest passati (isolamento, contratti, resume complete≠partial, Kelvin, omogeneità evaluator).
+- **Overfit diagnostico (CPU, 8 frame train_fit, seed subset 7):** fixed masks 40 ep loss 1.0015→0.1287; variable masks 15 ep 1.0015→0.3828; pesi **non** scientifici. Artefatti `results/month2/sparse_s2_diagnostic_overfit/`.
+- **Report:** `docs/month2/05_sparse_reconstruction.md`.
+- **STOP A:** niente S3/GLU trainer, niente screening/training 760, niente tuning VAL, niente tetti 24 GPU-h reintrodotti.

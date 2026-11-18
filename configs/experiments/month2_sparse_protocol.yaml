@@ -1,0 +1,89 @@
+# Executable sparse protocol contract (S1–S2). Unknown scientific keys are refused.
+protocol_id: month2_sparse_v1
+roadmap: roadmapsparse.md
+status: s1_s2_implementation
+scientific_training_authorized: false
+
+roles:
+  train_fit: 760
+  seen_train_eval: 220
+  val_eval: 123
+  test_payloads: none
+
+observation:
+  components: 2C
+  co_located: true
+  K: 0
+  task_mode: temperature_free
+  coverages_nominal: [0.01, 0.05, 0.20]
+  n_sites: {0.01: 164, 0.05: 819, 0.20: 3277}
+  layout_id: random_sparse_primary
+  eval_mask_seed: 20261116
+  eval_replicas: [0, 1, 2]
+  nested_policy: nested_subset_extension_v1
+  mask_payload_manifest: data/manifests/month2_sparse_eval_masks_manifest.json
+  mask_payload_root: data/processed/month2_sparse_eval_masks
+  format_id: month2_sparse_eval_masks_v1
+
+training_masks:
+  first_contract_coverage: 0.05
+  train_mask_seed: 20261118
+  resample_per_frame_epoch: true
+  namespace: training_mask_seed  # distinct from eval observation_mask_seed
+  set_epoch_required: true
+
+seeds:
+  model_seed: 0
+  shuffle_seed: 0
+  train_mask_seed: 20261118
+  eval_mask_seed: 20261116
+
+normalization:
+  stats: data/manifests/train_norm_stats_month2_fit.json
+  fit_only: true
+  distinguish_physical_vs_normalized: true
+  baseline_adapters_require: physical_m_s
+
+cache:
+  reuse: data/processed/month2_dense_unet_cache
+  verify_fingerprints_on_load: true
+  rebuild_raw_if_invalid: false
+
+unet_sparse:
+  config: configs/models/unet_sparse.yaml
+  channels: 7
+  channel_order:
+    - vi_obs_norm
+    - vj_obs_norm
+    - Mv
+    - x_scaled
+    - y_scaled
+    - nh3_norm
+    - phi_norm
+  base_channels: 32
+  p_off_zeros_last_two_channels: true
+  warm_start_dense: false
+
+glu:
+  implementation_phase: S3
+  audit: docs/month2/04_glu_release_adaptation.md
+  wrapper_authorized_this_mission: false
+
+forbidden_this_mission:
+  - scientific_training_760
+  - val_tuning
+  - glu_wrapper_implementation
+  - s4_profiling_freeze
+  - s5_screening
+  - comparative_baseline_eval_1_20
+  - scientific_snapshot_control
+  - test_payloads
+  - new_raw_downloads
+  - modify_HONF
+  - modify_external_GLU_Reconstruction
+  - reopen_dense_U0_U7
+
+diagnostic_overfit:
+  n_frames: 8
+  role: train_fit
+  weights_reusable_for_science: false

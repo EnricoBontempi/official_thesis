@@ -7,7 +7,12 @@ from combustion_recon.models.baselines import (
     ParamConditionedMeanPredictor,
     apply_anchor_offset,
 )
-from combustion_recon.models.unet import DenseUNet, build_dense_unet_from_config
+from combustion_recon.models.unet import (
+    DenseUNet,
+    SparseUNet,
+    build_dense_unet_from_config,
+    build_sparse_unet_from_config,
+)
 
 __all__ = [
     "GappyPODReconstructor",
@@ -16,5 +21,7 @@ __all__ = [
     "ParamConditionedMeanPredictor",
     "apply_anchor_offset",
     "DenseUNet",
+    "SparseUNet",
     "build_dense_unet_from_config",
+    "build_sparse_unet_from_config",
 ]

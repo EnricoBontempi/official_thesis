@@ -3,7 +3,7 @@
 **Progetto:** esclusivamente `EnricoBontempi/official_thesis`, MIT / Deng Lab.  
 **Data:** 2026-11-18, America/New_York.  
 **Base verificata:** `87d1e3f40826a9343c3c2ce19d140d481b911619`, chiusura U7, branch `mission/dense-unet`.  
-**Stato:** piano scritto e pubblicato su richiesta di Enrico; nessuna implementazione sparse, prova GPU o nuovo training eseguito per questa pubblicazione. Solo S0 completato.  
+**Stato:** S0–S2 completati su `mission/dense-unet` (maschere persistite 3309/3309, audit GLU documentale, U-Net sparse 7 canali + test/overfit diagnostico). **STOP A.** Nessun training scientifico sparse; S3–S7 aperti.  
 **Piano principale:** [roadmap_month2.md](roadmap_month2.md). Questo documento dettaglia **2.5–2.6 e la sola conferma sparse pertinente di 2.8**; non chiude il Mese 2 e non autorizza assisted o TEST.  
 **Esecutore:** Cursor, per incarichi delimitati successivi. Pubblicare il piano non autorizza a percorrerlo automaticamente.
 
@@ -273,12 +273,12 @@ Per ogni run: SHA e hash sorgenti/config, working tree con tracked/untracked dis
 Estensioni di tranche esplicite, checkpoint completi distinti da partial; no reset stato e no continuazione da epoca incompleta. Pubblicare tabelle/figure/script e risultati negativi. Prima di push rileggere remoto; fast-forward senza force; nessuna PR/merge implicita nell'incarico.
 
 - [x] S0 — Piano documentale approvato operativamente da Enrico; pubblicazione, nessun esperimento.
-- [ ] S1 — Osservazioni persistite e audit GLU.
-- [ ] S2 — U-Net sparse/test/overfit/resume. STOP A.
+- [x] S1 — Osservazioni persistite (3309/3309 @5%, nested 1⊂5⊂20) e audit GLU documentale (`04_glu_release_adaptation.md`).
+- [x] S2 — U-Net sparse/test/overfit/resume. **STOP A.**
 - [ ] S3 — GLU adattato e verifiche. STOP B.
 - [ ] S4 — Baseline/profiling/freeze. STOP C.
 - [ ] S5 — Screening seed 0. STOP D.
 - [ ] S6 — Confronti/coperture/snapshot e scelta finalisti. STOP E.
 - [ ] S7 — Repliche/chiusura con limiti o rinvii dichiarati. STOP F.
 
-**Prossimo incarico previsto:** S1–S2, con STOP A prima del training scientifico. Questa pubblicazione termina a S0.
+**Prossimo incarico previsto:** S3 (GLU wrapper + prove piccole), poi STOP B. Nessun training scientifico da questa chiusura S1–S2.
