@@ -1,10 +1,10 @@
 # S5 neural protocol freeze + submission record
 
 **Branch:** `mission/dense-unet`  
-**Freeze / execution SHA:** _(filled at commit/submit)_  
+**Freeze / execution SHA:** `797134348e78feb9c4d26ada1157fc03cbbf9f9d`  
 **Profiling SHA (reference):** `740805f7e5537090a0f08478cdc1587ed6c9c5e3` (jobs 29554165 / 29554166)  
 **S4:** neural feasibility verified; GappyPOD 1/20% **still open** — S4 not declared fully complete.  
-**S5 status:** **submitted** (this record). Runs **not** declared completed here.
+**S5 status:** **submitted** (`2026-11-18T12:47:33-05:00`). Runs **not** declared completed here.
 
 ## Checkpoint correction (pre-launch)
 
@@ -12,24 +12,38 @@
 - Absolute-best **weights** remain the selection snapshot; state is epoch-boundary coherent.
 - Atomic `torch.save` via temp + `os.replace`.
 - Partial checkpoints remain separate; never overwrite complete `last.pt`.
+- Tests: `tests/test_sparse_scientific_trainer.py` (7 passed) — warmup crossed, LR reduce asserted, early-stop reset, continuous vs resume, resume-from-best + extend, partial/incompat reject.
 
 ## Frozen runs (seed 0, fresh init)
 
-| run_id | Family | p | Config |
-|---|---|---|---|
-| `s5_sparse_unet_pon_seed0` | sparse_unet | on | `configs/experiments/s5_sparse_unet_pon_seed0.yaml` |
-| `s5_sparse_unet_poff_seed0` | sparse_unet | off | `configs/experiments/s5_sparse_unet_poff_seed0.yaml` |
-| `s5_adapted_glu_pon_seed0` | adapted_glu | on | `configs/experiments/s5_adapted_glu_pon_seed0.yaml` |
-| `s5_adapted_glu_poff_seed0` | adapted_glu | off | `configs/experiments/s5_adapted_glu_poff_seed0.yaml` |
+| Job ID | run_id | Family / p | Config | config sha256 |
+|---|---|---|---|---|
+| **29555700** | `s5_sparse_unet_pon_seed0` | U-Net p_on | `configs/experiments/s5_sparse_unet_pon_seed0.yaml` | `be71eafd740cd40e3f757d8cd1bcd38cfe81a416914f5129d1d656fe0c873772` |
+| **29555701** | `s5_sparse_unet_poff_seed0` | U-Net p_off | `configs/experiments/s5_sparse_unet_poff_seed0.yaml` | `e6a56bbfec29e674c3f89f86ef29459bbe345d7d0ed05477959d34e239013859` |
+| **29555702** | `s5_adapted_glu_pon_seed0` | GLU p_on | `configs/experiments/s5_adapted_glu_pon_seed0.yaml` | `cd72809489ab8d32662abdbd82eac9114c646c12bc1b275f8fceb79a6c46886b` |
+| **29555703** | `s5_adapted_glu_poff_seed0` | GLU p_off | `configs/experiments/s5_adapted_glu_poff_seed0.yaml` | `fbe862fc82982681d90b350bf068804efc4e03ee7bd98330d2f557983003e977` |
 
 Contract: 5% only, K=0, batch 8, microbatch null, 16384 GLU queries, fp32, AdamW 1e-3/1e-4, clip 1, warmup 950, plateau/early-stop per roadmap, VAL 5%×3 every 10 epochs, tranche 1000, no S4 weight reuse. `p_off` zeros parameter channels / GLU `p` per batch.
 
-## Operational resources
+## Operational resources (each job)
 
 - Partition/account/QoS: `mit_normal_gpu` / `mit_amf_advanced_gpu` / `mit_amf_advanced_gpu`
 - GRES: `gpu:l40s:1` (non-preemptable); mem 64G; 8 CPU; Slurm wall `06:00:00`
 - Internal `wall_time_cap_hours: 5.5` (margin under Slurm; incomplete epoch → partial interrupt, not “converged”)
 - No automatic requeue; no preemptable fallback; HONF untouched
+- One-shot queue at submit: empty personal queue before submit; all four PENDING on normal L40S after submit
+
+## Absolute paths (Engaging)
+
+| run_id | Run dir | Expected artifacts |
+|---|---|---|
+| s5_sparse_unet_pon_seed0 | `/home/bontempi/orcd/pool/official_thesis_runs/s5_sparse_unet_pon_seed0/` | `progress.json`, `checkpoints/{best,last}.pt`, `stdout.log`, `slurm_context.txt` |
+| s5_sparse_unet_poff_seed0 | `/home/bontempi/orcd/pool/official_thesis_runs/s5_sparse_unet_poff_seed0/` | same |
+| s5_adapted_glu_pon_seed0 | `/home/bontempi/orcd/pool/official_thesis_runs/s5_adapted_glu_pon_seed0/` | same |
+| s5_adapted_glu_poff_seed0 | `/home/bontempi/orcd/pool/official_thesis_runs/s5_adapted_glu_poff_seed0/` | same |
+
+Slurm stdout: `/home/bontempi/orcd/pool/official_thesis/slurm-29555700.out` … `slurm-29555703.out`  
+Launcher record: `/home/bontempi/orcd/pool/official_thesis_runs/launcher/s5_submit_797134348e78feb9c4d26ada1157fc03cbbf9f9d.txt`
 
 ## Provenance (Engaging payloads)
 
@@ -37,19 +51,8 @@ Contract: 5% only, K=0, batch 8, microbatch null, 16384 GLU queries, fp32, AdamW
 - Geometry: `97e2e9df79c87a3fbf019fa1d9ac270aafe42319f83425afb5f3fb3be8f36ce7`
 - Stats: `678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e`
 - Masks aggregate (Git manifest): `7be78f35ffea2ebc598adce8cec39dc719339aac17ecadde3137f2064891ffeb`
+- Mask manifest file sha: `2e2d8ff6edabf62ad56702a155140d064c0b4014d06ee96debf52811efa5c75e`
 - Env: `/home/bontempi/envs/official_thesis` (torch `2.8.0+cu128`, einops `0.8.2`)
-
-## Job IDs (filled at submit)
-
-| Job ID | run_id | Model / p |
-|---|---|---|
-| TBD | s5_sparse_unet_pon_seed0 | U-Net p_on |
-| TBD | s5_sparse_unet_poff_seed0 | U-Net p_off |
-| TBD | s5_adapted_glu_pon_seed0 | GLU p_on |
-| TBD | s5_adapted_glu_poff_seed0 | GLU p_off |
-
-Run roots: `/home/bontempi/orcd/pool/official_thesis_runs/<run_id>/`  
-Slurm stdout: `/home/bontempi/orcd/pool/official_thesis/slurm-<jobid>.out`
 
 ## Duration note
 
