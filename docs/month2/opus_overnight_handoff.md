@@ -92,3 +92,22 @@ tail -n 40 ~/official_thesis_opus_c149_runs/O-C149-on-s0/stdout.log
 Remote note: `~/official_thesis_opus_c149_runs/wave2_c149_submission.txt`.  
 C149 prep SHA: `07646e884d89da9b04383b77b6c71802f8870a81`.  
 Wave-1 tip left at `969b6c7`. Astra tip not modified (Astra GPU jobs observed pending separately). No polling after submit.
+
+## Morning read and C149 attempt2 (submitted, not finished)
+
+Wave-1 jobs **29612010–29612013** reached early-stop with complete checkpoints. Verify **29613544** completed; its remote report is `status=ok`. GPU jobs **29613545** and **29613546** exited 1 in seconds on L40S. `SparseUNetCacheDataset` called `validate_dense_cache_manifest` with the historical allowlist only, so cache id `month2_dense_unet_cache_opus_c149_v1` was refused before epoch 0. Those run directories and `slurm-29613545.out` / `slurm-29613546.out` stay in place.
+
+Attempt2 does not resume and does not reuse those directories. Executed code is `d6332000491ba0e8983b9e7fa09b34badb191ea4` on `/home/bontempi/projects/official_thesis_opus_c149_attempt2` (detached, clean except `.git_commit`). The previous C149 checkout remains `f061df1`. Output root: `/home/bontempi/official_thesis_opus_c149_attempt2_runs/`. Cache and verify report of 29613544 were reused after the login gate matched id, counts 2980/220/123, shared-A38 760 frames at max abs 0, and payload aggregate `fa1c9358deb3bda0313cd74f9ab6855af87bc969c4069a463073d4c4120f03b4`.
+
+| Scientific run | Attempt2 job | State at submit | Preserved failure |
+| --- | --- | --- | --- |
+| O-C149-on-s0 | **29645053** | PENDING 2026-11-19T09:38:08-05:00 | 29613545 |
+| O-C149-off-s0 | **29645054** | PENDING 2026-11-19T09:38:08-05:00 | 29613546 |
+
+Resources: `mit_normal_gpu`, account/QoS `mit_amf_advanced_gpu`, `gpu:l40s:1`, 8 CPU, 64G, 6h. No general/preemptable fallback. Training is not complete.
+
+```bash
+ssh engaging 'squeue -j 29645053,29645054 -o "%.18i %.24j %.20P %.24a %.24q %.2t %.10M %R"'
+ssh engaging 'sacct -j 29645053,29645054 -X -o JobID,State,ExitCode,Elapsed,NodeList'
+ssh engaging 'tail -n 40 ~/official_thesis_opus_c149_attempt2_runs/O-C149-on-s0/stdout.log'
+```

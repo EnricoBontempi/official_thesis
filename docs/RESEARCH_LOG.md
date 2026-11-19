@@ -401,3 +401,13 @@ Numeri di run, soglie e raccomandazioni dettagliate dei revisori **non** sono de
 
 **Sei training Opus nuovi:** A38 s1 on/off, B19 s0 on/off (29612010–13), C149 s0 on/off (questa onda).
 
+---
+
+## 2026-11-19 — Opus C149 attempt2: allowlist della cache e risubmission
+
+**Lettura notturna, non un nuovo calcolo.** Wave-1 **29612010–29612013**: Slurm COMPLETED per early-stop, con checkpoint `best`/`last`/`best_seen_diagnostic`. Il verify **29613544** è COMPLETED e il report remoto ha `status=ok` (2980/220/123, 760 frame condivisi a differenza 0). **29613545** e **29613546** sono FAILED in 9–14 s su L40S, prima dell'epoca 0: `SparseUNetCacheDataset` invocava `validate_dense_cache_manifest` senza allowlist, quindi l'unico id ammesso restava `month2_dense_unet_cache_v1`. Il Reason `QOSMaxGRESPerUser` è l'attesa in coda, non la causa dell'exit 1. Directory e `slurm-2961354{5,6}.out` del tentativo 1 sono conservati.
+
+**Correzione eseguita.** `cache_validation_kwargs` passa il contratto del run al dataset: C149 solo `month2_dense_unet_cache_opus_c149_v1`, con conteggi 2980/220/123 e protocollo C149; A38, B19 e il default solo l'id storico. I conteggi servono perché, superato l'id, la stessa funzione avrebbe confrontato 2980 con il default storico 760. Gli altri gate di manifest restano. Test: `tests/test_opus_c149_cache_contract.py` insieme a `tests/test_scientific_epoch_sampler.py`, 22 passed. Nessun training locale.
+
+**Attempt2 sottomesso, non concluso.** SHA eseguito `d6332000491ba0e8983b9e7fa09b34badb191ea4`. Checkout congelato `/home/bontempi/projects/official_thesis_opus_c149_attempt2`; il checkout precedente resta `f061df1`. Job **29645053** (`O-C149-on-s0`) e **29645054** (`O-C149-off-s0`), PENDING alle 09:38:08 EST, `mit_normal_gpu` / `mit_amf_advanced_gpu` / L40S×1 / 64G / 6h. Output nuovo: `/home/bontempi/official_thesis_opus_c149_attempt2_runs/`. Cache e report di 29613544 riusati; aggregate payload `fa1c9358deb3bda0313cd74f9ab6855af87bc969c4069a463073d4c4120f03b4`. Nessun warm start. Wave-1, S5, Astra e HONF non toccati. Opus, sparse e Mese 2 restano aperti. Dettaglio: [opus_overnight_handoff.md](month2/opus_overnight_handoff.md).
+
