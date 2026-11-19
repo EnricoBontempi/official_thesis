@@ -137,6 +137,8 @@ def test_pool_nesting_and_counts_on_real_cache():
         "opus_O-A38-off-s1.yaml",
         "opus_O-B19-on-s0.yaml",
         "opus_O-B19-off-s0.yaml",
+        "opus_O-C149-on-s0.yaml",
+        "opus_O-C149-off-s0.yaml",
     ],
 )
 def test_opus_candidate_contracts(name: str):

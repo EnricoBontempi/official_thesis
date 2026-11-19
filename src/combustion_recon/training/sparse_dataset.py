@@ -62,6 +62,9 @@ class SparseUNetCacheDataset(Dataset):
         vi_phys: np.ndarray | None = None,
         vj_phys: np.ndarray | None = None,
         normalizer: Any | None = None,
+        allowed_cache_ids: Sequence[str] | None = None,
+        expected_role_counts: dict[str, int] | None = None,
+        frame_protocol_path: str | Path | None = None,
     ):
         if role in FORBIDDEN_ROLES:
             raise DenseCacheError(f"refusing TEST role {role!r}")
@@ -81,6 +84,13 @@ class SparseUNetCacheDataset(Dataset):
         self.require_denorm_phys = bool(require_denorm_phys)
         self.require_eval_mask_payload = bool(require_eval_mask_payload)
         self.normalizer = normalizer
+        self.allowed_cache_ids = None if allowed_cache_ids is None else list(allowed_cache_ids)
+        self.expected_role_counts = (
+            None if expected_role_counts is None else dict(expected_role_counts)
+        )
+        self.frame_protocol_path = (
+            None if frame_protocol_path is None else Path(frame_protocol_path)
+        )
 
         self.root = Path(cache_root) if cache_root is not None else DEFAULT_CACHE_ROOT
         self.paths = DenseCachePaths.from_root(self.root)
@@ -91,6 +101,9 @@ class SparseUNetCacheDataset(Dataset):
             self.manifest,
             cache_root=self.root,
             require_roles=(role,),
+            allowed_cache_ids=self.allowed_cache_ids,
+            expected_role_counts=self.expected_role_counts,
+            frame_protocol_path=self.frame_protocol_path,
         )
 
         rd = self.root / role

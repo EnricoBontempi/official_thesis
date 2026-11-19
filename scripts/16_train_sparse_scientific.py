@@ -33,8 +33,7 @@ from combustion_recon.models.unet import build_sparse_unet_from_config  # noqa: 
 from combustion_recon.training.dense_cache import (  # noqa: E402
     DEFAULT_CACHE_ROOT,
     OPUS_C149_CACHE_ID,
-    OPUS_C149_EXPECTED_COUNTS,
-    OPUS_C149_FRAME_PROTOCOL,
+    cache_validation_kwargs,
     compute_cache_payload_hashes,
     validate_dense_cache_manifest,
     verify_cache_payload_hashes,
@@ -145,25 +144,17 @@ def main() -> int:
     cfg = config_from_candidate(cand, device=args.device, wall_time_cap_s=wall_s)
     pool_id = cfg.pool_id or "A38"
 
-    if pool_id == "C149":
-        if manifest.get("cache_id") != OPUS_C149_CACHE_ID:
-            raise SystemExit(
-                f"C149 requires cache_id={OPUS_C149_CACHE_ID}, got {manifest.get('cache_id')}"
-            )
-        validate_dense_cache_manifest(
-            manifest,
-            cache_root=cache_root,
-            require_roles=("train_fit", "seen_train_eval", "val_eval"),
-            expected_role_counts=OPUS_C149_EXPECTED_COUNTS,
-            allowed_cache_ids=[OPUS_C149_CACHE_ID],
-            frame_protocol_path=OPUS_C149_FRAME_PROTOCOL,
+    cache_kwargs = cache_validation_kwargs(pool_id)
+    if pool_id == "C149" and manifest.get("cache_id") != OPUS_C149_CACHE_ID:
+        raise SystemExit(
+            f"C149 requires cache_id={OPUS_C149_CACHE_ID}, got {manifest.get('cache_id')}"
         )
-    else:
-        validate_dense_cache_manifest(
-            manifest,
-            cache_root=cache_root,
-            require_roles=("train_fit", "seen_train_eval", "val_eval"),
-        )
+    validate_dense_cache_manifest(
+        manifest,
+        cache_root=cache_root,
+        require_roles=("train_fit", "seen_train_eval", "val_eval"),
+        **cache_kwargs,
+    )
     payload_hashes = compute_cache_payload_hashes(cache_root)
     if args.expect_cache_hashes:
         expected = json.loads(Path(args.expect_cache_hashes).read_text())
@@ -206,6 +197,7 @@ def main() -> int:
         normalizer=normalizer,
         eval_mask_payload_root=args.mask_root,
         require_eval_mask_payload=require_payload,
+        **cache_kwargs,
     )
     # Historical 760-frame reference for TRAIN diagnostic (B19/C149 included).
     train_eval_ds = SparseUNetCacheDataset(
@@ -221,6 +213,7 @@ def main() -> int:
         normalizer=normalizer,
         eval_mask_payload_root=args.mask_root,
         require_eval_mask_payload=require_payload,
+        **cache_kwargs,
     )
     val_ds = SparseUNetCacheDataset(
         "val_eval",
@@ -233,6 +226,7 @@ def main() -> int:
         normalizer=normalizer,
         eval_mask_payload_root=args.mask_root,
         require_eval_mask_payload=require_payload,
+        **cache_kwargs,
     )
     seen_ds = SparseUNetCacheDataset(
         "seen_train_eval",
@@ -246,6 +240,7 @@ def main() -> int:
         normalizer=normalizer,
         eval_mask_payload_root=args.mask_root,
         require_eval_mask_payload=require_payload,
+        **cache_kwargs,
     )
 
     if cfg.family == "sparse_unet":

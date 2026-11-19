@@ -69,6 +69,27 @@ OPUS_C149_FRAME_PROTOCOL = (
 HISTORICAL_CACHE_ID = "month2_dense_unet_cache_v1"
 
 
+def cache_validation_kwargs(pool_id: str | None) -> dict[str, Any]:
+    """Manifest-validation kwargs for one Opus/S5 run.
+
+    C149 may name only the densified Opus cache, with that cache's counts and
+    frame protocol. A38, B19, and the historical default may name only the
+    historical cache id. Every other manifest gate stays inside
+    ``validate_dense_cache_manifest``.
+    """
+    if pool_id == "C149":
+        return {
+            "allowed_cache_ids": [OPUS_C149_CACHE_ID],
+            "expected_role_counts": dict(OPUS_C149_EXPECTED_COUNTS),
+            "frame_protocol_path": OPUS_C149_FRAME_PROTOCOL,
+        }
+    if pool_id in (None, "A38", "B19"):
+        return {"allowed_cache_ids": [HISTORICAL_CACHE_ID]}
+    raise ValueError(
+        f"unknown pool_id {pool_id!r}; expected C149, A38, B19, or None"
+    )
+
+
 class DenseCacheError(ValueError):
     """Raised when dense cache construction or reuse fails a contract check."""
 

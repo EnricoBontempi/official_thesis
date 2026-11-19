@@ -109,18 +109,26 @@ operational_from_s5_recipe:
   sbatch_qos: mit_amf_advanced_gpu
   microbatch_size: null
   note: >
-    C149 uses densified cache month2_dense_unet_cache_c149 and a separate
-    Engaging tip official_thesis_opus_c149 so wave-1 jobs stay untouched.
+    C149 attempt2 reuses the verified densified cache. Output is a new
+    directory. The failed attempt and wave-1 runs stay untouched.
   pool_frames_per_condition: 149
   pool_total_frames: 2980
   freeze_record: roadmapopus.md
 
 artifacts:
-  results_root_engaging: /home/bontempi/official_thesis_opus_c149_runs
+  results_root_engaging: /home/bontempi/official_thesis_opus_c149_attempt2_runs
   run_id: O-C149-off-s0
+  scientific_run_id: O-C149-off-s0
+  attempt: 2
+  previous_failed_job: 29613546
+  previous_out_preserved: /home/bontempi/official_thesis_opus_c149_runs/O-C149-off-s0
+  previous_slurm_log_preserved: /home/bontempi/projects/official_thesis_opus_c149/slurm-29613546.out
+  previous_checkout_preserved: /home/bontempi/projects/official_thesis_opus_c149
+  warm_start: false
   refuse_overwrite_existing_run_dir: true
   refuse_load_s5_or_wave1_checkpoints: true
 
 notes:
-  - Opus wave-2 C149 only; no GLU/Astra/S7/TEST.
+  - Opus C149 attempt2 of the same scientific run. No GLU/Astra/S7/TEST.
+  - Attempt 1 died before epoch 0 because SparseUNetCacheDataset validated only the historical cache id.
   - train_eval metric uses reference760 (A38 subset) even though pool is 2980.
