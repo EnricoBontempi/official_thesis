@@ -2,7 +2,7 @@
 
 **Date:** 2026-11-19 (America/New_York).  
 **Branch:** `mission/dense-unet`.  
-**Prep SHA:** *(filled at submission; see `submission_record` below or `git rev-parse HEAD`)*.  
+**Prep SHA:** `969b6c78a84465eb89b63bb5b7a0187c908652e5`.  
 **Organization tomorrow:** Cursor follows Opus; a new Claude Code/Sonnet chat follows Astra; coordinated by a new Sol chat. Astra may use the four original S5 best checkpoints for its primary diagnosis — it does **not** wait for C149.
 
 ## Submitted wave-1 runs (authorized)
@@ -90,14 +90,14 @@ tail -n 50 ~/official_thesis_opus_runs/O-A38-on-s1/stdout.log
 
 ## Submission record
 
-*(Agent fills job IDs and prep SHA at submit time.)*
+Submitted 2026-11-19T00:20:36-05:00 on Engaging (`mit_normal_gpu` / `mit_amf_advanced_gpu`, L40S×1, 64G, 6h). Remote note: `~/official_thesis_opus_runs/wave1_submission.txt`.
 
 | Run ID | Job ID | State at submit |
 | --- | --- | --- |
-| O-A38-on-s1 | TBD | submitted |
-| O-A38-off-s1 | TBD | submitted |
-| O-B19-on-s0 | TBD | submitted |
-| O-B19-off-s0 | TBD | submitted |
+| O-A38-on-s1 | **29612010** | PD (submitted) |
+| O-A38-off-s1 | **29612011** | PD (submitted) |
+| O-B19-on-s0 | **29612012** | PD (submitted) |
+| O-B19-off-s0 | **29612013** | PD (submitted) |
 
-Prep SHA: TBD  
-No Astra activity executed in this session.
+Prep SHA: `969b6c78a84465eb89b63bb5b7a0187c908652e5`  
+No Astra activity executed in this session. No polling/relaunch after submit.
