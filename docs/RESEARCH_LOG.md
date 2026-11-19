@@ -444,3 +444,33 @@ C149 attempt2 è il run scientifico: init condivisa fra on e off a seed 0, cache
 
 **Submission.** SHA eseguito `32a59cab21884d8c052f941f526c7cf09367b1f3`. Checkout congelato `/home/bontempi/projects/official_thesis_opus_a38s0`. Output nuovo `/home/bontempi/official_thesis_opus_a38s0_runs/`. Job **29671719** (`O-A38-on-s0`) e **29671721** (`O-A38-off-s0`), entrambi PENDING alle 14:19:40 EST. Risorse del freeze A38: `mit_normal_gpu`, account/QoS `mit_amf_advanced_gpu`, L40S×1, 8 CPU, 64G, 6h, tetto interno 5.5h. Il QoS consente 4 GPU, 64 CPU e 1T per utente; il replay ne occupava una, quindi i due riferimenti rientrano nel tetto e possono partire quando la partizione ha i nodi. Cache storica `month2_dense_unet_cache_v1`, aggregate `710bab909a0efb6cc1b4b4a0d7f7dcc4889472b7adc8076abb94fd529576ab5d`; il gate rifiuta la cache C149. Gli hash consumati vengono scritti in `slurm_context_O-A38-*-s0.txt` all'avvio, prima del training. Wave-1, C149, bridge, Astra, S5 e HONF non sono stati toccati. Opus resta aperto.
 
+
+
+---
+
+## 2026-11-19 — Chiusura Astra primaria e diagnostica median9; revisione Neon
+
+**Decisione di Enrico/coordinatore.** Conclusi nel perimetro svolto il blocco Astra primario S5 A0–A3 e l'estensione esplorativa median9. Nessuna nuova inferenza o sweep richiesto per questa chiusura. A4 sui checkpoint Opus resta non eseguita e da decidere dopo Opus. Sparse, S7 e Mese 2 restano aperti. I pacchetti e i report sono sui branch dedicati elencati sotto: questa entry non ne costituisce integrazione in `mission/dense-unet`.
+
+**Primaria S5.** Quattro best originali U-Net/GLU adattato deterministico × p_on/off seed 0, velocità 5%, seen220/VAL123, tre repliche di maschera, T9 fisso [32,64,95]×[32,64,95], rumore 0. Free, oracle-offset e AO9 tau1 dalla stessa predizione. Pacchetto tecnico `86a925af61accdef0b235ac084827cf639c1040c` su `mission/astra-level`; report 07 revisionato dal coordinatore in `82bff35726fb70af9987081802ece3ef718e42bd` su `review/astra-07-report`. Il replay neurale automatico originale aveva riferimenti vuoti; gli originali sono preservati e la verifica sostitutiva copre 24/24 celle tramite S6, con riscontro S5 sulle celle disponibili. Risultato: il livello spiega il crollo di IoU nel caso motivante, ma AO9 non migliora sistematicamente le reti sulle macro.
+
+**Second pass autorizzato, distinto dal primario.** Aggiunti mean9 senza shrink e mediana ordinaria dei nove residui senza shrink, mantenendo pesi, siti e osservazioni. T-only storico separato. Nuova inferenza `44e5e5e0bd0907560d1736a53d357933680b090a`: task GPU **29686178_0–3**, baseline CPU **29686179**. Cursor riferisce tutti COMPLETED 0:0, gate/replay completo accettato, hash delle maschere su ogni riga e residui delle nove ancore persistiti. Aggregazione `04e3b68addc891034f0840c2cbaa141d5ef8c4ac` su `astra/median9-second-pass`, indice `results/month2/astra_median9_second_pass/full_set/INDEX.md`; i 12 esempi frame1000 restano separati dall'insieme completo.
+
+**Revisione Neon.** Report 08: `7cb7bfdc6430a2731c924a31d90897a3aa52a89f`, branch `review/astra-08-median9`, file `docs/month2/08_astra_median9_second_pass_analysis.md`. Neon riferisce ricalcoli delle tabelle aggregate e coerenza del replay primario, nessun errore bloccante e giudizio favorevole alla chiusura senza ulteriori run. Distingue le verifiche Git dagli output grezzi/log/gate remoti, documentati da Cursor. Il coordinatore ha letto report e consegne; non ha rieseguito inferenza, accounting o ricalcolo indipendente delle tabelle.
+
+**Numeri dal report Neon, macro sulle tre maschere, RMSE in K (free / AO9 / median9 / oracle).**
+
+| Modello | VAL | Seen |
+| --- | --- | --- |
+| U-Net p_on | 42.96 / 43.14 / 38.58 / 38.36 | 51.67 / 53.81 / 51.10 / 50.61 |
+| U-Net p_off | 43.53 / 42.86 / 38.49 / 38.00 | 55.44 / 53.78 / 51.79 / 51.17 |
+| GLU p_on | 45.80 / 51.12 / 44.88 / 44.61 | 55.51 / 58.48 / 55.56 / 55.09 |
+| GLU p_off | 47.54 / 48.20 / 43.16 / 42.72 | 60.31 / 61.83 / 59.25 / 58.51 |
+
+Median9 migliora la RMSE macro rispetto ad AO9 su tutti gli otto metodi, e rispetto a free su 8/8 metodi VAL e 7/8 seen (GLU p_on seen +0.05 K). Sulle reti VAL dista circa 0.2–0.5 K dall'oracle. Mean9 senza shrink peggiora rispetto ad AO9 sulle macro considerate: il miglioramento della mediana non è spiegato dalla sola rimozione dello shrink. Non si assegna una quota causale «100%» allo stimatore e non si seleziona retroattivamente una ricetta diversa per condizione.
+
+**Interpretazione e limiti accettati.** I residui nei due siti (32,95)/(95,95) sono grandi rispetto agli altri siti e sostengono l'ipotesi di sovrarappresentazione degli errori nei getti nella media delle ancore; sono errori del modello, non rumore strumentale. La mediana stima bene l'offset nei casi valutati, ma non è per definizione uno stimatore della media spaziale. Una traslazione non cambia la centered-RMSE; RMSE regionale e IoU possono cambiare. Le reti restano migliori delle baseline congelate anche con median9, senza dimostrazione di indispensabilità universale. Singolo seed, layout unico, T ideali e analisi motivata da VAL già usata in selezione: evidenza esplorativa, non TEST indipendente.
+
+**Rilievi non bloccanti di Neon.** Il filtro `anchor_col == 95` include tre siti, mentre alcune descrizioni parlano di due: la relativa quota non va attribuita ai soli due siti di bordo getto. Le colonne specifiche mean9/median9 sono non applicabili e NaN sulle righe degli altri trattamenti; le tabelle degli errori di offset usano la colonna comune senza tale lacuna. Nessun cambiamento a metriche o artefatti storici in questa entry.
+
+**Seguito concordato.** Attendere e verificare i riferimenti A38 seed0 e il replay Opus, completare O5 e analisi Opus; poi sintesi con Enrico di Astra+Opus, riesame delle proposte Neon già documentate e decisione esplicita su S7. Nessuna chiusura automatica sparse o Mese 2 e nessun nuovo training autorizzato da questa entry.
