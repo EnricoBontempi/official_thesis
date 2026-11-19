@@ -395,7 +395,7 @@ Numeri di run, soglie e raccomandazioni dettagliate dei revisori **non** sono de
 
 ## 2026-11-19 — Opus C149: cache densificata, tip separato, submission afterok
 
-**Fatti.** Sorgenti Arrow verificate in WSL (`data/raw/combustion/hf_dataset/numerical`, 23 shard TRAIN+VAL); assenti su Engaging. Cache C149 costruita in streaming (`scripts/18_build_opus_c149_cache.py`): 2980/220/123; B19⊂A38⊂C149; 760 frame A38 bit-identici alla cache storica; geometria uguale; anomalia `40NH3_1.2` conservata. Normalizzatore storico 760 invariato. Tip esecuzione separato `official_thesis_opus_c149` (wave-1 tip e Astra frozen intatti). Job CPU verify + due GPU `O-C149-on/off-s0` con `afterok` — ID in [opus_overnight_handoff.md](month2/opus_overnight_handoff.md).
+**Fatti.** Sorgenti Arrow verificate in WSL (`data/raw/combustion/hf_dataset/numerical`, 23 shard TRAIN+VAL); assenti su Engaging. Cache C149 costruita in streaming (`scripts/18_build_opus_c149_cache.py`): 2980/220/123; B19⊂A38⊂C149; 760 frame A38 bit-identici alla cache storica; geometria uguale; anomalia `40NH3_1.2` conservata. Normalizzatore storico 760 invariato. Tip esecuzione separato `official_thesis_opus_c149` (wave-1 tip e Astra frozen intatti). Prep SHA `07646e8`. Job CPU verify **29613544**; GPU **29613545/29613546** con `afterok:29613544`. Dettaglio: [opus_overnight_handoff.md](month2/opus_overnight_handoff.md).
 
 **Controlli.** Sampler pool 2980 (residuo/confine/resume; nessuna coda droppata su una permutazione completa); 95 update/epoca; init on/off seed 0 uguale; contratti YAML C149; gate shared-A38. **Non rivendicato:** rebuild raw su Engaging; equivalenza scientifica completa vs S5 Engaging.
 

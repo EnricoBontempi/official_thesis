@@ -2,7 +2,7 @@
 
 **Branch:** `mission/dense-unet`.  
 **Wave-1 prep SHA:** `969b6c78a84465eb89b63bb5b7a0187c908652e5`.  
-**C149 prep SHA:** *(filled at C149 commit; see submission record)*.  
+**C149 prep SHA:** `07646e884d89da9b04383b77b6c71802f8870a81`.  
 **Organization tomorrow:** Cursor → Opus; Sonnet → Astra (original S5 best; does **not** wait for C149); Sol coordinates.
 
 ## Six new Opus trainings (matrix)
@@ -13,8 +13,8 @@
 | `O-A38-off-s1` | A38 (760) | off | 1 | **29612011** | same |
 | `O-B19-on-s0` | B19 (380) | on | 0 | **29612012** | same |
 | `O-B19-off-s0` | B19 (380) | off | 0 | **29612013** | same |
-| `O-C149-on-s0` | C149 (2980) | on | 0 | afterok ← cache prepare | `official_thesis_opus_c149` |
-| `O-C149-off-s0` | C149 (2980) | off | 0 | afterok ← cache prepare | same |
+| `O-C149-on-s0` | C149 (2980) | on | 0 | **29613545** afterok←**29613544** | `official_thesis_opus_c149` |
+| `O-C149-off-s0` | C149 (2980) | off | 0 | **29613546** afterok←**29613544** | same |
 
 All: SparseUNet, TRAIN 5%, `train_mask_seed=20261118`, `eval_mask_seed=20261116`, historical fit-only **760-frame** normalizer, scientific epoch **760/95**, fresh init. **Not launched:** GLU, Astra, S7, TEST.
 
@@ -81,13 +81,14 @@ tail -n 40 ~/official_thesis_opus_c149_runs/O-C149-on-s0/stdout.log
 | O-B19-on-s0 | **29612012** | submitted |
 | O-B19-off-s0 | **29612013** | submitted |
 
-### Wave-2 C149 *(filled at submit)*
+### Wave-2 C149 (submitted 2026-11-19T00:46:52-05:00)
 
 | Step | Job ID | Notes |
 | --- | --- | --- |
-| `opus_c149_cache` prepare/verify | TBD | CPU Advanced; verify-only |
-| `O-C149-on-s0` | TBD | `--dependency=afterok:<cache>` |
-| `O-C149-off-s0` | TBD | `--dependency=afterok:<cache>` |
+| `opus_c149_cache` prepare/verify | **29613544** | CPU Advanced; verify-only on staged cache |
+| `O-C149-on-s0` | **29613545** | `--dependency=afterok:29613544` |
+| `O-C149-off-s0` | **29613546** | `--dependency=afterok:29613544` |
 
-C149 prep SHA: TBD  
-No Astra activity in this Opus session.
+Remote note: `~/official_thesis_opus_c149_runs/wave2_c149_submission.txt`.  
+C149 prep SHA: `07646e884d89da9b04383b77b6c71802f8870a81`.  
+Wave-1 tip left at `969b6c7`. Astra tip not modified (Astra GPU jobs observed pending separately). No polling after submit.
