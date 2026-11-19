@@ -1,103 +1,93 @@
-# Opus overnight handoff — wave-1 submission
+# Opus overnight handoff — wave-1 + C149 wave-2
 
-**Date:** 2026-11-19 (America/New_York).  
 **Branch:** `mission/dense-unet`.  
-**Prep SHA:** `969b6c78a84465eb89b63bb5b7a0187c908652e5`.  
-**Organization tomorrow:** Cursor follows Opus; a new Claude Code/Sonnet chat follows Astra; coordinated by a new Sol chat. Astra may use the four original S5 best checkpoints for its primary diagnosis — it does **not** wait for C149.
+**Wave-1 prep SHA:** `969b6c78a84465eb89b63bb5b7a0187c908652e5`.  
+**C149 prep SHA:** *(filled at C149 commit; see submission record)*.  
+**Organization tomorrow:** Cursor → Opus; Sonnet → Astra (original S5 best; does **not** wait for C149); Sol coordinates.
 
-## Submitted wave-1 runs (authorized)
+## Six new Opus trainings (matrix)
 
-| Run ID | Pool | p | seeds (model=shuffle) | Purpose |
-| --- | --- | --- | ---: | --- |
-| `O-A38-on-s1` | A38 (760) | on | 1 | Training variability vs S5 seed 0 |
-| `O-A38-off-s1` | A38 (760) | off | 1 | Same, p_off |
-| `O-B19-on-s0` | B19 (380) | on | 0 | Fewer supervised frames, fixed update budget |
-| `O-B19-off-s0` | B19 (380) | off | 0 | Same, p_off |
+| Run ID | Pool | p | seeds | Job / dependency | Tip |
+| --- | --- | --- | ---: | --- | --- |
+| `O-A38-on-s1` | A38 (760) | on | 1 | **29612010** | `official_thesis_opus` |
+| `O-A38-off-s1` | A38 (760) | off | 1 | **29612011** | same |
+| `O-B19-on-s0` | B19 (380) | on | 0 | **29612012** | same |
+| `O-B19-off-s0` | B19 (380) | off | 0 | **29612013** | same |
+| `O-C149-on-s0` | C149 (2980) | on | 0 | afterok ← cache prepare | `official_thesis_opus_c149` |
+| `O-C149-off-s0` | C149 (2980) | off | 0 | afterok ← cache prepare | same |
 
-All: SparseUNet, TRAIN coverage 5%, `train_mask_seed=20261118`, `eval_mask_seed=20261116`, frozen fit-only 760-frame normalizer, scientific epoch = **760 presentations / 95 updates**, fresh init, no S5 warm start. **Not launched:** C149, GLU, Astra, S7, TEST.
+All: SparseUNet, TRAIN 5%, `train_mask_seed=20261118`, `eval_mask_seed=20261116`, historical fit-only **760-frame** normalizer, scientific epoch **760/95**, fresh init. **Not launched:** GLU, Astra, S7, TEST.
 
-**Engaging paths**
+## C149 data path (facts)
+
+- **Raws verified locally (WSL):** `data/raw/combustion/hf_dataset/numerical/` (30 Arrow shards, ~59 GB). TRAIN+VAL = 23 shards (~48 GB).
+- **Engaging:** no raw Arrow tree under pool/HOME at check time; pool held only historical dense cache + masks.
+- **Construction:** densified cache built with streaming `ShardStore` (one condition prefetch) via `scripts/18_build_opus_c149_cache.py` from local raws; **not** a Hub re-download of 70 GB.
+- **Gates passed locally:** counts 2980/220/123; B19⊂A38⊂C149; train∩seen=∅; **760 shared A38 frames bit-identical** vs historical cache; geometry identical; `40NH3_1.2` anomaly retained (warning only).
+- **Staged on Engaging:** `/orcd/pool/005/bontempi/official_thesis_data/month2_dense_unet_cache_c149/` (~873 MB) + `payload_hashes.json` + `c149_build_verify_report.json`.
+- **CPU prepare job:** verify-only re-check against S5 historical cache; **fails closed** before GPU `afterok` dependents start. Does **not** claim Engaging raw rebuild.
+
+**Still open / declared limits:** Engaging raw rebuild not executed (raws not on cluster); full scientific equivalence of Opus runner vs historical Engaging S5 **not** claimed; O1 R0 deferred; Astra untouched.
+
+## Paths
 
 | Item | Absolute path |
 | --- | --- |
-| Code tip | `/home/bontempi/projects/official_thesis_opus` |
-| Cache / masks / hashes (reuse S5 HOME) | `/home/bontempi/projects/official_thesis_s5/data/processed/month2_dense_unet_cache`, `.../month2_sparse_eval_masks`, `.../month2_dense_unet_cache_payload_hashes_s5_homecopy.json` |
-| Outputs | `/home/bontempi/official_thesis_opus_runs/<RUN_ID>/` |
-| Checkpoints | `.../checkpoints/{best,last,best_seen_diagnostic,partial_interrupt}.pt` |
-| Logs | `.../stdout.log`, `.../slurm_context.txt`; Slurm `~/slurm-<jobid>.out` if default |
+| Wave-1 tip (DO NOT update while jobs run) | `/home/bontempi/projects/official_thesis_opus` |
+| C149 tip (separate frozen checkout) | `/home/bontempi/projects/official_thesis_opus_c149` |
+| Astra tip (DO NOT modify) | `/home/bontempi/projects/official_thesis_astra_frozen` |
+| C149 cache | `/orcd/pool/005/bontempi/official_thesis_data/month2_dense_unet_cache_c149` |
+| Historical cache / masks (S5 HOME) | `/home/bontempi/projects/official_thesis_s5/data/processed/...` |
+| Wave-1 outs | `/home/bontempi/official_thesis_opus_runs/<RUN_ID>/` |
+| C149 outs | `/home/bontempi/official_thesis_opus_c149_runs/<RUN_ID>/` |
 
-**Resources requested:** account/QoS `mit_amf_advanced_gpu`, partition `mit_normal_gpu`, `gres=gpu:l40s:1`, mem `64G`, time `06:00:00`, internal wall cap 5.5 h (checkpoint margin ≠ plateau).
+## Resources
 
-## Common corrections reusable by Astra (Sonnet)
+- GPU trainings: `mit_normal_gpu` + account/QoS `mit_amf_advanced_gpu`, L40S×1, 64G, 6h (internal 5.5h).
+- CPU prepare: `mit_normal` + account/QoS `mit_amf_advanced_cpu`, 8 CPU, 64G, 4h.
+- No general/preemptable fallback. HONF untouched.
 
-Do **not** reimplement from scratch; reuse these:
+## Common corrections (Astra may reuse)
 
-1. **YAML protocol parse** — `authorized_s6_offline` is a mapping with `items` + `note` (bare list + sibling key was invalid YAML). Loader allows `authorized_s6_offline` and `opus_wave1_prepared`.
-2. **Eval mask integrity** — `SparseUNetCacheDataset(require_eval_mask_payload=True)` refuses silent seed regeneration when payloads are missing.
-3. **Last eval persistence** — early-stop path now writes `eval_history.json` including the final eval (also still inside `last.pt`).
-4. **Explicit precision** — Opus configs set `precision: fp32`, `amp: false`, `torch_compile: false`, `allow_tf32: false`; runner refuses amp/compile.
-5. **Gappy gate empty reference** — `_gate_vs_historical` fails closed on empty/missing historical rows and requires `expected_n_checks=6`.
-6. **Init manifest** — `init_manifest.json` with `init_state_dict_sha256` before any step (same seed ⇒ same hash for on/off).
-7. **Scientific presentation stream** — `scientific_epoch_sampler.py`; B19 keeps 95 updates/epoch without shortening warmup. Sampler state in checkpoints for resume.
+Same as wave-1 handoff (YAML parse, eval mask payload gate, eval_history on early-stop, fp32/amp/compile, Gappy empty-ref, init manifest, scientific stream) **plus**:
 
-**Not done for Astra tonight:** no Astra code, no AO/oracle-offset, no T-anchor pipeline, no S5 best packaging beyond existing Engaging S5 runs.
+8. **C149 densified cache** — `month2_frame_protocol_opus_c149.yaml`, `OPUS_C149_CACHE_ID`, shared-A38 bit-identity gate vs historical, `scripts/18_build_opus_c149_cache.py`.
+9. **reference760 eval** — even on C149/B19, TRAIN diagnostic uses A38 indices only.
 
-## Files touched in this preparation (local)
+## Hard rules
 
-- `configs/experiments/month2_sparse_protocol.yaml`
-- `configs/experiments/opus_O-*.yaml` (four)
-- `src/combustion_recon/data/sparse_protocol.py`
-- `src/combustion_recon/training/scientific_epoch_sampler.py` *(new)*
-- `src/combustion_recon/training/sparse_scientific_loop.py`
-- `src/combustion_recon/training/sparse_dataset.py`
-- `scripts/16_train_sparse_scientific.py`
-- `scripts/15_gappypod_nested_coverage_eval.py` (gate empty-ref)
-- `scripts/engaging/opus_O-*.sbatch` (four)
-- `tests/test_scientific_epoch_sampler.py` *(new)*
-- `docs/RESEARCH_LOG.md`, this handoff
+- Do **not** duplicate/overwrite wave-1 run dirs or update `official_thesis_opus` tip while 29612010–13 run.
+- Do **not** modify `official_thesis_astra_frozen` or include Astra edits in Opus commits.
+- Do **not** launch GLU / S7 / TEST / Neon from this handoff.
+- No polling/relaunch by agents after submit.
 
-## Opus work still open for tomorrow
-
-| Step | Status |
-| --- | --- |
-| O0 remainder | Provenance ledger for S6 scripts/patches; regional aggregate tables; common-scale figures; Gappy swap; roadmapsparse status prose — **not** all closed tonight |
-| O1 R0 selection reanalysis | **Deferred** (explicitly allowed to wait) |
-| O2 C149 | Raw/cache availability **blocked** for increase-data arm; A/B proceeded |
-| O2 bridge | A38 stream **order** matches S5 DataLoader seed formula; **full scientific equivalence with Engaging S5 run not claimed** |
-| O3 C149 configs | Not prepared |
-| O4 wave-2 C149 | Not authorized tonight |
-| O5/O6 | After jobs finish — recover once when Enrico signals; no polling by agents |
-
-## Hard rules for follow-on chats
-
-- **Do not duplicate** these four runs or overwrite `official_thesis_opus_runs/<RUN_ID>/` if artifacts exist.
-- **Do not** launch C149, GLU training, Astra jobs, S7, or TEST from this handoff alone.
-- **Do not** touch HONF / ModularDT.
-- Preserve concurrent untracked results (e.g. local `results/month2/sparse_gappypod_nested_1_20/` if present).
-- Astra primary diagnosis uses **original S5 best** checkpoints; optional later Opus-checkpoint extensions are separate.
-
-## Manual commands for Enrico
+## Manual commands
 
 ```bash
 ssh engaging
-squeue -u $USER -o '%.18i %.12P %.20j %.8u %.2t %.10M %R %b'
-# per run
-ls -lt ~/official_thesis_opus_runs/O-A38-on-s1/
-tail -n 50 ~/official_thesis_opus_runs/O-A38-on-s1/stdout.log
-# cancel only if needed (do not cancel HONF)
-# scancel <jobid>
+squeue -u $USER -o '%.18i %.12P %.20j %.2t %.10M %R %b'
+tail -n 40 ~/official_thesis_opus_c149_runs/c149_cache_prepare/stdout.log
+tail -n 40 ~/official_thesis_opus_c149_runs/O-C149-on-s0/stdout.log
 ```
 
 ## Submission record
 
-Submitted 2026-11-19T00:20:36-05:00 on Engaging (`mit_normal_gpu` / `mit_amf_advanced_gpu`, L40S×1, 64G, 6h). Remote note: `~/official_thesis_opus_runs/wave1_submission.txt`.
+### Wave-1 (already submitted)
 
 | Run ID | Job ID | State at submit |
 | --- | --- | --- |
-| O-A38-on-s1 | **29612010** | PD (submitted) |
-| O-A38-off-s1 | **29612011** | PD (submitted) |
-| O-B19-on-s0 | **29612012** | PD (submitted) |
-| O-B19-off-s0 | **29612013** | PD (submitted) |
+| O-A38-on-s1 | **29612010** | submitted 2026-11-19T00:20:36-05:00 |
+| O-A38-off-s1 | **29612011** | submitted |
+| O-B19-on-s0 | **29612012** | submitted |
+| O-B19-off-s0 | **29612013** | submitted |
 
-Prep SHA: `969b6c78a84465eb89b63bb5b7a0187c908652e5`  
-No Astra activity executed in this session. No polling/relaunch after submit.
+### Wave-2 C149 *(filled at submit)*
+
+| Step | Job ID | Notes |
+| --- | --- | --- |
+| `opus_c149_cache` prepare/verify | TBD | CPU Advanced; verify-only |
+| `O-C149-on-s0` | TBD | `--dependency=afterok:<cache>` |
+| `O-C149-off-s0` | TBD | `--dependency=afterok:<cache>` |
+
+C149 prep SHA: TBD  
+No Astra activity in this Opus session.

@@ -56,6 +56,19 @@ def expected_counts() -> dict[str, int]:
     return {"train_fit": 760, "seen_train_eval": 220, "val_eval": 123}
 
 
+# Opus C149 densified TRAIN pool (same seen/VAL as historical).
+OPUS_C149_EXPECTED_COUNTS: dict[str, int] = {
+    "train_fit": 2980,
+    "seen_train_eval": 220,
+    "val_eval": 123,
+}
+OPUS_C149_CACHE_ID = "month2_dense_unet_cache_opus_c149_v1"
+OPUS_C149_FRAME_PROTOCOL = (
+    ROOT / "configs" / "splits" / "month2_frame_protocol_opus_c149.yaml"
+)
+HISTORICAL_CACHE_ID = "month2_dense_unet_cache_v1"
+
+
 class DenseCacheError(ValueError):
     """Raised when dense cache construction or reuse fails a contract check."""
 
@@ -315,11 +328,54 @@ def build_dense_cache(
     max_cached_frames: int = 64,
     overwrite: bool = False,
     verify_n: int = 3,
+    frame_protocol_path: str | Path | None = None,
+    expected_role_counts: dict[str, int] | None = None,
+    cache_id: str | None = None,
+    skip_dense_unet_contract: bool = False,
 ) -> dict[str, Any]:
-    """Materialize dense U-Net tensors from Month2ReconDataset (no TEST payloads)."""
+    """Materialize dense U-Net tensors from Month2ReconDataset (no TEST payloads).
+
+    Opus C149: pass ``frame_protocol_path`` to the densified protocol,
+    ``expected_role_counts=OPUS_C149_EXPECTED_COUNTS``, ``cache_id=OPUS_C149_CACHE_ID``,
+    and ``skip_dense_unet_contract=True`` while still using historical fit-only stats.
+    """
     cfg_path = Path(dense_cfg_path) if dense_cfg_path else DEFAULT_DENSE_CFG
     dense_cfg = load_yaml(cfg_path)
-    contract = assert_dense_scientific_contract(dense_cfg)
+    counts_exp = (
+        dict(expected_role_counts)
+        if expected_role_counts is not None
+        else expected_counts()
+    )
+    out_cache_id = cache_id or HISTORICAL_CACHE_ID
+
+    if skip_dense_unet_contract:
+        stats_p = (
+            Path(stats_path)
+            if stats_path is not None
+            else ROOT / "data/manifests/train_norm_stats_month2_fit.json"
+        )
+        proto_path = (
+            Path(frame_protocol_path)
+            if frame_protocol_path is not None
+            else OPUS_C149_FRAME_PROTOCOL
+        )
+        protocol = load_frame_protocol(proto_path)
+        contract = {
+            "stats_path": stats_p,
+            "protocol_path": proto_path,
+            "stats_sha256": _file_sha256(stats_p),
+            "protocol_scientific_sha256": scientific_protocol_fingerprint(protocol),
+            "splits_sha256": sha256_file(DEFAULT_SPLITS),
+        }
+    else:
+        contract = assert_dense_scientific_contract(dense_cfg)
+        stats_p = Path(stats_path) if stats_path is not None else Path(contract["stats_path"])
+        proto_path = (
+            Path(frame_protocol_path)
+            if frame_protocol_path is not None
+            else Path(contract["protocol_path"])
+        )
+        protocol = load_frame_protocol(proto_path)
 
     root = Path(cache_root) if cache_root is not None else DEFAULT_CACHE_ROOT
     paths = DenseCachePaths.from_root(root)
@@ -329,6 +385,9 @@ def build_dense_cache(
             manifest,
             cache_root=root,
             require_roles=tuple(roles),
+            expected_role_counts=counts_exp,
+            allowed_cache_ids=[out_cache_id],
+            frame_protocol_path=proto_path,
         )
         return manifest
 
@@ -351,12 +410,10 @@ def build_dense_cache(
         if role not in CACHEABLE_ROLES:
             raise DenseCacheError(f"unsupported role {role!r}")
 
-    stats_p = Path(stats_path) if stats_path is not None else Path(contract["stats_path"])
     normalizer = Month2FitOnlyNormalizer(stats_p)
-    protocol = load_frame_protocol(contract["protocol_path"])
-    # Prefer keeping one condition (~38 frames) resident to avoid Arrow thrashing.
+    # Prefer keeping one condition resident to avoid Arrow thrashing.
     store = store or ShardStore(
-        raw_dir=raw_dir, max_cached_frames=max(max_cached_frames, 48)
+        raw_dir=raw_dir, max_cached_frames=max(max_cached_frames, 160)
     )
 
     t0 = time.perf_counter()
@@ -375,11 +432,12 @@ def build_dense_cache(
             p_conditioning=True,
             normalizer=normalizer,
             store=store,
-            max_cached_frames=max(max_cached_frames, 48),
+            frame_protocol_path=proto_path,
+            max_cached_frames=max(max_cached_frames, 160),
             allow_test_payloads=False,
         )
         n = len(ds)
-        expected = expected_counts().get(role)
+        expected = counts_exp.get(role)
         if expected is not None and n != expected:
             raise DenseCacheError(f"{role}: expected {expected} frames, got {n}")
 
@@ -594,10 +652,22 @@ def build_dense_cache(
         "model_config_sha256": _file_sha256(ROOT / "configs/models/unet_small.yaml"),
         "note": "Informational only; not required to match for data-cache reuse",
     }
+    try:
+        stats_rel = str(stats_p.relative_to(ROOT))
+    except ValueError:
+        stats_rel = str(stats_p)
+    try:
+        proto_rel = str(proto_path.relative_to(ROOT))
+    except ValueError:
+        proto_rel = str(proto_path)
+    try:
+        cfg_rel = str(cfg_path.relative_to(ROOT))
+    except ValueError:
+        cfg_rel = str(cfg_path)
     manifest = {
-        "cache_id": "month2_dense_unet_cache_v1",
+        "cache_id": out_cache_id,
         "cache_schema_version": 2,
-        "experiment_id": dense_cfg["experiment_id"],
+        "experiment_id": dense_cfg.get("experiment_id", "month2_dense_unet_v1"),
         "created_unix": time.time(),
         "build_wall_s": float(time.perf_counter() - t0),
         "git_commit": _git_head(),
@@ -624,8 +694,9 @@ def build_dense_cache(
             "geometry_sha256": data_fps["geometry_sha256"],
         },
         "model_fingerprints": model_fps,
-        "stats_path": str(stats_p.relative_to(ROOT)),
-        "dense_config_path": str(cfg_path.relative_to(ROOT)),
+        "stats_path": stats_rel,
+        "frame_protocol_path": proto_rel,
+        "dense_config_path": cfg_rel,
         "shard_provenance": shard_provenance,
         "shard_sha256_policy": (
             "inventory_lfs_sha256_plus_local_size_verify; "
@@ -640,7 +711,12 @@ def build_dense_cache(
     }
     _write_json(paths.manifest, manifest)
     validate_dense_cache_manifest(
-        manifest, cache_root=root, require_roles=tuple(roles)
+        manifest,
+        cache_root=root,
+        require_roles=tuple(roles),
+        expected_role_counts=counts_exp,
+        allowed_cache_ids=[out_cache_id],
+        frame_protocol_path=proto_path,
     )
     return manifest
 
@@ -671,10 +747,16 @@ def validate_dense_cache_manifest(
     require_roles: Sequence[str] | None = None,
     check_payload_shapes: bool = True,
     check_frame_identities: bool = True,
+    expected_role_counts: dict[str, int] | None = None,
+    allowed_cache_ids: Sequence[str] | None = None,
+    frame_protocol_path: str | Path | None = None,
 ) -> None:
     root = Path(cache_root)
-    if manifest.get("cache_id") != "month2_dense_unet_cache_v1":
-        raise DenseCacheError("unknown cache_id")
+    allowed_ids = list(allowed_cache_ids) if allowed_cache_ids is not None else [HISTORICAL_CACHE_ID]
+    if manifest.get("cache_id") not in allowed_ids:
+        raise DenseCacheError(
+            f"unknown cache_id {manifest.get('cache_id')!r}; allowed={allowed_ids}"
+        )
     if manifest.get("test_payloads") not in (None, "none"):
         raise DenseCacheError("cache claims TEST payloads")
     if manifest.get("task_mode", "temperature_free") != "temperature_free":
@@ -694,11 +776,21 @@ def validate_dense_cache_manifest(
         if role not in CACHEABLE_ROLES:
             raise DenseCacheError(f"unsupported role in cache: {role}")
 
+    counts_exp = (
+        dict(expected_role_counts)
+        if expected_role_counts is not None
+        else expected_counts()
+    )
+    proto_path = Path(frame_protocol_path) if frame_protocol_path is not None else None
+    if proto_path is None and manifest.get("frame_protocol_path"):
+        proto_path = ROOT / str(manifest["frame_protocol_path"])
+    protocol = load_frame_protocol(proto_path)
+
     req = list(require_roles) if require_roles is not None else sorted(roles_present)
     for role in req:
         if role not in roles_present:
             raise DenseCacheError(f"required role {role!r} missing from cache")
-        n_exp = expected_counts().get(role)
+        n_exp = counts_exp.get(role)
         n_got = int(manifest["counts"][role])
         if n_exp is not None and n_got != n_exp:
             raise DenseCacheError(f"{role} count mismatch: got {n_got}, expected {n_exp}")
@@ -722,7 +814,6 @@ def validate_dense_cache_manifest(
         raise DenseCacheError(f"missing stats at {stats_path}")
     if data_fps.get("stats_sha256") != _file_sha256(stats_path):
         raise DenseCacheError("stats fingerprint mismatch on reuse")
-    protocol = load_frame_protocol()
     if data_fps.get("frame_protocol_scientific_sha256") != scientific_protocol_fingerprint(
         protocol
     ):
@@ -769,7 +860,7 @@ def validate_dense_cache_manifest(
                             f"{role}/{name}: trailing shape {arr.shape[1:]} != {expect_tail}"
                         )
             if check_frame_identities:
-                expected = build_index(role)  # type: ignore[arg-type]
+                expected = build_index(role, protocol=protocol)  # type: ignore[arg-type]
                 if len(expected) != n:
                     raise DenseCacheError(
                         f"{role}: protocol index length {len(expected)} != cache {n}"

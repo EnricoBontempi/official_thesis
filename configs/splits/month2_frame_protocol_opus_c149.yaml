@@ -1,0 +1,103 @@
+# Opus C149 frame protocol — denser TRAIN fit sampling only.
+# protocol_id distinct from month2_frame_protocol_v1 so historical stats/cache
+# fingerprints stay valid. Normalizer remains the v1 fit-only 760-frame stats.
+#
+# train_fit: 0…1480 step 10 → 149 frames/condition × 20 = 2980
+# seen_train_eval / val_eval: identical to month2_frame_protocol_v1
+
+protocol_id: month2_frame_protocol_opus_c149_v1
+protocol_date: '2026-11-19'
+status: opus_c149_optimization_pool_only
+parent_protocol_id: month2_frame_protocol_v1
+note: >
+  Optimization-pool densification for Opus C149. Does not redefine Month-2
+  fit-only statistics; preprocessing stays on the historical 760-frame normalizer.
+
+operating_condition_split:
+  path: configs/splits/splits_interp_extrap.yaml
+  sha256: acb87bf95852e7849f88a270af8cbd211ad999d0039c35885232b7bc2a99e7b9
+  partition_rule: entire_operating_condition_withholding
+  n_conditions:
+    train: 20
+    val: 3
+    test_interp: 3
+    test_extrap: 4
+
+trajectory:
+  n_frames_per_condition: 2001
+  dt_seconds: 0.00025
+  indexing: zero_based_inclusive_listed_endpoints
+
+frames:
+  train_fit:
+    role: fitting_and_supervised_training
+    applies_to_splits: [train]
+    slice: '0:1481:10'
+    start: 0
+    stop_exclusive: 1481
+    step: 10
+    first_index: 0
+    last_index: 1480
+    n_per_condition: 149
+    n_total_train_conditions: 2980
+    description: >
+      Opus C149 supervised pool. Superset of historical train_fit (step 40).
+      Anomalies (e.g. 40NH3_1.2) retained; no silent exclusion.
+
+  seen_train_eval:
+    role: temporal_diagnostics_on_same_trajectory
+    applies_to_splits: [train]
+    slice: '1600:2001:40'
+    start: 1600
+    stop_exclusive: 2001
+    step: 40
+    first_index: 1600
+    last_index: 2000
+    n_per_condition: 11
+    n_total_train_conditions: 220
+    gap_after_last_fit_frames: 120
+    description: Identical to month2_frame_protocol_v1 seen_train_eval.
+
+  val_eval:
+    role: model_and_hyperparameter_selection
+    applies_to_splits: [val]
+    slice: '0:2001:50'
+    start: 0
+    stop_exclusive: 2001
+    step: 50
+    first_index: 0
+    last_index: 2000
+    n_per_condition: 41
+    n_total_val_conditions: 123
+    description: Identical to month2_frame_protocol_v1 val_eval.
+
+  test_interp_eval:
+    role: frozen_holdout_interpolation
+    applies_to_splits: [test_interp]
+    slice: '0:2001:50'
+    start: 0
+    stop_exclusive: 2001
+    step: 50
+    first_index: 0
+    last_index: 2000
+    n_per_condition: 41
+    n_total_test_interp_conditions: 123
+    description: Listed for completeness; TEST payloads forbidden in Opus.
+
+  test_extrap_eval:
+    role: frozen_holdout_extrapolation
+    applies_to_splits: [test_extrap]
+    slice: '0:2001:50'
+    start: 0
+    stop_exclusive: 2001
+    step: 50
+    first_index: 0
+    last_index: 2000
+    n_per_condition: 41
+    n_total_test_extrap_conditions: 164
+    description: Listed for completeness; TEST payloads forbidden in Opus.
+
+invariants:
+  train_fit_and_seen_disjoint: true
+  c149_superset_of_a38: true
+  a38_superset_of_b19: true

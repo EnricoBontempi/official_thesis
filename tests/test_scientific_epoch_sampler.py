@@ -82,6 +82,32 @@ def test_stream_resume_mid_cycle_continuous():
     assert first != second_cont
 
 
+def test_c149_pool_residual_across_scientific_epochs():
+    """2980 pool: one permutation spans multiple scientific epochs; no dropped tails."""
+    stream = ScientificPresentationStream(
+        2980, shuffle_seed=1, presentations_per_epoch=760
+    )
+    # Consume exactly one full permutation via scientific epochs.
+    first_perm: list[int] = []
+    while len(first_perm) < 2980:
+        first_perm.extend(stream.next_scientific_epoch())
+    first_perm = first_perm[:2980]
+    g = torch.Generator()
+    g.manual_seed(1 + 100_003 * 1)
+    expected = torch.randperm(2980, generator=g).tolist()
+    assert first_perm == expected
+    assert set(first_perm) == set(range(2980))
+    # Residual position after crossing into next cycle is restored on resume.
+    mid = stream.state_dict()
+    cont = stream.next_scientific_epoch()
+    resumed = ScientificPresentationStream(
+        2980, shuffle_seed=1, presentations_per_epoch=760
+    )
+    resumed.load_state_dict(mid)
+    assert resumed.next_scientific_epoch() == cont
+    assert 760 // 8 == 95
+
+
 def test_list_sampler_length_and_order():
     order = [3, 1, 4, 1, 5]
     samp = ListSampler(order)

@@ -32,6 +32,9 @@ from combustion_recon.models.glu_reconstructor import (  # noqa: E402
 from combustion_recon.models.unet import build_sparse_unet_from_config  # noqa: E402
 from combustion_recon.training.dense_cache import (  # noqa: E402
     DEFAULT_CACHE_ROOT,
+    OPUS_C149_CACHE_ID,
+    OPUS_C149_EXPECTED_COUNTS,
+    OPUS_C149_FRAME_PROTOCOL,
     compute_cache_payload_hashes,
     validate_dense_cache_manifest,
     verify_cache_payload_hashes,
@@ -138,11 +141,29 @@ def main() -> int:
 
     cache_root = Path(args.cache_root)
     manifest = json.loads((cache_root / "manifest.json").read_text())
-    validate_dense_cache_manifest(
-        manifest,
-        cache_root=cache_root,
-        require_roles=("train_fit", "seen_train_eval", "val_eval"),
-    )
+    wall_s = None if args.wall_hours is None else float(args.wall_hours) * 3600.0
+    cfg = config_from_candidate(cand, device=args.device, wall_time_cap_s=wall_s)
+    pool_id = cfg.pool_id or "A38"
+
+    if pool_id == "C149":
+        if manifest.get("cache_id") != OPUS_C149_CACHE_ID:
+            raise SystemExit(
+                f"C149 requires cache_id={OPUS_C149_CACHE_ID}, got {manifest.get('cache_id')}"
+            )
+        validate_dense_cache_manifest(
+            manifest,
+            cache_root=cache_root,
+            require_roles=("train_fit", "seen_train_eval", "val_eval"),
+            expected_role_counts=OPUS_C149_EXPECTED_COUNTS,
+            allowed_cache_ids=[OPUS_C149_CACHE_ID],
+            frame_protocol_path=OPUS_C149_FRAME_PROTOCOL,
+        )
+    else:
+        validate_dense_cache_manifest(
+            manifest,
+            cache_root=cache_root,
+            require_roles=("train_fit", "seen_train_eval", "val_eval"),
+        )
     payload_hashes = compute_cache_payload_hashes(cache_root)
     if args.expect_cache_hashes:
         expected = json.loads(Path(args.expect_cache_hashes).read_text())
@@ -150,20 +171,17 @@ def main() -> int:
         if not verify["ok"]:
             raise SystemExit(f"cache hash mismatch: {verify['mismatches']}")
 
-    wall_s = None if args.wall_hours is None else float(args.wall_hours) * 3600.0
-    cfg = config_from_candidate(cand, device=args.device, wall_time_cap_s=wall_s)
     set_seed(int(cfg.seed))
     normalizer = Month2FitOnlyNormalizer(args.stats)
 
-    # Pool selection: A38 = full historical train_fit; B19 = subset of cache rows.
+    # Pool selection on the train_fit role of the provided cache.
     train_frames = json.loads((cache_root / "train_fit" / "frames.json").read_text())
     pool_report = assert_pool_nesting(train_frames)
-    pool_id = cfg.pool_id or "A38"
     if pool_id == "C149" and not all(
         v.get("c149_fully_in_cache") for v in pool_report["conditions"].values()
     ):
         raise SystemExit(
-            "C149 not fully present in historical train_fit cache; refuse silent partial pool"
+            "C149 not fully present in train_fit cache; refuse silent partial pool"
         )
     train_indices = cache_indices_for_pool(train_frames, pool_id)
     expected_n = {"B19": 380, "A38": 760, "C149": 2980}[pool_id]
@@ -171,6 +189,10 @@ def main() -> int:
         raise SystemExit(
             f"pool {pool_id} resolved {len(train_indices)} cache rows; expected {expected_n}"
         )
+    # Diagnostic TRAIN metric always on historical reference760 (A38 indices).
+    ref760_indices = cache_indices_for_pool(train_frames, "A38")
+    if len(ref760_indices) != 760:
+        raise SystemExit(f"reference760 resolved {len(ref760_indices)} != 760")
 
     require_payload = bool(cfg.require_eval_mask_payload)
     train_ds = SparseUNetCacheDataset(
@@ -185,10 +207,11 @@ def main() -> int:
         eval_mask_payload_root=args.mask_root,
         require_eval_mask_payload=require_payload,
     )
-    # Historical 760-frame reference for TRAIN diagnostic (even when optimizing B19).
+    # Historical 760-frame reference for TRAIN diagnostic (B19/C149 included).
     train_eval_ds = SparseUNetCacheDataset(
         "train_fit",
         cache_root=cache_root,
+        indices=ref760_indices,
         mask_mode="evaluation",
         site_fraction=float(cfg.site_fraction),
         eval_mask_seed=int(cfg.eval_mask_seed),
