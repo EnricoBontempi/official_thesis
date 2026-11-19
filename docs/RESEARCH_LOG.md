@@ -345,6 +345,39 @@ Questo file è il diario del progetto di tesi in `official_thesis` (ricostruzion
 - **S5 seed 0 (HOME tip `38ac7fe`):** jobs 29567988/90/92/94 COMPLETED early-stop. Best VAL@5%: U-Net p_on **42.964**, p_off 43.526, GLU p_on 45.801, p_off 47.535 K.
 - **GappyPOD nested:** job **29601906** (`mit_amf_advanced_cpu`, 128G) COMPLETED 55 s; load-equivalence ok; fit SHA `a6fbdfd2…`; **gate 5% passed** (6/6); 1% e 20% prodotti. OUT `~/official_thesis_gappypod_nested_1_20_amf_v2/` → mirror Git `results/month2/gappypod_nested_1_20/`.
 - **S6:** best 1/5/20% riusati dal primo tentativo (fail swap `p_conditioning`); last+swap jobs **29601907–29601910** COMPLETED dopo fix collate. Coverage 27/27 best + 27/27 last ×4 run; swap seen+VAL + T_donor ref.
-- **Risultati chiave:** deployable @5% neurali ≪ Gappy; inversione best↔last (U-Net p_on 1°→4°); @1% GLU davanti a U-Net; U-Net p_off peggiora a 20%; swap ΔVAL ~54–58 K.
+- **Risultati chiave:** deployable @5% neurali ≪ Gappy; inversione best↔last (U-Net p_on 1°→4°); @1% GLU davanti a U-Net; U-Net p_off peggiora a 20%; swap ΔVAL ~58 K.
 - **Consegna revisori:** `docs/month2/05_sparse_reconstruction.md`; `results/month2/s6_sparse_eval/STOP_E_delivery/`; aggiornati `roadmapsparse.md` / `roadmap_month2.md`. **Nessun S7.** Lacune: montage scale comuni; solo seed 0.
+
+---
+
+## 2026-11-18 — Dopo le tre revisioni STOP E: stato, scopo e piano approvato (solo diario)
+
+**Fatti eseguiti (non ricalcolati in questa entry).** Missione U-Net densa U0–U7 chiusa nel perimetro dichiarato ([03](month2/03_dense_velocity_diagnostic.md)). S4 baseline/profiling e freeze neurale eseguiti; S5 quattro training seed 0 conclusi (early-stop). S6 consegnato allo STOP E nel commit `a6b2bad7445170e6d821a14de9f7af9a1905ab2c` (`mission/dense-unet`), con lacune poi segnalate dai revisori. GappyPOD job **29601906** concluso, gate storico 5% passato, nested 1%/20% prodotti. Completamenti S6 **29601907–29601910** (last + snapshot-swap) recuperati nella stessa consegna. Tip di esecuzione Engaging: `38ac7fe`. Report versionato: [05_sparse_reconstruction.md](month2/05_sparse_reconstruction.md); artefatti: `results/month2/s6_sparse_eval/STOP_E_delivery/`.
+
+**Risultati preliminari dal report (seed 0; da non elevare a conclusione multi-seed).** Al 5% VAL best i neurali restano nettamente sotto GappyPOD matched (U-Net p_on ~43 K vs Gappy p_on ~71 K). Lo snapshot-swap indica forte dipendenza dall’istantanea (Δ VAL swap−aligned ~54–58 K, vicino al riferimento T_donatore). Le classifiche cambiano con checkpoint (best vs last), copertura (a 1% GLU davanti a U-Net) e, dove ispezionato, condizione. Un solo seed di training: le tre «repliche» S6 sono **repliche di maschera eval**, non tre seed di modello/shuffle.
+
+**Revisioni indipendenti (Opus, Astra, Neon) — direzioni discusse da Enrico, non risultati dimostrati.**
+- *Opus:* verificare quanto quantità di frame e variabilità del training limitino la generalizzazione a nuove istantanee; propone una curva nel numero di frame e repliche controllate.
+- *Astra:* separare livello e struttura usando gli attuali checkpoint, con oracle-offset diagnostico e correzione da poche ancore T, prima di scegliere il contrasto da replicare.
+- *Neon:* completare diagnostici e valutare successivamente training multidensità, confronto U-Net/GLU e trasferimento fra condizioni.
+
+**Rilievi comuni ancora da verificare/correggere (non risolti in questa turnazione):** protocollo YAML; provenienza del codice di valutazione e degli artefatti riusati; figure complete a scale confrontabili; metriche regionali aggregate; swap GappyPOD mancante nella consegna neurale.
+
+**Scopo ingegneristico (da `docs/proposal.md` e contesto Mese 2).** La tesi mira a ricostruire campi di temperatura in camere di combustione da velocità accessibili (riferimento applicativo: PIV / accesso ottico laser) e, se serve, poche misure termiche (termocoppie). Il setup attuale usa osservazioni ideali su dati numerici e ancore T puntuali come proxy; il problema sperimentale guida scelte ed estensioni. Rigore, verifiche e riproducibilità devono sostenere questo obiettivo: le campagne diagnostiche rispondono a domande utili alla ricostruzione sparsa e alle decisioni successive, non a curiosità isolate.
+
+**Piano approvato da Enrico — ancora da eseguire (nessuna implementazione in questa entry).**
+1. Creare `analisi tripla revisore s7.md` con spiegazione completa delle tre proposte, convergenze/divergenze e decisione concordata; conservare bene le proposte Neon per riesame successivo.
+2. Creare `roadmapopus.md` sulla quantità di dati e sulla variabilità dei training; matrice di run, controlli e criteri da fissare nella roadmap prima del lancio.
+3. Creare `roadmapastra.md` su livello/struttura e contributo di poche ancore T, riusando i checkpoint dove possibile; piano dettagliato nella roadmap.
+4. Eseguire le due sotto-missioni nell’ordine **Opus → Astra**, discutere gli esiti e riprendere la decisione S7. Le correzioni tecniche comuni saranno una preparazione condivisa, da fare una sola volta.
+5. Dopo queste due missioni, riesaminare Neon. La roadmap Neon **non** è ancora da creare e la sua campagna **non** è autorizzata al lancio.
+
+Numeri di run, soglie e raccomandazioni dettagliate dei revisori **non** sono decisioni già approvate: il disegno resta da definire nei passi successivi.
+
+**Gerarchia e stato.**
+- [roadmapsparse.md](../roadmapsparse.md) resta aperta allo **STOP E**; S7 sospeso in attesa delle due sotto-missioni, senza annullare gli esperimenti già eseguiti.
+- `roadmapopus.md` e `roadmapastra.md` saranno sotto-missioni di approfondimento che informano la chiusura sparse.
+- Il Mese 2 resta aperto; Astra contribuirà anche allo Step 2.7 (ancore T / assisted).
+- Dopo Opus e Astra: discutere esiti, decidere il seguito sparse, poi completare gli aperti del Mese 2.
+- Nessuna scelta definitiva tra U-Net e GLU; nessun training S7, nessun job e nessun file nuovo in questa turnazione (solo aggiornamento del diario).
 
