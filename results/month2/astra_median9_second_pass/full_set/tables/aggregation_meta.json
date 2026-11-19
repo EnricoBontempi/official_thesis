@@ -1,0 +1,80 @@
+{
+  "scope": "full_seen220_val123_replicas_0_1_2",
+  "not_the_example_frame_package": true,
+  "example_frame_package": "results/month2/astra_median9_second_pass/example_frame1000_rep0",
+  "macro_definition": "frame -> condition(sim_id, NaN skipped) -> mean over conditions = replica; replica mean = mean of the three mask replicas",
+  "paired_definition": "value = treatment_A - treatment_B. For RMSE, MAE and absolute bias, negative means A is closer to the truth and positive means A is worse. Both are kept. No estimator is selected.",
+  "centered_translation_max_abs_K": 4.069472032080574e-15,
+  "gates": [
+    {
+      "name": "s5_sparse_unet_pon_seed0",
+      "scientific_validated": true,
+      "max_abs_reported_gate_K": 0.0,
+      "primary_files_sha256": {
+        "/home/bontempi/official_thesis_astra_results/level_structure_v1/s5_sparse_unet_pon_seed0/per_frame_seen_train_eval.csv.gz": "392804ecc355b0419aabae0aa51b6b658f7e2114e3a1250ee2bf5e5da1c273af",
+        "/home/bontempi/official_thesis_astra_results/level_structure_v1/s5_sparse_unet_pon_seed0/per_frame_val_eval.csv.gz": "92fb62042bec684fc5ce550ea2a4cbdd5ee44eaac7dfe3cf6ab928c5abdfa19e"
+      },
+      "git_sha": "44e5e5e0bd0907560d1736a53d357933680b090a"
+    },
+    {
+      "name": "s5_sparse_unet_poff_seed0",
+      "scientific_validated": true,
+      "max_abs_reported_gate_K": 0.0,
+      "primary_files_sha256": {
+        "/home/bontempi/official_thesis_astra_results/level_structure_v1/s5_sparse_unet_poff_seed0/per_frame_seen_train_eval.csv.gz": "a3c83755ac1a3af6027a2c36d59696ea5bdae110e7fac7e3f1a4f4049ab89a66",
+        "/home/bontempi/official_thesis_astra_results/level_structure_v1/s5_sparse_unet_poff_seed0/per_frame_val_eval.csv.gz": "716a8880773df1b6c8964e950e0e107499839aae03dcb9563c7fe6800974071f"
+      },
+      "git_sha": "44e5e5e0bd0907560d1736a53d357933680b090a"
+    },
+    {
+      "name": "s5_adapted_glu_pon_seed0",
+      "scientific_validated": true,
+      "max_abs_reported_gate_K": 0.0,
+      "primary_files_sha256": {
+        "/home/bontempi/official_thesis_astra_results/level_structure_v1/s5_adapted_glu_pon_seed0/per_frame_seen_train_eval.csv.gz": "1c2c4d0dd9948d1e8a0b049593616515e0c6e01400562e3b67cb0c62b32c6e03",
+        "/home/bontempi/official_thesis_astra_results/level_structure_v1/s5_adapted_glu_pon_seed0/per_frame_val_eval.csv.gz": "2a3e1103b8237bccd1eb4aed3f8afec8dc348755cac636756206793833d40509"
+      },
+      "git_sha": "44e5e5e0bd0907560d1736a53d357933680b090a"
+    },
+    {
+      "name": "s5_adapted_glu_poff_seed0",
+      "scientific_validated": true,
+      "max_abs_reported_gate_K": 0.0,
+      "primary_files_sha256": {
+        "/home/bontempi/official_thesis_astra_results/level_structure_v1/s5_adapted_glu_poff_seed0/per_frame_seen_train_eval.csv.gz": "b6d3bcb09d20a93c7c89be2801ae6f5436e84db5ed9657ab6351c1189c57a738",
+        "/home/bontempi/official_thesis_astra_results/level_structure_v1/s5_adapted_glu_poff_seed0/per_frame_val_eval.csv.gz": "50e14ed911ee55c32fb53f907f856aeb0f2d5db9271b79ac7c12e3040cdc9cfc"
+      },
+      "git_sha": "44e5e5e0bd0907560d1736a53d357933680b090a"
+    },
+    {
+      "name": "baselines",
+      "scientific_validated": true,
+      "max_abs_reported_gate_K": 0.0,
+      "primary_files_sha256": {
+        "/home/bontempi/official_thesis_astra_results/level_structure_v1/baselines/per_frame_seen_train_eval.csv.gz": "9a32277878eaa7609e322997f2497ae3db364692552a335ca5e8ef1a2b1bcc1f",
+        "/home/bontempi/official_thesis_astra_results/level_structure_v1/baselines/per_frame_val_eval.csv.gz": "5b148a9aae2f511d34ce9bdaafc6412769616b74d2547a98a622c571ec55c84d"
+      },
+      "git_sha": "44e5e5e0bd0907560d1736a53d357933680b090a"
+    }
+  ],
+  "n_level_rows": 41160,
+  "n_t_only_rows": 1029,
+  "tables": [
+    "anchor_col95_share_macro_long.csv",
+    "anchor_residual_per_condition.csv",
+    "information_labels.csv",
+    "macro_headline_wide.csv",
+    "macro_metrics_long.csv",
+    "macro_regional_long.csv",
+    "macro_valid_counts_long.csv",
+    "offset_error_macro_long.csv",
+    "offset_error_per_condition.csv",
+    "paired_diff_macro_long.csv",
+    "paired_diff_per_condition.csv",
+    "paired_frame_signs.csv",
+    "per_condition_metrics.csv",
+    "t_only_macro_long.csv",
+    "t_only_per_condition.csv"
+  ],
+  "source_root": "/home/bontempi/official_thesis_astra_results/median9_second_pass"
+}

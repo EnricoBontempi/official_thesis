@@ -88,3 +88,11 @@ PY
 ```
 
 Nessuno stimatore è stato scelto. L’aggregazione resta dopo questa verifica.
+
+## Esito, letto una volta il 2026-11-19
+
+I cinque task sono `COMPLETED` con exit `0:0`. Stderr vuoto. Durate: U-Net p_on 2 min 00 s, U-Net p_off 2 min 07 s, GLU p_on 1 min 58 s, GLU p_off 2 min 02 s, baseline 29 s.
+
+Ogni directory ha il replay eseguito e `COMPLETE.json` scientifico. Free, oracle e AO9 sono accoppiati al CSV primario su tutte le celle metodo×ruolo×replica×trattamento; gli scarti registrati di RMSE macro, RMSE per-frame e offset sono 0 K. Le righe, i nove residui, gli hash di checkpoint e maschere e l’assenza di offset nuovi sul T-only sono stati ricontrollati. Il dettaglio è in `docs/month2/astra_median9_full_set_handoff.md`.
+
+Le tabelle dell’insieme completo stanno in `results/month2/astra_median9_second_pass/full_set/`. I 12 campi esemplificativi restano in `example_frame1000_rep0/` e non sono stati ricalcolati. Nessuno stimatore è stato scelto.

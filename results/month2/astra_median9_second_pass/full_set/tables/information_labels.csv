@@ -1,0 +1,7 @@
+group,treatment,information,note
+same base prediction,free,"velocity at the persisted 5% sites, plus p only when p_on",no T observation
+same base prediction,oracle,free plus the full true T field through one scalar,"diagnostic, not deployable"
+same base prediction,ao9,"free plus nine ideal T, tau=1, so 0.9 times the mean residual","shrink and mean, together"
+same base prediction,mean9,free plus the unshrunk mean of the same nine residuals,no tau; separates the shrink from AO9
+same base prediction,median9,free plus the ordinary median of the same nine residuals,no tau; median versus AO9 changes estimator and shrink
+historical T-only,t_only_const,field equals the mean of the nine observed T,mean9 and median9 were not applied
