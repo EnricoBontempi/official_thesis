@@ -34,8 +34,13 @@ def test_protocol_yaml_parses_with_s6_and_opus_keys():
     assert cfg["scientific_training_authorized"] is False
 
 
-def test_a38_stream_matches_historical_dataloader_order():
-    """95 updates / 760 presentations; A38 order == S5 DataLoader randperm seed formula."""
+def test_a38_stream_matches_raw_randperm_seed_formula():
+    """95 updates / 760 presentations; A38 order == one raw randperm on the seed formula.
+
+    This is not the order produced by DataLoader(shuffle=True). That loader
+    draws one integer from the same generator before randperm. See
+    test_opus_s5_bridge_order.py.
+    """
     pool = 760
     shuffle_seed = 0
     stream = ScientificPresentationStream(

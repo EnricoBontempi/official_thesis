@@ -1,0 +1,21 @@
+{
+  "cache_aggregate_sha256": "710bab909a0efb6cc1b4b4a0d7f7dcc4889472b7adc8076abb94fd529576ab5d",
+  "mask_manifest_sha256": "2e2d8ff6edabf62ad56702a155140d064c0b4014d06ee96debf52811efa5c75e",
+  "stats_sha256": "678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e",
+  "runs": [
+    {
+      "run_id": "s5_sparse_unet_pon_seed0",
+      "p_conditioning": true,
+      "best_pt_sha256": "b03b896eb4a9f9da3f14969772e832547a09987b19915f9db25a539b07464b7a",
+      "best_val_epoch": 60,
+      "best_val_metric": 42.96406039204512
+    },
+    {
+      "run_id": "s5_sparse_unet_poff_seed0",
+      "p_conditioning": false,
+      "best_pt_sha256": "0d9d93a164bcdcaf19b1fd8e1eb98a8cf95567b95e6e4d291f864ca2407fb9fc",
+      "best_val_epoch": 140,
+      "best_val_metric": 43.525349292222806
+    }
+  ]
+}
