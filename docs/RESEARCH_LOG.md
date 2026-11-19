@@ -411,3 +411,26 @@ Numeri di run, soglie e raccomandazioni dettagliate dei revisori **non** sono de
 
 **Attempt2 sottomesso, non concluso.** SHA eseguito `d6332000491ba0e8983b9e7fa09b34badb191ea4`. Checkout congelato `/home/bontempi/projects/official_thesis_opus_c149_attempt2`; il checkout precedente resta `f061df1`. Job **29645053** (`O-C149-on-s0`) e **29645054** (`O-C149-off-s0`), PENDING alle 09:38:08 EST, `mit_normal_gpu` / `mit_amf_advanced_gpu` / L40S×1 / 64G / 6h. Output nuovo: `/home/bontempi/official_thesis_opus_c149_attempt2_runs/`. Cache e report di 29613544 riusati; aggregate payload `fa1c9358deb3bda0313cd74f9ab6855af87bc969c4069a463073d4c4120f03b4`. Nessun warm start. Wave-1, S5, Astra e HONF non toccati. Opus, sparse e Mese 2 restano aperti. Dettaglio: [opus_overnight_handoff.md](month2/opus_overnight_handoff.md).
 
+---
+
+## 2026-11-19 — Sei training Opus in early-stop; bridge S5 e R0
+
+**Sei training, tutti early-stop.** Slurm COMPLETED con exit 0 non è convergenza: `summary.completed` resta falso e lo stato è `stopped_early_plateau`. VAL ha guidato checkpoint, scheduler e arresto.
+
+| Run | Job | Epoche | Best VAL (K) | Epoca best |
+| --- | --- | ---: | ---: | ---: |
+| O-A38-on-s1 | 29612010 | 630 | 48.219 | 60 |
+| O-A38-off-s1 | 29612011 | 610 | 43.056 | 40 |
+| O-B19-on-s0 | 29612012 | 620 | 43.929 | 50 |
+| O-B19-off-s0 | 29612013 | 630 | 46.737 | 60 |
+| O-C149-on-s0 attempt2 | 29645053 | 660 | 38.712 | 90 |
+| O-C149-off-s0 attempt2 | 29645054 | 710 | 39.824 | 260 |
+
+C149 attempt2 è il run scientifico: init condivisa fra on e off a seed 0, cache `fa1c9358deb3bda0313cd74f9ab6855af87bc969c4069a463073d4c4120f03b4`, nessun partial. Il tentativo 1 (29613545/46) resta il fallimento di allowlist. Il checkout attempt2 resta fermo a `d633200`.
+
+**Bridge, due controlli separati.** Il confronto statico e il test sintetico, ripetuto su torch 2.8 di Engaging, mostrano che lo stream A38 è un `randperm` sul seme, mentre S5 ha eseguito `DataLoader(shuffle=True)`, che estrae prima un intero dallo stesso generatore. All'epoca 0 le sequenze iniziano rispettivamente con `[26, 184, 591, …]` e `[193, 743, 248, …]`: stessi 760 frame, tutti i 95 batch diversi. Loss, optimizer, warmup, plateau e TF32 spento coincidono; l'hash iniziale S5 non esiste. Questo basta a non usare S5 come braccio A38 seed 0 del runner nuovo. Il replay di inferenza dei due `best.pt` U-Net al 5% è il job **29670888**, sottomesso e non letto: tolleranza macro 0.05 K, e non prova l'equivalenza del training. Ledger: `results/month2/opus_data_study/bridge_s5/LEDGER.md`.
+
+**R0 eseguito sulle curve, non sui pesi.** Per i quattro S5: minimo seen, leave-one-VAL-condition-out e primo minimo della media mobile causale di cinque eval, con le prime quattro escluse. Best e last originali restano. L'eval di arresto, assente da `eval_history.json`, è stata unita dal CSV e da `progress.json`. Non è una validazione indipendente. Tabelle: `results/month2/opus_data_study/r0_selection/`.
+
+**O5 non preparata e non sottomessa.** Il divario di ordine confonde il confronto dati/seed. Due riferimenti A38 seed 0 nel runner nuovo sarebbero necessari per quel contrasto; non sono stati lanciati. Opus, sparse e Mese 2 restano aperti. Nessun S7, A4 o TEST.
+

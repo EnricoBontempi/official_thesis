@@ -104,10 +104,32 @@ Attempt2 does not resume and does not reuse those directories. Executed code is 
 | O-C149-on-s0 | **29645053** | PENDING 2026-11-19T09:38:08-05:00 | 29613545 |
 | O-C149-off-s0 | **29645054** | PENDING 2026-11-19T09:38:08-05:00 | 29613546 |
 
-Resources: `mit_normal_gpu`, account/QoS `mit_amf_advanced_gpu`, `gpu:l40s:1`, 8 CPU, 64G, 6h. No general/preemptable fallback. Training is not complete.
+Resources: `mit_normal_gpu`, account/QoS `mit_amf_advanced_gpu`, `gpu:l40s:1`, 8 CPU, 64G, 6h. No general/preemptable fallback. The table above is the state at submit. The outcome is the next section.
+
+## 2026-11-19 outcome — six early-stops, bridge, R0
+
+Slurm `COMPLETED` with exit 0 is the early-stop boundary. `summary.completed` stays false.
+
+| Run | Job | Epochs | Best VAL (K) | Best epoch | Output |
+| --- | --- | ---: | ---: | ---: | --- |
+| O-A38-on-s1 | 29612010 | 630 | 48.219 | 60 | `~/official_thesis_opus_runs/O-A38-on-s1` |
+| O-A38-off-s1 | 29612011 | 610 | 43.056 | 40 | `~/official_thesis_opus_runs/O-A38-off-s1` |
+| O-B19-on-s0 | 29612012 | 620 | 43.929 | 50 | `~/official_thesis_opus_runs/O-B19-on-s0` |
+| O-B19-off-s0 | 29612013 | 630 | 46.737 | 60 | `~/official_thesis_opus_runs/O-B19-off-s0` |
+| O-C149-on-s0 attempt2 | 29645053 | 660 | 38.712 | 90 | `~/official_thesis_opus_c149_attempt2_runs/O-C149-on-s0` |
+| O-C149-off-s0 attempt2 | 29645054 | 710 | 39.824 | 260 | `~/official_thesis_opus_c149_attempt2_runs/O-C149-off-s0` |
+
+Attempt1 C149 directories and the attempt2 checkout at `d633200` stay untouched. Wave-1 tip stays at `969b6c7`.
+
+**Bridge.** Static diff plus a synthetic check on torch 2.8: the new A38 stream is a raw `randperm` on `shuffle_seed + 100003*(epoch+1)`. Executed S5 used `DataLoader(shuffle=True)`, which draws one integer from that generator before `randperm`. Epoch 0 starts `[26, 184, 591, …]` versus `[193, 743, 248, …]`. Same 760 indices, all 95 batches differ. Optimizer, warmup, plateau and TF32-off match. S5 saved no init hash. This blocks using historical S5 as the seed-0 A38 arm of the new runner. Ledger: `results/month2/opus_data_study/bridge_s5/LEDGER.md`.
+
+**Inference replay, separate from that order check.** Job **29670888** submitted, not read. L40S, Advanced+normal, 1h. Checkout `/home/bontempi/projects/official_thesis_opus_bridge` detached at `bc7ab22a54c1bfb2a97c9a19fa96745a7aee1493`. Report path: `/home/bontempi/official_thesis_opus_bridge_runs/replay_unet_best_5pct.json`. It replays the two U-Net `best.pt` at 5% against the recorded VAL macro, tolerance 0.05 K. It does not prove training equivalence.
+
+**R0 done** from recorded curves only: `results/month2/opus_data_study/r0_selection/`. Original best and last kept. Not an independent validation.
+
+**O5 not prepared and not submitted.** Two new A38 seed-0 runs on the scientific stream would be required before a seed-0 data comparison. They were not launched. Opus remains open. No S7, A4, or TEST.
 
 ```bash
-ssh engaging 'squeue -j 29645053,29645054 -o "%.18i %.24j %.20P %.24a %.24q %.2t %.10M %R"'
-ssh engaging 'sacct -j 29645053,29645054 -X -o JobID,State,ExitCode,Elapsed,NodeList'
-ssh engaging 'tail -n 40 ~/official_thesis_opus_c149_attempt2_runs/O-C149-on-s0/stdout.log'
+ssh engaging 'sacct -j 29670888 -X -o JobID,State,ExitCode,Elapsed,NodeList'
+ssh engaging 'cat ~/official_thesis_opus_bridge_runs/replay_unet_best_5pct.json'
 ```

@@ -24,7 +24,7 @@ Questa differenza cambia la traiettoria SGD. Non è correggibile sui checkpoint 
 
 - Hash dei pesi iniziali S5.
 - Dump delle maschere TRAIN epoca per epoca.
-- Replay di inferenza dei due `best.pt` U-Net al 5%: script e identità sono pronti (`expected_unet_best_5pct.json`), l'esito numerico non c'è ancora. Il replay confronta l'evaluatore corrente con il macro RMSE VAL storico, tolleranza 0.05 K. Non misura l'ordine di training.
+- Esito numerico del replay di inferenza. Job **29670888** sottomesso, non letto. Confronta i due `best.pt` U-Net al 5% con il macro RMSE VAL storico, tolleranza 0.05 K, identità in `expected_unet_best_5pct.json`. Non misura l'ordine di training.
 - CSV `train_fit` dell'epoca di arresto S5 (usato da R0 come assenza, non come valore).
 
 ## Conseguenza per O5
