@@ -1,0 +1,8 @@
+model_group,treatment,information_available,label
+neural U-Net/GLU,free,velocity at 5% random sites (persisted mask) [+ p only if p_on],no T observation
+neural U-Net/GLU,oracle,same as free + FULL true T field (via one scalar offset),"diagnostic, not deployable"
+neural U-Net/GLU,ao9,"same as free + nine ideal T (3x3 grid rows/cols 32,64,95; no noise; tau=1)","ideal simulation values, not thermocouples"
+GappyPOD p_off/p_on,free/oracle/ao9,"velocity at the same 5% sites [+ p if p_on]; frozen fitted POD, no refit",oracle/AO9 as for neural
+ParamMean (p_on),free/oracle/ao9,"p only (NH3, phi); NO velocity; coefficients frozen from Gappy artifact",receives p: not matched to the p_off prohibition
+GlobalMean,free/oracle/ao9,nothing (train_fit mean T field),reference floor
+T-only constant,t_only_const,only the nine ideal T: field = mean of the nine T,"no velocity, no p, no other pixels"

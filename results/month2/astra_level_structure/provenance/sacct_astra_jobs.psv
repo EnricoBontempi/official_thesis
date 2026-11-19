@@ -1,0 +1,6 @@
+JobID|JobName|State|ExitCode|Submit|Start|End|Elapsed|NodeList|Partition|Account|QOS|ReqTRES
+29612403|astra_s5_sparse_unet_pon_seed0|COMPLETED|0:0|2026-11-19T00:26:37|2026-11-19T03:46:51|2026-11-19T03:48:57|00:02:06|node3207|mit_normal_gpu|mit_amf_advanced_gpu|mit_amf_advanced_gpu|billing=4,cpu=4,gres/gpu:l40s=1,gres/gpu=1,mem=32G,node=1
+29612404|astra_s5_sparse_unet_poff_seed0|COMPLETED|0:0|2026-11-19T00:26:37|2026-11-19T03:50:50|2026-11-19T03:52:48|00:01:58|node3202|mit_normal_gpu|mit_amf_advanced_gpu|mit_amf_advanced_gpu|billing=4,cpu=4,gres/gpu:l40s=1,gres/gpu=1,mem=32G,node=1
+29612405|astra_s5_adapted_glu_pon_seed0|COMPLETED|0:0|2026-11-19T00:26:37|2026-11-19T03:50:50|2026-11-19T03:52:58|00:02:08|node3302|mit_normal_gpu|mit_amf_advanced_gpu|mit_amf_advanced_gpu|billing=4,cpu=4,gres/gpu:l40s=1,gres/gpu=1,mem=32G,node=1
+29612406|astra_s5_adapted_glu_poff_seed0|COMPLETED|0:0|2026-11-19T00:26:37|2026-11-19T03:53:48|2026-11-19T03:55:51|00:02:03|node3302|mit_normal_gpu|mit_amf_advanced_gpu|mit_amf_advanced_gpu|billing=4,cpu=4,gres/gpu:l40s=1,gres/gpu=1,mem=32G,node=1
+29612407|astra_base|COMPLETED|0:0|2026-11-19T00:26:37|2026-11-19T00:27:47|2026-11-19T00:28:09|00:00:22|node1610|mit_normal|mit_amf_advanced_cpu|mit_amf_advanced_cpu|billing=4,cpu=4,mem=64G,node=1

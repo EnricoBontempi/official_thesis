@@ -1,0 +1,46 @@
+{
+  "seen_train_eval": {
+    "GappyPOD_p_off": {
+      "n_neural": 660,
+      "n_baseline": 660,
+      "n_matched_keys": 660,
+      "n_velocity_sites_equal": true,
+      "n_t9_on_velocity_sites_equal": true,
+      "n_velocity_sites_unique": [
+        819
+      ]
+    },
+    "GappyPOD_p_on": {
+      "n_neural": 660,
+      "n_baseline": 660,
+      "n_matched_keys": 660,
+      "n_velocity_sites_equal": true,
+      "n_t9_on_velocity_sites_equal": true,
+      "n_velocity_sites_unique": [
+        819
+      ]
+    }
+  },
+  "val_eval": {
+    "GappyPOD_p_off": {
+      "n_neural": 369,
+      "n_baseline": 369,
+      "n_matched_keys": 369,
+      "n_velocity_sites_equal": true,
+      "n_t9_on_velocity_sites_equal": true,
+      "n_velocity_sites_unique": [
+        819
+      ]
+    },
+    "GappyPOD_p_on": {
+      "n_neural": 369,
+      "n_baseline": 369,
+      "n_matched_keys": 369,
+      "n_velocity_sites_equal": true,
+      "n_t9_on_velocity_sites_equal": true,
+      "n_velocity_sites_unique": [
+        819
+      ]
+    }
+  }
+}

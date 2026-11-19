@@ -1,0 +1,19 @@
+{
+  "tables": [
+    "completeness_nan_columns.csv",
+    "completeness_rows.csv",
+    "information_labels.csv",
+    "macro_headline_wide.csv",
+    "macro_metrics_long.csv",
+    "macro_regional_long.csv",
+    "macro_valid_counts_long.csv",
+    "offsets_macro_long.csv",
+    "offsets_per_condition.csv",
+    "paired_diff_macro_long.csv",
+    "paired_diff_per_condition.csv",
+    "per_condition_metrics.csv",
+    "region_valid_frame_counts.csv"
+  ],
+  "macro_definition": "frame -> condition(sim_id, NaN skipped) -> mean over conditions = replica value; replica 'mean' = mean of 3 replica values",
+  "n_rows_per_frame_table": 25725
+}

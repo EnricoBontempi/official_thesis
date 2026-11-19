@@ -1,0 +1,164 @@
+{
+  "atol_K": 0.05,
+  "cells_A_expected": 24,
+  "cells_A_pass": 24,
+  "cells_BC_available": 32,
+  "cells_BC_pass": 32,
+  "cells_BC_missing": [
+    {
+      "run": "s5_sparse_unet_pon_seed0",
+      "role": "seen_train_eval",
+      "replica": 1,
+      "source": "B_S5_eval_history"
+    },
+    {
+      "run": "s5_sparse_unet_pon_seed0",
+      "role": "seen_train_eval",
+      "replica": 1,
+      "source": "C_S5_evals_epoch_per_frame"
+    },
+    {
+      "run": "s5_sparse_unet_pon_seed0",
+      "role": "seen_train_eval",
+      "replica": 2,
+      "source": "B_S5_eval_history"
+    },
+    {
+      "run": "s5_sparse_unet_pon_seed0",
+      "role": "seen_train_eval",
+      "replica": 2,
+      "source": "C_S5_evals_epoch_per_frame"
+    },
+    {
+      "run": "s5_sparse_unet_poff_seed0",
+      "role": "seen_train_eval",
+      "replica": 1,
+      "source": "B_S5_eval_history"
+    },
+    {
+      "run": "s5_sparse_unet_poff_seed0",
+      "role": "seen_train_eval",
+      "replica": 1,
+      "source": "C_S5_evals_epoch_per_frame"
+    },
+    {
+      "run": "s5_sparse_unet_poff_seed0",
+      "role": "seen_train_eval",
+      "replica": 2,
+      "source": "B_S5_eval_history"
+    },
+    {
+      "run": "s5_sparse_unet_poff_seed0",
+      "role": "seen_train_eval",
+      "replica": 2,
+      "source": "C_S5_evals_epoch_per_frame"
+    },
+    {
+      "run": "s5_adapted_glu_pon_seed0",
+      "role": "seen_train_eval",
+      "replica": 1,
+      "source": "B_S5_eval_history"
+    },
+    {
+      "run": "s5_adapted_glu_pon_seed0",
+      "role": "seen_train_eval",
+      "replica": 1,
+      "source": "C_S5_evals_epoch_per_frame"
+    },
+    {
+      "run": "s5_adapted_glu_pon_seed0",
+      "role": "seen_train_eval",
+      "replica": 2,
+      "source": "B_S5_eval_history"
+    },
+    {
+      "run": "s5_adapted_glu_pon_seed0",
+      "role": "seen_train_eval",
+      "replica": 2,
+      "source": "C_S5_evals_epoch_per_frame"
+    },
+    {
+      "run": "s5_adapted_glu_poff_seed0",
+      "role": "seen_train_eval",
+      "replica": 1,
+      "source": "B_S5_eval_history"
+    },
+    {
+      "run": "s5_adapted_glu_poff_seed0",
+      "role": "seen_train_eval",
+      "replica": 1,
+      "source": "C_S5_evals_epoch_per_frame"
+    },
+    {
+      "run": "s5_adapted_glu_poff_seed0",
+      "role": "seen_train_eval",
+      "replica": 2,
+      "source": "B_S5_eval_history"
+    },
+    {
+      "run": "s5_adapted_glu_poff_seed0",
+      "role": "seen_train_eval",
+      "replica": 2,
+      "source": "C_S5_evals_epoch_per_frame"
+    }
+  ],
+  "epoch_matches_all": true,
+  "max_abs_delta_K": 0.00086629259189408,
+  "max_abs_frame_delta_K": 0.033478134578814434,
+  "overall_pass": true,
+  "caveat": "S6 per_frame_best files carry no epoch column: best-checkpoint identity rests on the value match with S5 eval_history/evals at the best epoch (sources B/C) plus provenance epoch == S5 summary best_val_epoch. Seen replicas 1/2 are covered by source A only.",
+  "source_sha256": {
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/astra/s5_sparse_unet_pon_seed0/provenance.json": "3143372e57396d677279afdba6c0bb2ae40863d0af3a123e8dcaf591b4a8caca",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s5/s5_sparse_unet_pon_seed0/summary.json": "57a233a7ec0d61bf441c5247defb6b679001aa0d8f320c514848fc87a6954674",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s5/s5_sparse_unet_pon_seed0/eval_history.json": "900847164a5b8654cc93f8f386f92e598eceea16f1b31ffd74deaf1ad8ea72fc",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/astra/s5_sparse_unet_pon_seed0/per_frame_seen_train_eval.csv.gz": "392804ecc355b0419aabae0aa51b6b658f7e2114e3a1250ee2bf5e5da1c273af",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s6/s5_sparse_unet_pon_seed0/s5_sparse_unet_pon_seed0/per_frame_best_cov05_seen_train_eval_rep0.csv.gz": "74c3e80699d49aabe4670fcc0fed897ba05bbefee058c72309fddb10094f1ecf",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s5/s5_sparse_unet_pon_seed0/evals/epoch_0060/seen_train_eval_per_frame.csv.gz": "d1fbb8a3b32dee661f90a01527c4a5d8d9de020fce9e446efaf1f90b744ce31a",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s6/s5_sparse_unet_pon_seed0/s5_sparse_unet_pon_seed0/per_frame_best_cov05_seen_train_eval_rep1.csv.gz": "ac9b17fa3b4af4748c8e750bdc50f59fbeda04a0d29b7784bc86ca7d83fd935d",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s6/s5_sparse_unet_pon_seed0/s5_sparse_unet_pon_seed0/per_frame_best_cov05_seen_train_eval_rep2.csv.gz": "86a8975dc01140bcf7399c79a98000f1973799f1d67ee1bbb956fc5ada58c999",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/astra/s5_sparse_unet_pon_seed0/per_frame_val_eval.csv.gz": "92fb62042bec684fc5ce550ea2a4cbdd5ee44eaac7dfe3cf6ab928c5abdfa19e",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s6/s5_sparse_unet_pon_seed0/s5_sparse_unet_pon_seed0/per_frame_best_cov05_val_eval_rep0.csv.gz": "5fd5814ca9492cdc461229cc474187a8cb9620d284ce4fd07362a7a84ca7e968",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s5/s5_sparse_unet_pon_seed0/evals/epoch_0060/val_eval_per_frame.csv.gz": "d0e26ce7ddc0a6526a668121631a87272afca83fbd10cc969477d4771efdff72",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s6/s5_sparse_unet_pon_seed0/s5_sparse_unet_pon_seed0/per_frame_best_cov05_val_eval_rep1.csv.gz": "fa939f7f7d34b894c52d563a5d8c5004cd6b945501e97d823f7a96e1cd39f735",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s6/s5_sparse_unet_pon_seed0/s5_sparse_unet_pon_seed0/per_frame_best_cov05_val_eval_rep2.csv.gz": "c3b6ab1d52345ef918cf7d9f47bedaad209153b55ba89cb9874e92567240b48c",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/astra/s5_sparse_unet_poff_seed0/provenance.json": "fddac6837f94f7c701c684ce89a6494a8ff1ae98aeef08a5ef2d0ea520e15d56",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s5/s5_sparse_unet_poff_seed0/summary.json": "0e1366aa270d7418a651b875852ea01fe3be4c406b8d195d430c609fee03140a",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s5/s5_sparse_unet_poff_seed0/eval_history.json": "6a2d7640436568bca3086ebfe303e325581a0462e62174c837055258a085a277",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/astra/s5_sparse_unet_poff_seed0/per_frame_seen_train_eval.csv.gz": "a3c83755ac1a3af6027a2c36d59696ea5bdae110e7fac7e3f1a4f4049ab89a66",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s6/s5_sparse_unet_poff_seed0/s5_sparse_unet_poff_seed0/per_frame_best_cov05_seen_train_eval_rep0.csv.gz": "1043224e28f7d68fdf0be319d7174a06a17f64ba44ef4eabde03b6cbd5298ace",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s5/s5_sparse_unet_poff_seed0/evals/epoch_0140/seen_train_eval_per_frame.csv.gz": "4ad6d591897a09ef062507b11f994bb6dc451c4d2378d2e88f98e2a1038e5ace",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s6/s5_sparse_unet_poff_seed0/s5_sparse_unet_poff_seed0/per_frame_best_cov05_seen_train_eval_rep1.csv.gz": "b562f56a28b0bca4ec81dbf765078fb42a5f9bf10c96845926f9b98a3fc832a8",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s6/s5_sparse_unet_poff_seed0/s5_sparse_unet_poff_seed0/per_frame_best_cov05_seen_train_eval_rep2.csv.gz": "9b3aafbaaa6787537c06362f4600ec6c00c411ba58bbe82a3ba60778d74a7058",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/astra/s5_sparse_unet_poff_seed0/per_frame_val_eval.csv.gz": "716a8880773df1b6c8964e950e0e107499839aae03dcb9563c7fe6800974071f",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s6/s5_sparse_unet_poff_seed0/s5_sparse_unet_poff_seed0/per_frame_best_cov05_val_eval_rep0.csv.gz": "3eb665369b4e9134c67920dc148296d907bb624308cc5a1ba077204d58e7a724",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s5/s5_sparse_unet_poff_seed0/evals/epoch_0140/val_eval_per_frame.csv.gz": "3971e950bd22b0aded4b991f9ee08c12911da7b90767a64a3e340dd0e30d458c",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s6/s5_sparse_unet_poff_seed0/s5_sparse_unet_poff_seed0/per_frame_best_cov05_val_eval_rep1.csv.gz": "632e918d99187385484b882a7392272710267f2f07f5ecd0c1110537f9c8d715",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s6/s5_sparse_unet_poff_seed0/s5_sparse_unet_poff_seed0/per_frame_best_cov05_val_eval_rep2.csv.gz": "66d62f61de2f7912d624424533e024737351d07d019e400d2256158d2b1a93ab",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/astra/s5_adapted_glu_pon_seed0/provenance.json": "ac7a257b3c5d414b88a056bae1e4304abc6f13656dfc31b51b97a2cf72516f11",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s5/s5_adapted_glu_pon_seed0/summary.json": "5adbd3595b38b42a475e7a4978ae0568ab49f609922f0fdf1f610128c063af07",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s5/s5_adapted_glu_pon_seed0/eval_history.json": "f3b9954f83b30ce695472a4cfad7e33f7ed1dd279094bb88c7f9bad42391e616",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/astra/s5_adapted_glu_pon_seed0/per_frame_seen_train_eval.csv.gz": "1c2c4d0dd9948d1e8a0b049593616515e0c6e01400562e3b67cb0c62b32c6e03",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s6/s5_adapted_glu_pon_seed0/s5_adapted_glu_pon_seed0/per_frame_best_cov05_seen_train_eval_rep0.csv.gz": "8766294697c6969c09c7b31097abe50603aa6d8b3b6b92934e855fbe377014b5",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s5/s5_adapted_glu_pon_seed0/evals/epoch_0440/seen_train_eval_per_frame.csv.gz": "1075d64b0864123dd162c347c57dcfe4458e5603c6e1e2b84caa8440345e591a",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s6/s5_adapted_glu_pon_seed0/s5_adapted_glu_pon_seed0/per_frame_best_cov05_seen_train_eval_rep1.csv.gz": "106c75348aad125dcaba9abab8ddd6bb1b2849ab271735250aae680d1355c79d",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s6/s5_adapted_glu_pon_seed0/s5_adapted_glu_pon_seed0/per_frame_best_cov05_seen_train_eval_rep2.csv.gz": "d776e1f59a2e92f58a8fecc1a1e71d9072a40dbc7876ba58a38d778385e4b7da",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/astra/s5_adapted_glu_pon_seed0/per_frame_val_eval.csv.gz": "2a3e1103b8237bccd1eb4aed3f8afec8dc348755cac636756206793833d40509",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s6/s5_adapted_glu_pon_seed0/s5_adapted_glu_pon_seed0/per_frame_best_cov05_val_eval_rep0.csv.gz": "a78c1390f366903388fc6dd4d3b5e9ce9172ed258915365a32891c306ced0854",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s5/s5_adapted_glu_pon_seed0/evals/epoch_0440/val_eval_per_frame.csv.gz": "fdedeb8d51d8fbaac9f0f88f96bfa7c901dbfb09ef13c7e348238216bd32e2aa",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s6/s5_adapted_glu_pon_seed0/s5_adapted_glu_pon_seed0/per_frame_best_cov05_val_eval_rep1.csv.gz": "cafe9f882fbcb84660c50e53970faa990cfde4c18c7eda21f734af00114f3fb7",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s6/s5_adapted_glu_pon_seed0/s5_adapted_glu_pon_seed0/per_frame_best_cov05_val_eval_rep2.csv.gz": "342409b2d2577734b8a694fb70180759fc9fde2749cda06da31ceaf7921544b7",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/astra/s5_adapted_glu_poff_seed0/provenance.json": "c20676ee00ddcab545e7248f9d6d914e44930d272b61ba36df418691385714f1",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s5/s5_adapted_glu_poff_seed0/summary.json": "fe5cdc781eefc4be9aae158e2410b1dfd64dbb764df89294ca9dfcaaf8f679b6",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s5/s5_adapted_glu_poff_seed0/eval_history.json": "aa631c1441d4f1cdb6bfc9a870ea93268ac0801b332caae83bde9eb7358cf8e2",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/astra/s5_adapted_glu_poff_seed0/per_frame_seen_train_eval.csv.gz": "b6d3bcb09d20a93c7c89be2801ae6f5436e84db5ed9657ab6351c1189c57a738",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s6/s5_adapted_glu_poff_seed0/s5_adapted_glu_poff_seed0/per_frame_best_cov05_seen_train_eval_rep0.csv.gz": "20ba59f6b1949fbb5e5591945ead3ddbcd58d79f4d67a87eac627b53ee27c397",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s5/s5_adapted_glu_poff_seed0/evals/epoch_0650/seen_train_eval_per_frame.csv.gz": "9f70d20bdc3eb507df79c46119a0f0ddf63aa6590bcb8240a713ff555a4a74f0",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s6/s5_adapted_glu_poff_seed0/s5_adapted_glu_poff_seed0/per_frame_best_cov05_seen_train_eval_rep1.csv.gz": "b473f72825acdc48c0ce1e63a21cb7662a323a9a404b44ba6ada287e4741fa6c",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s6/s5_adapted_glu_poff_seed0/s5_adapted_glu_poff_seed0/per_frame_best_cov05_seen_train_eval_rep2.csv.gz": "297ae0aa961276732ef744a47a4d76a2da367f7aa007f49cccc5c920cf7e0276",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/astra/s5_adapted_glu_poff_seed0/per_frame_val_eval.csv.gz": "50e14ed911ee55c32fb53f907f856aeb0f2d5db9271b79ac7c12e3040cdc9cfc",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s6/s5_adapted_glu_poff_seed0/s5_adapted_glu_poff_seed0/per_frame_best_cov05_val_eval_rep0.csv.gz": "5c4edd612dddee039dfc5cf9ebf2dfa15a1c817e52f1dafa289b167f583cb0cc",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s5/s5_adapted_glu_poff_seed0/evals/epoch_0650/val_eval_per_frame.csv.gz": "8fd00c865e8dfdb5bbd131a0a0bf4f7a2ff94f9ff70fc276fd7e105a0ab17d5b",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s6/s5_adapted_glu_poff_seed0/s5_adapted_glu_poff_seed0/per_frame_best_cov05_val_eval_rep1.csv.gz": "49ec1b0071343877ec1138a21848f5879f896ba3d04b1d1c2d9cf22fe2c979c7",
+    "/tmp/claude-1000/-home-enric-projects-official-thesis/9dfcdbe2-090e-4dd0-b071-e9667fc6e087/scratchpad/mirror/s6/s5_adapted_glu_poff_seed0/s5_adapted_glu_poff_seed0/per_frame_best_cov05_val_eval_rep2.csv.gz": "b5651b4e91c462368ba29972de78b6a3f93b551adce7c4ee3faefcfad87a0882"
+  }
+}
