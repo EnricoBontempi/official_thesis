@@ -46,3 +46,45 @@ Per seen220, VAL123, repliche 0/1/2, quattro best S5 e le baseline Gappy/ParamMe
 Misura già disponibile, stessi percorsi di A2: i quattro job neurali 29612403–29612406 hanno impiegato 1 min 58 s–2 min 08 s su L40S (4 CPU, 32G, `mit_normal_gpu` / `mit_amf_advanced_gpu`). Il job baseline 29612407 ha impiegato 22 s su CPU. Una ripetizione che aggiunge mean9, median9 e i nove residui ha lo stesso costo di ordine, con uscita nuova `~/official_thesis_astra_results/median9_second_pass/`, senza sovrascrivere `level_structure_v1`. Prima di accettare median9, free/oracle/AO9 vanno confrontati con i CSV primari entro 0.05 K; se falliscono, i riferimenti non si aggiornano. T-only resta etichettato a parte.
 
 A4, sui checkpoint Opus, non è eseguita. Le funzioni non dipendono dal checkpoint, ma il tempo non è stato misurato su quei run e non viene promesso. Opus e la scelta S7 restano aperti.
+
+## Submission dell’insieme completo
+
+Codice eseguito: `44e5e5e0bd0907560d1736a53d357933680b090a`.
+Checkout congelato, detached: `/home/bontempi/projects/official_thesis_astra_median9`.
+Output nuovo: `/home/bontempi/official_thesis_astra_results/median9_second_pass/`.
+Riferimento primario, solo lettura: `/home/bontempi/official_thesis_astra_results/level_structure_v1/`.
+
+Sottomessi il 2026-11-19 alle 16:32 circa EST, senza toccare i training Opus `29671719` e `29671721` (ancora in esecuzione su due L40S). Il QoS GPU consente 4 GPU; questa diagnostica ne chiede al massimo 2 insieme.
+
+| Job | Cosa | Risorse |
+| --- | --- | --- |
+| `29686178` array `0-3%2` | 0 U-Net p_on, 1 U-Net p_off, 2 GLU p_on, 3 GLU p_off | `mit_normal_gpu` / `mit_amf_advanced_gpu`, 1 L40S, 4 CPU, 32G, wall 4 h |
+| `29686179` | baseline Gappy, ParamMean, GlobalMean, T-only | `mit_normal` / `mit_amf_advanced_cpu`, 4 CPU, 64G, wall 4 h |
+
+Log: `.../median9_second_pass/slurm_logs/astra_m9n-29686178_<task>.out` e `astra_m9b-29686179.out`, con gli analoghi `.err`.
+
+Alla sottomissione i cinque task erano `PENDING` con reason `None`. Nessun attesa dopo la sottomissione.
+
+Matrice attesa, se il forward arriva in fondo:
+
+- neurale, per run: seen 3300 righe e VAL 1845 (220 e 123 frame × 3 repliche × 5 trattamenti); residui 5940 e 3321 (nove ancore).
+- baseline: seen 13860 e VAL 7749, di cui 660 e 369 sono T-only; residui solo per i quattro metodi con predizione, 37044 righe in totale.
+
+Il gate confronta free, oracle e AO9 con i CSV primari, chiavi `method × role × replica × treatment` e poi `sim_id, frame_index`. Tolleranza 0.05 K sulla RMSE macro e sullo scarto per-frame, e 0.05 K anche sull’offset applicato. T-only è confrontato sulla RMSE e non riceve mean9 né median9. `COMPLETE.json` compare solo se il replay è stato eseguito e resta dentro tolleranza. Un exit 3 lascia i CSV e `GATE.json`, senza `COMPLETE.json`.
+
+Controlli, da lanciare a mano quando i job hanno lasciato la coda:
+
+```bash
+squeue -u bontempi -j 29686178,29686179
+sacct -j 29686178,29686179 --format=JobID,JobName,State,ExitCode,Elapsed,AllocTRES%50
+python - << 'PY'
+import json
+from pathlib import Path
+root = Path("/home/bontempi/official_thesis_astra_results/median9_second_pass")
+for gate in sorted(root.glob("*/GATE.json")):
+    doc = json.loads(gate.read_text())
+    print(gate.parent.name, doc["replay_executed"], doc["scientific_validated"], doc["reason"])
+PY
+```
+
+Nessuno stimatore è stato scelto. L’aggregazione resta dopo questa verifica.
