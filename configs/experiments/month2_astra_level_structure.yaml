@@ -1,0 +1,68 @@
+# Astra A0 freeze: level (uniform offset) vs structure, oracle offset, AO9 (nine ideal T).
+# Offline evaluation of FROZEN S5 best checkpoints. NO training. NO K sweep/layout/noise sweep.
+# Written before any scientific evaluation; do not edit after submission (new file instead).
+experiment_id: month2_astra_level_structure_v1
+status: a2_primary_independent_of_opus
+scientific_training_authorized: false
+assisted_exception: >
+  Scope-limited extension of the K=0 sparse perimeter: nine ideal T observations are used
+  ONLY in a post-hoc scalar offset (AO9) on frozen free predictions. No training, no other K.
+
+evaluation:
+  site_fraction: 0.05
+  roles: [seen_train_eval, val_eval]
+  mask_replicas: [0, 1, 2]
+  layout_id: random_sparse_primary
+  eval_mask_seed: 20261116
+  mask_payload_root_rel: data/processed/month2_sparse_eval_masks   # persisted nested masks, no seed fallback
+  precision: fp32_no_amp_no_tf32_no_compile
+  treatments: [free, oracle, ao9]            # all from the same base prediction (one forward)
+  expected_frames: {seen_train_eval: 220, val_eval: 123}
+
+anchors_T9:
+  layout: grid_3x3_zero_based_128x128
+  rows: [32, 64, 95]
+  cols: [32, 64, 95]
+  site_index_rule: row*128+col
+  selection: a_priori_no_T_no_error_no_hotspot_no_VAL
+  historical_unique_K9_layout: false   # historical K=9 anchors are per-frame random nested (not a single fixed layout)
+  noise_K: 0.0
+  grid_fully_valid: true               # N=16384, no domain mask in dense cache
+
+offsets:
+  oracle: "delta = mean_grid(T_true - T_pred)  [diagnostic, not deployable]"
+  ao9: "delta = sum_anchor(T_obs - T_pred_at_anchor) / (K + tau), K=9"
+  tau: 1.0
+  units: kelvin_after_denormalization
+  implementation: combustion_recon.models.baselines.apply_anchor_offset   # consolidated; no clipping
+
+metrics:
+  hot_threshold_K: 2100.0     # combustion_recon.evaluation.metrics.DEFAULT_T_HIGH
+  peak_threshold_K: 2200.0
+  jet_threshold_K: 1800.0     # jet = T < 1800 (historical convention)
+  domains: [all_field, off_anchor_16375]
+  empty_region_convention: "IoU/RMSE NaN with explicit counts (never 0/1)"
+  mse_recovery: "(MSE_free-MSE_AO9)/(MSE_free-MSE_oracle) per frame, NaN if denominator<=1e-6 K^2"
+
+replay_gate:
+  free_k0_macro_rmse_atol_K: 0.05
+  reference: S6 summary_all_settings.csv (best, 5%, per role/replica) and historical baseline summary
+  on_failure: record in output, do not update reference
+
+neural_checkpoints:   # frozen STOP E ledger (docs/month2/05_sparse_reconstruction.md, runs_provenance.json)
+  s5_sparse_unet_pon_seed0:  {job_id: 29567988, family: sparse_unet, p_conditioning: true,  best_sha256: b03b896eb4a9f9da3f14969772e832547a09987b19915f9db25a539b07464b7a}
+  s5_sparse_unet_poff_seed0: {job_id: 29567990, family: sparse_unet, p_conditioning: false, best_sha256: 0d9d93a164bcdcaf19b1fd8e1eb98a8cf95567b95e6e4d291f864ca2407fb9fc}
+  s5_adapted_glu_pon_seed0:  {job_id: 29567992, family: adapted_glu, p_conditioning: true,  best_sha256: bfd126e5a4289b16c5104fba70f9af8fa3376929df503589ca0a8b792f4639c1}
+  s5_adapted_glu_poff_seed0: {job_id: 29567994, family: adapted_glu, p_conditioning: false, best_sha256: fbae86d5ac1850f99dce69843ea612df984abc1e4dc6fadfd535211db552d1f4}
+train_git_sha: 38ac7fe40178982ac1bd33c5d5602a5e7d928d3b
+
+baselines_matched:
+  gappypod_artifact_sha256: a6fbdfd2a0409cd11995247ab93db694d0c440d677f810b433daf2fe10a74ac9
+  gappypod: {p_off: free+oracle+ao9, p_on: free+oracle+ao9}   # frozen lambdas/R, no refit
+  param_mean: {p_on_only: true, treatments: [free, oracle, ao9]}   # coef from gappy artifact (frozen)
+  global_mean: {no_p_no_velocity: true, treatments: [free, oracle, ao9]}   # fit-only train_fit mean field
+  t_only_constant: "constant field = mean of the nine T; no velocity/p/other target pixels"
+  no_new_fit_no_tuning: true
+
+secondary_block:
+  opus_checkpoints: not_included_here   # A4 is a later, separately agreed extension
