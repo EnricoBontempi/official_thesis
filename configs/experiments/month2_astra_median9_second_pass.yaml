@@ -1,0 +1,54 @@
+# Median9 second pass. Written before the inference. Do not edit after submission.
+# Exploratory diagnostic on the frozen Astra S5 predictions. Not a new estimator,
+# not A4, not TEST, and not a replacement of the primary free/oracle/AO9 tables.
+experiment_id: month2_astra_median9_second_pass
+status: authorized_full_set_inference
+scientific_training_authorized: false
+parent_config: configs/experiments/month2_astra_level_structure.yaml
+technical_package_sha: 86a925af61accdef0b235ac084827cf639c1040c
+revised_report_sha: 82bff35726fb70af9987081802ece3ef718e42bd
+
+evaluation:
+  site_fraction: 0.05
+  roles: [seen_train_eval, val_eval]
+  mask_replicas: [0, 1, 2]
+  layout_id: random_sparse_primary
+  eval_mask_seed: 20261116
+  precision: fp32_no_amp_no_tf32_no_compile
+  expected_frames: {seen_train_eval: 220, val_eval: 123}
+  treatments_from_same_prediction: [free, oracle, ao9, mean9, median9]
+  t_only_constant: historical_separate_not_median9
+
+anchors_T9:
+  rows: [32, 64, 95]
+  cols: [32, 64, 95]
+  site_index_rule: row*128+col
+  tau: 1.0
+  mean9: "sum(T_obs-T_pred)/9, no tau"
+  median9: "ordinary median, fifth ordered residual, no shrink"
+
+replay_gate:
+  reference: level_structure_v1 per_frame csv, free/oracle/ao9
+  macro_rmse_atol_K: 0.05
+  per_frame_rmse_atol_K: 0.05
+  delta_applied_atol_K: 0.05
+  t_only_rmse_preserved: true
+  on_failure: keep diagnostic tables, do not write scientific COMPLETE, do not edit the reference
+
+inputs:
+  mask_manifest_sha256: 2e2d8ff6edabf62ad56702a155140d064c0b4014d06ee96debf52811efa5c75e
+  cache_aggregate_sha256: 710bab909a0efb6cc1b4b4a0d7f7dcc4889472b7adc8076abb94fd529576ab5d
+  stats_sha256: 678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e
+  gappypod_artifact_sha256: a6fbdfd2a0409cd11995247ab93db694d0c440d677f810b433daf2fe10a74ac9
+  train_git_sha: 38ac7fe40178982ac1bd33c5d5602a5e7d928d3b
+
+neural_checkpoints:
+  s5_sparse_unet_pon_seed0:  {job_id: 29567988, family: sparse_unet, p_conditioning: true,  best_sha256: b03b896eb4a9f9da3f14969772e832547a09987b19915f9db25a539b07464b7a}
+  s5_sparse_unet_poff_seed0: {job_id: 29567990, family: sparse_unet, p_conditioning: false, best_sha256: 0d9d93a164bcdcaf19b1fd8e1eb98a8cf95567b95e6e4d291f864ca2407fb9fc}
+  s5_adapted_glu_pon_seed0:  {job_id: 29567992, family: adapted_glu, p_conditioning: true,  best_sha256: bfd126e5a4289b16c5104fba70f9af8fa3376929df503589ca0a8b792f4639c1}
+  s5_adapted_glu_poff_seed0: {job_id: 29567994, family: adapted_glu, p_conditioning: false, best_sha256: fbae86d5ac1850f99dce69843ea612df984abc1e4dc6fadfd535211db552d1f4}
+
+baselines_matched:
+  methods: [GappyPOD_p_off, GappyPOD_p_on, ParamMean_p_on, GlobalMean]
+  t_only_method: T_only_const
+  no_refit: true

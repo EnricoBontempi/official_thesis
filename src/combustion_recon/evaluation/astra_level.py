@@ -11,9 +11,10 @@ consolidated :func:`combustion_recon.models.baselines.apply_anchor_offset`
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Mapping
 
 import numpy as np
+import pandas as pd
 
 from combustion_recon.evaluation.metrics import (
     DEFAULT_T_HIGH,
@@ -305,3 +306,296 @@ def treat_frame_with_level_diagnostics(
         "delta_oracle_K": d_or,
     }
     return rows, detail
+
+
+_REPLAY_FRAME_KEYS = ("method", "role", "replica_id", "sim_id", "frame_index", "treatment")
+
+
+def prediction_tables(
+    pred_K: np.ndarray,
+    true_K: np.ndarray,
+    sites: np.ndarray,
+    identity: Mapping[str, Any],
+    *,
+    tau: float = AO_TAU,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Metric rows and one residual row per anchor, from one base prediction.
+
+    Free, oracle and AO9 stay the primary rows. mean9 and median9 are extra
+    translations of that same prediction. The identity is copied onto every row.
+    """
+    rows, detail = treat_frame_with_level_diagnostics(pred_K, true_K, sites, tau=tau)
+    d_mean = float(detail["delta_mean9_K"])
+    d_med = float(detail["delta_median9_K"])
+    metric_rows: list[dict[str, Any]] = []
+    for row in rows:
+        applied = float(row["delta_applied_K"])
+        oracle = float(row["delta_oracle_K"])
+        metric_rows.append(
+            {
+                **dict(identity),
+                **row,
+                "delta_mean9_K": d_mean,
+                "delta_median9_K": d_med,
+                "delta_applied_minus_oracle_K": applied - oracle,
+                "level_recipe": "same_base_prediction",
+            }
+        )
+    residual_rows: list[dict[str, Any]] = []
+    for i in range(N_ANCHORS):
+        residual_rows.append(
+            {
+                **dict(identity),
+                "anchor_id": i,
+                "anchor_flat_index": int(detail["anchor_flat_index"][i]),
+                "anchor_row": int(detail["anchor_row"][i]),
+                "anchor_col": int(detail["anchor_col"][i]),
+                "resid_K": float(detail["resid_K"][i]),
+                "ao9_contribution_K": float(detail["ao9_contribution_K"][i]),
+                "delta_mean9_K": d_mean,
+                "delta_median9_K": d_med,
+                "delta_ao9_K": float(detail["delta_ao9_K"]),
+                "delta_oracle_K": float(detail["delta_oracle_K"]),
+            }
+        )
+    return metric_rows, residual_rows
+
+
+def t_only_constant_row(
+    true_K: np.ndarray,
+    sites: np.ndarray,
+    identity: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Historical constant field: the mean of the nine observed T values.
+
+    mean9 and median9 are not applied. Offset columns stay NaN.
+    """
+    true = np.asarray(true_K, np.float64)
+    sites = np.asarray(sites, dtype=np.int64)
+    const = np.full_like(true, float(np.mean(true.ravel()[sites])))
+    row: dict[str, Any] = {
+        **dict(identity),
+        "treatment": "t_only_const",
+        "level_recipe": "historical_t_only_const",
+        "delta_applied_K": float("nan"),
+        "delta_oracle_K": float("nan"),
+        "delta_ao9_K": float("nan"),
+        "delta_mean9_K": float("nan"),
+        "delta_median9_K": float("nan"),
+        "delta_applied_minus_oracle_K": float("nan"),
+        "anchor_mean_resid_K": float("nan"),
+        "mse_recovery_vs_oracle": float("nan"),
+    }
+    row.update(frame_metrics(const, true, anchor_mask_from_sites(sites, *true.shape)))
+    return row
+
+
+def _macro_rmse(frame: pd.DataFrame, col: str = "all_rmse_K") -> float:
+    """Mean over conditions of the per-condition mean. One weight per condition."""
+    return float(frame.groupby("sim_id")[col].mean().mean())
+
+
+def _replay_norm(frame: pd.DataFrame) -> pd.DataFrame:
+    out = frame.copy()
+    out["method"] = out["method"].astype(str)
+    out["role"] = out["role"].astype(str)
+    out["replica_id"] = out["replica_id"].astype(int)
+    out["sim_id"] = out["sim_id"].astype(str)
+    out["frame_index"] = out["frame_index"].astype(int)
+    out["treatment"] = out["treatment"].astype(str)
+    return out
+
+
+def primary_level_replay(
+    candidate: pd.DataFrame,
+    reference: pd.DataFrame,
+    *,
+    atol_K: float = 0.05,
+    treatments: tuple[str, ...] = TREATMENTS,
+    roles: tuple[str, ...] = ("seen_train_eval", "val_eval"),
+    replicas: tuple[int, ...] = (0, 1, 2),
+    expected_frames: Mapping[str, int] | None = None,
+    compare_delta_applied: bool = True,
+) -> dict[str, Any]:
+    """Compare free/oracle/AO9 with a non-empty primary table.
+
+    The pass/fail cell is method × role × replica × treatment. Macro RMSE and
+    the largest per-frame RMSE difference both have to sit within ``atol_K``.
+    When ``compare_delta_applied`` is set, the applied offset is held to the
+    same tolerance. An empty reference is not a replay: ``replay_executed``
+    stays false and ``validated`` stays false.
+    """
+    empty_frames = pd.DataFrame(
+        columns=[
+            "method", "role", "replica_id", "sim_id", "frame_index", "treatment",
+            "all_rmse_K_new", "all_rmse_K_ref", "delta_all_rmse_K",
+            "delta_applied_K_new", "delta_applied_K_ref", "delta_delta_applied_K",
+            "pair",
+        ]
+    )
+    base: dict[str, Any] = {
+        "replay_executed": False,
+        "validated": False,
+        "reason": None,
+        "atol_K": float(atol_K),
+        "treatments": list(treatments),
+        "keys": list(_REPLAY_FRAME_KEYS),
+        "compare_delta_applied": bool(compare_delta_applied),
+        "n_cells_expected": 0,
+        "n_cells_pass": 0,
+        "max_abs_macro_rmse_K": None,
+        "max_abs_frame_rmse_K": None,
+        "max_abs_delta_applied_K": None,
+        "cells": [],
+        "frames": empty_frames,
+    }
+    if reference is None or len(reference) == 0:
+        base["reason"] = "empty_reference"
+        return base
+    need = set(_REPLAY_FRAME_KEYS) | {"all_rmse_K"}
+    if compare_delta_applied:
+        need.add("delta_applied_K")
+    missing_ref = sorted(need - set(reference.columns))
+    missing_cand = sorted(need - set(candidate.columns))
+    if missing_cand or missing_ref:
+        base["reason"] = "missing_columns"
+        base["missing_columns"] = {"candidate": missing_cand, "reference": missing_ref}
+        return base
+
+    cand = _replay_norm(candidate)
+    ref = _replay_norm(reference)
+    cand = cand[cand["treatment"].isin(treatments)]
+    ref = ref[ref["treatment"].isin(treatments)]
+    if len(ref) == 0 or len(cand) == 0:
+        base["reason"] = "empty_reference"
+        return base
+    if cand.duplicated(list(_REPLAY_FRAME_KEYS)).any() or ref.duplicated(list(_REPLAY_FRAME_KEYS)).any():
+        base["replay_executed"] = True
+        base["reason"] = "duplicate_keys"
+        return base
+
+    methods = sorted(set(cand["method"]) | set(ref["method"]))
+    if not methods or set(cand["method"]) != set(ref["method"]):
+        base["replay_executed"] = True
+        base["reason"] = "method_set_mismatch"
+        base["methods_candidate"] = sorted(set(cand["method"]))
+        base["methods_reference"] = sorted(set(ref["method"]))
+        return base
+
+    base["replay_executed"] = True
+    cells: list[dict[str, Any]] = []
+    frame_parts: list[pd.DataFrame] = []
+    macro_abs: list[float] = []
+    frame_abs: list[float] = []
+    applied_abs: list[float] = []
+    for method in methods:
+        for role in roles:
+            for replica in replicas:
+                for treatment in treatments:
+                    c = cand[
+                        (cand["method"] == method)
+                        & (cand["role"] == role)
+                        & (cand["replica_id"] == int(replica))
+                        & (cand["treatment"] == treatment)
+                    ]
+                    r = ref[
+                        (ref["method"] == method)
+                        & (ref["role"] == role)
+                        & (ref["replica_id"] == int(replica))
+                        & (ref["treatment"] == treatment)
+                    ]
+                    merged = c[["sim_id", "frame_index", "all_rmse_K"]].merge(
+                        r[["sim_id", "frame_index", "all_rmse_K"]],
+                        on=["sim_id", "frame_index"],
+                        how="outer",
+                        suffixes=("_new", "_ref"),
+                        indicator=True,
+                    )
+                    if compare_delta_applied:
+                        applied = c[["sim_id", "frame_index", "delta_applied_K"]].merge(
+                            r[["sim_id", "frame_index", "delta_applied_K"]],
+                            on=["sim_id", "frame_index"],
+                            how="outer",
+                            suffixes=("_new", "_ref"),
+                        )
+                        merged = merged.merge(applied, on=["sim_id", "frame_index"], how="left")
+                    else:
+                        merged["delta_applied_K_new"] = np.nan
+                        merged["delta_applied_K_ref"] = np.nan
+                    merged["delta_all_rmse_K"] = merged["all_rmse_K_new"] - merged["all_rmse_K_ref"]
+                    merged["delta_delta_applied_K"] = (
+                        merged["delta_applied_K_new"] - merged["delta_applied_K_ref"]
+                    )
+                    merged.insert(0, "treatment", treatment)
+                    merged.insert(0, "replica_id", int(replica))
+                    merged.insert(0, "role", role)
+                    merged.insert(0, "method", method)
+                    merged = merged.rename(columns={"_merge": "pair"})
+                    frame_parts.append(merged)
+
+                    paired = merged[merged["pair"] == "both"]
+                    n_expected = None if expected_frames is None else int(expected_frames[role])
+                    macro_new = _macro_rmse(c) if len(c) else None
+                    macro_ref = _macro_rmse(r) if len(r) else None
+                    macro_delta = None if macro_new is None or macro_ref is None else macro_new - macro_ref
+                    max_frame = float(paired["delta_all_rmse_K"].abs().max()) if len(paired) else None
+                    max_applied = (
+                        float(paired["delta_delta_applied_K"].abs().max())
+                        if compare_delta_applied and len(paired)
+                        else None
+                    )
+                    ok = (
+                        len(c) > 0
+                        and len(r) > 0
+                        and bool((merged["pair"] == "both").all())
+                        and (n_expected is None or len(c) == n_expected)
+                        and macro_delta is not None
+                        and abs(macro_delta) <= atol_K
+                        and max_frame is not None
+                        and max_frame <= atol_K
+                        and (
+                            not compare_delta_applied
+                            or (max_applied is not None and max_applied <= atol_K)
+                        )
+                    )
+                    if macro_delta is not None:
+                        macro_abs.append(abs(macro_delta))
+                    if max_frame is not None:
+                        frame_abs.append(max_frame)
+                    if max_applied is not None:
+                        applied_abs.append(max_applied)
+                    cells.append(
+                        {
+                            "method": method,
+                            "role": role,
+                            "replica_id": int(replica),
+                            "treatment": treatment,
+                            "n_frames_new": int(len(c)),
+                            "n_frames_ref": int(len(r)),
+                            "n_frames_expected": n_expected,
+                            "n_paired": int(len(paired)),
+                            "macro_rmse_new_K": macro_new,
+                            "macro_rmse_ref_K": macro_ref,
+                            "delta_macro_rmse_K": macro_delta,
+                            "max_abs_frame_rmse_K": max_frame,
+                            "max_abs_delta_applied_K": max_applied,
+                            "ok": bool(ok),
+                        }
+                    )
+    frames = pd.concat(frame_parts, ignore_index=True) if frame_parts else empty_frames
+    n_pass = int(sum(bool(c["ok"]) for c in cells))
+    validated = bool(cells) and n_pass == len(cells)
+    base.update(
+        {
+            "reason": None if validated else "out_of_tolerance_or_unpaired",
+            "n_cells_expected": len(cells),
+            "n_cells_pass": n_pass,
+            "max_abs_macro_rmse_K": max(macro_abs) if macro_abs else None,
+            "max_abs_frame_rmse_K": max(frame_abs) if frame_abs else None,
+            "max_abs_delta_applied_K": max(applied_abs) if applied_abs else None,
+            "cells": cells,
+            "frames": frames,
+            "validated": validated,
+        }
+    )
+    return base
