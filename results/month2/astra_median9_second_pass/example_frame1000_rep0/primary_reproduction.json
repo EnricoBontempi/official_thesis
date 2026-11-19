@@ -1,0 +1,50 @@
+{
+  "scope": "example_frame1000_rep0_only",
+  "not_the_seen_or_val_population": true,
+  "primary_atol_K": 0.05,
+  "primary_match": true,
+  "n_mismatches": 0,
+  "mismatches": [],
+  "provenance": [
+    {
+      "run_id": "s5_adapted_glu_poff_seed0",
+      "npz": "/tmp/astra_median9_fields/s5_adapted_glu_poff_seed0/val_frame1000_rep0_fields.npz",
+      "sha256": "4702cc914dc28c547c6294863e3e39ef6861b900c370130be0009d22d57c1b4d",
+      "reference_csv": "/tmp/astra_median9_ref/s5_adapted_glu_poff_seed0/per_frame_val_eval.csv.gz",
+      "reference_sha256": "50e14ed911ee55c32fb53f907f856aeb0f2d5db9271b79ac7c12e3040cdc9cfc",
+      "engaging_npz": "/home/bontempi/official_thesis_astra_results/level_structure_v1/s5_adapted_glu_poff_seed0/val_frame1000_rep0_fields.npz",
+      "engaging_reference_csv": "/home/bontempi/official_thesis_astra_results/level_structure_v1/s5_adapted_glu_poff_seed0/per_frame_val_eval.csv.gz"
+    },
+    {
+      "run_id": "s5_adapted_glu_pon_seed0",
+      "npz": "/tmp/astra_median9_fields/s5_adapted_glu_pon_seed0/val_frame1000_rep0_fields.npz",
+      "sha256": "b59b6596e923acd2f7c706a00f9a340ce77860c31a73553b3e3576856e6251a6",
+      "reference_csv": "/tmp/astra_median9_ref/s5_adapted_glu_pon_seed0/per_frame_val_eval.csv.gz",
+      "reference_sha256": "2a3e1103b8237bccd1eb4aed3f8afec8dc348755cac636756206793833d40509",
+      "engaging_npz": "/home/bontempi/official_thesis_astra_results/level_structure_v1/s5_adapted_glu_pon_seed0/val_frame1000_rep0_fields.npz",
+      "engaging_reference_csv": "/home/bontempi/official_thesis_astra_results/level_structure_v1/s5_adapted_glu_pon_seed0/per_frame_val_eval.csv.gz"
+    },
+    {
+      "run_id": "s5_sparse_unet_poff_seed0",
+      "npz": "/tmp/astra_median9_fields/s5_sparse_unet_poff_seed0/val_frame1000_rep0_fields.npz",
+      "sha256": "61c523e2ab061b718cb36c5c55386ec678f0bb2a415922720fcacfb9c9fa553c",
+      "reference_csv": "/tmp/astra_median9_ref/s5_sparse_unet_poff_seed0/per_frame_val_eval.csv.gz",
+      "reference_sha256": "716a8880773df1b6c8964e950e0e107499839aae03dcb9563c7fe6800974071f",
+      "engaging_npz": "/home/bontempi/official_thesis_astra_results/level_structure_v1/s5_sparse_unet_poff_seed0/val_frame1000_rep0_fields.npz",
+      "engaging_reference_csv": "/home/bontempi/official_thesis_astra_results/level_structure_v1/s5_sparse_unet_poff_seed0/per_frame_val_eval.csv.gz"
+    },
+    {
+      "run_id": "s5_sparse_unet_pon_seed0",
+      "npz": "/tmp/astra_median9_fields/s5_sparse_unet_pon_seed0/val_frame1000_rep0_fields.npz",
+      "sha256": "b58d08eb657f2602abbe8bc5c889b14d44053bfda10a92d1cf9eb178da498319",
+      "reference_csv": "/tmp/astra_median9_ref/s5_sparse_unet_pon_seed0/per_frame_val_eval.csv.gz",
+      "reference_sha256": "92fb62042bec684fc5ce550ea2a4cbdd5ee44eaac7dfe3cf6ab928c5abdfa19e",
+      "engaging_npz": "/home/bontempi/official_thesis_astra_results/level_structure_v1/s5_sparse_unet_pon_seed0/val_frame1000_rep0_fields.npz",
+      "engaging_reference_csv": "/home/bontempi/official_thesis_astra_results/level_structure_v1/s5_sparse_unet_pon_seed0/per_frame_val_eval.csv.gz"
+    }
+  ],
+  "note": "AO9 uses sum(resid)/(9+tau). mean9 is sum(resid)/9. median9 is the fifth ordered residual. A median-versus-AO9 difference is not only a robustness difference.",
+  "code_sha": "8621c2006d5a72e347caed45d9a90ab7a2057b66",
+  "observed_max_abs_K": 4.091236805781051e-05,
+  "observed_max_abs_note": "max over free/oracle/AO9 compare keys on the 12 example frames, after the script gate"
+}
