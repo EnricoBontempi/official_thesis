@@ -434,3 +434,13 @@ C149 attempt2 è il run scientifico: init condivisa fra on e off a seed 0, cache
 
 **O5 non preparata e non sottomessa.** Il divario di ordine confonde il confronto dati/seed. Due riferimenti A38 seed 0 nel runner nuovo sarebbero necessari per quel contrasto; non sono stati lanciati. Opus, sparse e Mese 2 restano aperti. Nessun S7, A4 o TEST.
 
+---
+
+## 2026-11-19 — Due riferimenti A38 seed 0 sul runner Opus
+
+**Motivazione.** Il bridge ha mostrato che S5 ha eseguito il DataLoader, mentre i sei training Opus usano lo stream. S5 non può fare da braccio A38 seed 0 di quel runner. Enrico ha autorizzato `O-A38-on-s0` e `O-A38-off-s0`: SparseUNet b32, init fresca, stesso contratto A38 seed 1 con soli `seed` e `shuffle_seed` a 0. Lo stream non è stato modificato per imitare il DataLoader. Nessun GLU, nessuna O5.
+
+**Replay 29670888.** Alle 14:13 EST era RUNNING su L40S da un minuto e mezzo, stdout solo di avvio, stderr vuoto, report assente. Alla submission dei riferimenti, intorno alle 14:19, era ancora in esecuzione. Nessun errore di identità visibile. Non è stato atteso: il replay di inferenza resta distinto dalla differenza di shuffle già accertata.
+
+**Submission.** SHA eseguito `32a59cab21884d8c052f941f526c7cf09367b1f3`. Checkout congelato `/home/bontempi/projects/official_thesis_opus_a38s0`. Output nuovo `/home/bontempi/official_thesis_opus_a38s0_runs/`. Job **29671719** (`O-A38-on-s0`) e **29671721** (`O-A38-off-s0`), entrambi PENDING alle 14:19:40 EST. Risorse del freeze A38: `mit_normal_gpu`, account/QoS `mit_amf_advanced_gpu`, L40S×1, 8 CPU, 64G, 6h, tetto interno 5.5h. Il QoS consente 4 GPU, 64 CPU e 1T per utente; il replay ne occupava una, quindi i due riferimenti rientrano nel tetto e possono partire quando la partizione ha i nodi. Cache storica `month2_dense_unet_cache_v1`, aggregate `710bab909a0efb6cc1b4b4a0d7f7dcc4889472b7adc8076abb94fd529576ab5d`; il gate rifiuta la cache C149. Gli hash consumati vengono scritti in `slurm_context_O-A38-*-s0.txt` all'avvio, prima del training. Wave-1, C149, bridge, Astra, S5 e HONF non sono stati toccati. Opus resta aperto.
+

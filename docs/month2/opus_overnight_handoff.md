@@ -129,6 +129,27 @@ Attempt1 C149 directories and the attempt2 checkout at `d633200` stay untouched.
 
 **O5 not prepared and not submitted.** Two new A38 seed-0 runs on the scientific stream would be required before a seed-0 data comparison. They were not launched. Opus remains open. No S7, A4, or TEST.
 
+## A38 seed-0 references (submitted 2026-11-19T14:19:40-05:00)
+
+S5 cannot be the seed-0 A38 arm of the Opus runner: its DataLoader order differs from the stream used by the six trainings. Enrico authorized two fresh SparseUNet references on that same stream. Only `seed` and `shuffle_seed` change from the A38 seed-1 contract, both to 0. The stream was not edited to imitate S5. No GLU and no O5.
+
+Replay **29670888** was RUNNING on an L40S at 14:13 (startup lines only, empty stderr, no report) and still running at this submission. No identity error was visible. It was not awaited. Inference replay stays separate from the shuffle finding.
+
+| Run | Job | State at submit | Checkout |
+| --- | --- | --- | --- |
+| O-A38-on-s0 | **29671719** | PENDING | `/home/bontempi/projects/official_thesis_opus_a38s0` @ `32a59cab21884d8c052f941f526c7cf09367b1f3` |
+| O-A38-off-s0 | **29671721** | PENDING | same detached checkout |
+
+Output root: `/home/bontempi/official_thesis_opus_a38s0_runs/`. Logs: `slurm-29671719.out/.err` and `slurm-29671721.out/.err`. Consumed cache, mask, and stats hashes are written to `slurm_context_O-A38-on-s0.txt` and `slurm_context_O-A38-off-s0.txt` when each job passes its gate. Expected cache id `month2_dense_unet_cache_v1`, aggregate `710bab909a0efb6cc1b4b4a0d7f7dcc4889472b7adc8076abb94fd529576ab5d`. C149 cache id is refused.
+
+Resources, same as the A38 seed-1 freeze: `mit_normal_gpu`, account/QoS `mit_amf_advanced_gpu`, `gpu:l40s:1`, 8 CPU, 64G, Slurm 6h, internal cap 5.5h. QoS MaxTRESPU is cpu=64, gres/gpu=4, mem=1T. The replay held one GPU, so both references fit under the user cap and were pending for partition resources. Prior run directories, Astra, and HONF were not modified.
+
+```bash
+ssh engaging 'squeue -j 29671719,29671721 -o "%.18i %.24j %.20P %.24a %.24q %.2t %.10M %R"'
+ssh engaging 'sacct -j 29671719,29671721 -X -o JobID,State,ExitCode,Elapsed,NodeList'
+ssh engaging 'tail -n 40 ~/official_thesis_opus_a38s0_runs/O-A38-on-s0/stdout.log'
+```
+
 ```bash
 ssh engaging 'sacct -j 29670888 -X -o JobID,State,ExitCode,Elapsed,NodeList'
 ssh engaging 'cat ~/official_thesis_opus_bridge_runs/replay_unet_best_5pct.json'
