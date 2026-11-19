@@ -357,12 +357,27 @@ def _gate_vs_historical(
     historical: pd.DataFrame,
     *,
     atol_rmse_K: float,
+    expected_n_checks: int = 6,
 ) -> dict[str, Any]:
+    if historical is None or len(historical) == 0:
+        return {
+            "ok": False,
+            "n_checks": 0,
+            "checks": [],
+            "error": "historical_reference_empty",
+        }
     hist = historical[
         (historical["method"] == "GappyPOD_free")
         & (historical["K"] == 0)
         & (np.isclose(historical["site_fraction"], 0.05))
     ].copy()
+    if len(hist) == 0:
+        return {
+            "ok": False,
+            "n_checks": 0,
+            "checks": [],
+            "error": "historical_gappypod_free_k0_5pct_rows_missing",
+        }
     checks = []
     ok = True
     for _, h in hist.iterrows():
@@ -394,7 +409,20 @@ def _gate_vs_historical(
             }
         )
         ok = ok and passed
-    return {"ok": ok, "n_checks": len(checks), "checks": checks}
+    n_checks = len(checks)
+    if n_checks != int(expected_n_checks):
+        ok = False
+    return {
+        "ok": ok,
+        "n_checks": n_checks,
+        "expected_n_checks": int(expected_n_checks),
+        "checks": checks,
+        **(
+            {}
+            if n_checks == int(expected_n_checks)
+            else {"error": "unexpected_gate_check_count"}
+        ),
+    }
 
 
 def main() -> int:

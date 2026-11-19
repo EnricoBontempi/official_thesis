@@ -58,6 +58,7 @@ class SparseUNetCacheDataset(Dataset):
         eval_mask_payload_root: str | Path | None = None,
         fixed_sites_by_cache_index: dict[int, np.ndarray] | None = None,
         require_denorm_phys: bool = True,
+        require_eval_mask_payload: bool = False,
         vi_phys: np.ndarray | None = None,
         vj_phys: np.ndarray | None = None,
         normalizer: Any | None = None,
@@ -78,6 +79,7 @@ class SparseUNetCacheDataset(Dataset):
         self.eval_mask_payload_root = Path(eval_mask_payload_root) if eval_mask_payload_root else DEFAULT_PAYLOAD_ROOT
         self.fixed_sites_by_cache_index = fixed_sites_by_cache_index or {}
         self.require_denorm_phys = bool(require_denorm_phys)
+        self.require_eval_mask_payload = bool(require_eval_mask_payload)
         self.normalizer = normalizer
 
         self.root = Path(cache_root) if cache_root is not None else DEFAULT_CACHE_ROOT
@@ -177,9 +179,22 @@ class SparseUNetCacheDataset(Dataset):
                     "sites_20pct": "hash_20pct",
                 }[key]
                 return sites, int(loaded["velocity_mask_seed"]), str(loaded[hash_key])
-            except KeyError:
-                pass
+            except KeyError as exc:
+                if self.require_eval_mask_payload:
+                    raise KeyError(
+                        "required eval mask payload missing for "
+                        f"role={self.role} sim={meta['sim_id']} frame={meta['frame_index']} "
+                        f"replica={self.replica_id} coverage={cov}: {exc}"
+                    ) from exc
+        elif self.require_eval_mask_payload:
+            raise FileNotFoundError(
+                f"require_eval_mask_payload=True but payload root missing/unusable: "
+                f"{self.eval_mask_payload_root}"
+            )
         # Fallback: seed regeneration (5% historical path; 1/20% non-nested).
+        # Forbidden when require_eval_mask_payload is set (Opus/Astra contract).
+        if self.require_eval_mask_payload:
+            raise RuntimeError("eval mask payload required; refusing seed regeneration fallback")
         return sites_from_eval_seed(
             eval_mask_seed=self.eval_mask_seed,
             sim_id=meta["sim_id"],

@@ -381,3 +381,13 @@ Numeri di run, soglie e raccomandazioni dettagliate dei revisori **non** sono de
 - Dopo Opus e Astra: discutere esiti, decidere il seguito sparse, poi completare gli aperti del Mese 2.
 - Nessuna scelta definitiva tra U-Net e GLU; nessun training S7, nessun job e nessun file nuovo in questa turnazione (solo aggiornamento del diario).
 
+---
+
+## 2026-11-19 — Opus wave-1: preparazione, controlli e submission (quattro GPU normal)
+
+**Fatti.** Prima onda Opus autorizzata da Enrico: `O-A38-on/off-s1` e `O-B19-on/off-s0` (SparseUNet, 5%, scientific epoch 760/95, normalizzatore 760 congelato, init fresca). Correzioni comuni riusabili da Astra: YAML protocollo di nuovo parsabile (`authorized_s6_offline` mapping); `require_eval_mask_payload`; scrittura `eval_history.json` anche su early-stop; amp/compile/tf32 espliciti off; gate Gappy rifiuta riferimento vuoto; stream presentazioni + stato sampler in checkpoint; `init_manifest.json`. Tip Engaging codice: `$HOME/projects/official_thesis_opus`; cache/maschere riusate da tip S5 HOME; output `$HOME/official_thesis_opus_runs/`. Dettaglio job/path: [opus_overnight_handoff.md](month2/opus_overnight_handoff.md).
+
+**Controlli eseguiti (locali).** Nesting B19⊂A38 su cache; stream A38 ≡ formula seed DataLoader S5; B19 = due permutazioni/epoca e maschera condivisa per doppia presentazione; resume stream sintetico; p_off isolation; stessi pesi iniziali on/off a seed uguale; contratti YAML Opus; protocollo load. Dichiarato: **95 update/epoca verificati**; **equivalenza scientifica completa con il run Engaging S5 non rivendicata** (nessun bridge replay RMSE).
+
+**Aperto per domani.** O1 (R0) non eseguito; C149 non in cache storica (braccio aumento dati bloccato); provenienza S6/figure/regionali/swap Gappy e prosa roadmapsparse non chiusi; nessuna attività Astra; niente C149/GLU/S7. Organizzazione: Cursor→Opus, Sonnet→Astra (best S5), Sol coordina.
+

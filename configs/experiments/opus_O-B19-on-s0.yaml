@@ -1,0 +1,128 @@
+# Opus wave-1 — authorized overnight matrix only (see roadmapopus.md O4).
+# Fresh init; no S5/profiling warm start. Scientific epoch = 760 presentations / 95 updates.
+
+experiment_id: month2_opus_O-B19-on-s0_v1
+status: opus_wave1_authorized
+scientific_training_authorized: true
+profiling_diagnostic_only: false
+opus_submission_authorized: true
+family: sparse_unet
+
+decision:
+  by: Enrico
+  date: "2026-11-19"
+  summary: >
+    Enrico authorized Opus first-wave submission of four SparseUNet runs
+    (A38 seed1 on/off + B19 seed0 on/off) after STOP E reviews and roadmapopus freeze.
+  supervisor_ratification: not_claimed
+
+inherits_protocol:
+  path: configs/experiments/month2_sparse_protocol.yaml
+
+model:
+  path: configs/models/unet_sparse.yaml
+  base_channels: 32
+  sparse_unet: configs/models/unet_sparse.yaml
+  adapted_glu: configs/models/glu_minimal.yaml
+
+training_candidate:
+  family: sparse_unet
+  p_conditioning: true
+  pool_id: B19
+  presentations_per_scientific_epoch: 760
+  require_eval_mask_payload: true
+  amp: false
+  torch_compile: false
+  save_best_seen_diagnostic: true
+
+  temporal_mode: single_frame
+  task_mode: temperature_free
+  K: 0
+  site_fraction: 0.05
+  seed: 0
+  shuffle_seed: 0
+  train_mask_seed: 20261118
+  eval_mask_seed: 20261116
+  layout_id: random_sparse_primary
+  val_replicas: [0, 1, 2]
+  device: cuda
+  precision: fp32
+  allow_tf32: false
+  batch_size: 8
+  n_epochs: 1000
+  lr: 1.0e-3
+  weight_decay: 1.0e-4
+  warmup_updates: 950
+  schedule_kind: warmup_then_reduce_on_plateau
+  plateau:
+    mode: min
+    factor: 0.5
+    patience_evals: 5
+    threshold_rel: 0.001
+    min_lr: 1.0e-5
+    metric: val_mean_condition_rmse_K
+  grad_clip_norm: 1.0
+  eval_every_epochs: 10
+  eval_roles: [train_fit, seen_train_eval, val_eval]
+  wall_time_cap_hours: 5.5
+  wall_time_cap_configurable: true
+  allow_automatic_lr_fallback_3e4: false
+  num_workers: 0
+  init: fresh_seed0_no_s5_or_profile_weights
+  decode_chunk_size: 512
+  decode_chunked_eval: true
+  microbatch_size: null
+  selection:
+    role: val_eval
+    coverage: 0.05
+    replicas: [0, 1, 2]
+    metric: mean_over_replicas_of_mean_condition_full_field_RMSE_K
+    tie_break: first_absolute_minimum
+    also_keep: [last, best_seen_diagnostic]
+    significant_ref_distinct_from_absolute_best: true
+  also_evaluate: [seen_train_eval, train_fit]
+  early_stopping:
+    enabled: true
+    min_epochs: 200
+    patience_evals: 15
+    rel_improvement: 0.001
+    reset_patience_on_lr_reduce: true
+    metric: val_mean_condition_rmse_K
+    note: operational_convention_not_physical_certification
+  checkpoint:
+    boundary: epoch_complete_only
+    kinds: [sparse_scientific_epoch_complete_v1, sparse_scientific_epoch_partial_v1]
+    partial_overwrite_last: false
+    save_optimizer_scheduler_rng_history: true
+    save_mask_epoch_set_epoch: true
+    save_glu_geometry_buffers: true
+  resume_policy:
+    boundary: epoch_complete_only
+    reject_incompatible_data_arch_science: true
+    allow_n_epochs_extension: explicit_flag_only
+
+operational_from_s5_recipe:
+  sbatch_time: "06:00:00"
+  sbatch_mem: 64G
+  sbatch_gres: gpu:l40s:1
+  sbatch_account: mit_amf_advanced_gpu
+  sbatch_partition: mit_normal_gpu
+  sbatch_qos: mit_amf_advanced_gpu
+  microbatch_size: null
+  note: >
+    Same Slurm envelope as S5. Internal wall_time_cap_hours=5.5 leaves margin under
+    Slurm 06:00:00 for a complete-epoch checkpoint; wall expiry is not convergence.
+  pool_frames_per_condition: 19
+  pool_total_frames: 380
+  freeze_record: roadmapopus.md
+
+artifacts:
+  results_root_engaging: /home/bontempi/official_thesis_opus_runs
+  run_id: O-B19-on-s0
+  refuse_overwrite_existing_run_dir: true
+  refuse_load_s5_or_s4_checkpoints: true
+
+notes:
+  - Opus wave-1 only; C149/GLU/Astra/S7/TEST not authorized here.
+  - Normalizer remains historical fit-only 760-frame stats (preprocessing frozen).
+  - train_eval uses reference760 even for B19.

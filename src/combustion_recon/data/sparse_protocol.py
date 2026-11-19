@@ -30,6 +30,8 @@ ALLOWED_TOP = {
     "glu",
     "scientific_runner",
     "gappypod_nested",
+    "authorized_s6_offline",
+    "opus_wave1_prepared",
     "forbidden_this_mission",
     "diagnostic_overfit",
 }

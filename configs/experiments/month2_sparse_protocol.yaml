@@ -1,7 +1,7 @@
 # Executable sparse protocol contract (S1–S2). Unknown scientific keys are refused.
 protocol_id: month2_sparse_v1
 roadmap: roadmapsparse.md
-status: s4_in_progress_profiling_jobs_failed_einops_s5_prepared_not_submitted
+status: stop_e_delivered_opus_wave1_prepared_protocol_auth_remains_false
 scientific_training_authorized: false
 s4_profiling_diagnostic_only: true
 s5_screening_authorized: false
@@ -109,10 +109,25 @@ s5_screening_prepared:
     entrypoint scripts/17_s6_sparse_eval_and_swap.py. No S7 training here.
 
 authorized_s6_offline:
-  - scientific_snapshot_control
-  - multi_coverage_best_last_eval
-  - matched_baseline_reuse_5pct
-  note: no silent POD/λ refit; GappyPOD 1/20% remains open
+  items:
+    - scientific_snapshot_control
+    - multi_coverage_best_last_eval
+    - matched_baseline_reuse_5pct
+  note: >
+    no silent POD/λ refit; GappyPOD nested 1/20% delivered under STOP E
+    (job 29601906). YAML mapping form required — a bare list plus sibling
+    keys is not valid YAML and previously made this file unparsable.
+
+opus_wave1_prepared:
+  roadmap: roadmapopus.md
+  first_wave_runs:
+    - O-A38-on-s1
+    - O-A38-off-s1
+    - O-B19-on-s0
+    - O-B19-off-s0
+  note: >
+    Protocol-level scientific_training_authorized remains false; per-run
+    Opus candidate YAMLs carry their own authorization flags.
 
 forbidden_this_mission:
   - scientific_training_760

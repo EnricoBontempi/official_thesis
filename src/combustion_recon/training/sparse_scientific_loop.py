@@ -41,6 +41,10 @@ from combustion_recon.training.epoch_loop import (
     total_scheduled_updates,
     updates_per_epoch,
 )
+from combustion_recon.training.scientific_epoch_sampler import (
+    ListSampler,
+    ScientificPresentationStream,
+)
 from combustion_recon.training.sparse_dataset import SparseUNetCacheDataset, collate_sparse_batch
 from combustion_recon.training.sparse_epoch_trainer import make_sparse_loader
 from combustion_recon.training.trainer import build_optimizer, mse_loss, set_seed, write_json
@@ -88,6 +92,11 @@ _RESUME_LOCKED_CFG_KEYS = (
     "eval_mask_seed",
     "layout_id",
     "val_replicas",
+    "presentations_per_scientific_epoch",
+    "pool_id",
+    "require_eval_mask_payload",
+    "amp_enabled",
+    "torch_compile",
 )
 
 
@@ -106,11 +115,21 @@ class SparseScientificConfig(EpochTrainConfig):
     decode_chunked_eval: bool = True
     microbatch_size: int | None = None  # None → full batch_size; accumulation to batch_size
     wall_time_cap_s: float = 6 * 3600
+    # Opus scientific-epoch contract. None → historical one-pass-over-pool (S5).
+    presentations_per_scientific_epoch: int | None = None
+    pool_id: str | None = None
+    require_eval_mask_payload: bool = False
+    amp_enabled: bool = False
+    torch_compile: bool = False
+    save_best_seen_diagnostic: bool = False
 
 
 @dataclass
 class SparseScientificState(EpochTrainState):
     mask_epoch: int = 0  # last set_epoch value applied to train dataset
+    sampler_cycle: int = 0
+    sampler_pos: int = 0
+    sampler_presentations_served: int = 0
 
 
 def _state_from_mapping(raw: dict[str, Any]) -> SparseScientificState:
@@ -181,6 +200,8 @@ def save_sparse_scientific_checkpoint(
         payload["dataloader_generator_state"] = loader_generator.get_state()
     if _is_adapted_glu(model):
         payload["glu_geometry_meta"] = dict(model.geometry_meta)
+    if extra and "scientific_sampler_state" in extra:
+        payload["scientific_sampler_state"] = extra["scientific_sampler_state"]
     _atomic_torch_save(payload, path)
 
 
@@ -309,8 +330,10 @@ def assert_sparse_scientific_candidate_contract(cand: dict[str, Any]) -> dict[st
             "notes",
             "family",
             "s5_submission_authorized",
+            "opus_submission_authorized",
             "operational_provisional_pending_s4_profiling",
             "operational_from_s4_profiling_candidate",
+            "operational_from_s5_recipe",
         }
     )
     if unknown_top:
@@ -364,6 +387,12 @@ def assert_sparse_scientific_candidate_contract(cand: dict[str, Any]) -> dict[st
         "decode_chunk_size",
         "decode_chunked_eval",
         "microbatch_size",
+        "pool_id",
+        "presentations_per_scientific_epoch",
+        "require_eval_mask_payload",
+        "amp",
+        "torch_compile",
+        "save_best_seen_diagnostic",
     }
     unknown_tc = sorted(set(tc) - allowed_tc)
     if unknown_tc:
@@ -375,6 +404,10 @@ def assert_sparse_scientific_candidate_contract(cand: dict[str, Any]) -> dict[st
         raise ValueError("precision must be fp32")
     if bool(tc.get("allow_tf32", False)):
         raise ValueError("allow_tf32 must be false")
+    if bool(tc.get("amp", False)):
+        raise ValueError("amp must be false (explicit fp32)")
+    if bool(tc.get("torch_compile", False)):
+        raise ValueError("torch_compile must be false")
     if bool(tc.get("allow_automatic_lr_fallback_3e4", False)):
         raise ValueError("automatic lr fallback must remain false")
     if int(tc.get("K", -1)) != 0:
@@ -389,6 +422,11 @@ def assert_sparse_scientific_candidate_contract(cand: dict[str, Any]) -> dict[st
         raise ValueError("batch_size must be 8")
     if int(tc.get("n_epochs", -1)) != 1000:
         raise ValueError("n_epochs initial tranche must be 1000")
+    if tc.get("presentations_per_scientific_epoch") is not None:
+        if int(tc["presentations_per_scientific_epoch"]) != 760:
+            raise ValueError("presentations_per_scientific_epoch must be 760 when set")
+    if tc.get("pool_id") is not None and str(tc["pool_id"]) not in {"A38", "B19", "C149"}:
+        raise ValueError("pool_id must be A38|B19|C149 when set")
 
     plateau = tc.get("plateau") or {}
     for k, expected in {
@@ -499,7 +537,19 @@ def config_from_candidate(
         microbatch_size=(
             None if tc.get("microbatch_size") in (None, "null") else int(tc["microbatch_size"])
         ),
+        presentations_per_scientific_epoch=(
+            None
+            if tc.get("presentations_per_scientific_epoch") in (None, "null")
+            else int(tc["presentations_per_scientific_epoch"])
+        ),
+        pool_id=(None if tc.get("pool_id") in (None, "null") else str(tc["pool_id"])),
+        require_eval_mask_payload=bool(tc.get("require_eval_mask_payload", False)),
+        amp_enabled=bool(tc.get("amp", False)),
+        torch_compile=bool(tc.get("torch_compile", False)),
+        save_best_seen_diagnostic=bool(tc.get("save_best_seen_diagnostic", False)),
     )
+    if cfg.amp_enabled or cfg.torch_compile:
+        raise ValueError("amp and torch_compile must remain disabled")
     if overrides:
         for k, v in overrides.items():
             if not hasattr(cfg, k):
@@ -534,12 +584,23 @@ class SparseScientificTrainer:
         self.normalizer = normalizer
         self.device = torch.device(cfg.device)
         self.tf32_policy = apply_tf32_policy(allow_tf32=cfg.allow_tf32)
+        if cfg.amp_enabled or cfg.torch_compile:
+            raise ValueError("amp/torch_compile must be false for sparse scientific training")
         self.model.to(self.device)
+        # n_train_samples = pool size (distinct frames). Scientific presentations
+        # may exceed pool size (B19); updates/epoch use presentations when set.
         self.n_train_samples = int(n_train_samples)
-        self.u_per_epoch = updates_per_epoch(self.n_train_samples, cfg.batch_size)
-        self.total_updates = total_scheduled_updates(
-            cfg.n_epochs, self.n_train_samples, cfg.batch_size
+        self.presentations_per_epoch = int(
+            cfg.presentations_per_scientific_epoch
+            if cfg.presentations_per_scientific_epoch is not None
+            else n_train_samples
         )
+        self.use_scientific_stream = cfg.presentations_per_scientific_epoch is not None
+        self.u_per_epoch = updates_per_epoch(self.presentations_per_epoch, cfg.batch_size)
+        self.total_updates = total_scheduled_updates(
+            cfg.n_epochs, self.presentations_per_epoch, cfg.batch_size
+        )
+        self.presentation_stream: ScientificPresentationStream | None = None
         from combustion_recon.training.trainer import TrainConfig
 
         tcfg = TrainConfig(
@@ -882,6 +943,13 @@ class SparseScientificTrainer:
         write_json(out_dir / "run_identity.json", run_identity)
         start_epoch = 0
 
+        if self.use_scientific_stream:
+            self.presentation_stream = ScientificPresentationStream(
+                pool_size=self.n_train_samples,
+                shuffle_seed=int(self.cfg.shuffle_seed),
+                presentations_per_epoch=self.presentations_per_epoch,
+            )
+
         if resume_path is not None:
             payload = load_sparse_scientific_checkpoint(
                 resume_path,
@@ -906,6 +974,14 @@ class SparseScientificTrainer:
             if "dataloader_generator_state" in payload:
                 self.loader_generator = torch.Generator()
                 self.loader_generator.set_state(payload["dataloader_generator_state"])
+            if self.use_scientific_stream:
+                samp = payload.get("scientific_sampler_state")
+                if samp is None:
+                    raise ResumeIncompatibilityError(
+                        "resume rejected: scientific_sampler_state missing from checkpoint"
+                    )
+                assert self.presentation_stream is not None
+                self.presentation_stream.load_state_dict(samp)
             train_ds.set_epoch(self.state.mask_epoch)
             run_identity = {
                 **run_identity,
@@ -913,6 +989,9 @@ class SparseScientificTrainer:
                 "resume_meta": resume_meta,
                 "resume_shuffle_state_restored": "dataloader_generator_state" in payload,
                 "resume_mask_epoch": self.state.mask_epoch,
+                "resume_scientific_sampler_restored": bool(
+                    payload.get("scientific_sampler_state")
+                ),
             }
             write_json(out_dir / "run_identity.json", run_identity)
 
@@ -925,6 +1004,20 @@ class SparseScientificTrainer:
         last_train_loss = float("nan")
         stop_now: str | None = None
 
+        def _ckpt_extra(base: dict[str, Any] | None = None) -> dict[str, Any]:
+            out = dict(base or {})
+            out["run_identity"] = run_identity
+            out["presentations_per_scientific_epoch"] = self.presentations_per_epoch
+            out["pool_size"] = self.n_train_samples
+            out["updates_per_scientific_epoch"] = self.u_per_epoch
+            out["amp_enabled"] = False
+            out["torch_compile"] = False
+            out["allow_tf32"] = False
+            out["precision"] = "fp32"
+            if self.presentation_stream is not None:
+                out["scientific_sampler_state"] = self.presentation_stream.state_dict()
+            return out
+
         try:
             for epoch in range(start_epoch, int(self.cfg.n_epochs)):
                 if (time.perf_counter() - t0) >= wall_cap:
@@ -932,19 +1025,38 @@ class SparseScientificTrainer:
                     self.state.stop_reason = "wall_time_cap"
                     break
 
-                # Mask epoch = completed epochs so far (0-based for first epoch).
+                # Mask epoch = scientific epoch index (0-based). Shared by all
+                # presentations of the same frame within this scientific epoch.
                 train_ds.set_epoch(epoch)
                 self.state.mask_epoch = int(epoch)
 
-                epoch_seed = int(self.cfg.shuffle_seed) + 100_003 * (epoch + 1)
-                train_loader, self.loader_generator = make_sparse_loader(
-                    train_ds,
-                    batch_size=self.cfg.batch_size,
-                    shuffle=True,
-                    shuffle_seed=epoch_seed,
-                    num_workers=self.cfg.num_workers,
-                    generator=None,
-                )
+                if self.use_scientific_stream:
+                    assert self.presentation_stream is not None
+                    epoch_indices = self.presentation_stream.next_scientific_epoch()
+                    self.state.sampler_cycle = int(self.presentation_stream.state.cycle)
+                    self.state.sampler_pos = int(self.presentation_stream.state.pos)
+                    self.state.sampler_presentations_served = int(
+                        self.presentation_stream.state.presentations_served
+                    )
+                    train_loader = DataLoader(
+                        train_ds,
+                        batch_size=self.cfg.batch_size,
+                        sampler=ListSampler(epoch_indices),
+                        shuffle=False,
+                        num_workers=self.cfg.num_workers,
+                        collate_fn=collate_sparse_batch,
+                    )
+                    self.loader_generator = None
+                else:
+                    epoch_seed = int(self.cfg.shuffle_seed) + 100_003 * (epoch + 1)
+                    train_loader, self.loader_generator = make_sparse_loader(
+                        train_ds,
+                        batch_size=self.cfg.batch_size,
+                        shuffle=True,
+                        shuffle_seed=epoch_seed,
+                        num_workers=self.cfg.num_workers,
+                        generator=None,
+                    )
                 self.train_mode()
                 epoch_losses: list[float] = []
                 n_seen_epoch = 0
@@ -1016,11 +1128,11 @@ class SparseScientificTrainer:
                     )
                     break
 
-                if n_seen_epoch != self.n_train_samples:
+                if n_seen_epoch != self.presentations_per_epoch:
                     self.state.status = "stopped_error"
                     self.state.stop_reason = (
                         f"incomplete_epoch_sample_coverage: "
-                        f"seen {n_seen_epoch} != {self.n_train_samples}"
+                        f"seen {n_seen_epoch} != {self.presentations_per_epoch}"
                     )
                     save_sparse_scientific_checkpoint(
                         ckpt_dir / "partial_interrupt.pt",
@@ -1034,7 +1146,7 @@ class SparseScientificTrainer:
                         eval_history=self.eval_history,
                         curves=self.curves,
                         clip_events=self.clip_events,
-                        extra={"run_identity": run_identity},
+                        extra=_ckpt_extra(),
                     )
                     break
 
@@ -1064,6 +1176,7 @@ class SparseScientificTrainer:
                         self._persist_eval_tables(
                             out_dir, epoch=self.state.epoch, role="train_fit", rows=tr_out["rows"]
                         )
+                    selected_best_seen_weights: dict[str, Any] | None = None
                     if seen_ds is not None:
                         seen_out = self.evaluate_dataset(
                             seen_ds,
@@ -1081,6 +1194,17 @@ class SparseScientificTrainer:
                             role="seen_train_eval",
                             rows=seen_out["rows"],
                         )
+                        if self.cfg.save_best_seen_diagnostic:
+                            seen_score = seen_out["mean_condition_rmse_K"]
+                            if seen_score is not None and math.isfinite(float(seen_score)):
+                                prev = run_identity.get("_best_seen_metric")
+                                if prev is None or float(seen_score) < float(prev):
+                                    run_identity["_best_seen_metric"] = float(seen_score)
+                                    run_identity["_best_seen_epoch"] = int(self.state.epoch)
+                                    selected_best_seen_weights = {
+                                        k: v.detach().cpu().clone()
+                                        for k, v in self.model.state_dict().items()
+                                    }
 
                     val_out = self.evaluate_val_replicas(
                         val_ds,
@@ -1171,14 +1295,40 @@ class SparseScientificTrainer:
                             curves=self.curves,
                             clip_events=self.clip_events,
                             model_state_dict=selected_best_weights,
-                            extra={
-                                "selection_metric": "val_mean_condition_rmse_K",
-                                "selection_value": self.state.best_val_metric,
-                                "selection_epoch": self.state.best_val_epoch,
-                                "run_identity": run_identity,
-                                "best_weights_are_absolute_min_selection": True,
-                                "epoch_boundary_state_after_scheduler_counters": True,
-                            },
+                            extra=_ckpt_extra(
+                                {
+                                    "selection_metric": "val_mean_condition_rmse_K",
+                                    "selection_value": self.state.best_val_metric,
+                                    "selection_epoch": self.state.best_val_epoch,
+                                    "best_weights_are_absolute_min_selection": True,
+                                    "epoch_boundary_state_after_scheduler_counters": True,
+                                }
+                            ),
+                        )
+                    if selected_best_seen_weights is not None:
+                        # Diagnostic only — does not change scheduler/early-stop/primary.
+                        save_sparse_scientific_checkpoint(
+                            ckpt_dir / "best_seen_diagnostic.pt",
+                            model=self.model,
+                            optimizer=self.optimizer,
+                            plateau_scheduler=self.plateau_scheduler,
+                            state=self.state,
+                            cfg=self.cfg,
+                            checkpoint_kind=CHECKPOINT_KIND_COMPLETE,
+                            loader_generator=self.loader_generator,
+                            eval_history=self.eval_history,
+                            curves=self.curves,
+                            clip_events=self.clip_events,
+                            model_state_dict=selected_best_seen_weights,
+                            extra=_ckpt_extra(
+                                {
+                                    "selection_metric": "seen_mean_condition_rmse_K",
+                                    "selection_value": run_identity.get("_best_seen_metric"),
+                                    "selection_epoch": run_identity.get("_best_seen_epoch"),
+                                    "diagnostic_only": True,
+                                    "does_not_affect_scheduler_or_primary": True,
+                                }
+                            ),
                         )
 
                     if self.state.status == "stopped_early_plateau":
@@ -1194,8 +1344,11 @@ class SparseScientificTrainer:
                             eval_history=self.eval_history,
                             curves=self.curves,
                             clip_events=self.clip_events,
-                            extra={"run_identity": run_identity},
+                            extra=_ckpt_extra(),
                         )
+                        # Persist standalone history including the final early-stop eval
+                        # (previously omitted on this path; last.pt still held it).
+                        write_json(out_dir / "eval_history.json", self.eval_history)
                         self._write_progress(
                             out_dir,
                             last_train_loss=last_train_loss,
@@ -1216,7 +1369,7 @@ class SparseScientificTrainer:
                     eval_history=self.eval_history,
                     curves=self.curves,
                     clip_events=self.clip_events,
-                    extra={"run_identity": run_identity},
+                    extra=_ckpt_extra(),
                 )
                 write_json(out_dir / "eval_history.json", self.eval_history)
                 if self.curves:
@@ -1267,9 +1420,15 @@ class SparseScientificTrainer:
             "updates": self.state.update,
             "total_updates_planned": self.total_updates,
             "updates_per_epoch": self.u_per_epoch,
+            "presentations_per_scientific_epoch": self.presentations_per_epoch,
+            "pool_size": self.n_train_samples,
+            "pool_id": self.cfg.pool_id,
+            "use_scientific_stream": self.use_scientific_stream,
             "samples_seen": self.state.samples_seen,
             "best_val_metric": self.state.best_val_metric,
             "best_val_epoch": self.state.best_val_epoch,
+            "best_seen_diagnostic_metric": run_identity.get("_best_seen_metric"),
+            "best_seen_diagnostic_epoch": run_identity.get("_best_seen_epoch"),
             "early_stop_ref_metric": self.state.early_stop_ref_metric,
             "early_stop_bad_evals": self.state.early_stop_bad_evals,
             "selection": selection,
@@ -1277,6 +1436,9 @@ class SparseScientificTrainer:
             "clip_events": self.clip_events,
             "elapsed_s": time.perf_counter() - t0,
             "tf32_policy": self.tf32_policy,
+            "precision": "fp32",
+            "amp_enabled": False,
+            "torch_compile": False,
         }
         write_json(out_dir / "summary.json", summary)
         return summary
