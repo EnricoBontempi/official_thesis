@@ -9,11 +9,16 @@ from combustion_recon.evaluation.astra_level import (
     H,
     W,
     anchor_mask_from_sites,
+    anchor_residuals_K,
     ao_correct,
+    delta_mean9,
+    delta_median9,
     frame_metrics,
     oracle_delta,
+    saved_columns_have_anchor_residuals,
     t9_site_indices,
     treat_frame,
+    treat_frame_with_level_diagnostics,
 )
 
 
@@ -187,3 +192,71 @@ def test_glu_poff_forward_ignores_p_values():
     assert torch.all(seen["p"] == 0)
     mod._forward(Stub(), "adapted_glu", batch, p_conditioning=True, query_coords_phys=q, device=torch.device("cpu"))
     assert torch.allclose(seen["p"], batch["p_norm_tensor"])
+
+
+def test_uniform_offset_sign_units_and_shrink_split():
+    true = np.full((H, W), 1800.0)
+    pred = true - 40.0
+    sites = t9_site_indices()
+    resid = anchor_residuals_K(pred, true, sites)
+    assert np.allclose(resid, 40.0)
+    assert delta_mean9(resid) == pytest.approx(40.0)
+    assert delta_median9(resid) == pytest.approx(40.0)
+    rows, detail = treat_frame_with_level_diagnostics(pred, true, sites, tau=1.0)
+    by = {row["treatment"]: row for row in rows}
+    assert by["ao9"]["delta_applied_K"] == pytest.approx(36.0)
+    assert by["mean9"]["delta_applied_K"] == pytest.approx(40.0)
+    assert by["median9"]["delta_applied_K"] == pytest.approx(40.0)
+    assert by["median9"]["all_rmse_K"] == pytest.approx(0.0, abs=1e-9)
+    # AO9 = mean9 * 9/10. The gap is the shrink, not a different estimator.
+    assert detail["delta_ao9_K"] == pytest.approx(detail["delta_mean9_K"] * 9.0 / 10.0)
+    assert by["mean9"]["all_centered_rmse_K"] == pytest.approx(by["free"]["all_centered_rmse_K"])
+
+
+def test_median9_permutation_invariant_and_robust_to_extremes():
+    resid = np.array([1.0, 3, 2, 8, 5, 4, 7, 6, 9])
+    perm = np.array([8, 0, 3, 5, 1, 7, 2, 6, 4])
+    assert delta_median9(resid) == pytest.approx(5.0)
+    assert delta_median9(resid[perm]) == pytest.approx(delta_median9(resid))
+    one = np.full(9, 10.0)
+    one[0] = 1000.0
+    assert delta_median9(one) == pytest.approx(10.0)
+    assert delta_mean9(one) == pytest.approx((8 * 10.0 + 1000.0) / 9.0)
+    two = one.copy()
+    two[1] = -1000.0
+    assert delta_median9(two) == pytest.approx(10.0)
+    assert delta_mean9(two) != pytest.approx(delta_median9(two))
+
+
+def test_off_anchor_mutation_leaves_median_and_centered_is_translation_invariant():
+    pred, true = _fields(7)
+    sites = t9_site_indices()
+    am = anchor_mask_from_sites(sites)
+    mutated = true.copy()
+    mutated[~am] += 80.0
+    _, keep = treat_frame_with_level_diagnostics(pred, true, sites)
+    _, changed = treat_frame_with_level_diagnostics(pred, mutated, sites)
+    assert keep["delta_median9_K"] == pytest.approx(changed["delta_median9_K"])
+    assert keep["delta_mean9_K"] == pytest.approx(changed["delta_mean9_K"])
+    rows = {row["treatment"]: row for row in treat_frame_with_level_diagnostics(pred, true, sites)[0]}
+    shifted = frame_metrics(pred + rows["median9"]["delta_applied_K"], true, am)
+    assert shifted["all_centered_rmse_K"] == pytest.approx(rows["free"]["all_centered_rmse_K"], rel=1e-9)
+    assert shifted["off_centered_rmse_K"] == pytest.approx(rows["free"]["off_centered_rmse_K"], rel=1e-9)
+
+
+def test_oracle_translation_minimises_full_field_rmse():
+    pred, true = _fields(8)
+    sites = t9_site_indices()
+    am = anchor_mask_from_sites(sites)
+    best = oracle_delta(pred, true)
+    best_rmse = frame_metrics(pred + best, true, am)["all_rmse_K"]
+    for shift in np.linspace(best - 40.0, best + 40.0, 17):
+        if abs(shift - best) < 1e-8:
+            continue
+        other = frame_metrics(pred + shift, true, am)["all_rmse_K"]
+        assert other > best_rmse
+
+
+def test_mean_column_does_not_count_as_nine_residuals():
+    assert not saved_columns_have_anchor_residuals(["anchor_mean_resid_K", "delta_ao9_K"])
+    assert saved_columns_have_anchor_residuals([f"resid_K_{i}" for i in range(9)])

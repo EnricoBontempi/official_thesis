@@ -27,6 +27,12 @@ T9_ROWS: tuple[int, ...] = (32, 64, 95)
 T9_COLS: tuple[int, ...] = (32, 64, 95)
 AO_TAU = 1.0
 TREATMENTS: tuple[str, ...] = ("free", "oracle", "ao9")
+# Second-pass diagnostics. They are not part of the primary A0–A3 treatments.
+# mean9 is the unshrunk mean of the same nine residuals; median9 is their
+# ordinary median. AO9 is mean9 * 9 / (9 + tau), so a median-versus-AO9
+# contrast changes both the estimator and the shrink.
+LEVEL_DIAGNOSTICS: tuple[str, ...] = ("mean9", "median9")
+N_ANCHORS = 9
 
 
 def t9_site_indices(height: int = H, width: int = W) -> np.ndarray:
@@ -191,3 +197,111 @@ def treat_frame(
         )
         rows.append(row)
     return rows
+
+
+def anchor_residuals_K(
+    pred_K: np.ndarray,
+    true_K: np.ndarray,
+    sites: np.ndarray,
+) -> np.ndarray:
+    """Nine residuals ``T_obs - T_pred`` at ``sites``, in site order, kelvin."""
+    pred = np.asarray(pred_K, np.float64).ravel()
+    true = np.asarray(true_K, np.float64).ravel()
+    sites = np.asarray(sites, dtype=np.int64).ravel()
+    if sites.size != N_ANCHORS:
+        raise ValueError(f"expected {N_ANCHORS} anchors, got {sites.size}")
+    if np.unique(sites).size != N_ANCHORS:
+        raise ValueError("anchor sites must be unique")
+    return true[sites] - pred[sites]
+
+
+def delta_mean9(residuals_K: np.ndarray) -> float:
+    """Unregularised mean of the nine residuals. No tau, shrink, or clip."""
+    resid = np.asarray(residuals_K, np.float64).ravel()
+    if resid.size != N_ANCHORS:
+        raise ValueError(f"mean9 requires {N_ANCHORS} residuals, got {resid.size}")
+    return float(resid.sum() / N_ANCHORS)
+
+
+def delta_median9(residuals_K: np.ndarray) -> float:
+    """Ordinary median: the fifth value of the nine residuals sorted ascending."""
+    resid = np.sort(np.asarray(residuals_K, np.float64).ravel())
+    if resid.size != N_ANCHORS:
+        raise ValueError(f"median9 requires {N_ANCHORS} residuals, got {resid.size}")
+    return float(resid[N_ANCHORS // 2])
+
+
+def ao9_contributions_K(residuals_K: np.ndarray, *, tau: float = AO_TAU) -> np.ndarray:
+    """Per-anchor term of AO9. Their sum is ``delta_ao9`` for the same tau."""
+    resid = np.asarray(residuals_K, np.float64).ravel()
+    if resid.size != N_ANCHORS:
+        raise ValueError(f"AO9 contributions require {N_ANCHORS} residuals")
+    return resid / (N_ANCHORS + float(tau))
+
+
+def saved_columns_have_anchor_residuals(columns: Any) -> bool:
+    """True only when the nine residuals themselves are present.
+
+    ``anchor_mean_resid_K`` is not enough: the median is not a function of the mean.
+    """
+    names = set(columns)
+    return all(f"resid_K_{i}" in names for i in range(N_ANCHORS))
+
+
+def treat_frame_with_level_diagnostics(
+    pred_K: np.ndarray,
+    true_K: np.ndarray,
+    sites: np.ndarray,
+    *,
+    tau: float = AO_TAU,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Primary free/oracle/AO9 rows plus mean9 and median9 from the same prediction.
+
+    The primary rows are exactly :func:`treat_frame`. mean9 and median9 add a
+    uniform translation and do not replace AO9. T-only is not produced here.
+    """
+    pred = np.asarray(pred_K, np.float64)
+    true = np.asarray(true_K, np.float64)
+    sites = np.asarray(sites, dtype=np.int64)
+    resid = anchor_residuals_K(pred, true, sites)
+    d_mean = delta_mean9(resid)
+    d_med = delta_median9(resid)
+    d_ao = float(resid.sum() / (N_ANCHORS + float(tau)))
+    rows = treat_frame(pred, true, sites, tau=tau)
+    am = anchor_mask_from_sites(sites, *pred.shape)
+    d_or = float(rows[0]["delta_oracle_K"])
+    mse_free = float(np.mean((pred - true) ** 2))
+    mse_or = float(np.mean((pred + d_or - true) ** 2))
+    den = mse_free - mse_or
+    for name, delta in (("mean9", d_mean), ("median9", d_med)):
+        field = pred + delta
+        row: dict[str, Any] = {
+            "treatment": name,
+            "delta_applied_K": float(delta),
+            "delta_oracle_K": d_or,
+            "delta_ao9_K": d_ao,
+            "delta_mean9_K": d_mean,
+            "delta_median9_K": d_med,
+            "delta_ao9_minus_oracle_K": d_ao - d_or,
+            "delta_mean9_minus_oracle_K": d_mean - d_or,
+            "delta_median9_minus_oracle_K": d_med - d_or,
+            "anchor_mean_resid_K": d_mean,
+        }
+        row.update(frame_metrics(field, true, am))
+        mse_t = float(np.mean((field - true) ** 2))
+        row["mse_recovery_vs_oracle"] = (
+            (mse_free - mse_t) / den if den > 1e-6 else float("nan")
+        )
+        rows.append(row)
+    detail = {
+        "anchor_flat_index": sites.astype(np.int64).copy(),
+        "anchor_row": (sites // pred.shape[1]).astype(np.int64),
+        "anchor_col": (sites % pred.shape[1]).astype(np.int64),
+        "resid_K": resid.copy(),
+        "ao9_contribution_K": ao9_contributions_K(resid, tau=tau),
+        "delta_mean9_K": d_mean,
+        "delta_median9_K": d_med,
+        "delta_ao9_K": d_ao,
+        "delta_oracle_K": d_or,
+    }
+    return rows, detail
