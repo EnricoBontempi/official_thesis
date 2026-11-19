@@ -276,9 +276,9 @@ Estensioni di tranche esplicite, checkpoint completi distinti da partial; no res
 - [x] S1 — Osservazioni persistite + join baseline storico 3309/3309 @5% (hex) + audit GLU documentale.
 - [x] S2 — U-Net sparse/test/overfit/resume diagnostico. STOP A.
 - [x] S3 — GLU adattato deterministico, test e piccolo overfit TRAIN. **STOP B.**
-- [ ] S4 — Baseline/profiling/freeze. Profiling **COMPLETED**; freeze neurale fatto; GappyPOD 1/20% **aperto**. STOP C parziale.
-- [ ] S5 — Screening seed 0 (**submitted**; non dichiarato completato). STOP D.
-- [ ] S6 — Confronti/coperture/snapshot e scelta finalisti. STOP E.
+- [x] S4 — Profiling + freeze neurale; GappyPOD nested 1/5/20% gate-pass job **29601906**. STOP C chiuso per sparse.
+- [x] S5 — Screening seed 0 COMPLETED (early-stop) tip `38ac7fe`. STOP D.
+- [x] S6 — Best/last 1/5/20% ×3 ruoli ×3 mask-replicas + swap + Gappy matched; consegna `results/month2/s6_sparse_eval/STOP_E_delivery/`. **STOP E** (finalisti non decretati; solo seed 0).
 - [ ] S7 — Repliche/chiusura con limiti o rinvii dichiarati. STOP F.
 
-**Prossimo incarico previsto:** Enrico controlla esiti S5; eventuale resume/tranche; GappyPOD 1/20% separato.
+**Prossimo incarico previsto:** revisione indipendente STOP E (Opus/Astra/Neon); poi decisione contrasto S7 (candidato operativo: U-Net p_on vs p_off). Nessun training S7 finché non autorizzato.

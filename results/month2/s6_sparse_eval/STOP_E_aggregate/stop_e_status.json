@@ -1,0 +1,88 @@
+{
+  "stop": "E",
+  "gappypod": {
+    "original_job_id": 29586868,
+    "original_account": "mit_general",
+    "original_state": "CANCELLED (never ran / PENDING Priority)",
+    "actual_job_id": 29599533,
+    "actual_account": "mit_amf_advanced_cpu",
+    "state": "OUT_OF_MEMORY",
+    "exit_code": "0:125",
+    "elapsed": "00:04:16",
+    "req_mem": "64G",
+    "max_rss_approx_KiB": 67107940,
+    "gate_5pct": "NOT_EXECUTED",
+    "results_1_5_20": "ABSENT",
+    "log": "/home/bontempi/projects/official_thesis_s5/slurm-29599533.out",
+    "oom_stage": "Loading physical fields from dense cache (denormalize velocities)..."
+  },
+  "s6_jobs": {
+    "29584098": {
+      "run_id": "s5_sparse_unet_pon_seed0",
+      "state": "FAILED",
+      "exit": "1:0",
+      "completed": "best@1/5/20% train_fit+seen_train_eval+val_eval x3 reps",
+      "missing": [
+        "last_*",
+        "test_eval",
+        "swap_summary"
+      ],
+      "fail": "KeyError p_conditioning in evaluate_swap/collate_sparse_batch"
+    },
+    "29584100": {
+      "run_id": "s5_sparse_unet_poff_seed0",
+      "state": "FAILED",
+      "exit": "1:0",
+      "completed": "best@1/5/20% train_fit+seen_train_eval+val_eval x3 reps",
+      "missing": [
+        "last_*",
+        "test_eval",
+        "swap_summary"
+      ],
+      "fail": "KeyError p_conditioning in evaluate_swap/collate_sparse_batch"
+    },
+    "29584101": {
+      "run_id": "s5_adapted_glu_pon_seed0",
+      "state": "FAILED",
+      "exit": "1:0",
+      "completed": "best@1/5/20% train_fit+seen_train_eval+val_eval x3 reps",
+      "missing": [
+        "last_*",
+        "test_eval",
+        "swap_summary"
+      ],
+      "fail": "KeyError p_conditioning in evaluate_swap/collate_sparse_batch"
+    },
+    "29584102": {
+      "run_id": "s5_adapted_glu_poff_seed0",
+      "state": "FAILED",
+      "exit": "1:0",
+      "completed": "best@1/5/20% train_fit+seen_train_eval+val_eval x3 reps",
+      "missing": [
+        "last_*",
+        "test_eval",
+        "swap_summary"
+      ],
+      "fail": "KeyError p_conditioning in evaluate_swap/collate_sparse_batch"
+    }
+  },
+  "primary_best_val_5pct_mean_condition_rmse_K": {
+    "U-Net p_on": 42.964017,
+    "U-Net p_off": 43.525703,
+    "GLU p_on": 45.800727,
+    "GLU p_off": 47.5354
+  },
+  "historical_baseline_val_5pct_rmse_K": {
+    "GappyPOD_free p_on": 70.598528,
+    "GappyPOD_free p_off": 94.798655,
+    "ParamConditionedMean p_on": 88.008301,
+    "GlobalTrainMean p_off": 139.700336
+  },
+  "incomplete_comparisons": [
+    "GappyPOD nested gate + 1/5/20% vs U-Net/GLU (OOM before gate)",
+    "last.pt evals (jobs died before last loop)",
+    "snapshot swap metrics (KeyError p_conditioning)",
+    "test_eval role (not reached / not in completed tags)"
+  ],
+  "s7_proposed_contrast": "U-Net p_on vs U-Net p_off @5% VAL (best), seed0 provisional \u2014 largest actionable architecture-matched p-conditioning delta among completed neural results; GLU gap larger but worse absolute; Gappy incomplete so classical-vs-neural not closable yet."
+}

@@ -1,0 +1,13 @@
+label,run_id,site_fraction,mean_condition_rmse_K,n_rep
+GLU p_off,s5_adapted_glu_poff_seed0,0.01,67.2026704379226,3
+GLU p_off,s5_adapted_glu_poff_seed0,0.05,47.535399850964815,3
+GLU p_off,s5_adapted_glu_poff_seed0,0.2,48.516402514842014,3
+GLU p_on,s5_adapted_glu_pon_seed0,0.01,68.08468715573008,3
+GLU p_on,s5_adapted_glu_pon_seed0,0.05,45.80072748522861,3
+GLU p_on,s5_adapted_glu_pon_seed0,0.2,46.84423564872471,3
+U-Net p_off,s5_sparse_unet_poff_seed0,0.01,73.69634787749483,3
+U-Net p_off,s5_sparse_unet_poff_seed0,0.05,43.52570262224853,3
+U-Net p_off,s5_sparse_unet_poff_seed0,0.2,54.075916690907,3
+U-Net p_on,s5_sparse_unet_pon_seed0,0.01,75.19877039628466,3
+U-Net p_on,s5_sparse_unet_pon_seed0,0.05,42.964016515760335,3
+U-Net p_on,s5_sparse_unet_pon_seed0,0.2,44.32112413594962,3

@@ -1,0 +1,30 @@
+{
+  "status": "STOP_E",
+  "execution_sha_s5": "38ac7fe40178982ac1bd33c5d5602a5e7d928d3b",
+  "tip": "/home/bontempi/projects/official_thesis_s5",
+  "runs_root": "/home/bontempi/official_thesis_s5_runs",
+  "out_root": "/home/bontempi/official_thesis_s6_results",
+  "delivery": "results/month2/s6_sparse_eval/STOP_E_delivery/",
+  "gappypod": {
+    "job_id": 29601906,
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "account": "mit_amf_advanced_cpu",
+    "qos": "mit_amf_advanced_cpu",
+    "partition": "mit_normal",
+    "gate_5pct": true,
+    "out": "/home/bontempi/official_thesis_gappypod_nested_1_20_amf_v2",
+    "artifact_sha256": "a6fbdfd2a0409cd11995247ab93db694d0c440d677f810b433daf2fe10a74ac9",
+    "git_mirror": "results/month2/gappypod_nested_1_20/"
+  },
+  "s6_last_swap_jobs": [
+    {"job_id": 29601907, "run_id": "s5_sparse_unet_pon_seed0", "state": "COMPLETED", "elapsed": "00:26:25"},
+    {"job_id": 29601908, "run_id": "s5_sparse_unet_poff_seed0", "state": "COMPLETED", "elapsed": "00:25:57"},
+    {"job_id": 29601909, "run_id": "s5_adapted_glu_pon_seed0", "state": "COMPLETED", "elapsed": "00:27:38"},
+    {"job_id": 29601910, "run_id": "s5_adapted_glu_poff_seed0", "state": "COMPLETED", "elapsed": "00:26:57"}
+  ],
+  "best_coverages": "reused_from_prior_s6_attempt_after_27_of_27_verification",
+  "pool_untouched": true,
+  "honf_untouched": true,
+  "no_s7_training": true
+}

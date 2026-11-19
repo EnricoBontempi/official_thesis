@@ -1,0 +1,7 @@
+method,role,p_conditioning,K,site_fraction,variant,ridge_lambda,R,rmse_K,abs_bias_K,centered_rmse_K,n_condition_rows,n_frame_rows,label
+GappyPOD_free,val_eval,False,0,0.01,free,0.001,32,98.43556371284707,57.824402967197116,75.76467193286297,9,369,GappyPOD p_off
+GappyPOD_free,val_eval,True,0,0.01,free,0.01,32,71.37255392173005,15.305686470926698,69.00309910474591,9,369,GappyPOD p_on
+GappyPOD_free,val_eval,False,0,0.05,free,0.001,32,94.79865467847259,57.57882260315893,71.69160512015159,9,369,GappyPOD p_off
+GappyPOD_free,val_eval,True,0,0.05,free,0.01,32,70.59852779054368,15.3823844674733,68.19376041371011,9,369,GappyPOD p_on
+GappyPOD_free,val_eval,False,0,0.2,free,0.001,32,93.80782932699103,57.001442100057176,71.0266657769552,9,369,GappyPOD p_off
+GappyPOD_free,val_eval,True,0,0.2,free,0.01,32,70.45720667532795,15.363731034914998,68.05384299094487,9,369,GappyPOD p_on

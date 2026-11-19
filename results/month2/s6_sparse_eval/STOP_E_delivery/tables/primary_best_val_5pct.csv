@@ -1,0 +1,5 @@
+run_id,label,family,p_on,job_s6,checkpoint,site_fraction,role,replica_id,mean_condition_rmse_K,mean_abs_bias_K,mean_centered_rmse_K,n_frames,source,donor_T_ref_mean_condition_rmse_K,delta_swapped_minus_aligned
+s5_sparse_unet_pon_seed0,U-Net p_on,sparse_unet,True,29601907,best,0.05,val_eval,mean,42.964016515760335,12.884050916649969,38.36472457806518,369,mean_over_mask_replicas,,
+s5_sparse_unet_poff_seed0,U-Net p_off,sparse_unet,False,29601908,best,0.05,val_eval,mean,43.52570262224853,17.517557123368686,38.0018380492393,369,mean_over_mask_replicas,,
+s5_adapted_glu_pon_seed0,GLU p_on,adapted_glu,True,29601909,best,0.05,val_eval,mean,45.80072748522861,8.7737239375998,44.608917666220634,369,mean_over_mask_replicas,,
+s5_adapted_glu_poff_seed0,GLU p_off,adapted_glu,False,29601910,best,0.05,val_eval,mean,47.535399850964815,18.57550340756441,42.716295115791375,369,mean_over_mask_replicas,,

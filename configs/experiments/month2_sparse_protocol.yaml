@@ -103,13 +103,20 @@ s5_screening_prepared:
     - scripts/engaging/s5_glu_pon.sbatch
     - scripts/engaging/s5_glu_poff.sbatch
   train_entrypoint: scripts/16_train_sparse_scientific.py
-  note: scientific_training_authorized remains false; no afterok; no auto-launch
+  note: >
+    S5 seed-0 screening completed on HOME tip 38ac7fe (jobs 29567988/90/92/94).
+    S6 offline eval+snapshot authorized (inference only; jobs 29584098/100/101/102);
+    entrypoint scripts/17_s6_sparse_eval_and_swap.py. No S7 training here.
+
+authorized_s6_offline:
+  - scientific_snapshot_control
+  - multi_coverage_best_last_eval
+  - matched_baseline_reuse_5pct
+  note: no silent POD/λ refit; GappyPOD 1/20% remains open
 
 forbidden_this_mission:
   - scientific_training_760
   - val_tuning
-  - s5_screening
-  - scientific_snapshot_control
   - test_payloads
   - new_raw_downloads
   - modify_HONF
@@ -118,6 +125,7 @@ forbidden_this_mission:
   - silent_pod_refit
   - silent_lambda_retune
   - preemptable_fallback_for_s4
+  - s7_replica_training_until_stop_e
 
 diagnostic_overfit:
   n_frames: 8

@@ -1,11 +1,12 @@
 # Nested 1%/20% GappyPOD evaluation with lambdas frozen at 5% selection.
-# No retuning. Historical 5% results untouched (new output directory).
+# Explicit deterministic train_fit POD refit authorized for local CPU completion.
+# Historical 5% result tables untouched (new output directory).
 
 experiment_id: month2_sparse_gappypod_nested_v1
-status: prepared_blocked_until_pod_artifacts
+status: local_cpu_refit_authorized
 scientific_training_authorized: false
 retune_lambda: false
-refit_pod_basis_authorized: false
+refit_pod_basis_authorized: true
 
 frozen_from_5pct:
   source_manifest: results/meta/month2_baseline_run_manifest.json
@@ -15,9 +16,12 @@ frozen_from_5pct:
   n_velocity_components: 2
   K: 0
   task: temperature_free
+  param_mean_basis: piecewise_phi1
+  param_mean_ridge_alpha: 0.01
 
 evaluation:
   coverages: [0.01, 0.20]
+  gate_coverage: 0.05
   roles: [train_fit, seen_train_eval, val_eval]
   replicas: [0, 1, 2]
   layout_id: random_sparse_primary
@@ -26,17 +30,19 @@ evaluation:
   use_persisted_nested_sites: true
   physical_velocity_units: m/s
   same_frames_fit_stats_as_5pct: true
+  gate_atol_rmse_K: 0.05
 
 prerequisites:
   fitted_pod_artifacts:
     required: true
     expected_keys: [pod_p_off, pod_p_on]
-    status: missing_not_persisted_from_month2_baselines_v1
+    status: refit_from_dense_cache_denormalized_train_fit
     action_if_missing: >
-      Leave nested GappyPOD eval open. Do not silently refit POD basis or
-      retune lambda. Enrico may later authorize artifact recovery or an
-      explicit deterministic refit of the train_fit POD basis only.
+      Explicit deterministic refit of the train_fit POD basis only, with frozen
+      5% lambdas. No λ retune. Persist artifact then gate vs historical 5% before
+      nested 1/20% evaluation.
 
 artifacts:
   results_root: results/month2/sparse_gappypod_nested_1_20
   refuse_overwrite_historical_5pct: true
+  fitted_archive: results/month2/sparse_gappypod_nested_1_20/artifacts/gappypod_fitted_pod_p_off_on.npz

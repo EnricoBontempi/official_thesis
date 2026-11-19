@@ -338,3 +338,13 @@ Questo file è il diario del progetto di tesi in `official_thesis` (ricostruzion
 - **S4:** neural profiling OK; GappyPOD 1/20% still open — S4 not fully closed.
 - **Submission:** U-Net p_on **29555700**, p_off **29555701**; GLU p_on **29555702**, p_off **29555703** (SHA `7971343`); no preemptable; no polling; HONF untouched. Record: `docs/month2/s5_neural_freeze_record.md`.
 
+---
+
+## 2026-11-18 — STOP E sparse delivery (S5 done + S6 + Gappy nested)
+
+- **S5 seed 0 (HOME tip `38ac7fe`):** jobs 29567988/90/92/94 COMPLETED early-stop. Best VAL@5%: U-Net p_on **42.964**, p_off 43.526, GLU p_on 45.801, p_off 47.535 K.
+- **GappyPOD nested:** job **29601906** (`mit_amf_advanced_cpu`, 128G) COMPLETED 55 s; load-equivalence ok; fit SHA `a6fbdfd2…`; **gate 5% passed** (6/6); 1% e 20% prodotti. OUT `~/official_thesis_gappypod_nested_1_20_amf_v2/` → mirror Git `results/month2/gappypod_nested_1_20/`.
+- **S6:** best 1/5/20% riusati dal primo tentativo (fail swap `p_conditioning`); last+swap jobs **29601907–29601910** COMPLETED dopo fix collate. Coverage 27/27 best + 27/27 last ×4 run; swap seen+VAL + T_donor ref.
+- **Risultati chiave:** deployable @5% neurali ≪ Gappy; inversione best↔last (U-Net p_on 1°→4°); @1% GLU davanti a U-Net; U-Net p_off peggiora a 20%; swap ΔVAL ~54–58 K.
+- **Consegna revisori:** `docs/month2/05_sparse_reconstruction.md`; `results/month2/s6_sparse_eval/STOP_E_delivery/`; aggiornati `roadmapsparse.md` / `roadmap_month2.md`. **Nessun S7.** Lacune: montage scale comuni; solo seed 0.
+
