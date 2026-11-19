@@ -1,6 +1,6 @@
 # Report ASTRA — Livello termico, struttura spaziale e nove temperature osservate
 
-**Stato:** Analisi scientifica completa della consegna tecnica A3.  
+**Stato:** Blocco primario S5 A0–A3 concluso nel perimetro dichiarato; estensione A4 rinviata alla consegna Opus e a decisione esplicita. Riesame delle proposte Neon e decisione S7 successivi alla sintesi Astra/Opus; sparse e Mese 2 restano aperti.  
 **Repository:** `EnricoBontempi/official_thesis`  
 **Commit tecnico analizzato:** `86a925af61accdef0b235ac084827cf639c1040c` (branch `mission/astra-level`)  
 **Codice di esecuzione A2:** `eb264bdd637f216f51267c4990f583d0ed165a32` (job Engaging `29612403–29612407`, tutti `COMPLETED 0:0`)  
@@ -12,11 +12,11 @@
 
 ## Sintesi esecutiva
 
-1. **L'ipotesi sul livello termico è confermata dall'oracolo.** Nel caso motivante `40NH3_0.9`, il crollo dell'IoU calda di U-Net `p_on` (`0.310`, area predetta `24.4%` contro `78.5%` vera) era interamente dovuto a un offset negativo di `-29.35 K`. Applicando la sola traslazione scalare perfetta (`oracle`), U-Net `p_on` passa a RMSE `26.80 K` e IoU calda `0.950`, superando GLU `p_on` (`28.55 K`, IoU `0.936`). Su tutta `VAL`, U-Net ha errore strutturale (`centered-RMSE`) nettamente inferiore a GLU (`38.00–38.36 K` contro `42.72–44.61 K`).
+1. **L'ipotesi sul livello termico è confermata dall'oracolo.** Nel caso motivante `40NH3_0.9`, il crollo dell'IoU calda di U-Net `p_on` (`0.310`, area predetta `24.4%` contro `78.5%` vera) era in larga parte recuperabile correggendo il bias medio di `-29.35 K`. Applicando la sola traslazione scalare perfetta (`oracle`), U-Net `p_on` passa a RMSE `26.80 K` e IoU calda `0.950`, superando GLU `p_on` (`28.55 K`, IoU `0.936`). Su tutta `VAL`, U-Net ha errore strutturale (`centered-RMSE`) nettamente inferiore a GLU (`38.00–38.36 K` contro `42.72–44.61 K`).
 2. **Tuttavia, `AO9` nella ricetta congelata (griglia fissa $3\times 3$ `[32, 64, 95]`, media con $\tau=1$) fallisce come correttore generale.** Su `VAL`, `AO9` peggiora o lascia invariata la RMSE macro di 3 reti su 4 (`U-Net p_on`: `+0.17 K`, `GLU p_on`: `+5.31 K`, `GLU p_off`: `+0.67 K`; unico lieve miglioramento `U-Net p_off`: `-0.67 K`). Su `seen`, peggiora 3 reti su 4 (`GLU p_on` peggiora in **20/20** condizioni).
-3. **Il meccanismo del fallimento è visibile e chiaro:** i due siti a destra della griglia $3\times 3$, `(row=32, col=95)` e `(row=95, col=95)`, cadono sul bordo dei getti freddi (V-jet) dove le reti presentano errori locali di centinaia di kelvin. Una media non robusta di 9 residui trasferisce quegli outlier locali in un bias sistematico negativo su tutto il campo (`-22.07 K` su `20NH3_1.1` per U-Net `p_on`, `-25.81 K` per GLU `p_on`).
+3. **Una possibile spiegazione del fallimento è suggerita dalle mappe esemplificative:** i due siti a destra della griglia $3\times 3$, `(row=32, col=95)` e `(row=95, col=95)`, cadono sul bordo dei getti freddi (V-jet) dove le reti presentano errori locali di centinaia di kelvin. Una media di 9 residui può trasferire grandi errori locali in un offset globale poco rappresentativo. Nelle tabelle aggregate si osserva un bias negativo dopo AO9 (`-22.07 K` su `20NH3_1.1` per U-Net `p_on`, `-25.81 K` per GLU `p_on`).
 4. **Le reti restano nettamente superiori alle baseline anche a parità di T osservate.** Con `AO9`, U-Net (`42.86–43.14 K` su VAL; `53.78–53.81 K` su seen) quasi dimezza l'errore di `GappyPOD+AO9` (`76.24–79.95 K` su VAL; `111.88–115.97 K` su seen), stacca `ParamMean+AO9` (`94.30 K` VAL) e `GlobalMean+AO9` (`122.01 K` VAL), e supera di oltre 7× `T_only_const` (`311.79 K` VAL, dove i getti hanno RMSE `> 1100 K`).
-5. **Il collo di bottiglia strutturale residuo è nei getti freddi (`T < 1800 K`, RMSE `124–147 K` su VAL),** che nessuna traslazione scalare uniforme può ridurre.
+5. **Il collo di bottiglia strutturale residuo è nei getti freddi (`T < 1800 K`, RMSE `124–147 K` su VAL),** Una traslazione uniforme lascia invariata la centered-RMSE sullo stesso insieme di siti; può invece migliorare o peggiorare la RMSE nei getti.
 
 ---
 
@@ -41,11 +41,11 @@ Sono state verificate direttamente le tabelle in `results/month2/astra_level_str
 ### 1.2 Audit del replay K=0 e delle maschere baseline
 - **Replay neurale sostitutivo (`verification/replay_k0_verification.json`, `scripts/19_astra_replay_k0_verify.py`):**
   - I `replay_k0.json` originali erano rimasti non eseguiti (`ok=null`) perché `scripts/18` cercava `checkpoint=="best"` in `summary_all_settings.csv` di S6, che contiene solo `last` e `best_swapped`.
-  - La verifica sostitutiva confronta Astra `free` contro tre fonti storiche **indipendenti** (SHA-256 distinti e registrati):
+  - La verifica sostitutiva confronta Astra `free` contro tre fonti storiche distinte (SHA-256 registrati; hash diversi non dimostrano indipendenza della produzione degli artefatti):
     - **Fonte A** (`S6 per_frame_best_cov05_*`): **24/24 PASS** (tutti i 4 run × 2 ruoli × 3 repliche, join su `(sim_id, frame_index)`), scarto macro massimo `8.66e-4 K`, scarto per-frame massimo `0.0335 K` (entro `0.05 K`).
     - **Fonti B/C** (`S5 eval_history.json` e `S5 evals/epoch_<best>/*`): **16/16 PASS** ciascuna sulle celle disponibili (VAL rep 0/1/2 e seen rep 0), coincidenza esatta entro `1.42e-14 K` (B) e `0.000 K` (C).
     - **Epoche `best`:** confermate identiche a `summary.json` di S5 (`60, 140, 440, 650`).
-  - **Valutazione critica:** la coincidenza esatta (`≤1.4e-14 K`) con S5 su VAL (tutte e 3 le repliche) e seen rep 0 dimostra che Astra ha eseguito gli esatti checkpoint `best` S5 con la stessa precisione `fp32`. Lo scarto per-frame fino a `0.033 K` rispetto a S6 (fonte A) è coerente con una diversa policy TF32/numerica di S6 (già segnalata nell'analisi tripla) e non incide minimamente sui risultati. Le 16 celle `MISSING` in B/C (`seen rep 1/2`) sono coperte dalla fonte A indipendente: **nessun impatto sulle conclusioni**.
+  - **Valutazione critica:** la coincidenza esatta (`≤1.4e-14 K`) con S5 su VAL (tutte e 3 le repliche) e seen rep 0 sostiene la coerenza numerica del replay; l'identità dei checkpoint e la policy fp32 sono documentate separatamente dalla provenienza. Lo scarto per-frame fino a `0.033 K` rispetto a S6 (fonte A) rientra nella tolleranza congelata. Una differenza di esecuzione numerica è una possibile spiegazione, non una causa accertata da questa analisi. Le 16 celle `MISSING` in B/C (`seen rep 1/2`) sono coperte dalla fonte A: il gate previsto è coperto, con minore ridondanza dei riferimenti.
 - **Maschere baseline (`verification/baseline_mask_crosscheck.json`):**
   - In `scripts/18` (righe 351–359), GappyPOD legge le maschere persistite `sites_5pct` da `nested_sites.npz` senza fallback da seed (`KeyError` se mancante) e `baseline_mask_crosscheck.json` conferma `n_velocity_sites=819` e `n_t9_on_velocity_sites` identici ai neurali su tutte le 660 chiavi `seen` e 369 chiavi `VAL`. Il replay `GappyPOD` K=0 coincide con la tabella storica entro `~1e-8 K`.
   - **Limite di tracciabilità residuo:** le tabelle baseline non registrano `mask_hash` per frame, e `baselines/replay_k0.json` confronta la media sulle repliche senza registrare l'hash del file storico di riferimento. Non è una prova crittografica completa dei siti consumati, ma codice + conteggi + replay esatto escludono con ragionevole certezza errori di allineamento.
@@ -86,7 +86,7 @@ Fonti: `tables/macro_headline_wide.csv`, `tables/offsets_macro_long.csv`, `table
 | **T-only costante** | no | — | 315.85 | 323.84 | — | — | — | — | — | +0.97 | 60.74 | — |
 
 ### 2.3 Lettura principale dei risultati globali e off-anchor
-- **Regola empirica netta su `AO9`:** `AO9` migliora la RMSE solo quando il modello `free` ha un errore di livello già elevato (`|Bias| free ≳ 16–20 K`), come `GlobalMean` (`-17.69 K` su VAL, `-10.47 K` su seen), `GappyPOD p_off` (`-14.85 K` su VAL) e `U-Net p_off` (`-0.67 K` su VAL, `-1.67 K` su seen). Quando il modello `free` ha già un livello discreto (`|Bias| free ≈ 6–15 K`, cioè tutte le varianti `p_on` e `GLU p_off`), l'errore di stima dell'offset di `AO9` (`|dAO9 − dOr| = 12.8–19.1 K` sui neurali, `27.8–38.1 K` su GappyPOD) **supera il bias iniziale** e degrada sistematicamente la ricostruzione.
+- **Andamento descrittivo nelle macro esaminate, non soglia generale:** i miglioramenti di `AO9` si osservano quando il modello `free` ha un errore di livello già elevato (`|Bias| free ≳ 16–20 K`), come `GlobalMean` (`-17.69 K` su VAL, `-10.47 K` su seen), `GappyPOD p_off` (`-14.85 K` su VAL) e `U-Net p_off` (`-0.67 K` su VAL, `-1.67 K` su seen). Quando il modello `free` ha già un livello discreto (`|Bias| free ≈ 6–15 K`, cioè tutte le varianti `p_on` e `GLU p_off`), l'errore di stima dell'offset di `AO9` (`|dAO9 − dOr| = 12.8–19.1 K` sui neurali, `27.8–38.1 K` su GappyPOD) **supera il bias iniziale** e degrada sistematicamente la ricostruzione.
 - **Distanza residua `AO9 − oracle`:** è sempre positiva in 100% delle celle (60/60 su `seen`, 9/9 su `VAL`), pari a `+2.61`–`+3.39 K` sui neurali su `seen` e `+4.77`–`+6.51 K` su `VAL`.
 - **Comportamento `off-anchor` (16375 pixel):** gli scarti tra `off_rmse_K` e `all_rmse_K` sono compresi tra `-0.036 K` e `+0.000 K` su tutti i neurali e baseline (e `+0.037`/`+0.062 K` su `T_only_const`), e l'IoU calda coincide fino alla terza cifra decimale. Poiché `AO9` è una traslazione uniforme dell'intero campo e 9 pixel rappresentano lo `0.055%` della griglia, il comportamento `off-anchor` è praticamente identico al campo completo: eventuali guadagni (come su `40NH3_0.9`) e peggioramenti (come su `20NH3_1.1`) sono reali fuori dalle ancore, non artefatti locali sui 9 siti.
 
@@ -156,16 +156,16 @@ Fonti: `tables/per_condition_metrics.csv`, `tables/macro_regional_long.csv`, `ta
 | **seen** | GLU `p_off` | 0.721 | 0.725 | 0.693 | 30.6 / 31.6 / 36.9 | 78.4 / 79.8 / 81.6 | 145.8 / 143.3 / 144.4 | 101.0 / 99.2 / 101.6 |
 
 ### 3.3 Lettura critica delle sei figure (frame 1000 vs intero insieme)
-Le sei figure (`figures/val_*_frame1000_rep0_{fields,signed_error}.png`) usano scale comuni (`50–2750 K` per i campi, `±700 K` per `T_pred − T_true`), contorno `T = 2100 K` e cerchi sui 9 siti `T9` (tutti i 36 pannelli verificati contro il CSV entro `5e-7 K` in `figure_panel_check.csv`). L'ispezione visiva rivela il meccanismo fisico-numerico dietro i numeri aggregati:
+Le sei figure (`figures/val_*_frame1000_rep0_{fields,signed_error}.png`) usano scale comuni (`50–2750 K` per i campi, `±700 K` per `T_pred − T_true`), contorno `T = 2100 K` e cerchi sui 9 siti `T9` (tutti i 36 pannelli verificati contro il CSV entro `5e-7 K` in `figure_panel_check.csv`). L'ispezione visiva suggerisce un possibile meccanismo; i pannelli di un solo frame non ne quantificano il contributo sull'intera traiettoria:
 
 1. **Posizione critica dei siti `(row=32, col=95)` e `(row=95, col=95)`:** in tutte e tre le condizioni VAL, i due siti a destra della griglia $3\times 3$ cadono **sul bordo interno o dentro i due rami del getto freddo (V-jet)**, esattamente nella fascia ad alto gradiente dove i modelli neurali accumulano errori locali di `±200–600 K` (macchie rosse/blu intense nei pannelli `signed_error`). Gli altri 7 siti giacciono invece nella regione calda di prodotti dove l'errore locale è piccolo e uniforme (`~10–30 K`).
 2. **`40NH3_0.9` frame 1000 — conferma della soglia e dimostrazione dell'outlier AO9:**
    - Su `U-Net p_on` (riga 1), in `free` il campo caldo è spostato sotto `2100 K` (`bias -25.5 K`), frammentando il contorno bianco in tutta la camera (`RMSE 37.8 K`). Con `oracle` e `AO9` (`+25.5 K` e `+23.2 K`), il contorno `2100 K` torna quasi identico a `truth` (`RMSE 27.9 / 28.0 K`), coerente col recupero sull'intera condizione (`IoU 0.310 -> 0.950 oracle / 0.889 AO9`).
-   - Su `U-Net p_off` (riga 2), lo stesso frame 1000 mostra però la vulnerabilità fatale della media semplice: il sito in basso a destra `(95, 95)` colpisce una macchia blu (`T_pred - T_true ≈ -400 K`) sul bordo del getto inferiore. Quel **singolo sito** spinge `delta_ao9` a `+55.2 K` contro `delta_oracle = +15.9 K`, facendo esplodere il bias a `+39.4 K` e la RMSE da `31.0 K` a `47.5 K` (sfondo rosa uniforme su tutta la camera!).
+   - Su `U-Net p_off` (riga 2), lo stesso frame 1000 mostra però la sensibilità della media semplice a residui locali grandi: il sito in basso a destra `(95, 95)` colpisce una macchia blu (`T_pred - T_true ≈ -400 K`) sul bordo del getto inferiore. La mappa suggerisce un contributo rilevante di quel sito all'offset complessivo; non è stata pubblicata una decomposizione per ancora. Nel frame `delta_ao9` a `+55.2 K` contro `delta_oracle = +15.9 K`, facendo esplodere il bias a `+39.4 K` e la RMSE da `31.0 K` a `47.5 K` (sfondo rosa uniforme su tutta la camera!).
 3. **`20NH3_1.1` — divario netto tra frame 1000 e media dei 41 frame:**
    - Al frame 1000, `U-Net p_on` ha `dOr = -6.22 K` e `dAO9 = -5.97 K` (`RMSE 32.2 -> 31.6 K`), e `GLU p_on` passa da `49.0` a `46.0 K`. Presa da sola, la figura del frame 1000 farebbe apparire `AO9` efficace su `20NH3_1.1`.
-   - Sull'intero insieme di 41 frame, invece, i rami del getto oscillano sopra `(32, 95)` e `(95, 95)`, dove le reti sovrastimano sistematicamente $T$ (patch rosse evidenti nel ramo superiore). Il residuo negativo su quei 2 siti spinge `dAO9` a `-28.39 K` (contro `dOr = -6.32 K`) per U-Net `p_on` e `-41.60 K` (contro `-15.79 K`) per GLU `p_on`, degradando la RMSE macro di `+8.40` e `+8.88 K` e facendo crollare l'IoU calda di GLU `p_on` da `0.982` a `0.879`.
-4. **`0NH3_1.05` — errore concentrato nei getti:** le patch rosse fino a `+500–600 K` nel getto superiore e blu/rosse nel getto inferiore restano **identiche** tra `free`, `oracle` e `AO9` (confermato da `Jet RMSE ≈ 168–190 K` invariata). L'errore strutturale nella zona di miscelamento e nel fronte di fiamma non viene toccato da nessuna correzione di livello.
+   - Sull'intero insieme di 41 frame, invece, le tabelle mostrano una sovracorrezione media negativa. Un contributo dei residui nei siti prossimi ai getti è plausibile, ma richiede una verifica per ancora sull'intero insieme. I valori aggregati di `dAO9` sono `-28.39 K` (contro `dOr = -6.32 K`) per U-Net `p_on` e `-41.60 K` (contro `-15.79 K`) per GLU `p_on`, degradando la RMSE macro di `+8.40` e `+8.88 K` e facendo crollare l'IoU calda di GLU `p_on` da `0.982` a `0.879`.
+4. **`0NH3_1.05` — errore concentrato nei getti:** le patch rosse fino a `+500–600 K` nel getto superiore e blu/rosse nel getto inferiore mantengono errori spaziali localizzati dopo le traslazioni (`Jet RMSE ≈ 168–190 K`, con variazioni tra trattamenti). La centered-RMSE resta invariata; la RMSE regionale può cambiare.
 5. **Nota su `seen` (oracle può ridurre leggermente Hot IoU):** su `seen`, `oracle` riduce la RMSE globale ma abbassa leggermente l'IoU calda di `U-Net p_on` (`0.766 -> 0.739`) e `GLU p_on` (`0.759 -> 0.746`). Questo accade perché `oracle` minimizza la MSE sull'intero campo (inclusi getti freddi), non la soglia binaria `2100 K`: un piccolo bias positivo nei prodotti poteva compensare localmente una sottostima vicino alla soglia. È un promemoria importante che RMSE globale e metrica di soglia non sono sempre monotone tra loro.
 
 ---
@@ -185,7 +185,7 @@ Tenendo `oracle` rigorosamente separato dai metodi utilizzabili con sole osserva
   - Seen: U-Net `53.81 K`, GLU `58.48 K` vs `GappyPOD p_on + AO9` `115.97 K` e `ParamMean + AO9` `139.54 K`.
 - **Riferimento diagnostico `oracle` (non deployable):** anche eliminando completamente l'errore di livello da tutti i metodi, il divario strutturale delle reti resta enorme: su VAL `38.0–44.6 K` contro `68.2–71.7 K` (`GappyPOD`), `84.8 K` (`ParamMean`) e `114.8 K` (`GlobalMean`); su `seen` `50.6–58.5 K` contro `103.5–106.6 K` (`GappyPOD`).
 
-**Conclusione sul contributo incrementale:** l'aggiunta delle 9 T non riduce il valore della ricostruzione neurale da velocità. `T_only_const` è del tutto inutilizzabile (`Jet RMSE > 1040 K`), e anche `ParamMean+AO9` / `GappyPOD+AO9` restano circa **1.8×–2.6× peggiori** delle reti sulla RMSE globale e **1.5×–2.5× peggiori** nei getti e nelle regioni di picco.
+**Conclusione sul contributo incrementale:** l'aggiunta delle 9 T non riduce il valore della ricostruzione neurale da velocità. `T_only_const` ha errori molto maggiori in questo confronto (`Jet RMSE > 1040 K`), e anche `ParamMean+AO9` / `GappyPOD+AO9` restano circa **1.8×–2.6× peggiori** delle reti sulla RMSE globale e **1.5×–2.5× peggiori** nei getti e nelle regioni di picco.
 
 ---
 
@@ -203,12 +203,12 @@ Fonti: `tables/paired_diff_macro_long.csv`, `tables/per_condition_metrics.csv`.
 - **In `free`:** fornire `p` (NH₃, $\phi$) aiuta soprattutto il **livello termico**, riducendo `|Bias|` su VAL da `17.52` a `12.88 K` (U-Net), da `18.58` a `8.77 K` (GLU) e da `57.58` a `15.38 K` (GappyPOD).
 - **Dopo `oracle`:** su VAL il vantaggio di `p` **svanisce o si inverte leggermente** per le reti: `U-Net p_on − p_off = +0.36 K` (`centered`: `38.36` vs `38.00 K`), `GLU p_on − p_off = +1.89 K` (`44.61` vs `42.72 K`). Su `seen`, il guadagno strutturale di `p` è quasi nullo per U-Net (`-0.56 K`) e moderato per GLU (`-3.42 K`).
 - **Dopo `AO9`:** su VAL, `p_off + AO9` eguaglia o supera `p_on + AO9` (`U-Net`: `42.86` vs `43.14 K`, IoU `0.945` vs `0.940`; `GLU`: `48.20` vs `51.12 K`).
-- **Lettura:** nelle reti S5, i parametri operativi `p` servono primariamente a stimare il livello termico medio; la struttura spaziale è guidata quasi interamente dal campo di velocità al 5%.
+- **Lettura:** nei checkpoint S5 esaminati, il vantaggio di p è più evidente nel livello che nella centered-RMSE, soprattutto su VAL. Questo confronto non identifica da solo quali informazioni determinino la geometria né dimostra un ruolo generale di p.
 
 ### 5.3 Eterogeneità tra condizioni
 Le tre condizioni VAL si comportano in modo molto diverso:
 - `40NH3_0.9` è **dominata dal livello** (`centered 26.8–32.2 K`, area calda vicino a `2100 K`): qui un offset di `25–30 K` ribalta completamente l'IoU calda.
-- `0NH3_1.05` e `20NH3_1.1` sono **dominate dalla struttura dei getti** (`centered 40.3–53.0 K`, `Jet RMSE 125–190 K`): qui l'offset oracolo recupera poco (`0.14–4.51 K`), mentre `AO9` con media semplice peggiora nettamente la ricostruzione a causa degli outlier sui due siti nel getto.
+- `0NH3_1.05` e `20NH3_1.1` sono **dominate dalla struttura dei getti** (`centered 40.3–53.0 K`, `Jet RMSE 125–190 K`): qui l'offset oracolo recupera poco (`0.14–4.51 K`), mentre `AO9` con media semplice peggiora nettamente la ricostruzione con un comportamento compatibile con una stima dell'offset influenzata da grandi residui locali.
 
 ---
 
@@ -216,12 +216,12 @@ Le tre condizioni VAL si comportano in modo molto diverso:
 
 ### Domanda 1 — Quanto errore dipende da una traslazione uniforme del livello?
 - **Evidenza quantitativa:** `oracle − free` riduce la RMSE macro su VAL di `-4.60 K` (`U-Net p_on`), `-5.52 K` (`U-Net p_off`), `-1.19 K` (`GLU p_on`), `-4.82 K` (`GLU p_off`), contro `-23.11 K` (`GappyPOD p_off`) e `-24.86 K` (`GlobalMean`). Su `seen`, il recupero neurale è `-0.42`–`-4.27 K`. Su `40NH3_0.9`, invece, per `U-Net p_on` l'offset vale `-13.12 K` di RMSE e `+0.640` di IoU calda (`0.310 -> 0.950`).
-- **Interpretazione sostenuta:** sulla media globale, la quota dominante dell'errore neurale (`~85–97%` della RMSE) è **strutturale (`centered-RMSE`)**, concentrata nei getti freddi. Tuttavia, vicino alla soglia calda (`2100 K`), anche un errore di livello di `20–30 K` produce un fallimento catastrofico delle regioni calde pur con struttura spaziale molto buona.
+- **Interpretazione sostenuta:** la centered-RMSE resta vicina alla RMSE free nelle macro neurali, e i getti presentano errori regionali elevati. Il rapporto tra queste macro non è una decomposizione percentuale dell'errore. Tuttavia, vicino alla soglia calda (`2100 K`), anche un errore di livello di `20–30 K` produce un fallimento catastrofico delle regioni calde pur con struttura spaziale molto buona.
 - **Ciò che resta incerto:** quanto il bias di livello su `40NH3_0.9` sia sistematico rispetto a fluttuazioni del singolo `seed 0`, e quanto pesi in condizioni di vera estrapolazione fuori inviluppo (`TEST` o fold di estrapolazione).
 
 ### Domanda 2 — Nove T stimano abbastanza bene quella traslazione?
 - **Evidenza quantitativa:** **No, con la ricetta congelata (`[32,64,95]`, media con $\tau=1$).** Su VAL, `AO9 − oracle` resta `+4.77`–`+6.51 K` sui neurali (`|dAO9 − dOr| = 14.7–19.1 K`), e rispetto a `free` `AO9` peggiora 3 reti su 4 su VAL e 3 reti su 4 su `seen` (`0/20` miglioramenti su `GLU p_on`). Funziona bene solo dove il bias `free` è grande (`40NH3_0.9` per U-Net `p_on`: `-10.77 K`, IoU `0.310 -> 0.889`; `GappyPOD p_off`: `-14.85 K`).
-- **Interpretazione sostenuta:** il fallimento non indica che 9 misure termiche siano intrinsecamente inutili, ma che **la media aritmetica non robusta su una griglia $3\times 3$ che interseca i getti freddi (`(32,95)` e `(95,95)`) è contaminata dagli errori locali ad alto gradiente**, generando un bias negativo sistematico sul resto della camera.
+- **Interpretazione sostenuta:** il fallimento non indica che 9 misure termiche siano intrinsecamente inutili, ma che la stima da nove residui può essere poco rappresentativa dell'offset globale. Le mappe suggeriscono un possibile ruolo dei siti prossimi ai getti; manca una quantificazione per ancora su tutti i frame.
 - **Ciò che resta incerto:** quanto migliorerebbe la stima dell'offset usando uno stimatore robusto (es. mediana/Huber) sugli stessi 9 siti, oppure evitando la fascia di ingresso dei getti, oppure aggiungendo rumore realistico di misura.
 
 ### Domanda 3 — Il vantaggio GLU nelle regioni calde sopravvive alla correzione?
@@ -231,12 +231,12 @@ Le tre condizioni VAL si comportano in modo molto diverso:
 
 ### Domanda 4 — `p` serve ancora con poche T?
 - **Evidenza quantitativa:** con `oracle` su VAL, `p_on` non migliora `p_off` (`U-Net +0.36 K`, `GLU +1.89 K`, IoU identica). Con `AO9` su VAL, `p_off` eguaglia o batte `p_on` (`U-Net 42.86` vs `43.14 K`; `GLU 48.20` vs `51.12 K`). Su `seen` con `oracle`, `p` dà `-0.56 K` su U-Net e `-3.42 K` su GLU.
-- **Interpretazione sostenuta:** in questo setup, il ruolo principale di `p` è fissare il livello termico medio; una volta corretto il livello, `p` aggiunge pochissimo (o nulla su VAL) alla struttura ricostruita da velocità al 5%.
+- **Interpretazione sostenuta:** in questo setup, nei checkpoint S5 esaminati il vantaggio di p si riduce o si inverte su VAL dopo oracle, mentre persiste un vantaggio centered su seen, soprattutto per GLU. È una descrizione di questi run, non una conclusione generale sul ruolo di p.
 - **Ciò che resta incerto:** se `p` torni decisivo in estrapolazione severa (miscele con $\text{NH}_3$ o $\phi$ fuori intervallo) o a coperture di velocità molto basse (es. 1%), dove le sole velocità potrebbero non identificare il regime di fiamma.
 
 ### Domanda 5 — La rete resta utile quando aggiungiamo T?
 - **Evidenza quantitativa:** **Sì, con ampio margine.** A informazione comparabile con `AO9` su VAL, `U-Net` (`42.86–43.14 K`) supera `GappyPOD` (`76.24–79.95 K`), `ParamMean` (`94.30 K`, solo con `p`), `GlobalMean` (`122.01 K`) e `T_only_const` (`311.79 K`). Su `seen` il divario è ancora maggiore (`53.8 K` vs `111.9–116.0 K` GappyPOD vs `323.8 K` T-only).
-- **Interpretazione sostenuta:** poche T fissano (al più) una scala termica, ma tutta la geometria del fronte di fiamma e dei getti viene dalla ricostruzione non lineare delle velocità sparse.
+- **Interpretazione sostenuta:** con la correzione scalare studiata, le T cambiano il livello ma non la centered-RMSE. Le reti da velocità sparse superano le baseline considerate; non è dimostrata l'indispensabilità delle reti o della non linearità, né esclusa l'utilità di altri metodi T-only.
 - **Ciò che resta incerto:** il confronto contro un eventuale interpolatore spaziale T-only (non nel perimetro A2) e la resa delle reti quando le velocità hanno rumore o geometria PIV realistica.
 
 ---
@@ -244,16 +244,16 @@ Le tre condizioni VAL si comportano in modo molto diverso:
 ## 7. Limiti che incidono sulle decisioni
 
 1. **Un solo seed (`seed 0`) e 3 condizioni `VAL` usate per selezione/early stop S5:** tutte le cifre VAL sono evidenze di sviluppo, non validazione indipendente. Le differenze di `2–6 K` tra modelli o tra `p_on`/`p_off` non hanno ancora stima di variabilità tra training.
-2. **Un solo layout `T9` e un solo stimatore (`AO9` media con $\tau=1$):** il fallimento medio di `AO9` è strettamente legato all'intersezione tra la griglia `[32,64,95]` e i getti freddi combinata con una media non robusta. Non va letto come impossibilità fisica dell'approccio assisted.
+2. **Un solo layout `T9` e un solo stimatore (`AO9` media con $\tau=1$):** una possibile spiegazione del fallimento medio di `AO9` riguarda l'intersezione tra la griglia `[32,64,95]` e i getti freddi combinata con una media non robusta. Non va letto come impossibilità fisica dell'approccio assisted.
 3. **Osservazioni numeriche ideali (rumore 0):** sia i guadagni su `40NH3_0.9` sia i limiti rilevati valgono per misure puntuali ideali, non per termocoppie reali.
-4. **Tracciabilità secondaria (`seen rep 1/2` solo fonte A; `mask_hash` assente nelle baseline):** documentata in §1.2; non altera alcuna conclusione numerica o scientifica.
+4. **Tracciabilità secondaria (`seen rep 1/2` solo fonte A; `mask_hash` assente nelle baseline):** documentata in §1.2; non impedisce l'analisi nel perimetro dichiarato; resta un limite della verifica degli input storici.
 
 ---
 
 ## 8. Prossimo passo scientifico minimo e proposta per A4
 
 ### 8.1 Cosa può procedere subito (zero training, basso costo)
-Non è necessaria alcuna rilavorazione da parte di Sonnet sui risultati A3 appena consegnati. Prima di decidere se investire in metodi assisted o scartare `AO9`, l'unico controllo diagnostico mirato e immediato (eseguibile offline sui campi/predizioni già calcolati, previa autorizzazione del coordinatore) è verificare **se uno stimatore robusto dell'offset (mediana o media troncata / Huber) sugli stessi 9 siti** elimina il bias negativo sistematico su `20NH3_1.1`, `0NH3_1.05` e `seen`. Questo chiude definitivamente l'ambiguità tra *"9 T sono insufficienti"* e *"la media semplice è corrotta dai 2 siti nel getto"*.
+Non è necessaria alcuna rilavorazione da parte di Sonnet sui risultati A3 appena consegnati. Prima di decidere se investire in metodi assisted o scartare `AO9`, un possibile controllo diagnostico successivo (previa verifica della disponibilità dei nove residui per tutti i frame e autorizzazione del coordinatore) è verificare **se uno stimatore robusto dell'offset (mediana o media troncata / Huber) sugli stessi 9 siti** elimina il bias negativo sistematico su `20NH3_1.1`, `0NH3_1.05` e `seen`. Sarebbe un'estensione esplorativa suggerita dai risultati, da congelare prima dell'esecuzione; potrebbe aiutare a distinguere *"9 T sono insufficienti"* e *"la media semplice è corrotta dai 2 siti nel getto"*.
 
 ### 8.2 Cosa deve attendere Opus C149 — Proposta motivata per A4 (non eseguita)
 L'estensione **A4** va decisa dopo la chiusura dei due run Opus `C149` (attualmente in corso su `mission/dense-unet`). La domanda di collegamento è precisa: *aumentare le istantanee TRAIN da 38 a 149 riduce soprattutto l'errore strutturale nei getti (`centered-RMSE`), riduce anche il bias di livello (come `40NH3_0.9`), oppure i due effetti sono indipendenti?*
@@ -265,3 +265,8 @@ L'estensione **A4** va decisa dopo la chiusura dei due run Opus `C149` (attualme
 
 ### 8.3 Eventuale incarico tecnico opzionale per Sonnet (solo se/quando A4 verrà autorizzata)
 Il pacchetto `86a925a` **non richiede correzioni bloccanti**. Se e quando A4 sarà autorizzata, due piccoli miglioramenti igienici in `scripts/18_astra_level_structure_eval.py` (non retroattivi) miglioreranno la tracciabilità futura: (i) registrare `mask_hash` anche nelle righe baseline; (ii) puntare il replay inline neurale ai file `per_frame_best_cov05_*` invece di `summary_all_settings.csv`.
+
+
+## 9. Decisione del coordinatore — 19 novembre 2026
+
+Il blocco primario S5 A0–A3 è accettato come concluso nel perimetro dichiarato. A4 e gli stimatori robusti restano estensioni non eseguite e non necessarie alla chiusura del blocco primario. Si attende il completamento e l'analisi Opus; seguiranno sintesi con Enrico, riesame delle proposte Neon già documentate e decisione su S7. Solo dopo gli impegni concordati si chiuderanno sparse e gli aperti del Mese 2. Questa revisione del coordinatore riguarda interpretazione e stato, senza ricalcolo delle tabelle o nuova verifica dei job.
