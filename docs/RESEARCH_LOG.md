@@ -492,3 +492,11 @@ SHA eseguito dei due training: `32a59cab21884d8c052f941f526c7cf09367b1f3`. Check
 Il replay ha confrontato i due best U-Net S5 al 5% con le macro registrate: delta 0.0 K, `passed` vero, `training_equivalence=not_tested`. I riferimenti non erano vuoti. Non cancella la differenza di ordine fra DataLoader S5 e stream Opus già scritta nel bridge.
 
 **O5 preparata, non lanciata.** La matrice è `configs/experiments/opus_o5_matrix.json`: otto run del runner Opus, con S5 tenuto fuori. reference760 usa gli indici A38 anche su B19 e C149. Coperture 1/5/20% e repliche 0/1/2, queste ultime presenti nel payload. I pesi identici di tre coppie best/best_seen possono condividere il forward e restano identità distinte. Indice: `results/month2/opus_data_study/o5_prep/INDEX.md`. Le curve del loop sono lì, etichettate come tali. R0 non è stata rifatta. Il report scientifico resta a Neon. Opus non è chiuso: O5 non è eseguita, O6 non è iniziata, S7 non è scelto, A4 non è autorizzata.
+
+---
+
+## 2026-11-19 — Array O5 29716019 fallito prima della valutazione
+
+**Otto task, stesso errore.** 29716019_0–7 sono FAILED con ExitCode 1:0, durate 8–12 s, nodi node4108, node4203, node4206, node3007, node4106, node4108, node4203, node3204. Stdout vuoto. Gli otto stderr hanno lo stesso SHA-256. Checkout eseguito ancora `c70565978b27ebdae7ad11a84dcefecf3845dde2`. Nessun `COMPLETE.json`, nessuna riga di valutazione, nessun confronto col loop.
+
+L'import in `scripts/26_opus_o5_eval.py` chiede `combustion_recon.training.normalizer`. La classe `Month2FitOnlyNormalizer` sta in `combustion_recon.data.month2_normalizer`, che è il modulo usato dall'evaluator S6. L'import avviene dopo `mkdir` della directory di run: le otto directory sotto `/home/bontempi/official_thesis_opus_o5_runs/` esistono e sono vuote, quindi il launcher attuale le rifiuterebbe. Non è stato fatto alcun rilancio. Aggregazione, figure e pacchetto Neon non sono stati prodotti. Opus resta aperto.

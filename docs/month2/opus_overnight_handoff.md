@@ -238,3 +238,20 @@ ssh engaging 'tail -n 40 ~/official_thesis_opus_o5_runs/slurm-29716019_0.out'
 ```
 
 Aggregation, figures, and the Neon package wait for the outcome check. No polling from this record.
+
+## 2026-11-19 O5 array 29716019 failed before evaluation
+
+One read after Enrico reported the array finished. All eight tasks are FAILED, ExitCode 1:0. No scientific output was written, so aggregation and figures were not run and no result was relaunched.
+
+| Task | Run | State | Exit | Elapsed | Node | End |
+| --- | --- | --- | --- | ---: | --- | --- |
+| 29716019_0 | O-B19-on-s0 | FAILED | 1:0 | 00:00:11 | node4108 | 2026-11-19T21:02:58 |
+| 29716019_1 | O-B19-off-s0 | FAILED | 1:0 | 00:00:11 | node4203 | 2026-11-19T21:02:58 |
+| 29716019_2 | O-A38-on-s0 | FAILED | 1:0 | 00:00:11 | node4206 | 2026-11-19T21:02:58 |
+| 29716019_3 | O-A38-off-s0 | FAILED | 1:0 | 00:00:11 | node3007 | 2026-11-19T21:02:58 |
+| 29716019_4 | O-A38-on-s1 | FAILED | 1:0 | 00:00:12 | node4106 | 2026-11-19T21:08:23 |
+| 29716019_5 | O-A38-off-s1 | FAILED | 1:0 | 00:00:08 | node4108 | 2026-11-19T21:08:19 |
+| 29716019_6 | O-C149-on-s0 | FAILED | 1:0 | 00:00:11 | node4203 | 2026-11-19T21:08:22 |
+| 29716019_7 | O-C149-off-s0 | FAILED | 1:0 | 00:00:08 | node3204 | 2026-11-19T21:08:20 |
+
+Stdout is empty. All eight stderr files share sha256 `5e1f9836f16cc0881ed234995b67e6f6e45efba278b975c35ad645da81f31e11`. The traceback is `ModuleNotFoundError: No module named 'combustion_recon.training.normalizer'` at `scripts/26_opus_o5_eval.py` line 242. `Month2FitOnlyNormalizer` is defined in `combustion_recon.data.month2_normalizer`, which `scripts/17_s6_sparse_eval_and_swap.py` already imports. The failed import is after `out_run.mkdir`, so the eight run directories exist and are empty. The launcher refuses an existing run directory. Checkout `/home/bontempi/projects/official_thesis_opus_o5_v2` is still `c70565978b27ebdae7ad11a84dcefecf3845dde2`. No `COMPLETE.json`, no per-frame rows, and no 5% comparison with the loop.
