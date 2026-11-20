@@ -8,10 +8,24 @@
 
 - Repository: `EnricoBontempi/official_thesis`; branch `mission/dense-unet`.
 - Decisione: Enrico, 18 novembre 2026, America/New_York.
-- Stato iniziale: **PIANIFICATA, nessun passo eseguito da questo documento**.
+- Stato corrente, 20 novembre 2026: **CONCLUSA nel perimetro O0–O5 revisionato; decisione O6 registrata sotto.** Il piano originario e le checklist successive restano storico, non elenco di job ancora da lanciare.
 - Analisi di riferimento: [analisi tripla revisore s7.md](analisi%20tripla%20revisore%20s7.md), commit `6e2d176fa74d097aa8128c472103cf76c5a8a7a6`.
 - Evidenze di partenza: STOP E `a6b2bad7445170e6d821a14de9f7af9a1905ab2c`; diario `925f556823214e37f3abf9d73b41d6e5ed815e58`.
 - Piani collegati: [roadmapsparse.md](roadmapsparse.md), [roadmap_month2.md](roadmap_month2.md), [roadmapastra.md](roadmapastra.md).
+
+## 0. Chiusura e decisione O6 — 20 novembre 2026
+
+**Fonte/decisore:** consegna tecnica dell'esecutore, [review scientifica 06](https://github.com/EnricoBontempi/official_thesis/blob/4f0e2637758de0766d0bb0891fe8ff97eee978c9/docs/month2/06_opus_data_and_training_variability.md) e decisione di Enrico con il coordinatore. Pacchetto tecnico `5373aa3c7633585edcee3d879b3c92bbb4748c11` su `opus/o5-eval-attempt2`; review `4f0e2637758de0766d0bb0891fe8ff97eee978c9` su `review/opus-06-report`. Questi artefatti restano sui branch dedicati: questa chiusura documentale non è un merge o una nuova verifica dei job.
+
+- [x] O0–O4: correzioni comuni, R0, dati/sampler/bridge, freeze e **otto** training nel runner Opus, inclusi i due riferimenti A38 seed 0 aggiunti per la differenza di shuffle rispetto a S5.
+- [x] O5: otto run valutati (array 29728465 task 0 e 2–7, sostitutivo 29732630_1); packaging finale 29771334 dopo correzione del post-processing NaN, senza ripetere inferenza. La review riferisce completezza, provenienza e 72/72 confronti loop/O5 entro 0.05 K (massimo 0.0011 K), senza errori bloccanti.
+- [x] O6: adottare **C149, 149 frame/condizione = 2980**, normalizzatore 760 congelato e `ScientificPresentationStream` per il confronto successivo. Non è una dichiarazione di overfitting eliminato, superiorità universale o trasferimento indipendentemente validato.
+- [x] Seguito trasferito a [S7 corrente](roadmapsparse.md#s7--confronto-c149-multi-seed-e-chiusura-sparse-decisione-20-novembre): **entrambe** le famiglie U-Net masked e GLU adattato × p_on/off × seed 0/1/2. Due U-Net C149 s0 riusati; **dieci nuovi training approvati**, nessuno lanciato da questo aggiornamento.
+
+**Limiti accettati:** un seed B19/C149 in Opus, due A38; tre VAL usate da selezione/scheduler/arresto; frame temporalmente correlati; stats 760 congelate anche per gli altri pool; reference760 non è own_pool_train. Replay d'inferenza S5 passato, ma stream/DataLoader e traiettorie di training non equivalenti: lo storico S5 rimane separato. La prosecuzione su altri seed appartiene a S7, senza riaprire Opus.
+
+**Ordine aggiornato:** confronto free S7 prima, sweep K media/mediana poi, training con T in ingresso successivamente secondo [roadmap Mese 2](roadmap_month2.md#piano-corrente-di-completamento--20-novembre-2026). Nessuna A4 autonoma obbligatoria prima dei training. Sparse e Mese 2 ancora aperti.
+
 
 ## 1. Contesto e motivazione ingegneristica
 
@@ -113,7 +127,7 @@ Maschere dei frame storici: payload persistiti condivisi, nessun fallback. Nuovi
 
 La matrice è incompleta rispetto a una replica di ogni regime: B19 e C149 hanno inizialmente un seed. Non promettere significatività dall'unica coppia 38. Se l'effetto dati è ambiguo rispetto alla variabilità osservata, proporre come passo O6 separato la replica seed 1 di B19 e/o C149 on/off. Non avviarla automaticamente.
 
-## 6. Passi operativi e STOP
+## 6. Piano operativo originario e STOP (storico; stato corrente in §0)
 
 ### O0 — Preparazione comune e verifica dei rilievi
 
@@ -193,7 +207,7 @@ Solo dopo che Enrico segnala la fine: leggere stato e output una volta, verifica
 
 Niente test di significatività costruito dai pixel o dalle tre maschere. Due seed sono un metro descrittivo del rumore, non una distribuzione stimata robustamente. Nessuna soglia automatica «due volte il gap seed».
 
-## 7. Chiusura verificabile
+## 7. Criteri di chiusura originari (storico; esito corrente in §0)
 
 - [ ] Sei training principali consegnati, oppure righe esplicitamente bloccate con motivazione: in tal caso campagna parziale, non domanda risolta.
 - [ ] Dati, durata, selection e runner confrontabili o differenze chiaramente dichiarate.

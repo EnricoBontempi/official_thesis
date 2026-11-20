@@ -7,6 +7,8 @@
 **Piano operativo:** [roadmap_month2.md](../../roadmap_month2.md).  
 **Autorizzazione operativa Enrico:** conversazione del 16 novembre 2026 (approvazione roadmap e avvio lavoro). Distinta da qualsiasi approvazione dei supervisori.
 
+> **Stato corrente (20 novembre 2026):** il registro D1–D9 del 16–18 novembre è storico. L'aggiornamento finale **§11** e il [piano Mese 2](../../roadmap_month2.md#piano-corrente-di-completamento--20-novembre-2026) prevalgono sulle scelte successivamente modificate; nessun job viene eseguito da questo aggiornamento.
+
 ## 1. Provenienza e limite sul documento inviato
 
 Ricognizione precedente del remoto `main` a `6fd0f15` (con diario semplificato preservato da `a2cebb1`); roadmap pubblicata in `ef4b708`.
@@ -161,3 +163,25 @@ Questo aggiornamento prevale sugli stati pendenti storici delle sezioni 5–9 pe
 - **D3/D4:** [roadmapsparse.md](../../roadmapsparse.md) dettaglia 2.5–2.6: training solo 5%, eval 1/5/20% con maschere condivise/persistite e annidate mantenendo il 5% storico; U-Net nuova a 7 canali; GLU adattato deterministico, p con proiezione additiva senza bias, coordinate isotrope e sigma condivisa; batch omogenei senza padding iniziale e rifiuto esplicito dei casi non supportati. Quattro screening seed 0, poi due configurazioni da confermare con seed 1/2. Decisioni numeriche/config da verificare e congelare prima dei run, senza tuning occulto.
 - **D8:** Enrico esclude tetti arbitrari di ore, anche di campagna. Costo misurato e comunicato; plateau operativo e tranche riesaminabile, non termine orario scientifico. Il walltime reale dello scheduler si rispetta con checkpoint/resume. Quattro slot normal riferiti consentono concorrenza potenziale, da verificare sul momento; nessun job lanciato qui.
 - **Stato:** solo S0 piano; prossimo incarico previsto S1–S2 con STOP A. Steps 2.5–2.9 e Mese 2 restano aperti. Nessun training, raw download o modifica upstream per questa pubblicazione.
+
+
+## 11. Decisione corrente — C149 entrambe le famiglie, poi sweep K e T in ingresso (20 novembre 2026)
+
+**Fonte:** conversazione operativa con Enrico Bontempi, che approva la sequenza e chiede al coordinatore di aggiornare/pushare le roadmap prima dell'incarico a Sonnet. Non ratifica dei supervisori.
+
+| Decisione | Impostazione corrente | Stato |
+| --- | --- | --- |
+| D3 / D9 — Dati e osservazioni free | C149 2980 frame (149×20), velocità 2C TRAIN 5%, seen220/VAL123 invariati; stream Opus 760 presentazioni/95 update; stats fit-only 760 congelate | Approvata per S7 |
+| D4 — Famiglie e repliche | U-Net masked e GLU adattato deterministico, ciascuno p_on/off e seed init/shuffle 0/1/2 | **12 run totali, 10 nuovi + 2 U-Net C149 s0 riusati**; nessun GLU C149 già disponibile |
+| D8 — Risorse | Max quattro GPU complessive, L40S normal Advanced; limiti attuali da verificare, checkpoint/resume e profiling reali, nessun tetto scientifico in ore o fallback general/preemptable | Preparazione verificata e submission dei dieci training approvate; prossimo incarico Sonnet |
+| D5 / D6 — Prima prova T | Dopo conclusione/analisi S7, sweep K=0/1/4/9/16/32 di AO tau1, mean e median su predizioni congelate + baseline matched; T ideali | Direzione approvata; manifest layout/selezione da congelare prima dello sweep |
+| D4 / D6 — T in ingresso | Dopo lo sweep, training che legga effettivamente i valori T osservati/posizioni; backbone scelto oppure entrambe le famiglie se confronto inconcludente; **stessi K/siti/osservazioni del confronto correzione** | Esperimento scelto; matrice, semi, p e TRAIN-K da specificare prima dell'esecuzione; non un numero indefinito di training autorizzati |
+| D2 — TEST | Nessuna apertura attuale; eventuale pilot soltanto con decisione distinta e freeze | Invariato; TEST Mese 1 già esaminati, non dichiararli indipendenti/intatti |
+| Chiusure | Opus O0–O5 e review accettati; O6 sceglie C149. Astra primaria e median9 concluse nel perimetro S5; A4 autonoma non richiesta | Sparse/S7 e Mese 2 aperti |
+| Confine del seguito | Multidensità, nuove architetture, 3C/temporale, rumore/layout strumentali e altri sweep | Fuori dall'incarico immediato |
+
+**Modifiche esplicite al piano:** S7 non è più limitato a quattro repliche di due configurazioni; include sei GLU C149 nuovi oltre alle quattro U-Net. Il training con T non resta una testa opzionale attivata soltanto se la mediana funziona male: Enrico sceglie di provarlo dopo il confronto delle correzioni. La specifica architetturale assisted resta da fissare e il ramo free originale va preservato.
+
+**Tracciabilità delle evidenze:** [Opus 06](https://github.com/EnricoBontempi/official_thesis/blob/4f0e2637758de0766d0bb0891fe8ff97eee978c9/docs/month2/06_opus_data_and_training_variability.md), [Astra 07](https://github.com/EnricoBontempi/official_thesis/blob/82bff35726fb70af9987081802ece3ef718e42bd/docs/month2/07_astra_level_structure_and_anchors.md), [median9 08](https://github.com/EnricoBontempi/official_thesis/blob/7cb7bfdc6430a2731c924a31d90897a3aa52a89f/docs/month2/08_astra_median9_second_pass_analysis.md), [proposta consultiva 09](https://github.com/EnricoBontempi/official_thesis/blob/9daf1585ba2bd9d264372e62565606a800fbefe5/docs/month2/09_astra_opus_synthesis_and_s7_proposal.md). Il rinvio GLU suggerito da 09 non è stato adottato. Nessun risultato storico modificato; report/codice ancora su branch distinti.
+
+**Regole di fine:** [S7](../../roadmapsparse.md) chiude il confronto free e sparse a STOP F; [2.7](../../roadmap_month2.md) completa correzione e T apprese; 2.8–2.9 completano valutazioni/decisioni/report Mese 2. Risultati negativi validi e assenza di vincitore sono esiti accettabili, senza campagne aggiuntive automatiche. Prima dell'analisi S7 fissare la regola di scelta del seguito con metriche per seed/condizione e costi. Nessun cambiamento al proposal inviato e nessuna approvazione del laboratorio inventata.

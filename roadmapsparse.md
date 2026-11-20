@@ -3,9 +3,22 @@
 **Progetto:** esclusivamente `EnricoBontempi/official_thesis`, MIT / Deng Lab.  
 **Data:** 2026-11-18, America/New_York.  
 **Base verificata:** `87d1e3f40826a9343c3c2ce19d140d481b911619`, chiusura U7, branch `mission/dense-unet`.  
-**Stato:** S0–S3 chiusi; S4 profiling COMPLETED; freeze neurale S5 **definitivo** e **submitted**; GappyPOD 1/20% ancora bloccato (S4 non tutto chiuso).  
+**Stato al 20 novembre 2026:** screening S0–S6 consegnato a STOP E, con completamento swap GappyPOD ancora da registrare; Opus e Astra conclusi nel rispettivo perimetro. **S7 approvato: confronto C149 U-Net/GLU × p_on/off × seed 0/1/2; dieci nuovi training, due U-Net seed 0 riusati. Nessuna submission S7 eseguita da questo aggiornamento.**  
 **Piano principale:** [roadmap_month2.md](roadmap_month2.md). Questo documento dettaglia **2.5–2.6 e la sola conferma sparse pertinente di 2.8**; non chiude il Mese 2 e non autorizza assisted o TEST.  
-**Esecutore:** Cursor, per incarichi delimitati successivi. Pubblicare il piano non autorizza a percorrerlo automaticamente.
+**Esecutore prossimo:** Sonnet, nel successivo incarico operativo di preparazione verificata e submission dei dieci training S7 approvati da Enrico. Questa modifica pubblica il piano; non esegue job né estende il mandato ai successivi blocchi assisted.
+
+## 0. Decisione corrente — 20 novembre 2026 (America/New_York)
+
+**Decisore:** Enrico Bontempi, conversazione con il coordinatore. Questa sezione e S7 sostituiscono la precedente conferma limitata a due configurazioni; S0–S6 e i risultati A38 restano storico. Il piano generale e la sequenza dopo S7 sono in [Mese 2, piano corrente](roadmap_month2.md#piano-corrente-di-completamento--20-novembre-2026).
+
+1. **Prima:** confronto temperature-free su C149, stessa velocità TRAIN 5%, U-Net masked e GLU adattato deterministico, entrambi p_on/off e seed modello/shuffle 0/1/2. Dodici run complessivi: due U-Net C149 seed 0 esistenti, quattro nuove U-Net, sei nuovi GLU. Il GLU A38 storico non sostituisce GLU C149 seed 0.
+2. **Poi:** sweep K=0/1/4/9/16/32 di correzioni media/mediana sui checkpoint congelati, con baseline matched, nell'ambito 2.7. Nessuna inferenza A4 anticipata obbligatoria e nessuna T nei dieci training free.
+3. **Dopo lo sweep:** training con T realmente osservate in ingresso sul backbone scelto; se il confronto fra famiglie resta inconcludente, su entrambe. Stessi siti, K, frame, velocità e convenzioni dello sweep; matrice assisted da congelare al relativo passaggio.
+4. **Infine:** confronti finali, decisione separata su eventuale TEST, report e integrazione Mese 2. Sparse si chiude a STOP F; Mese 2 resta aperto fino ai propri criteri.
+
+**Fonti:** [review Opus 06](https://github.com/EnricoBontempi/official_thesis/blob/4f0e2637758de0766d0bb0891fe8ff97eee978c9/docs/month2/06_opus_data_and_training_variability.md), [Astra primaria 07](https://github.com/EnricoBontempi/official_thesis/blob/82bff35726fb70af9987081802ece3ef718e42bd/docs/month2/07_astra_level_structure_and_anchors.md), [median9 08](https://github.com/EnricoBontempi/official_thesis/blob/7cb7bfdc6430a2731c924a31d90897a3aa52a89f/docs/month2/08_astra_median9_second_pass_analysis.md), [proposta Neon 09](https://github.com/EnricoBontempi/official_thesis/blob/9daf1585ba2bd9d264372e62565606a800fbefe5/docs/month2/09_astra_opus_synthesis_and_s7_proposal.md). La proposta 09 raccomandava quattro sole U-Net e rinvio GLU: **quella raccomandazione non è il piano approvato**. Non se ne copiano cifre o stime senza riscontro con i pacchetti sorgente. I report restano sui branch dedicati; questo aggiornamento non li integra e non modifica risultati.
+
+**Confini:** nessun training multidensità, modifica del GLU, rumore/layout strumentale, nuova condizione, TEST o lavoro HONF/presentazione in questo blocco. Non occorre ottenere una vittoria per completare l'esperimento.
 
 ## 1. Domande e punto di partenza
 
@@ -43,7 +56,7 @@ Gerarchia:
 
 ### 3.1 Dati e isolamento
 
-Conservare split e `configs/splits/month2_frame_protocol.yaml`: train_fit 760 (20×38, indici 0…1480 passo 40), seen_train_eval 220 (20×11, 1600…2000 passo 40), val_eval 123 (3×41, 0…2000 passo 50). Fit, normalizzazione, POD e prior solo train_fit. Riusare `train_norm_stats_month2_fit.json` e cache compatta previa verifica dei fingerprint e hash payload.
+**S0–S6 storico:** conservare split e `configs/splits/month2_frame_protocol.yaml`: train_fit 760 (20×38, indici 0…1480 passo 40), seen_train_eval 220 (20×11, 1600…2000 passo 40), val_eval 123 (3×41, 0…2000 passo 50); fit originari solo sui 760. **S7 corrente:** pool C149 = 20×149 = 2980 frame, indici 0…1480 passo 10, cache separata verificata in Opus; seen220 e VAL123 invariati e disgiunti dal fit. Conservare il normalizzatore storico fit-only 760 congelato per riusare i due U-Net C149 seed 0 e isolare il cambio di famiglia/seed. Non rifittarlo implicitamente su C149. Per il confronto principale a pari dati, predisporre baseline C149 distinte da quelle A38; dichiarare pool di fit di POD/prior e riuso delle statistiche. Verificare fingerprint e hash degli input consumati, senza sovrascrivere manifest o fit storici.
 
 Griglia 128×128; target T grezza canale 10, nessun clipping; velocità 11/12, senza identificazione automatica con assi fisici. Coordinate ammesse, p = frazione NH3 nella miscela e phi, non campi locali di specie. K=0, 2C, single-frame. Nessun sim_id, indice, tempo, T o vk nel forward. Metadata ammessi solo a registrazione, grouping e costruzione indipendente da target delle maschere.
 
@@ -143,7 +156,8 @@ Profilare self-attention sensori O(N²), cdist e aggregazione query×sensori: to
 | Lineare sparse | GappyPOD R=32 on/off | 0 | Riuso 5% dopo join; nuove eval 1/20% annidate |
 | Screening | U-Net on, U-Net off, GLU-det on, GLU-det off | 4, seed 0 | Tutti allenati 5%, dopo test/profiling/freeze |
 | Snapshot | Quattro best di screening | 0 | 5%, replica 0, seen e VAL; stesso controllo anche per GappyPOD |
-| Conferma | Due configurazioni del contrasto prioritario | 4, seed 1/2 | Decidere dopo screening; riportare tutti i seed |
+| Conferma originaria (superata il 20 novembre) | Due configurazioni del contrasto prioritario | 4, seed 1/2 | Conservata come decisione storica, sostituita da S7 sotto |
+| S7 corrente C149 | U-Net masked e GLU-det × p_on/off × seed 0/1/2 | **10 nuovi + 2 U-Net s0 riusati** | Stesso runner Opus, dati, osservazioni e selezione; matrice completa in S7 |
 | Denso | U4/U6 | 0 | Tabella separata: più informazione, seed singolo |
 
 Quattro screening sono la destinazione pianificata se GLU tecnicamente fattibile; non cancellare GLU off solo perché on perde. Se fattibilità non risolta, registrare GLU incompleto/rinviato e discutere, senza bloccare indefinitamente il risultato U-Net.
@@ -204,7 +218,7 @@ Sul best di ciascuno screening, 5%, replica 0, seen/VAL; stesso controllo per Ga
 
 Peggioramento sostiene specificità dell'istante, non causalità; assenza di peggioramento non prova che la velocità sia ignorata o che il modello produca soltanto una media. Leggere variabilità intrinseca, mappe, condizioni e pairing.
 
-## 8. Fasi per Cursor: output, verifiche e STOP
+## 8. Fasi operative: storico S0–S6 e incarico S7 corrente
 
 Tutti i percorsi nuovi sotto sono **output futuri**, non implementazioni già presenti. Per ogni incarico leggere istruzioni, remoto e diario, preservare concorrenti, committare prima di eseguire, consegnare risultati e aggiornare stato. Uno STOP chiude l'incarico: il successivo viene delimitato con Enrico, non serve chiedere permesso per ogni operazione ordinaria già inclusa.
 
@@ -249,11 +263,63 @@ Tutti i percorsi nuovi sotto sono **output futuri**, non implementazioni già pr
 **Output:** `docs/month2/05_sparse_reconstruction.md` e directory risultati dedicate, senza sovrascrivere storico.  
 **Decisione:** quale contrasto confermare? Se differenze piccole o discordi, non proclamare vincitore a seed 0; se GLU costa troppo documentare il limite. **STOP E per discutere finalisti e repliche.**
 
-### S7 — Repliche mirate e chiusura sparse
+### S7 — Confronto C149 multi-seed e chiusura sparse (decisione 20 novembre)
 
-**Attività:** seed modello/shuffle 1/2 delle due configurazioni scelte, stesso contratto e train_mask_seed; nessuna replica di ogni iperparametro. Se occorre confermare anche altri contrasti, scelta esplicita aggiuntiva.  
-**Output:** risultati individuali seed 0/1/2, dispersione training separata da repliche layout; report e stato 2.5–2.6 aggiornati, rimandi a 2.8 senza dichiararlo tutto completato.  
-**Completamento:** ogni fase eseguita o rinvio motivato; dati/codice/config/output ricostruibili, confronto GLU presente oppure apertamente incompleto. **STOP F.** Assisted 2.7 e TEST restano incarichi separati.
+**Obiettivo:** confrontare U-Net masked e GLU adattato deterministico a parità di pool ricco, osservazioni e ricetta di ottimizzazione; misurare separatamente architettura, disponibilità di p e variabilità init/shuffle. Questa sezione sostituisce la precedente conferma di sole due configurazioni.
+
+#### Matrice: dodici run complessivi, dieci nuovi training
+
+| Run ID scientifico | Famiglia | Pool / p | Model seed = shuffle seed | Azione |
+| --- | --- | --- | ---: | --- |
+| O-C149-on-s0 | U-Net masked | C149 / on | 0 | Riuso, training job 29645053 |
+| O-C149-off-s0 | U-Net masked | C149 / off | 0 | Riuso, training job 29645054 |
+| S7-C149-unet-on-s1 | U-Net masked | C149 / on | 1 | Nuovo training |
+| S7-C149-unet-off-s1 | U-Net masked | C149 / off | 1 | Nuovo training |
+| S7-C149-unet-on-s2 | U-Net masked | C149 / on | 2 | Nuovo training |
+| S7-C149-unet-off-s2 | U-Net masked | C149 / off | 2 | Nuovo training |
+| S7-C149-glu-on-s0 | GLU adattato deterministico | C149 / on | 0 | Nuovo training |
+| S7-C149-glu-off-s0 | GLU adattato deterministico | C149 / off | 0 | Nuovo training |
+| S7-C149-glu-on-s1 | GLU adattato deterministico | C149 / on | 1 | Nuovo training |
+| S7-C149-glu-off-s1 | GLU adattato deterministico | C149 / off | 1 | Nuovo training |
+| S7-C149-glu-on-s2 | GLU adattato deterministico | C149 / on | 2 | Nuovo training |
+| S7-C149-glu-off-s2 | GLU adattato deterministico | C149 / off | 2 | Nuovo training |
+
+#### Contratto scientifico e riuso
+
+- C149=2980, seen220, VAL123; 2C single-frame, velocità TRAIN 5%, **K=0 senza T nel forward**, target full-field e stesse osservazioni fra famiglie. Coperture eval 1/5/20% × repliche 0/1/2; nessun TRAIN multidensità.
+- Riusare il `ScientificPresentationStream` di Opus: 760 presentazioni e 95 update per epoca scientifica, stream persistente di permutazioni del pool; test di resume, ordine e maschere nel percorso GLU effettivamente eseguito. A parità di seed stesso stream e maschere per entrambe le famiglie/on-off, indipendentemente dal microbatch.
+- `train_mask_seed=20261118`, `eval_mask_seed=20261116`; variamo init/shuffle 0/1/2. Tre maschere eval non sono tre training. Stesso numero nominale di seed non rende uguali i pesi iniziali fra architetture; controllare init appaiata solo entro la stessa famiglia on/off.
+- Riferimento U-Net riusato: training SHA `d6332000491ba0e8983b9e7fa09b34badb191ea4`; pacchetto O5 `5373aa3c7633585edcee3d879b3c92bbb4748c11`. Verificare file/checkpoint/config/hash reali prima del riuso, preservando provenance e selezione originali.
+- Normalizzatore fit-only 760 congelato. Cache C149 aggregata `fa1c9358deb3bda0313cd74f9ab6855af87bc969c4069a463073d4c4120f03b4`; non usare l'allowlist/conteggio del pool storico per GLU C149.
+- Tenere distinti hash file manifest maschere `2e2d8ff6edabf62ad56702a155140d064c0b4014d06ee96debf52811efa5c75e` e aggregato payload `7be78f35ffea2ebc598adce8cec39dc719339aac17ecadde3137f2064891ffeb`; verificare i payload e registrare mask_hash per riga. Nessun fallback da seed.
+- U-Net b32 e GLU adattato S5 conservano architetture/config scientifiche; non introdurre contemporaneamente nuovi embedding, FFN, latenti, banda o importance. Adattare il runner ai contratti reali dei modelli, non copiare il trainer upstream.
+- Batch effettivo 8, MSE T normalizzata full-field, AdamW lr=1e-3 / wd=1e-4, clipping 1, warmup 950 update, fp32 senza AMP/TF32/compile. Scheduler/early stop identici a Opus: eval ogni 10 epoche, ReduceLROnPlateau factor .5/patience 5/threshold rel .001/min_lr 1e-5; stop non prima di epoca 200, 15 eval senza miglioramento relativo .001 con reset al calo LR; tranche 1000 epoche scientifiche, eventuale continuazione dallo stato completo da discutere.
+- Best primario = primo minimo assoluto VAL 5%, macro frame→condizione→media 3 maschere. Salvare last e best_seen_diagnostic separati, senza usarli per riselezionare il primario. Nessuna scelta su 1/20%, swap, T o TEST.
+- S5 storico A38/DataLoader e nuovo runner restano distinti. L'effetto dati C149–A38 è appaiabile ai seed comuni 0/1; A38 seed 2 non esiste. La matrice S7 dà tre seed per ciascuna delle quattro configurazioni C149, non tre coppie complete della curva dati.
+
+#### Preparazione, freeze e submission: prossimo incarico a Sonnet
+
+1. Leggere queste decisioni e le consegne sorgente sui loro branch. Integrare soltanto il codice necessario in worktree/branch dedicato S7, preservando checkout di training congelati, Astra primaria, presentazione, HONF e `external/`. Non assumere che i report o le patch Opus siano già integrati in questa linea.
+2. Test mirati di import/API e contratto reali; smoke su compute per U-Net e GLU C149, inclusi training/optimizer, checkpoint-resume e percorso di eval 1/5/20%. Verificare full-field, batch effettivo, split/payload e memoria; un problema GLU non autorizza a cambiare sensori o supervisione. Profilare il costo, senza inventare tempi GLU dal solo costo U-Net.
+3. Produrre config/matrice S7 eseguibile versionata con dieci nuovi run e due riferimenti riusati, hash degli input realmente consumati, output nuovi non sovrascrivibili, piano delle valutazioni e regole scientifiche coerenti con questa sezione. Committare/pushare prima dell'esecuzione e usare checkout remoto dedicato congelato.
+4. Preparazione verificata e submission dei dieci training sono **già approvate da Enrico**; saranno oggetto del prossimo incarico operativo. Il presente aggiornamento è solo documentale e non sottomette nulla. Nessuna nuova richiesta per operazioni ordinarie comprese nell'incarico; una modifica scientifica necessaria va invece esposta.
+5. GPU `mit_normal_gpu`, account/QoS `mit_amf_advanced_gpu`, L40S; al massimo **quattro GPU contemporanee complessive**, conteggiando smoke/eval e gli altri job dell'utente. Limite unico anche se si usano array distinti. CPU `mit_normal` + account/QoS `mit_amf_advanced_cpu`. Verificare limiti e walltime attuali (ultimo MaxTime osservato 6h: non copiare la richiesta 8h della proposta 09). Nessun fallback general/preemptable e nessun calcolo pesante sul login.
+6. Preflight solo sui percorsi realmente consumati dal task, con log di fase, controlli di accesso e fallimento esplicito. Checkpoint completi prima del walltime; timeout non equivale a plateau. Nessun overwrite/resume da partial.
+7. Consegnare SHA eseguito, job ID/risorse, directory assolute checkout/output/log, matrice e comandi manuali; poi STOP secondo incarico. Successivi recuperi e job di valutazione non diventano rilanci ciechi.
+
+#### Valutazione, selezione del seguito e STOP F
+
+- Completare il confronto dei dodici run: best, last e best_seen_diagnostic separati, reference760/seen220/VAL123, 1/5/20%, tre repliche; own_pool_train se calcolato resta separato. Riusare output O5 soltanto con identità/hash verificati, senza inferenza duplicata per file/pesi identici.
+- Snapshot-swap best 5% replica 0 su seen/VAL con medesimo pairing, osservazioni e riferimento donatore; verificare/completare anche GappyPOD p_on/off residuo S6. Etichettare pool e oggetti fit; nessuna pretesa di causalità fisica.
+- Macro e per-condizione, differenze appaiate di famiglia e p, singoli seed e media/range/deviazione descrittiva; dispersione training separata dalle maschere. RMSE/MAE/bias/centered, regioni con conteggi validi, aree/IoU, costi e pannelli su tutte le VAL. Non scartare seed o condizioni sfavorevoli.
+- Verificare replay della valutazione finale al 5% contro il loop con riferimenti non vuoti: tolleranza macro RMSE 0.05 K per run/checkpoint/ruolo/replica ove esiste riferimento; riportare anche scarti per-frame ove disponibili. Assenze non sono PASS. `COMPLETE` scientifico soltanto dopo i gate; preservare diagnostica dei fallimenti. NaN regionali ammessi solo con regione vuota/conteggio esplicito, non nelle metriche globali.
+- Per attribuire il vantaggio al modello a pari dati, completare baseline C149 con pool e ricetta di fit dichiarati e versionati, senza refit degli artefatti A38. Le baseline A38 restano riferimenti storici, non comparatori a pari dati di C149. Nessuno sweep non approvato di rango/lambda.
+- Prima di leggere gli esiti S7, fissare nella specifica eseguibile la regola di scelta del seguito: primaria VAL 5% aggregata sui tre training, accompagnata da segni/magnitudini per seed e condizione, centered/regionali, seen e costo. Nessuna soglia applicativa inventata dopo i risultati. Se il ranking è instabile o il compromesso accuratezza/costo non giustifica una scelta chiara, **mantenere entrambe le famiglie per il successivo esperimento con T in ingresso**, come deciso da Enrico; non scegliere il miglior singolo seed.
+- Output nuovi indicativi: `results/month2/s7_c149_comparison/`, specifica `configs/experiments/month2_s7_c149_protocol.yaml`, report `docs/month2/10_s7_c149_model_comparison.md`, ledger della matrice e handoff. Sono output futuri da creare; preservare report 05/06 e tutti i risultati storici.
+- **Completamento S7:** matrice valida e valutata, controlli e residui S6 completati, report/limiti/costi e decisione sul seguito registrati. Risultati negativi o assenza di vincitore non obbligano a un'altra campagna. Una cella mancante per errore è una lacuna da risolvere o una revisione esplicita del perimetro, non un PASS implicito. **STOP F: sparse conclusa nel perimetro svolto; Mese 2 e assisted restano aperti.**
+- **Ordine approvato:** solo dopo la conclusione/analisi della campagna free si eseguono lo sweep K e poi i training con T in ingresso descritti in 2.7. Non aggiungere A4 come prerequisito scientifico ai dieci training.
+
+**Storico sostituito:** il piano del 18 novembre prevedeva soltanto seed 1/2 per due configurazioni scelte dopo lo screening (quattro training). Enrico lo amplia esplicitamente il 20 novembre a entrambe le famiglie e p_on/off in C149; la proposta Neon 09 di rinviare GLU non è stata adottata.
 
 ## 9. Decisioni successive e limiti
 
@@ -278,7 +344,7 @@ Estensioni di tranche esplicite, checkpoint completi distinti da partial; no res
 - [x] S3 — GLU adattato deterministico, test e piccolo overfit TRAIN. **STOP B.**
 - [x] S4 — Profiling + freeze neurale; GappyPOD nested 1/5/20% gate-pass job **29601906**. STOP C chiuso per sparse.
 - [x] S5 — Screening seed 0 COMPLETED (early-stop) tip `38ac7fe`. STOP D.
-- [x] S6 — Best/last 1/5/20% ×3 ruoli ×3 mask-replicas + swap + Gappy matched; consegna `results/month2/s6_sparse_eval/STOP_E_delivery/`. **STOP E** (finalisti non decretati; solo seed 0).
-- [ ] S7 — Repliche/chiusura con limiti o rinvii dichiarati. STOP F.
+- [x] S6 — Consegna storica STOP E: best/last 1/5/20% ×3 ruoli ×3 mask-replicas, swap neurali e Gappy nested; `results/month2/s6_sparse_eval/STOP_E_delivery/`. Residuo swap GappyPOD trasferito esplicitamente alla checklist S7, non dichiarato eseguito.
+- [ ] S7 — C149 U-Net/GLU × p_on/off × seed 0/1/2: 10 nuovi training + 2 U-Net riusati, valutazione completa, residui S6 e report. Approvato il piano; non ancora eseguito. STOP F.
 
-**Prossimo incarico previsto:** revisione indipendente STOP E (Opus/Astra/Neon); poi decisione contrasto S7 (candidato operativo: U-Net p_on vs p_off). Nessun training S7 finché non autorizzato.
+**Prossimo incarico:** Sonnet prepara, verifica, congela e sottomette i dieci training temperature-free S7 già approvati. Nessun job lanciato da questo commit documentale; recupero/eval e analisi seguono l'incarico operativo. Sweep K e T in ingresso vengono dopo la campagna free, nello Step 2.7.

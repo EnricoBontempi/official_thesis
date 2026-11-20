@@ -8,10 +8,24 @@
 
 - Repository: `EnricoBontempi/official_thesis`; branch `mission/dense-unet`.
 - Decisione: Enrico, 18 novembre 2026, America/New_York.
-- Stato iniziale: **PIANIFICATA, esecuzione dopo la sotto-missione Opus**.
+- Stato corrente, 20 novembre 2026: **CONCLUSA nel perimetro primario S5 A0–A3 e second pass median9.** A4 autonoma non eseguita e non necessaria a questa chiusura; il seguito con T appartiene allo Step 2.7 Mese 2 dopo S7. Il piano originario resta storico.
 - Analisi sorgente: [analisi tripla revisore s7.md](analisi%20tripla%20revisore%20s7.md), `6e2d176fa74d097aa8128c472103cf76c5a8a7a6`.
 - Evidenze storiche: STOP E `a6b2bad7445170e6d821a14de9f7af9a1905ab2c`; diario `925f556823214e37f3abf9d73b41d6e5ed815e58`.
 - Piani collegati: [roadmapopus.md](roadmapopus.md), [roadmapsparse.md](roadmapsparse.md), [roadmap_month2.md](roadmap_month2.md).
+
+## 0. Stato concluso e passaggio al piano corrente — 20 novembre 2026
+
+**Decisione:** confermata la chiusura registrata nel diario per Astra primaria e median9 sul perimetro S5. Fonti: pacchetto primario `86a925af61accdef0b235ac084827cf639c1040c`, [report 07 revisionato](https://github.com/EnricoBontempi/official_thesis/blob/82bff35726fb70af9987081802ece3ef718e42bd/docs/month2/07_astra_level_structure_and_anchors.md); pacchetto median9 `04e3b68addc891034f0840c2cbaa141d5ef8c4ac`, [review 08](https://github.com/EnricoBontempi/official_thesis/blob/7cb7bfdc6430a2731c924a31d90897a3aa52a89f/docs/month2/08_astra_median9_second_pass_analysis.md). Sono sui branch dedicati; questo aggiornamento non li integra e non riesegue controlli remoti.
+
+- [x] A0–A3: quattro best S5, seen220/VAL123, 5% velocità, tre maschere, free/oracle/AO9 con provenienza, verifica sostitutiva K=0, aggregati e report.
+- [x] Second pass median9: inferenza full set separata, free/oracle/AO9/mean9/median9, residui per ancora e hash delle maschere, replay contro la primaria e review favorevole.
+- [x] Limiti registrati: seed 0, unico layout T9, rumore zero, VAL già osservata e usata nella selezione; non validazione di termocoppie reali. La mediana non è per definizione uno stimatore della media spaziale.
+- [x] A4 standalone rinviata: **non è un blocco da completare prima di S7**. La funzione di confronto sui checkpoint nuovi è assorbita dal successivo sweep K di Step 2.7, con output distinti e riferimenti allo storico.
+
+**Decisione corrente di Enrico:** prima [S7 C149 U-Net/GLU multi-seed](roadmapsparse.md#s7--confronto-c149-multi-seed-e-chiusura-sparse-decisione-20-novembre), poi sweep delle correzioni K=0/1/4/9/16/32; infine training con T in ingresso sul backbone scelto o su entrambe le famiglie se non emerge una scelta chiara. Si usano gli stessi K/siti/osservazioni nei due blocchi con T. **La fonte del piano futuro è [Mese 2, Step 2.7](roadmap_month2.md#step-27--correzione-con-t-e-poi-t-in-ingresso-stessi-k-e-stesse-osservazioni), non una riapertura di questa roadmap.**
+
+Il numero nove e la griglia 3×3 sono un riferimento diagnostico convenzionale, non il numero/layout ottimo dimostrato. Le checklist successive descrivono il mandato originario; il loro stato storico non autorizza nuovi job né contraddice la chiusura nel perimetro dichiarato. Nessun training o inferenza eseguito da questo commit.
+
 
 ## 1. Contesto e significato ingegneristico
 
@@ -126,7 +140,7 @@ La traslazione uniforme lascia invariata la centered-RMSE della stessa predizion
 
 Per descrivere quanta parte del margine oracle viene recuperata, si può riportare per frame il recupero in MSE `[(MSE_free−MSE_AO9)/(MSE_free−MSE_oracle)]`, con denominatore >1e-6 K²; altrimenti non definito. Non troncare valori negativi né aggregare soltanto frame favorevoli. È una misura descrittiva secondaria, non la nuova metrica di selezione.
 
-## 6. Passi operativi e STOP
+## 6. Passi operativi e STOP originari (storico; stato corrente in §0)
 
 ### A0 — Consegna Opus, preparazione comune e freeze Astra
 
@@ -200,7 +214,7 @@ Domanda aggiuntiva: più istantanee riducono il bias che AO9 deve correggere, mi
 
 Non stabilire a posteriori una soglia di «recupero sufficiente» solo perché un risultato la supera. La decisione finale deve riportare guadagni in kelvin, regioni, casi peggiori e costo osservativo; eventuali tolleranze applicative richiedono motivazione e confronto con i supervisori.
 
-## 8. Chiusura e ritorno al percorso della tesi
+## 8. Criteri originari di chiusura e ritorno al percorso della tesi
 
 - [ ] Matrice S5 primaria completa oppure lacune esplicite; nessun metodo escluso perché sfavorevole.
 - [ ] Oracle chiaramente separato da metodi che usano informazioni disponibili.
