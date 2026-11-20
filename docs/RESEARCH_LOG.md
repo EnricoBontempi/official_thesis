@@ -519,3 +519,10 @@ L'import in `scripts/26_opus_o5_eval.py` chiede `combustion_recon.training.norma
 **Superamento delle proposte precedenti.** La proposta 09 (`9daf1585ba2bd9d264372e62565606a800fbefe5`, `review/astra-opus-s7-proposal`) resta consultiva; non adottati rinvio GLU e sequenza A4 prima della campagna free. Astra primaria/report 07 e median9/report 08 restano conclusi nel perimetro S5, senza riapertura; i nuovi esperimenti T sono Step 2.7 Mese 2. Report e codice sui branch sorgente non sono integrati da questa entry; nessuna modifica a metriche, checkpoint o proposal.
 
 **Regole di conclusione e aperti.** S7 richiede matrice valida, eval e confronto multi-seed, costi, comparatori a pari dati (distinguendo baseline C149 da quelle A38), completamento residuo GappyPOD swap e report STOP F. Un risultato negativo valido o l'assenza di un vincitore non obbligano ad altre campagne. Sparse si chiude dopo questo blocco; Mese 2 resta aperto per sweep e T apprese, decisione separata su eventuale TEST/fold, report e integrazione finale. Test del Mese 1 già esaminati; VAL è sviluppo, non una conferma indipendente. Ratifica dei supervisori distinta. Nessuna modifica a HONF, presentazione, `external/` o checkout remoti.
+
+
+---
+
+## 2026-11-20 — S7: preparazione, smoke e submission dei dieci training free C149
+
+Branch `s7/c149-free-campaign`, SHA eseguito `f792b73388d43f008e8979f1aad0d1fa961cb559`. Preemptable con account Advanced non consentito dallo scheduler (`mit_amf_advanced_gpu` valido solo su `mit_normal_gpu`); Enrico sceglie `mit_normal_gpu` + Advanced non preemptable. Smoke reali U-Net (29797847) e GLU (29797848): PASS, dopo due errori reali corretti (automount `/orcd/pool` in timeout sui nodi → copia in home con stessi hash; RNG di resume su GPU da riportare su CPU). Array **29799680** (`0-9%4`, L40S, 6h, cap interno 5.5 h): task 0–3 (U-Net) in esecuzione con epoche reali; task 4–9 (GLU) pending. Dettagli e comandi in [s7_training_handoff.md](month2/s7_training_handoff.md). Nessun training concluso, nessuna valutazione; S7, sparse e Mese 2 restano aperti.
