@@ -290,6 +290,8 @@ def assert_sparse_resume_compatible(
         "stats_sha256",
         "cache_payload_sha256",
         "mask_payload_sha256",
+        "eval_mask_manifest_file_sha256",
+        "eval_mask_aggregate_payload_sha256",
         "family",
     ):
         if key not in ck_identity or key not in run_identity:
@@ -331,6 +333,8 @@ def assert_sparse_scientific_candidate_contract(cand: dict[str, Any]) -> dict[st
             "family",
             "s5_submission_authorized",
             "opus_submission_authorized",
+            "s7_submission_authorized",
+            "operational_s7",
             "operational_provisional_pending_s4_profiling",
             "operational_from_s4_profiling_candidate",
             "operational_from_s5_recipe",
@@ -628,6 +632,11 @@ class SparseScientificTrainer:
         self.eval_history: list[dict[str, Any]] = []
         self.clip_events = 0
         self.loader_generator: torch.Generator | None = None
+        # Smoke-only fault injection (None in every scientific run): called as
+        # fault_hook(epoch_index_0based, batches_done_in_epoch) before each step.
+        self.fault_hook: Any = None
+        # Per-epoch trace of the presentation stream, consumed by smoke checks.
+        self.stream_trace: list[dict[str, Any]] = []
         if query_coords_phys is not None:
             self.query_coords_phys = query_coords_phys.to(self.device)
         else:
@@ -909,6 +918,25 @@ class SparseScientificTrainer:
             },
         )
 
+    def _trace_epoch(self, epoch: int, epoch_indices: Sequence[int]) -> None:
+        """Record the presentation order of one scientific epoch (smoke/audit)."""
+        import hashlib
+
+        blob = ",".join(str(int(i)) for i in epoch_indices).encode()
+        rec = {
+            "epoch_index_0based": int(epoch),
+            "n_presentations": len(epoch_indices),
+            "indices_sha256": hashlib.sha256(blob).hexdigest(),
+            "first8": [int(i) for i in list(epoch_indices)[:8]],
+            "stream_cycle": int(self.state.sampler_cycle),
+            "stream_pos": int(self.state.sampler_pos),
+        }
+        self.stream_trace.append(rec)
+        path = getattr(self, "stream_trace_path", None)
+        if path is not None:
+            with open(path, "a") as fh:
+                fh.write(json.dumps(rec) + "\n")
+
     def fit(
         self,
         train_ds: SparseUNetCacheDataset,
@@ -983,9 +1011,20 @@ class SparseScientificTrainer:
                 assert self.presentation_stream is not None
                 self.presentation_stream.load_state_dict(samp)
             train_ds.set_epoch(self.state.mask_epoch)
+            # The best-seen diagnostic tracker lives in run_identity (mutated in
+            # place during training). Restore it from the checkpoint, otherwise a
+            # resumed run would overwrite best_seen_diagnostic.pt with a worse epoch.
+            ck_ident = (payload.get("extra") or {}).get("run_identity") or {}
+            for _k in ("_best_seen_metric", "_best_seen_epoch"):
+                if _k in ck_ident:
+                    run_identity[_k] = ck_ident[_k]
+            resumed_status = str(self.state.status)
             run_identity = {
                 **run_identity,
                 "resumed_from": str(resume_path),
+                "resume_checkpoint_epoch": int(self.state.epoch),
+                "resume_checkpoint_update": int(self.state.update),
+                "resume_checkpoint_status": resumed_status,
                 "resume_meta": resume_meta,
                 "resume_shuffle_state_restored": "dataloader_generator_state" in payload,
                 "resume_mask_epoch": self.state.mask_epoch,
@@ -997,8 +1036,15 @@ class SparseScientificTrainer:
 
         method = "SparseUNet" if self.cfg.family == "sparse_unet" else "AdaptedGLU"
         variant = "p_on" if self.cfg.p_conditioning else "p_off"
-        self.state.status = "running"
-        self.state.stop_reason = None
+        # A checkpoint written at an early-stop epoch already carries the terminal
+        # decision; resuming it must finalize the run, not train past the stop.
+        already_stopped = (
+            resume_path is not None
+            and str(self.state.status) == "stopped_early_plateau"
+        )
+        if not already_stopped:
+            self.state.status = "running"
+            self.state.stop_reason = None
         t0 = time.perf_counter()
         wall_cap = float(self.cfg.wall_time_cap_s)
         last_train_loss = float("nan")
@@ -1019,7 +1065,10 @@ class SparseScientificTrainer:
             return out
 
         try:
-            for epoch in range(start_epoch, int(self.cfg.n_epochs)):
+            loop_epochs = (
+                range(0) if already_stopped else range(start_epoch, int(self.cfg.n_epochs))
+            )
+            for epoch in loop_epochs:
                 if (time.perf_counter() - t0) >= wall_cap:
                     self.state.status = "stopped_wall_time"
                     self.state.stop_reason = "wall_time_cap"
@@ -1038,6 +1087,7 @@ class SparseScientificTrainer:
                     self.state.sampler_presentations_served = int(
                         self.presentation_stream.state.presentations_served
                     )
+                    self._trace_epoch(epoch, epoch_indices)
                     train_loader = DataLoader(
                         train_ds,
                         batch_size=self.cfg.batch_size,
@@ -1066,6 +1116,8 @@ class SparseScientificTrainer:
                     if (time.perf_counter() - t0) >= wall_cap:
                         stop_now = "wall_time_cap"
                         break
+                    if self.fault_hook is not None:
+                        self.fault_hook(int(epoch), len(epoch_losses))
                     if self.cfg.family == "adapted_glu":
                         p_rows = []
                         for meta in batch["metadata"]:
@@ -1385,8 +1437,9 @@ class SparseScientificTrainer:
                 if self.state.status.startswith("stopped_"):
                     break
             else:
-                self.state.status = "completed"
-                self.state.stop_reason = "reached_max_epochs"
+                if not already_stopped:
+                    self.state.status = "completed"
+                    self.state.stop_reason = "reached_max_epochs"
 
         except Exception as exc:  # noqa: BLE001
             self.state.status = "stopped_error"
