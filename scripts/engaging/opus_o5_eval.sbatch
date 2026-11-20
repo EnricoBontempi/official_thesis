@@ -1,5 +1,6 @@
 #!/bin/bash
 # Opus O5 final evaluation, attempt2. Prepared, not submitted by this file.
+# node4108 is excluded: a smoke task waited an hour in autofs_mount_wait there (job 29717341).
 # attempt1 (array 29716019) failed on an import; its directories are kept untouched.
 # One array task per scientific-stream run. Historical S5 is not a task.
 #SBATCH --job-name=opus_o5
@@ -7,6 +8,7 @@
 #SBATCH --partition=mit_normal_gpu
 #SBATCH --qos=mit_amf_advanced_gpu
 #SBATCH --gres=gpu:l40s:1
+#SBATCH --exclude=node4108
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=64G
 #SBATCH --time=04:00:00
@@ -55,6 +57,32 @@ if [[ -n "$DIRTY" ]]; then
   echo "REFUSE: dirty O5 checkout" >&2
   printf '%s\n' "$DIRTY" >&2
   exit 5
+fi
+
+# Light accessibility check of the cache roots this run will read. The timeout bounds
+# this stat only; it does not guarantee that a process stuck in D state can be stopped.
+echo "[$(date -Is)] launcher host=$(hostname) task=${SLURM_ARRAY_TASK_ID:-na}" >&2
+ACCESS_LIST="$(mktemp)"
+"$PY" - << 'PY' > "$ACCESS_LIST"
+import json
+from pathlib import Path
+shared = json.loads(Path("configs/experiments/opus_o5_matrix.json").read_text())["shared_inputs"]
+for key in ("c149_cache_root", "historical_cache_root", "mask_root"):
+    print(shared[key])
+PY
+ACCESS_FAIL=0
+while read -r P; do
+  if timeout 120 stat -c '%s' "$P/manifest.json" > /dev/null 2>&1; then
+    echo "[$(date -Is)] access ok: $P" >&2
+  else
+    echo "[$(date -Is)] ACCESS FAIL or timeout: $P" >&2
+    ACCESS_FAIL=1
+  fi
+done < "$ACCESS_LIST"
+rm -f "$ACCESS_LIST"
+if [[ "$ACCESS_FAIL" != "0" ]]; then
+  echo "REFUSE: a cache root is not reachable from $(hostname)" >&2
+  exit 6
 fi
 
 mapfile -t RUNS < <("$PY" - << 'PY'

@@ -12,6 +12,7 @@ import hashlib
 import importlib.util
 import json
 import sys
+import time
 from pathlib import Path
 from typing import Any
 
@@ -52,6 +53,12 @@ def _s6():
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def _log(message: str) -> None:
+    """Timestamped, flushed progress line. Operational only."""
+    stamp = time.strftime("%Y-%m-%dT%H:%M:%S%z")
+    print(f"[{stamp}] o5 {message}", flush=True)
 
 
 def sha256_file(path: Path) -> str:
@@ -333,6 +340,7 @@ def main() -> int:
         raise SystemExit("--smoke requires an out-root whose final directory name contains 'smoke'; a scientific out-root must not")
     smoke_frames = int(args.smoke_frames) if args.smoke else None
 
+    _log(f"start run={args.run_id} smoke={bool(args.smoke)} sha={args.eval_git_sha}")
     matrix = load_matrix(args.matrix)
     entry = _run_entry(matrix, args.run_id)
     import torch
@@ -340,15 +348,21 @@ def main() -> int:
     if args.device != "cuda" or not torch.cuda.is_available():
         raise SystemExit("O5 requires CUDA; refusing before creating an output directory")
     device = torch.device("cuda")
+    _log("phase checkpoints: begin (file and weight hashes)")
     inspected = _inspect_checkpoints(entry, torch)
+    _log("phase checkpoints: done")
+    _log(f"phase cache: begin (payload hashes, masks, stats) pool={entry['pool_id']}")
     consumed = _verify_inputs(entry, matrix)
+    _log("phase cache: done")
 
     # Everything that can fail on imports, API or data happens before the run directory exists.
+    _log("phase dataset: begin (normalizer, datasets, model)")
     s6 = _s6()
     normalizer = Month2FitOnlyNormalizer(matrix["shared_inputs"]["stats"])
     datasets, expected = _build_datasets(entry, matrix, consumed, normalizer, smoke_frames=smoke_frames)
     model, _ = s6._load_model("sparse_unet", consumed["cache_root"], device)
 
+    _log("phase dataset: done")
     out_run = args.out_root / args.run_id
     out_run.mkdir(parents=True, exist_ok=False)
     stored_rows: dict[str, dict[tuple, list[dict[str, Any]]]] = {}
@@ -396,6 +410,7 @@ def main() -> int:
             )
             continue
 
+        _log(f"phase forward: begin checkpoint={name}")
         payload = s6.load_sparse_scientific_checkpoint(
             inspected[name]["path"], model=model, require_resumable=True, restore_rng=False
         )
@@ -405,6 +420,7 @@ def main() -> int:
         model.eval()
         stored_rows[name] = {}
         for coverage in COVERAGES:
+            _log(f"forward checkpoint={name} coverage={coverage:.2f}")
             for role in ROLES:
                 for replica in REPLICAS:
                     out = s6.evaluate_setting(
@@ -473,6 +489,7 @@ def main() -> int:
             },
         )
         stored_fields[name] = field_path
+        _log(f"phase forward: done checkpoint={name}")
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
 
@@ -497,6 +514,7 @@ def main() -> int:
     expected_n = len(CHECKPOINTS) * len(COVERAGES) * len(ROLES) * len(REPLICAS)
     if len(completeness) != expected_n:
         raise SystemExit(f"completeness rows {len(completeness)} != {expected_n}")
+    _log("phase readback: begin")
     readback = verify_outputs(out_run, entry, expected, args.run_id)
     marker = "SMOKE_OK.json" if args.smoke else "COMPLETE.json"
     payload = {"ok": True, "n_settings": len(completeness), "run_id": args.run_id, **readback}
@@ -504,6 +522,7 @@ def main() -> int:
         payload["scientific"] = False
         payload["frames_per_role"] = expected
     (out_run / marker).write_text(json.dumps(payload, indent=2) + "\n")
+    _log(f"done {marker}")
     return 0
 
 

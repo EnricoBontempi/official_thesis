@@ -1,18 +1,20 @@
 #!/bin/bash
 # Opus O5 SMOKE: same entrypoint and environment, few frames, non-scientific.
-# Tasks 0 (O-B19-on-s0: historical cache, shared weights) and 6 (O-C149-on-s0: C149 cache).
+# Attempt2 runs only task 6 (O-C149-on-s0: C149 cache). Task 0 passed in job 29717341.
+# node4108 excluded after job 29717341 task 6 waited an hour in autofs_mount_wait there.
 # Never produces COMPLETE.json. Not chained to the campaign.
 #SBATCH --job-name=opus_o5_smoke
 #SBATCH --account=mit_amf_advanced_gpu
 #SBATCH --partition=mit_normal_gpu
 #SBATCH --qos=mit_amf_advanced_gpu
 #SBATCH --gres=gpu:l40s:1
+#SBATCH --exclude=node4108
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=64G
-#SBATCH --time=01:00:00
-#SBATCH --array=0,6
-#SBATCH --output=/home/bontempi/official_thesis_opus_o5_smoke_runs/slurm-%A_%a.out
-#SBATCH --error=/home/bontempi/official_thesis_opus_o5_smoke_runs/slurm-%A_%a.err
+#SBATCH --time=00:30:00
+#SBATCH --array=6
+#SBATCH --output=/home/bontempi/official_thesis_opus_o5_smoke_attempt2_runs/slurm-%A_%a.out
+#SBATCH --error=/home/bontempi/official_thesis_opus_o5_smoke_attempt2_runs/slurm-%A_%a.err
 set -euo pipefail
 
 if [[ -z "${EXPECT_SHA:-}" ]]; then
@@ -22,7 +24,7 @@ fi
 
 TIP="${TIP:-$HOME/projects/official_thesis_opus_o5_v3}"
 PY="${PY:-$HOME/envs/official_thesis/bin/python}"
-OUT_ROOT="${OUT_ROOT:-$HOME/official_thesis_opus_o5_smoke_runs}"
+OUT_ROOT="${OUT_ROOT:-$HOME/official_thesis_opus_o5_smoke_attempt2_runs}"
 if [[ "$OUT_ROOT" != *smoke* ]]; then
   echo "REFUSE: smoke OUT_ROOT must contain 'smoke', got $OUT_ROOT" >&2
   exit 4
@@ -51,6 +53,32 @@ if [[ -n "$DIRTY" ]]; then
   echo "REFUSE: dirty O5 checkout" >&2
   printf '%s\n' "$DIRTY" >&2
   exit 5
+fi
+
+# Light accessibility check of the cache roots this run will read. The timeout bounds
+# this stat only; it does not guarantee that a process stuck in D state can be stopped.
+echo "[$(date -Is)] launcher host=$(hostname) task=${SLURM_ARRAY_TASK_ID:-na}" >&2
+ACCESS_LIST="$(mktemp)"
+"$PY" - << 'PY' > "$ACCESS_LIST"
+import json
+from pathlib import Path
+shared = json.loads(Path("configs/experiments/opus_o5_matrix.json").read_text())["shared_inputs"]
+for key in ("c149_cache_root", "historical_cache_root", "mask_root"):
+    print(shared[key])
+PY
+ACCESS_FAIL=0
+while read -r P; do
+  if timeout 120 stat -c '%s' "$P/manifest.json" > /dev/null 2>&1; then
+    echo "[$(date -Is)] access ok: $P" >&2
+  else
+    echo "[$(date -Is)] ACCESS FAIL or timeout: $P" >&2
+    ACCESS_FAIL=1
+  fi
+done < "$ACCESS_LIST"
+rm -f "$ACCESS_LIST"
+if [[ "$ACCESS_FAIL" != "0" ]]; then
+  echo "REFUSE: a cache root is not reachable from $(hostname)" >&2
+  exit 6
 fi
 
 mapfile -t RUNS < <("$PY" - << 'PY'
