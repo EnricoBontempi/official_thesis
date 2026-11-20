@@ -228,3 +228,46 @@ def test_partial_and_best_are_not_resume_sources(tmp_path: Path):
     assert info["epoch"] == 2
     with pytest.raises(ValueError):
         inspect_last_checkpoint(ck / "last.pt", run_id="other_run")
+
+
+def test_rng_states_are_moved_to_cpu_before_restore(tmp_path: Path, monkeypatch):
+    """With map_location=cuda the payload RNG states are CUDA tensors; torch needs CPU ones."""
+    from combustion_recon.training import sparse_scientific_loop as loop
+
+    ident = _identity("s7_rng")
+    set_seed(0)
+    a = _trainer("sparse_unet", _science_cfg("sparse_unet", n_epochs=2), 8)
+    a.fit(_ds("train_fit", 8, 0), val_ds=_ds("val_eval", 4, 1), out_dir=tmp_path / "g", run_identity=dict(ident))
+
+    moved = []
+
+    class FakeDeviceTensor:
+        """Stands in for a CUDA tensor: usable only after .cpu()."""
+
+        def __init__(self, t):
+            self.t = t
+
+        def cpu(self):
+            moved.append(1)
+            return self.t
+
+    real_load = torch.load
+
+    def fake_load(path, *args, **kwargs):
+        p = real_load(path, *args, **{**kwargs, "map_location": "cpu"})
+        p["torch_rng_state"] = FakeDeviceTensor(p["torch_rng_state"])
+        return p
+
+    seen = {}
+    real_set = torch.set_rng_state
+
+    def strict_set(state):
+        assert isinstance(state, torch.Tensor) and state.device.type == "cpu"
+        seen["ok"] = True
+        real_set(state)
+
+    monkeypatch.setattr(loop.torch, "load", fake_load)
+    monkeypatch.setattr(loop.torch, "set_rng_state", strict_set)
+    tr = _trainer("sparse_unet", _science_cfg("sparse_unet", n_epochs=2), 8)
+    loop.load_sparse_scientific_checkpoint(tmp_path / "g" / "checkpoints" / "last.pt", model=tr.model)
+    assert seen.get("ok") and moved

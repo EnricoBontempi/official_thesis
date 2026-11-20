@@ -232,8 +232,13 @@ def load_sparse_scientific_checkpoint(
     if plateau_scheduler is not None and payload.get("plateau_scheduler_state_dict"):
         plateau_scheduler.load_state_dict(payload["plateau_scheduler_state_dict"])
     if restore_rng:
+        # With map_location=cuda every tensor in the payload, RNG states included, lands
+        # on the GPU; torch's RNG setters require CPU ByteTensors (found by the S7 GPU smoke).
+        def _cpu(obj):
+            return obj.cpu() if hasattr(obj, "cpu") else obj
+
         if "torch_rng_state" in payload:
-            torch.set_rng_state(payload["torch_rng_state"])
+            torch.set_rng_state(_cpu(payload["torch_rng_state"]))
         if "numpy_rng_state" in payload:
             np.random.set_state(payload["numpy_rng_state"])
         if payload.get("python_random_state") is not None:
@@ -242,7 +247,7 @@ def load_sparse_scientific_checkpoint(
             random.setstate(payload["python_random_state"])
         if "cuda_rng_state_all" in payload and torch.cuda.is_available():
             try:
-                torch.cuda.set_rng_state_all(payload["cuda_rng_state_all"])
+                torch.cuda.set_rng_state_all([_cpu(x) for x in payload["cuda_rng_state_all"]])
             except Exception:
                 pass
     return payload
@@ -1001,7 +1006,8 @@ class SparseScientificTrainer:
             start_epoch = int(self.state.epoch)
             if "dataloader_generator_state" in payload:
                 self.loader_generator = torch.Generator()
-                self.loader_generator.set_state(payload["dataloader_generator_state"])
+                _gs = payload["dataloader_generator_state"]
+                self.loader_generator.set_state(_gs.cpu() if hasattr(_gs, "cpu") else _gs)
             if self.use_scientific_stream:
                 samp = payload.get("scientific_sampler_state")
                 if samp is None:
