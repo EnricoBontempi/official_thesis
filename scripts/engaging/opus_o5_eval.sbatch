@@ -1,5 +1,6 @@
 #!/bin/bash
-# Opus O5 final evaluation. Prepared, not submitted by this file.
+# Opus O5 final evaluation, attempt2. Prepared, not submitted by this file.
+# attempt1 (array 29716019) failed on an import; its directories are kept untouched.
 # One array task per scientific-stream run. Historical S5 is not a task.
 #SBATCH --job-name=opus_o5
 #SBATCH --account=mit_amf_advanced_gpu
@@ -10,8 +11,8 @@
 #SBATCH --mem=64G
 #SBATCH --time=04:00:00
 #SBATCH --array=0-7%4
-#SBATCH --output=/home/bontempi/official_thesis_opus_o5_runs/slurm-%A_%a.out
-#SBATCH --error=/home/bontempi/official_thesis_opus_o5_runs/slurm-%A_%a.err
+#SBATCH --output=/home/bontempi/official_thesis_opus_o5_attempt2_runs/slurm-%A_%a.out
+#SBATCH --error=/home/bontempi/official_thesis_opus_o5_attempt2_runs/slurm-%A_%a.err
 set -euo pipefail
 
 if [[ "${AUTHORIZE_OPUS_O5:-0}" != "1" ]]; then
@@ -23,9 +24,13 @@ if [[ -z "${EXPECT_SHA:-}" ]]; then
   exit 78
 fi
 
-TIP="${TIP:-$HOME/projects/official_thesis_opus_o5_v2}"
+TIP="${TIP:-$HOME/projects/official_thesis_opus_o5_v3}"
 PY="${PY:-$HOME/envs/official_thesis/bin/python}"
-OUT_ROOT="${OUT_ROOT:-$HOME/official_thesis_opus_o5_runs}"
+OUT_ROOT="${OUT_ROOT:-$HOME/official_thesis_opus_o5_attempt2_runs}"
+if [[ "$OUT_ROOT" == *smoke* || "$OUT_ROOT" == */official_thesis_opus_o5_runs* ]]; then
+  echo "REFUSE: OUT_ROOT must be the attempt2 scientific root, got $OUT_ROOT" >&2
+  exit 4
+fi
 export PYTHONUNBUFFERED=1
 export PYTHONDONTWRITEBYTECODE=1
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-8}"

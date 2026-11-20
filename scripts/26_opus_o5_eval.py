@@ -21,6 +21,11 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
+from combustion_recon.data.month2_normalizer import Month2FitOnlyNormalizer  # noqa: E402
+from combustion_recon.data.sparse_eval_masks import (  # noqa: E402
+    EvalMaskContractError,
+    check_eval_mask_contract,
+)
 from combustion_recon.evaluation.opus_o5_plan import (  # noqa: E402
     CHECKPOINTS,
     COVERAGES,
@@ -36,6 +41,7 @@ from combustion_recon.training.dense_cache import (  # noqa: E402
 from combustion_recon.training.scientific_epoch_sampler import (  # noqa: E402
     cache_indices_for_pool,
 )
+from combustion_recon.training.sparse_dataset import SparseUNetCacheDataset  # noqa: E402
 
 
 def _s6():
@@ -157,11 +163,6 @@ def _verify_inputs(entry: dict[str, Any], matrix: dict[str, Any]) -> dict[str, A
     stats_sha = sha256_file(stats)
     if stats_sha != shared["stats_sha256"]:
         raise SystemExit("normalizer sha mismatch")
-    from combustion_recon.data.sparse_eval_masks import (
-        EvalMaskContractError,
-        check_eval_mask_contract,
-    )
-
     mask_root = Path(shared["mask_root"])
     try:
         mask_report = check_eval_mask_contract(
@@ -216,42 +217,30 @@ def _inspect_checkpoints(entry: dict[str, Any], torch) -> dict[str, dict[str, An
     return found
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--matrix", type=Path, required=True)
-    parser.add_argument("--run-id", required=True)
-    parser.add_argument("--out-root", type=Path, required=True)
-    parser.add_argument("--eval-git-sha", required=True)
-    parser.add_argument("--device", default="cuda")
-    parser.add_argument("--batch-size", type=int, default=8)
-    args = parser.parse_args()
+def _smoke_positions(frames: list[dict[str, Any]], indices: list[int], n: int, keep_frame_1000: bool) -> list[int]:
+    """Evenly spaced cache rows for the non-scientific smoke subset."""
+    take = sorted({int(round(v)) for v in np.linspace(0, len(indices) - 1, num=min(n, len(indices)))})
+    chosen = [indices[i] for i in take]
+    if keep_frame_1000:
+        chosen += [i for i in indices if int(frames[i]["frame_index"]) == 1000 and i not in chosen]
+    return sorted(set(chosen))
 
-    matrix = load_matrix(args.matrix)
-    entry = _run_entry(matrix, args.run_id)
-    import torch
 
-    if args.device != "cuda" or not torch.cuda.is_available():
-        raise SystemExit("O5 requires CUDA; refusing before creating an output directory")
-    device = torch.device("cuda")
-    inspected = _inspect_checkpoints(entry, torch)
-    consumed = _verify_inputs(entry, matrix)
-
-    out_run = args.out_root / args.run_id
-    out_run.mkdir(parents=True, exist_ok=False)
-    s6 = _s6()
-    from combustion_recon.training.normalizer import Month2FitOnlyNormalizer
-    from combustion_recon.training.sparse_dataset import SparseUNetCacheDataset
-
-    normalizer = Month2FitOnlyNormalizer(matrix["shared_inputs"]["stats"])
+def _build_datasets(entry, matrix, consumed, normalizer, *, smoke_frames: int | None):
     cache_root = consumed["cache_root"]
     train_frames = json.loads((cache_root / "train_fit" / "frames.json").read_text())
     ref760 = cache_indices_for_pool(train_frames, "A38")
     if len(ref760) != 760:
         raise SystemExit(f"reference760 resolved {len(ref760)} rows")
     cache_kwargs = cache_validation_kwargs(str(entry["pool_id"]))
-    datasets = {}
+    datasets: dict[str, SparseUNetCacheDataset] = {}
+    expected: dict[str, int] = {}
     for role in ROLES:
         indices = ref760 if role == "train_fit" else None
+        if smoke_frames is not None:
+            frames = json.loads((cache_root / role / "frames.json").read_text())
+            pool = ref760 if indices is not None else list(range(len(frames)))
+            indices = _smoke_positions(frames, pool, smoke_frames, role == "val_eval")
         datasets[role] = SparseUNetCacheDataset(
             role,
             cache_root=cache_root,
@@ -267,12 +256,101 @@ def main() -> int:
             require_eval_mask_payload=True,
             **cache_kwargs,
         )
-        if len(datasets[role]) != ROLE_N_FRAMES[role]:
-            raise SystemExit(
-                f"{role} has {len(datasets[role])} frames, expected {ROLE_N_FRAMES[role]}"
-            )
+        expected[role] = len(datasets[role]) if smoke_frames is not None else ROLE_N_FRAMES[role]
+        if len(datasets[role]) != expected[role]:
+            raise SystemExit(f"{role} has {len(datasets[role])} frames, expected {expected[role]}")
+    return datasets, expected
 
-    model, _ = s6._load_model("sparse_unet", cache_root, device)
+
+def verify_outputs(out_run: Path, entry: dict[str, Any], expected: dict[str, int], run_id: str) -> dict[str, Any]:
+    """Read every written file back. COMPLETE or SMOKE_OK only follows this check."""
+    n_csv = 0
+    for name in CHECKPOINTS:
+        spec = entry["checkpoints"][name]
+        source = spec.get("reuse_forward_from")
+        for coverage in COVERAGES:
+            cov = f"{float(coverage):.2f}"
+            for role in ROLES:
+                for replica in REPLICAS:
+                    path = out_run / "per_frame" / name / f"cov{cov}" / role / f"rep{replica}.csv"
+                    if not path.is_file():
+                        raise SystemExit(f"missing output {path}")
+                    frame = pd.read_csv(path)
+                    n_csv += 1
+                    if len(frame) != expected[role]:
+                        raise SystemExit(f"{path}: {len(frame)} rows, expected {expected[role]}")
+                    if not np.isfinite(frame["rmse_K"].to_numpy(dtype=float)).all():
+                        raise SystemExit(f"{path}: non-finite rmse_K")
+                    if set(frame["checkpoint_kind"]) != {name}:
+                        raise SystemExit(f"{path}: wrong checkpoint_kind")
+                    if set(frame["weights_sha256"]) != {spec["weights_sha256"]}:
+                        raise SystemExit(f"{path}: weights_sha256 drifted from the matrix")
+                    if set(frame["file_sha256"]) != {spec["file_sha256"]}:
+                        raise SystemExit(f"{path}: file_sha256 drifted from the matrix")
+                    if set(frame["run_id"]) != {run_id}:
+                        raise SystemExit(f"{path}: wrong run_id")
+                    if source:
+                        src = pd.read_csv(
+                            out_run / "per_frame" / source / f"cov{cov}" / role / f"rep{replica}.csv"
+                        )
+                        if not np.array_equal(src["rmse_K"].to_numpy(), frame["rmse_K"].to_numpy()):
+                            raise SystemExit(f"{path}: shared forward differs from {source}")
+                        if set(frame["shared_forward_from"].fillna("")) != {source}:
+                            raise SystemExit(f"{path}: shared_forward_from not recorded")
+        field = out_run / "fields" / f"val_frame1000_{name}_cov05_rep0.npz"
+        with np.load(field, allow_pickle=True) as data:
+            if data["pred_T_K"].shape != data["true_T_K"].shape or data["pred_T_K"].shape[0] != 3:
+                raise SystemExit(f"{field}: bad shape")
+            if not np.isfinite(data["pred_T_K"]).all():
+                raise SystemExit(f"{field}: non-finite prediction")
+    expected_n = len(CHECKPOINTS) * len(COVERAGES) * len(ROLES) * len(REPLICAS)
+    if n_csv != expected_n:
+        raise SystemExit(f"{n_csv} csv files, expected {expected_n}")
+    prov = json.loads((out_run / "provenance.json").read_text())
+    if prov["run_id"] != run_id:
+        raise SystemExit("provenance run_id mismatch")
+    return {"n_csv": n_csv, "n_fields": len(CHECKPOINTS)}
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--matrix", type=Path, required=True)
+    parser.add_argument("--run-id", required=True)
+    parser.add_argument("--out-root", type=Path, required=True)
+    parser.add_argument("--eval-git-sha", required=True)
+    parser.add_argument("--device", default="cuda")
+    parser.add_argument("--batch-size", type=int, default=8)
+    parser.add_argument(
+        "--smoke",
+        action="store_true",
+        help="non-scientific subset with the real entrypoint; writes SMOKE_OK.json, never COMPLETE.json",
+    )
+    parser.add_argument("--smoke-frames", type=int, default=6)
+    args = parser.parse_args()
+
+    in_smoke_dir = "smoke" in args.out_root.name.lower()
+    if args.smoke != in_smoke_dir:
+        raise SystemExit("--smoke requires an out-root whose final directory name contains 'smoke'; a scientific out-root must not")
+    smoke_frames = int(args.smoke_frames) if args.smoke else None
+
+    matrix = load_matrix(args.matrix)
+    entry = _run_entry(matrix, args.run_id)
+    import torch
+
+    if args.device != "cuda" or not torch.cuda.is_available():
+        raise SystemExit("O5 requires CUDA; refusing before creating an output directory")
+    device = torch.device("cuda")
+    inspected = _inspect_checkpoints(entry, torch)
+    consumed = _verify_inputs(entry, matrix)
+
+    # Everything that can fail on imports, API or data happens before the run directory exists.
+    s6 = _s6()
+    normalizer = Month2FitOnlyNormalizer(matrix["shared_inputs"]["stats"])
+    datasets, expected = _build_datasets(entry, matrix, consumed, normalizer, smoke_frames=smoke_frames)
+    model, _ = s6._load_model("sparse_unet", consumed["cache_root"], device)
+
+    out_run = args.out_root / args.run_id
+    out_run.mkdir(parents=True, exist_ok=False)
     stored_rows: dict[str, dict[tuple, list[dict[str, Any]]]] = {}
     stored_fields: dict[str, Path] = {}
     completeness: list[dict[str, Any]] = []
@@ -346,7 +424,7 @@ def main() -> int:
                         device=device,
                         batch_size=int(args.batch_size),
                     )
-                    if int(out["n_frames"]) != ROLE_N_FRAMES[role]:
+                    if int(out["n_frames"]) != expected[role]:
                         raise SystemExit(
                             f"{name} {role} coverage {coverage} replica {replica}: {out['n_frames']} frames"
                         )
@@ -401,6 +479,8 @@ def main() -> int:
     provenance = {
         "experiment_id": matrix["experiment_id"],
         "run_id": args.run_id,
+        "smoke": bool(args.smoke),
+        "smoke_frames_per_role": expected if args.smoke else None,
         "eval_git_sha": args.eval_git_sha,
         "training_git_sha": entry["training_git_sha"],
         "training_job_id": entry["job_id"],
@@ -417,9 +497,13 @@ def main() -> int:
     expected_n = len(CHECKPOINTS) * len(COVERAGES) * len(ROLES) * len(REPLICAS)
     if len(completeness) != expected_n:
         raise SystemExit(f"completeness rows {len(completeness)} != {expected_n}")
-    (out_run / "COMPLETE.json").write_text(
-        json.dumps({"ok": True, "n_settings": len(completeness), "run_id": args.run_id}, indent=2) + "\n"
-    )
+    readback = verify_outputs(out_run, entry, expected, args.run_id)
+    marker = "SMOKE_OK.json" if args.smoke else "COMPLETE.json"
+    payload = {"ok": True, "n_settings": len(completeness), "run_id": args.run_id, **readback}
+    if args.smoke:
+        payload["scientific"] = False
+        payload["frames_per_role"] = expected
+    (out_run / marker).write_text(json.dumps(payload, indent=2) + "\n")
     return 0
 
 
