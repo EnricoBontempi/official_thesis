@@ -330,3 +330,19 @@ ssh engaging 'squeue -j 29728465 -r -o "%.18i %.2t %.10M %R"'
 ssh engaging 'sacct -j 29728465 -X -o JobID,State,ExitCode,Elapsed,NodeList'
 ssh engaging 'tail -n 20 ~/official_thesis_opus_o5_attempt2_runs/slurm-29728465_0.out'
 ```
+
+## 2026-11-20 O5 attempt2: task 1 replaced
+
+**What failed.** Array 29728465 task 1 (O-B19-off-s0) FAILED 6:0 after 2:01 on node4204. The launcher preflight gave a 120 s timeout on `/orcd/pool/005/bontempi/official_thesis_data/month2_dense_unet_cache_c149`, then refused to start. The Python evaluator never ran and `O-B19-off-s0` was never created. A B19 run does not read the C149 cache, so the preflight was stricter than the run. Log `slurm-29728465_1.out/.err` is preserved in `/home/bontempi/official_thesis_opus_o5_attempt2_runs/`.
+
+**Correction, operational only** (`29b94345f0cac3f725662ad687a15ff841c7c730`). `scripts/engaging/o5_preflight_paths.py` builds the list of inputs from the matrix for the task's own run: cache manifest and hash file of its pool (C149 for C149 runs, historical for B19/A38), stats, mask manifest, training `run_identity.json`, and the three checkpoints. Both launchers stat that list under `timeout 120` and fail closed on an empty list. `tests/test_opus_o5_preflight_paths.py`: a B19/A38 run never calls stat on a C149 path (an unreachable C149 path would raise and the test records zero hits), C149 runs never list the historical cache, an unreachable required path is reported, and the listed paths equal what the evaluator's `_verify_inputs` reads for both pools (fakes record the reads). `scripts/26_opus_o5_eval.py`, `src/`, and `configs/` are byte-identical to `918286809d3cbb33d155b70a6e03a9b898bcab9e`. Cluster tests: 37 passed.
+
+**Replacement submission:** job **29732630**, array task `1` only, submitted 2026-11-20T00:10:04-05:00. It replaces `29728465_1`. `mit_normal_gpu`, account/QoS `mit_amf_advanced_gpu`, `gpu:l40s:1`, 8 CPU, 64G, wall 4h, `--exclude=node4108,node4204` (not assumed to solve filesystem problems). Frozen detached checkout `/home/bontempi/projects/official_thesis_opus_o5_v6`, clean except `.git_commit`. `/home/bontempi/official_thesis_opus_o5_attempt2_runs/O-B19-off-s0` was absent before submission; no overwrite. Output `/home/bontempi/official_thesis_opus_o5_attempt2_runs/O-B19-off-s0/`, logs `slurm-29732630_1.out/.err` in the same root. The rest of array 29728465, including its pending tasks, was not touched and keeps its frozen checkout `/home/bontempi/projects/official_thesis_opus_o5_v5` at `91828680…`. The new job shares the QoS cap of 4 GPUs with that array and may wait for a free slot.
+
+**For the final package, two SHAs.** Evaluator code is identical in both: `918286809d3cbb33d155b70a6e03a9b898bcab9e` (tasks 0 and 2-7) and `29b94345…` (O-B19-off-s0, launcher preflight differs). The run's `provenance.json` records `eval_git_sha` for each executed checkout; the package must list both and not describe the campaign as a single execution.
+
+```bash
+ssh engaging 'squeue -j 29732630 -r -o "%.18i %.2t %.10M %R"'
+ssh engaging 'sacct -j 29732630 -X -o JobID,State,ExitCode,Elapsed,NodeList'
+ssh engaging 'tail -n 20 ~/official_thesis_opus_o5_attempt2_runs/slurm-29732630_1.out'
+```
