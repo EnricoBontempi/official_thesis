@@ -28,6 +28,8 @@ run() { # name run_id [fault] [restart]
     bash "$S7_TIP/scripts/engaging/s7_run_task.sh"
 }
 set +e
+RESTART="${SLURM_RESTART_COUNT:-0}"; [[ -z "$RESTART" ]] && RESTART=0
+if [[ "$RESTART" == "0" ]]; then
 echo "[$(date -Is)] S7-SMOKE step A: uninterrupted p_on"
 run A "$ON"; rcA=$?
 echo "[$(date -Is)] S7-SMOKE step A2: second uninterrupted p_on (nondeterminism control)"
@@ -43,7 +45,32 @@ run B "$ON" "" 0; rcB4=$?
 echo "[$(date -Is)] S7-SMOKE step C: uninterrupted p_off"
 run C "$OFF"; rcC=$?
 echo "[$(date -Is)] S7-SMOKE rc A=$rcA A2=$rcA2 B1=$rcB1 B2=$rcB2 B3=$rcB3 B4=$rcB4 C=$rcC"
-
+# D: internal wall-time cap -> registered continuation. Long smoke (400 epochs) stopped by a 14 s cap.
+export S7_SMOKE_ARGS="--smoke-presentations 48 --smoke-epochs 400 --smoke-eval-every 10 --smoke-eval-frames 6"
+export S7_SMOKE_WALL_HOURS=0.004
+if [[ "${REAL_REQUEUE_TEST:-0}" == "1" ]]; then
+  echo "[$(date -Is)] S7-SMOKE step D1 (REAL): wall-time cap, then the runner issues scontrol requeue on this job"
+  S7_OUT_ROOT="$SM/D" S7_TASK="$ON" S7_SMOKE_REAL_REQUEUE=1 bash "$S7_TIP/scripts/engaging/s7_run_task.sh"; rcD1=$?
+  echo "[$(date -Is)] S7-SMOKE D1 returned rc=$rcD1; the job should now be requeued by Slurm"
+  sleep 300
+  echo "[$(date -Is)] S7-SMOKE ERROR: still running 300 s after requeue request" ; exit 1
+else
+  echo "[$(date -Is)] S7-SMOKE step D1 (emulated restart count): wall-time cap"
+  run D "$ON" "" 0; rcD1=$?
+  echo "[$(date -Is)] S7-SMOKE step D2: continuation attempt must resume from last.pt"
+  run D "$ON" "" 1; rcD2=$?
+  echo "[$(date -Is)] S7-SMOKE D rc=$rcD1/$rcD2"
+fi
+else
+echo "[$(date -Is)] S7-SMOKE RESTARTED by Slurm (SLURM_RESTART_COUNT=$RESTART): step D2 real continuation"
+export S7_SMOKE_ARGS="--smoke-presentations 48 --smoke-epochs 400 --smoke-eval-every 10 --smoke-eval-frames 6"
+export S7_SMOKE_WALL_HOURS=0.004
+S7_OUT_ROOT="$SM/D" S7_TASK="$ON" bash "$S7_TIP/scripts/engaging/s7_run_task.sh"; rcD2=$?
+echo "[$(date -Is)] S7-SMOKE D2 (real requeue) rc=$rcD2"
+fi
+echo "[$(date -Is)] S7-SMOKE continuation report"
+"$PY" "$S7_TIP/scripts/37_s7_smoke_continuation.py" --out-root "$SM/D" --run-id "$ON" \
+  --real-requeue "${REAL_REQUEUE_TEST:-0}" --out "$SM/continuation_report.json"; rcCont=$?
 echo "[$(date -Is)] S7-SMOKE compare continuous vs killed+resumed"
 "$PY" "$S7_TIP/scripts/36_s7_smoke_compare.py" --continuous "$SM/A/$ON" --continuous2 "$SM/A2/$ON" \
   --resumed "$SM/B/$ON" --out "$SM/compare_resume.json"; rcCmp=$?
@@ -51,7 +78,7 @@ echo "[$(date -Is)] S7-SMOKE checks (isolation, p behaviour, 1/5/20% evaluator, 
 PYTHONPATH="$S7_TIP/src" "$PY" "$S7_TIP/scripts/35_s7_smoke_checks.py" \
   --run-on "$SM/A/$ON" --run-off "$SM/C/$OFF" \
   --config-on "$S7_TIP/configs/experiments/s7/$ON.yaml" --config-off "$S7_TIP/configs/experiments/s7/$OFF.yaml" \
-  --cache-root /orcd/pool/005/bontempi/official_thesis_data/month2_dense_unet_cache_c149 \
+  --cache-root /home/bontempi/official_thesis_data/month2_dense_unet_cache_c149 \
   --mask-root /home/bontempi/projects/official_thesis_s5/data/processed/month2_sparse_eval_masks \
   --out "$SM/smoke_checks.json"; rcChk=$?
-echo "[$(date -Is)] S7-SMOKE end compare_rc=$rcCmp checks_rc=$rcChk"
+echo "[$(date -Is)] S7-SMOKE end continuation_rc=$rcCont compare_rc=$rcCmp checks_rc=$rcChk"

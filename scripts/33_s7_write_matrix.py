@@ -22,10 +22,16 @@ TEMPLATE = ROOT / "configs" / "experiments" / "opus_O-C149-on-s0.yaml"
 ENGAGING_HOME = "/home/bontempi"
 OUT_ROOT = f"{ENGAGING_HOME}/official_thesis_s7_c149_runs"
 SMOKE_ROOT = f"{ENGAGING_HOME}/official_thesis_s7_smoke_runs"
-CACHE = "/orcd/pool/005/bontempi/official_thesis_data/month2_dense_unet_cache_c149"
+# Byte-identical copy (20 payload files, aggregate fa1c9358...) of the pool cache
+# /orcd/pool/005/bontempi/official_thesis_data/month2_dense_unet_cache_c149. The pool automount
+# hung on compute nodes during the S7 smoke (stat of /orcd/pool/005/bontempi/... timed out on
+# node3004 and node4102), so the campaign reads the home copy; the hashes are re-verified at launch.
+CACHE = f"{ENGAGING_HOME}/official_thesis_data/month2_dense_unet_cache_c149"
+POOL_CACHE = "/orcd/pool/005/bontempi/official_thesis_data/month2_dense_unet_cache_c149"
 
 SHARED = {
     "cache_root": CACHE,
+    "cache_root_pool_original": POOL_CACHE,
     "cache_hash_file": f"{CACHE}/payload_hashes.json",
     "expect_cache_aggregate_sha256": "fa1c9358deb3bda0313cd74f9ab6855af87bc969c4069a463073d4c4120f03b4",
     "cache_id": "month2_dense_unet_cache_opus_c149_v1",

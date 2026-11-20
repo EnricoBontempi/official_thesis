@@ -60,15 +60,12 @@ if [[ "$MODE" == "smoke" && "$OUT_ROOT" != *smoke* ]]; then die 4 "smoke OUT_ROO
 OUT="$OUT_ROOT/$RUN_ID"
 log "run=$RUN_ID family=$FAMILY p_on=$P_ON seed=$SEED out=$OUT"
 
-FAIL=0
 while read -r P; do
-  if timeout 120 stat -c '%s' "$P" > /dev/null 2>&1; then
-    :
-  else
-    log "ACCESS FAIL or timeout: $P"; FAIL=1
+  if ! timeout 60 stat -c '%s' "$P" > /dev/null 2>&1; then
+    # Fail fast and loudly: a hung automount must not silently burn GPU hours.
+    die 6 "input not reachable within 60 s from $(hostname): $P"
   fi
 done < <("$PY" "$HELPER" paths "$MATRIX_JSON" "$S7_TIP" "$RUN_ID")
-[[ "$FAIL" == "0" ]] || die 6 "an input of $RUN_ID is not reachable from $(hostname)"
 log "input access ok"
 
 "$PY" - <<'PYGPU' || die 7 "no usable CUDA device"
@@ -133,6 +130,7 @@ if [[ "$MODE" == "smoke" ]]; then
   # shellcheck disable=SC2206
   CMD+=(--smoke ${S7_SMOKE_ARGS:-})
   [[ -n "${S7_SMOKE_FAULT_AT:-}" ]] && CMD+=(--smoke-fault-at "$S7_SMOKE_FAULT_AT")
+  [[ -n "${S7_SMOKE_WALL_HOURS:-}" ]] && CMD+=(--wall-hours "$S7_SMOKE_WALL_HOURS")
 else
   CMD+=(--wall-hours "$S7_WALL_HOURS")
 fi
@@ -164,7 +162,7 @@ log "training process exit rc=$rc state=$STATE"
 "$PY" "$HELPER" ledger "$OUT_ROOT" "$RUN_ID" event=attempt_end "slurm_job_id=$JOB_ID" "restart_count=$RESTART" "rc=$rc" "state=$STATE" || true
 
 if [[ "$rc" == "0" && "$STATE" == *'"summary_status": "stopped_wall_time"'* ]]; then
-  if [[ -n "${SLURM_JOB_ID:-}" && "$MODE" == "campaign" ]]; then
+  if [[ -n "${SLURM_JOB_ID:-}" && ( "$MODE" == "campaign" || "${S7_SMOKE_REAL_REQUEUE:-0}" == "1" ) ]]; then
     log "internal wall-time cap reached; scheduling a registered continuation (scontrol requeue); not a plateau"
     "$PY" "$HELPER" ledger "$OUT_ROOT" "$RUN_ID" event=continuation_requeue "slurm_job_id=$JOB_ID" || true
     scontrol requeue "$SLURM_JOB_ID" && exit 0

@@ -1,0 +1,111 @@
+{
+  "runs": [
+    {
+      "batch_size": 8,
+      "cache_payload_aggregate_sha256": "fa1c9358deb3bda0313cd74f9ab6855af87bc969c4069a463073d4c4120f03b4",
+      "checkpoints": {
+        "best": {
+          "bytes": 59623323,
+          "sha256": "bed10229342bb664adfbd247fb018670fa2b947df26092804841a7dfdc97bd7e"
+        },
+        "best_seen_diagnostic": {
+          "bytes": 60606939,
+          "sha256": "bc25cd10f63c8249097d00f9c2b3d1a696595ce141f52332dbdeb2bb5871f9e6"
+        },
+        "last": {
+          "bytes": 64035163,
+          "sha256": "66d59c6aec6f7ce7897ac5819438bcdf069cf306adb299f47aaf773f41ac41e0"
+        }
+      },
+      "config_sha256": "bf82dacff6a244273c5e992c4f5621095c29795d7e49bd79deebd1ac218b2515",
+      "eval_mask_seed": 20261116,
+      "expected_training_sha": "d6332000491ba0e8983b9e7fa09b34badb191ea4",
+      "family": "sparse_unet",
+      "git_sha_in_identity": "d6332000491ba0e8983b9e7fa09b34badb191ea4",
+      "init_state_dict_sha256": "18c51863f8cbcb94afc7184afab61c631beb679e0f26e01074551352a5a91765",
+      "mask_payload_sha256_legacy_key_is_manifest_file_hash": "2e2d8ff6edabf62ad56702a155140d064c0b4014d06ee96debf52811efa5c75e",
+      "model_seed": 0,
+      "p_conditioning": true,
+      "partial_interrupt_present": false,
+      "pool_id": "C149",
+      "pool_size": 2980,
+      "presentations_per_scientific_epoch": 760,
+      "run_id": "O-C149-on-s0",
+      "sacct": "29645053|COMPLETED|0:0|03:44:44|mit_normal_gpu|mit_amf_advanced_gpu|mit_amf_advanced_gpu|node3204",
+      "shuffle_seed": 0,
+      "stats_sha256": "678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e",
+      "summary": {
+        "best_seen_diagnostic_epoch": 220,
+        "best_seen_diagnostic_metric": 39.168666304056515,
+        "best_val_epoch": 90,
+        "best_val_metric": 38.71236153568071,
+        "completed": false,
+        "elapsed_s": 13458.681625293568,
+        "epochs_completed": 660,
+        "samples_seen": 501600,
+        "status": "stopped_early_plateau",
+        "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+        "updates": 62700
+      },
+      "train_mask_seed": 20261118,
+      "training_dir": "/home/bontempi/official_thesis_opus_c149_attempt2_runs/O-C149-on-s0",
+      "training_job": 29645053,
+      "warm_start": false,
+      "warmup_updates": 950
+    },
+    {
+      "batch_size": 8,
+      "cache_payload_aggregate_sha256": "fa1c9358deb3bda0313cd74f9ab6855af87bc969c4069a463073d4c4120f03b4",
+      "checkpoints": {
+        "best": {
+          "bytes": 60904347,
+          "sha256": "f7c515b0abea6e2d1491966e12750523d469a9210a0f47c9a209d95d5473a9df"
+        },
+        "best_seen_diagnostic": {
+          "bytes": 60757467,
+          "sha256": "23a83e219dbcd1c2c7a9d4a29a187e59f5e58fd555c3d5b8797e4af8036eb588"
+        },
+        "last": {
+          "bytes": 64429659,
+          "sha256": "16888d0a72038d4bb3375548c0a121736bb15ca3e76337330c10f62f45542758"
+        }
+      },
+      "config_sha256": "2e7c8db37818cd44b7f334c0fcf1b8783908b7358806adc76ac926c17fcb7081",
+      "eval_mask_seed": 20261116,
+      "expected_training_sha": "d6332000491ba0e8983b9e7fa09b34badb191ea4",
+      "family": "sparse_unet",
+      "git_sha_in_identity": "d6332000491ba0e8983b9e7fa09b34badb191ea4",
+      "init_state_dict_sha256": "18c51863f8cbcb94afc7184afab61c631beb679e0f26e01074551352a5a91765",
+      "mask_payload_sha256_legacy_key_is_manifest_file_hash": "2e2d8ff6edabf62ad56702a155140d064c0b4014d06ee96debf52811efa5c75e",
+      "model_seed": 0,
+      "p_conditioning": false,
+      "partial_interrupt_present": false,
+      "pool_id": "C149",
+      "pool_size": 2980,
+      "presentations_per_scientific_epoch": 760,
+      "run_id": "O-C149-off-s0",
+      "sacct": "29645054|COMPLETED|0:0|04:00:05|mit_normal_gpu|mit_amf_advanced_gpu|mit_amf_advanced_gpu|node4207",
+      "shuffle_seed": 0,
+      "stats_sha256": "678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e",
+      "summary": {
+        "best_seen_diagnostic_epoch": 240,
+        "best_seen_diagnostic_metric": 41.21474163400718,
+        "best_val_epoch": 260,
+        "best_val_metric": 39.82431101710156,
+        "completed": false,
+        "elapsed_s": 14378.827381601965,
+        "epochs_completed": 710,
+        "samples_seen": 539600,
+        "status": "stopped_early_plateau",
+        "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+        "updates": 67450
+      },
+      "train_mask_seed": 20261118,
+      "training_dir": "/home/bontempi/official_thesis_opus_c149_attempt2_runs/O-C149-off-s0",
+      "training_job": 29645054,
+      "warm_start": false,
+      "warmup_updates": 950
+    }
+  ],
+  "verified_at": "2026-11-20T13:08:37-05:00"
+}

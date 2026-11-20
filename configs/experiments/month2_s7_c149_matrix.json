@@ -134,9 +134,10 @@
       "train_fit": 2980,
       "val_eval": 123
     },
-    "cache_hash_file": "/orcd/pool/005/bontempi/official_thesis_data/month2_dense_unet_cache_c149/payload_hashes.json",
+    "cache_hash_file": "/home/bontempi/official_thesis_data/month2_dense_unet_cache_c149/payload_hashes.json",
     "cache_id": "month2_dense_unet_cache_opus_c149_v1",
-    "cache_root": "/orcd/pool/005/bontempi/official_thesis_data/month2_dense_unet_cache_c149",
+    "cache_root": "/home/bontempi/official_thesis_data/month2_dense_unet_cache_c149",
+    "cache_root_pool_original": "/orcd/pool/005/bontempi/official_thesis_data/month2_dense_unet_cache_c149",
     "expect_cache_aggregate_sha256": "fa1c9358deb3bda0313cd74f9ab6855af87bc969c4069a463073d4c4120f03b4",
     "mask_aggregate_payload_sha256": "7be78f35ffea2ebc598adce8cec39dc719339aac17ecadde3137f2064891ffeb",
     "mask_manifest_file_sha256": "2e2d8ff6edabf62ad56702a155140d064c0b4014d06ee96debf52811efa5c75e",
