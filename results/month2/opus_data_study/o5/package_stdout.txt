@@ -1,0 +1,4 @@
+package written to /home/bontempi/official_thesis_opus_o5_final/package_29771334/package: 21 files, 9 figures
+loop within tolerance everywhere: True
+
+--- stderr

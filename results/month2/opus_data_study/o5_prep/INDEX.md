@@ -38,3 +38,5 @@ Dentro: `per_frame/`, `fields/val_frame1000_<checkpoint>_cov05_rep0.npz` (un fra
 Dal replay 29670888, un checkpoint al 5%: reference760 replica 0 circa 156–158 s (760 frame), seen replica 0 circa 13.4 s (220), VAL una replica circa 4.4 s (123). Applicando queste durate alle tre coperture e alle tre repliche, un checkpoint distinto costa circa 26 minuti. I pesi condivisi tolgono tre forward su ventiquattro: circa 9.2 ore-GPU. Se ogni frame costasse quanto reference760 (0.21 s), si arriva a circa 12 ore-GPU. Il wall di 4 ore per job copre la stima lenta e il ricalcolo degli hash di cache, che non è incluso nei 26 minuti.
 
 Otto task, array `0-7%4`, al massimo quattro L40S insieme. Partizione `mit_normal_gpu`, account e QoS `mit_amf_advanced_gpu`, `gpu:l40s:1`, 8 CPU, 64G. Il launcher rifiuta l'avvio senza `AUTHORIZE_OPUS_O5=1` e senza `EXPECT_SHA`. Checkout proposto, da creare solo alla submission: `/home/bontempi/projects/official_thesis_opus_o5`.
+
+> **Aggiornamento 2026-11-20.** Questo indice descrive la preparazione. O5 è stata eseguita sugli otto run e il pacchetto tecnico è in `../o5/` (indice di lettura: `../o5/INDEX_FOR_NEON.md`).
