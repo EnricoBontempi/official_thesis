@@ -53,24 +53,26 @@ def render(panels: list[dict], dest: Path, checkpoint: str) -> None:
     fig, axes = plt.subplots(
         len(panels),
         n_cond * 2,
-        figsize=(2.2 * n_cond * 2, 2.1 * len(panels)),
+        figsize=(2.2 * n_cond * 2 + 1.5, 2.1 * len(panels) + 1.6),
         squeeze=False,
+        layout="constrained",
     )
+    im_pred = im_err = None
     for r, panel in enumerate(panels):
         for c in range(n_cond):
             pred_ax = axes[r, c]
             err_ax = axes[r, n_cond + c]
-            pred_ax.imshow(
+            im_pred = pred_ax.imshow(
                 panel["pred"][c],
                 vmin=limits["vmin"],
                 vmax=limits["vmax"],
                 cmap="inferno",
             )
             err = panel["pred"][c] - panel["true"][c]
-            err_ax.imshow(err, vmin=-limits["emax"], vmax=limits["emax"], cmap="coolwarm")
+            im_err = err_ax.imshow(err, vmin=-limits["emax"], vmax=limits["emax"], cmap="coolwarm")
             if r == 0:
-                pred_ax.set_title(f"{panel['sim_id'][c]} pred")
-                err_ax.set_title(f"{panel['sim_id'][c]} signed error")
+                pred_ax.set_title(f"{panel['sim_id'][c]}\nprediction", fontsize=7)
+                err_ax.set_title(f"{panel['sim_id'][c]}\nsigned error", fontsize=7)
             if c == 0:
                 pred_ax.set_ylabel(panel["run_id"])
             pred_ax.set_xticks([])
@@ -80,9 +82,11 @@ def render(panels: list[dict], dest: Path, checkpoint: str) -> None:
     fig.suptitle(
         f"VAL frame 1000, {checkpoint}, 5% replica 0. "
         f"Shared T [{limits['vmin']:.0f}, {limits['vmax']:.0f}] K, "
-        f"shared error ±{limits['emax']:.0f} K. One frame, not the VAL set."
+        f"shared error ±{limits['emax']:.0f} K. One frame, not the VAL set.",
+        fontsize=9,
     )
-    fig.tight_layout()
+    fig.colorbar(im_pred, ax=axes[:, :n_cond], shrink=0.5, label="T (K)", location="bottom")
+    fig.colorbar(im_err, ax=axes[:, n_cond:], shrink=0.5, label="signed error (K)", location="bottom")
     dest.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(dest, dpi=120)
     plt.close(fig)

@@ -9,6 +9,7 @@
 - Repository: `EnricoBontempi/official_thesis`; branch `mission/dense-unet`.
 - Decisione: Enrico, 18 novembre 2026, America/New_York.
 - Stato iniziale: **PIANIFICATA, nessun passo eseguito da questo documento**.
+- Stato al 2026-11-20: O0–O4 eseguiti, O5 valutata sugli otto run con pacchetto tecnico per Neon (`results/month2/opus_data_study/o5/`); ledger in `docs/month2/opus_ledger_o0_o6.md`. Report 06 e decisione O6 **non fatti**.
 - Analisi di riferimento: [analisi tripla revisore s7.md](analisi%20tripla%20revisore%20s7.md), commit `6e2d176fa74d097aa8128c472103cf76c5a8a7a6`.
 - Evidenze di partenza: STOP E `a6b2bad7445170e6d821a14de9f7af9a1905ab2c`; diario `925f556823214e37f3abf9d73b41d6e5ed815e58`.
 - Piani collegati: [roadmapsparse.md](roadmapsparse.md), [roadmap_month2.md](roadmap_month2.md), [roadmapastra.md](roadmapastra.md).

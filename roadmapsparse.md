@@ -3,7 +3,8 @@
 **Progetto:** esclusivamente `EnricoBontempi/official_thesis`, MIT / Deng Lab.  
 **Data:** 2026-11-18, America/New_York.  
 **Base verificata:** `87d1e3f40826a9343c3c2ce19d140d481b911619`, chiusura U7, branch `mission/dense-unet`.  
-**Stato:** S0–S3 chiusi; S4 profiling COMPLETED; freeze neurale S5 **definitivo** e **submitted**; GappyPOD 1/20% ancora bloccato (S4 non tutto chiuso).  
+**Stato al 2026-11-20:** S0–S6 consegnati (S5 screening seed 0, S6 best/last 1/5/20% con swap e Gappy nested, STOP E in `results/month2/s6_sparse_eval/STOP_E_delivery/`); GappyPOD nested 1/20% gate-pass (job 29601906); S7 non scelto e non avviato. La sotto-missione [roadmapopus.md](roadmapopus.md) ha prodotto otto valutazioni O5 e un pacchetto tecnico per Neon (`results/month2/opus_data_study/o5/`, ledger `docs/month2/opus_ledger_o0_o6.md`); report scientifico e decisione O6 sono ancora da fare. Sparse e Mese 2 restano aperti.  
+**Stato al 2026-11-18 (storico, non più corrente):** S0–S3 chiusi; S4 profiling COMPLETED; freeze neurale S5 **definitivo** e **submitted**; GappyPOD 1/20% ancora bloccato (S4 non tutto chiuso).  
 **Piano principale:** [roadmap_month2.md](roadmap_month2.md). Questo documento dettaglia **2.5–2.6 e la sola conferma sparse pertinente di 2.8**; non chiude il Mese 2 e non autorizza assisted o TEST.  
 **Esecutore:** Cursor, per incarichi delimitati successivi. Pubblicare il piano non autorizza a percorrerlo automaticamente.
 
@@ -282,3 +283,5 @@ Estensioni di tranche esplicite, checkpoint completi distinti da partial; no res
 - [ ] S7 — Repliche/chiusura con limiti o rinvii dichiarati. STOP F.
 
 **Prossimo incarico previsto:** revisione indipendente STOP E (Opus/Astra/Neon); poi decisione contrasto S7 (candidato operativo: U-Net p_on vs p_off). Nessun training S7 finché non autorizzato.
+
+**Aggiornamento 2026-11-20:** la sotto-missione Opus (dati e variabilità del training) precede S7 e Astra; il suo pacchetto tecnico O5 è pronto per la revisione Neon. La decisione S7 resta sospesa fino a quella revisione e alla decisione O6 del coordinatore. Nessun training S7, A4 o TEST è stato avviato.

@@ -11,8 +11,8 @@ Stato tecnico per la revisione Neon. Fonti: `roadmapopus.md`, [opus_overnight_ha
 | O0 | Precisione esplicita (fp32, AMP, TF32, compile spenti) | verificato | `progress.json` S5 con `allow_tf32=false`; bridge LEDGER |
 | O0 | Separare SHA di training, evaluator/launcher, checkpoint e CSV riusati | fatto per O5 | matrice con SHA di training; due SHA di launcher dichiarati; nessuno SHA storico inventato |
 | O0 | Riconciliare ultima eval fra checkpoint, CSV e JSON | parziale | R0 PROVENANCE; non rifatto per ogni run S5 |
-| O0 | Controllo figure loss/colonne, regioni e casi VAL di S6 | **aperto** | non verificato in questo mandato |
-| O0 | Aggiornare i riepiloghi obsoleti in `roadmapsparse.md` e report | **aperto** | non verificato in questo mandato |
+| O0 | Controllo figure loss/colonne, regioni e casi VAL di S6 | verificato, con limiti delle figure | `scripts/31_o0_s6_delivery_check.py`, `results/month2/opus_data_study/o0_checks/S6_DELIVERY_CHECK.md`: 20/20/3 condizioni, repliche 0/1/2, coperture 1/5/20%, 369 frame VAL per setting, colonne regionali complete e senza mancanti. Figure di loss su scala lineare e figure swap con barre colore per pannello: osservate, non rigenerate |
+| O0 | Aggiornare i riepiloghi obsoleti in `roadmapsparse.md` e report | fatto per `roadmapsparse.md` e `roadmapopus.md` | stato corrente aggiunto, stato del 18 novembre conservato come storico; `roadmapastra.md` e i report 05 non toccati (Astra fuori mandato) |
 | O1 | R0 sulle quattro history S5 | fatto | `results/month2/opus_data_study/r0_selection/`; non è una validazione indipendente; nessun peso intermedio |
 | O2 | Manifest e cache C149; nesting; 760 frame condivisi bit-identici | fatto | handoff «C149 data path»; verify 29613544; `tests/test_opus_c149_cache_contract.py` |
 | O2 | Unità di 95 update, stream, resume | fatto | `tests/test_scientific_epoch_sampler.py`, `tests/test_sparse_scientific_trainer.py` |
@@ -20,9 +20,9 @@ Stato tecnico per la revisione Neon. Fonti: `roadmapopus.md`, [opus_overnight_ha
 | O3 | Freeze, config, `best_seen_diagnostic` salvato | fatto | matrice `configs/experiments/opus_o5_matrix.json`, checkpoint verificati per hash |
 | O3 | Launcher robusto, preflight leggero, directory non sovrascrivibili | fatto | `scripts/engaging/opus_o5_eval.sbatch`; preflight per run da `o5_preflight_paths.py` |
 | O4 | Otto training conclusi (early-stop), nessun partial | fatto | handoff «outcome» e «verified outcomes»; `summary.completed` resta false (early-stop) |
-| O5 | Valutazione finale degli otto run | vedere sotto | array 29728465 e sostitutivo 29732630_1; due SHA di launcher |
-| O5 | Aggregazione, tabelle, confronto col loop, figure | vedere sotto | `scripts/29_opus_o5_package.py`, `scripts/28_opus_o5_figures.py`, job finale |
+| O5 | Valutazione finale degli otto run | fatto (otto run validi) | array 29728465 e sostitutivo 29732630_1; due SHA di launcher; `COMPLETE.json` degli otto run e controlli incrociati superati dal job 29771069 |
+| O5 | Aggregazione, tabelle, confronto col loop, figure | fatto | `scripts/29_opus_o5_package.py`, `scripts/28_opus_o5_figures.py`; confronto col loop entro 0.05 K su 72 su 72 righe (scarto massimo 0.0011 K); figure principali controllate visivamente (elenco nell’indice) |
 | O5 | Report `docs/month2/06_opus_data_and_training_variability.md` | **non fatto** | spetta alla revisione Neon |
 | O6 | Decisione e passaggio ad Astra | **non fatto** | spetta al coordinatore; nessuna scelta S7 |
 
-Obblighi tecnici ancora mancanti nel mandato: le due voci O0 aperte. Non bloccano la revisione di O5 ma vanno chiuse o dichiarate.
+Obblighi tecnici ancora aperti: nessun obbligo bloccante. Restano dichiarati: le figure S6 non sono state rigenerate, i riepiloghi dei report e di `roadmapastra.md` non sono stati rivisti, e la riconciliazione completa dell'ultima eval dei quattro S5 non è stata rifatta oltre R0.

@@ -59,7 +59,7 @@ def loop_curves(loop: pd.DataFrame, glob_rep: pd.DataFrame, runs: pd.DataFrame, 
         curve = loop[loop.run_id == row.run_id].sort_values("epoch")
         for c, (col, role, _) in enumerate(cols):
             ax = axes[r, c]
-            ax.plot(curve[x], curve[col], lw=1.2, label=_label(row), **_style(row))
+            ax.plot(curve[x], curve[col], lw=1.2, label=f"{row.pool_id} seed {int(row.model_seed)}", **_style(row))
             reps = (0,) if role != "val_eval" else (0, 1, 2)
             for ckpt in CHECKPOINTS:
                 part = o5[(o5.run_id == row.run_id) & (o5.checkpoint_kind == ckpt) & (o5.role == role) & (o5.replica.isin(reps))]
@@ -80,6 +80,7 @@ def loop_curves(loop: pd.DataFrame, glob_rep: pd.DataFrame, runs: pd.DataFrame, 
             ax.set_xscale("log")
     handles, labels = axes[0, 2].get_legend_handles_labels()
     marker_handles = [plt.Line2D([], [], marker=m, linestyle="", color="white", markeredgecolor="black", label=f"O5 5%: {k}") for k, m in CKPT_MARKER.items()]
+    marker_handles += [plt.Line2D([], [], color="black", linestyle="-", label="solid = p on"), plt.Line2D([], [], color="black", linestyle="--", label="dashed = p off")]
     fig.legend(handles + marker_handles, labels + [h.get_label() for h in marker_handles], loc="lower center", ncol=4, fontsize=8, frameon=False)
     fig.suptitle("Training-loop curves (training_loop_not_o5), markers = O5 re-evaluation at 5%. Common y per column.")
     fig.tight_layout(rect=(0, 0.07, 1, 0.96))
