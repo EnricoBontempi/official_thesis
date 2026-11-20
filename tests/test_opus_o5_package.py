@@ -231,3 +231,35 @@ def test_figures_are_written(built, tmp_path):
     )
     out = plots.make_all(tmp_path / "fig", tables, loop, runs, cmp)
     assert len(out) == 9 and all(p.stat().st_size > 5000 for p in out)
+
+
+def test_undefined_regional_metric_is_counted_not_fatal_and_shared_nan_matches(tmp_path):
+    import shutil
+
+    shutil.copytree(_template(), tmp_path / "o5")
+    root = tmp_path / "o5"
+    run = root / "O-B19-on-s0"
+    for name in ("best", "best_seen_diagnostic"):
+        p = run / "per_frame" / name / "cov0.05" / "val_eval" / "rep0.csv"
+        f = pd.read_csv(p)
+        f.loc[0, "peak_rmse_K"] = np.nan
+        f.to_csv(p, index=False)
+    table, _, issues = pkg.load_and_check(root, MATRIX, allowed_eval_shas=[SHA])
+    assert issues == []
+    report = pkg.nan_report(table)
+    assert set(report["metric"]) == {"peak_rmse_K"} and report["n_nan_frames"].sum() == 2
+    runs = pkg.run_table(MATRIX)
+    tables = pkg.build_tables(table, runs, MATRIX)
+    assert np.isfinite(tables["global_by_setting"]["rmse_K"]).all()
+
+
+def test_core_metric_nan_stays_fatal(tmp_path):
+    import shutil
+
+    shutil.copytree(_template(), tmp_path / "o5")
+    p = tmp_path / "o5" / "O-A38-on-s0" / "per_frame" / "last" / "cov0.20" / "seen_train_eval" / "rep2.csv"
+    f = pd.read_csv(p)
+    f.loc[0, "mae_K"] = np.nan
+    f.to_csv(p, index=False)
+    _, _, issues = pkg.load_and_check(tmp_path / "o5", MATRIX, allowed_eval_shas=[SHA])
+    assert any("non-finite core" in i for i in issues)

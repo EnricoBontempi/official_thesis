@@ -154,8 +154,12 @@ def load_and_check(
                         if missing:
                             issues.append(f"{tag}: metric columns missing {missing}")
                             continue
-                        if not np.isfinite(frame[list(ALL_METRICS)].to_numpy(dtype=float)).all():
-                            issues.append(f"{tag}: non-finite metric")
+                        # Core metrics must be finite. Regional metrics may be undefined on a
+                        # frame (for example an empty peak region); those are counted, not hidden.
+                        if not np.isfinite(frame[list(CORE_METRICS)].to_numpy(dtype=float)).all():
+                            issues.append(f"{tag}: non-finite core metric")
+                        if np.isinf(frame[list(REGIONAL_METRICS)].to_numpy(dtype=float)).any():
+                            issues.append(f"{tag}: infinite regional metric")
                         for column, want in (
                             ("checkpoint_kind", name),
                             ("run_id", run_id),
@@ -222,7 +226,7 @@ def _cross_checks(table: pd.DataFrame, entries: Mapping[str, Any]) -> list[str]:
             sort_key = ["role", "coverage", "replica", "sim_id", "frame_index"]
             a = a.sort_values(sort_key)
             b = b.sort_values(sort_key)
-            if not np.array_equal(a[list(ALL_METRICS)].to_numpy(), b[list(ALL_METRICS)].to_numpy()):
+            if not np.array_equal(a[list(ALL_METRICS)].to_numpy(), b[list(ALL_METRICS)].to_numpy(), equal_nan=True):
                 issues.append(f"{run_id}: {name} metrics differ from its shared source {source}")
             if set(a["shared_forward_from"].fillna("")) != {source}:
                 issues.append(f"{run_id}: {name} does not record shared_forward_from={source}")
@@ -425,3 +429,19 @@ def setting_costs(out_root: Path, run_ids: Sequence[str] = RUN_ORDER) -> pd.Data
             }
         )
     return pd.DataFrame(rows)
+
+
+def nan_report(table: pd.DataFrame) -> pd.DataFrame:
+    """Frames where a regional metric is undefined (NaN). Means skip them and say so."""
+    rows = []
+    keys = ["run_id", "checkpoint_kind", "role", "coverage"]
+    for metric in ALL_METRICS:
+        bad = table[table[metric].isna()]
+        if bad.empty:
+            continue
+        counts = bad.groupby(keys).size().rename("n_nan_frames").reset_index()
+        counts.insert(4, "metric", metric)
+        rows.append(counts)
+    if not rows:
+        return pd.DataFrame(columns=keys + ["metric", "n_nan_frames"])
+    return pd.concat(rows, ignore_index=True)

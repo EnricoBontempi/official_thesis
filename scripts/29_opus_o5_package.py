@@ -59,6 +59,7 @@ def main() -> int:
     loop_cmp = pkg.loop_comparison(tables["global_by_replica"], loop)
     cmp = pkg.comparisons(tables["per_condition"], runs)
     costs = pkg.setting_costs(args.out_root)
+    nans = pkg.nan_report(table)
 
     tdir = args.dest / "tables"
     fdir = args.dest / "figures"
@@ -67,6 +68,7 @@ def main() -> int:
         frame.to_csv(tdir / f"{name}.csv", index=False)
     loop_cmp.to_csv(tdir / "loop_vs_o5_5pct.csv", index=False)
     costs.to_csv(tdir / "setting_costs.csv", index=False)
+    nans.to_csv(tdir / "undefined_regional_metric_frames.csv", index=False)
     pd.DataFrame(run_rows).to_csv(tdir / "completeness.csv", index=False)
     figures = plots.make_all(fdir, tables, loop, runs, cmp)
 
@@ -101,6 +103,10 @@ def main() -> int:
         "## Selezione: last, best_seen meno best (stesso run)",
         "",
         _md_table(sel5),
+        "",
+        "## Metriche regionali non definite su alcuni frame",
+        "",
+        f"{len(nans)} gruppi (run, checkpoint, ruolo, copertura, metrica) hanno frame con metrica regionale non definita (NaN, per esempio picco vuoto). Le medie li saltano. Elenco: `tables/undefined_regional_metric_frames.csv`. Le metriche di base (RMSE, MAE, bias, centered) sono finite ovunque.",
         "",
         f"## O5 al 5% contro il loop alla stessa epoca (tolleranza {pkg.LOOP_TOLERANCE_K} K)",
         "",
