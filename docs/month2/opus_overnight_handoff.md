@@ -295,3 +295,24 @@ ssh engaging 'tail -n 40 ~/official_thesis_opus_o5_smoke_runs/slurm-29717341_0.e
 ```
 
 The campaign (array 0-7%4, attempt2 root, same SHA) is submitted only after Enrico reports the smoke end and its artifacts are checked. No polling from this record.
+
+## 2026-11-19 smoke 29717341 outcome and C149 smoke retry
+
+One read of accounting, logs, artifacts. Task 0 (O-B19-on-s0) COMPLETED 0:0 in 45 s, `SMOKE_OK.json` 81/81, read-back passed, sampled CSV and fields match the smoke contract. Task 6 (O-C149-on-s0) **TIMEOUT** at 1:00:21 on node4108 with no run directory and no output. Its stderr holds one line (cancelled at the time limit); stdout is empty. At the one earlier read the process was in state `D`, wchan `autofs_mount_wait`, 4 s CPU, no cache file open. The cause is a wait for an automount on that node; which mount was not readable. The C149 manifest and hash file answered from the login in 0.01 s and the C149 trainings had run on other nodes, so the evidence does not point at the pool. Logs and artifacts of 29717341 are preserved in `/home/bontempi/official_thesis_opus_o5_smoke_runs/`.
+
+**Operational change only** (`918286809d3cbb33d155b70a6e03a9b898bcab9e`, diff of `scripts/26_opus_o5_eval.py` against `a4aceafe…` is a `_log` helper, `import time`, and flushed timestamped lines at the phases checkpoints, cache, dataset, forward per coverage, readback). Both launchers now `stat` the C149 and historical cache roots and the mask root under `timeout 120` before starting and exit 6 if one does not answer (the timeout bounds the `stat`; it does not guarantee that a process in D state can be stopped). Both exclude `node4108`. Data, formulas, checkpoints, selection, precision, and protocol are unchanged, so the task-0 PASS at `a4aceafe…` is carried over. Tests on the cluster: 27 passed.
+
+**Smoke retry, task 6 only:** job **29725163**, array `6`, submitted 2026-11-19T22:55:13-05:00. `mit_normal_gpu`, account/QoS `mit_amf_advanced_gpu`, `gpu:l40s:1`, 8 CPU, 64G, wall 30 min, `--exclude=node4108`. Frozen detached checkout `/home/bontempi/projects/official_thesis_opus_o5_v4` at `91828680…`, clean except `.git_commit`. `TIP` was passed explicitly because the launcher default still names `official_thesis_opus_o5_v3`; the campaign must pass its own `TIP`.
+
+| Path | Role |
+| --- | --- |
+| `/home/bontempi/official_thesis_opus_o5_smoke_attempt2_runs/O-C149-on-s0/` | smoke output |
+| `/home/bontempi/official_thesis_opus_o5_smoke_attempt2_runs/slurm-29725163_6.out/.err` | logs with phase timestamps |
+
+```bash
+ssh engaging 'sacct -j 29725163 -X -o JobID,State,ExitCode,Elapsed,NodeList'
+ssh engaging 'cat ~/official_thesis_opus_o5_smoke_attempt2_runs/slurm-29725163_6.out ~/official_thesis_opus_o5_smoke_attempt2_runs/slurm-29725163_6.err'
+ssh engaging 'cat ~/official_thesis_opus_o5_smoke_attempt2_runs/O-C149-on-s0/SMOKE_OK.json'
+```
+
+The campaign stays authorized only after this smoke passes. If the new node also stalls, evidence goes to Enrico before any further attempt. No polling from this record.
