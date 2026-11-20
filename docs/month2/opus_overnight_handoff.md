@@ -255,3 +255,43 @@ One read after Enrico reported the array finished. All eight tasks are FAILED, E
 | 29716019_7 | O-C149-off-s0 | FAILED | 1:0 | 00:00:08 | node3204 | 2026-11-19T21:08:20 |
 
 Stdout is empty. All eight stderr files share sha256 `5e1f9836f16cc0881ed234995b67e6f6e45efba278b975c35ad645da81f31e11`. The traceback is `ModuleNotFoundError: No module named 'combustion_recon.training.normalizer'` at `scripts/26_opus_o5_eval.py` line 242. `Month2FitOnlyNormalizer` is defined in `combustion_recon.data.month2_normalizer`, which `scripts/17_s6_sparse_eval_and_swap.py` already imports. The failed import is after `out_run.mkdir`, so the eight run directories exist and are empty. The launcher refuses an existing run directory. Checkout `/home/bontempi/projects/official_thesis_opus_o5_v2` is still `c70565978b27ebdae7ad11a84dcefecf3845dde2`. No `COMPLETE.json`, no per-frame rows, and no 5% comparison with the loop.
+
+## 2026-11-19 O5 attempt2: import fixed, smoke submitted (campaign not submitted)
+
+Responsibility passed from Cursor to Claude (Enrico authorized). Work lives on branch `opus/o5-eval-attempt2` in worktree `/home/enric/projects/official_thesis_opus_o5_fix`; the main worktree and the presentation work were not touched. Astra, HONF and the training checkouts were not modified.
+
+**Diagnosis.** Attempt1 (array 29716019, code `c705659…`) failed at `import combustion_recon.training.normalizer`, a module that never existed. The consolidated class is `combustion_recon.data.month2_normalizer.Month2FitOnlyNormalizer`, the one `scripts/16_train_sparse_scientific.py` and `scripts/17_s6_sparse_eval_and_swap.py` already use. Everything before that line (checkpoint hashes, cache and eval-mask gates, training identity) had passed on the real data. The failed run directories and logs under `/home/bontempi/official_thesis_opus_o5_runs/` and the checkout `official_thesis_opus_o5_v2` are kept as they are.
+
+**Fix, no change to formulas, data, selection, precision or protocol** (`a4aceafe6a51b338475f0d7c2f95318983079804`):
+
+- Normalizer imported from `data.month2_normalizer`; project imports are now at module top.
+- Normalizer, datasets, and model are built before the run directory is created, so an import or API error can no longer leave an empty directory.
+- `verify_outputs` reads every CSV and field file back (row counts, finite RMSE, checkpoint and weight hashes against the matrix, shared-forward rows equal to their source). `COMPLETE.json` is written only after it passes.
+- `--smoke` runs a non-scientific spread subset of frames (VAL keeps its three frame-1000 rows) through the same entrypoint. It requires an out-root whose final name contains `smoke`, a scientific out-root must not, and it writes `SMOKE_OK.json`, never `COMPLETE.json`.
+- Launcher defaults moved to `official_thesis_opus_o5_v3` and `official_thesis_opus_o5_attempt2_runs`. It refuses a smoke root or the attempt1 root.
+
+**Tests** (`tests/test_opus_o5_eval_calls.py`): every `combustion_recon` import in the script resolves; the attempt1 module is shown not to exist; every keyword the script passes to the dataset, normalizer, mask contract, cache hash check, and S6 functions binds to the real signature; read-back accepts a consistent run and rejects NaN, a wrong weight hash, and a shared-forward mismatch. With the old import restored the suite fails. On the cluster with the thesis env: 31 passed (new file plus O5 prep, mask contract, C149 cache, A38 seed-0 suites). No forward on the login.
+
+**Smoke submitted** 2026-11-19T21:20:02-05:00: job **29717341**, array tasks `0` and `6`.
+
+| Task | Run | Why |
+| --- | --- | --- |
+| 29717341_0 | O-B19-on-s0 | historical cache, `best_seen_diagnostic` shares weights with `best` |
+| 29717341_6 | O-C149-on-s0 | C149 cache and its manifest gate |
+
+`mit_normal_gpu`, account/QoS `mit_amf_advanced_gpu`, `gpu:l40s:1`, 8 CPU, 64G, wall 1h. QoS cap cpu=64, gres/gpu=4, mem=1T, partition max 6h. Same entrypoint `scripts/26_opus_o5_eval.py`, 6 frames per role, all three checkpoints, coverages 1/5/20%, replicas 0/1/2, persisted masks required. Executed SHA `a4aceafe…` on the frozen detached checkout `/home/bontempi/projects/official_thesis_opus_o5_v3` (clean except `.git_commit`). Not chained to the campaign.
+
+| Path | Role |
+| --- | --- |
+| `/home/bontempi/official_thesis_opus_o5_smoke_runs/<run_id>/` | smoke output, `SMOKE_OK.json` on success |
+| `/home/bontempi/official_thesis_opus_o5_smoke_runs/slurm-29717341_<task>.out/.err` | logs |
+| `/home/bontempi/official_thesis_opus_o5_attempt2_runs/` | campaign output root, created empty, not used yet |
+
+```bash
+ssh engaging 'sacct -j 29717341 -X -o JobID,State,ExitCode,Elapsed,NodeList'
+ssh engaging 'ls -R ~/official_thesis_opus_o5_smoke_runs | head -60'
+ssh engaging 'cat ~/official_thesis_opus_o5_smoke_runs/O-B19-on-s0/SMOKE_OK.json'
+ssh engaging 'tail -n 40 ~/official_thesis_opus_o5_smoke_runs/slurm-29717341_0.err'
+```
+
+The campaign (array 0-7%4, attempt2 root, same SHA) is submitted only after Enrico reports the smoke end and its artifacts are checked. No polling from this record.
