@@ -45,6 +45,9 @@ def test_matrix_is_the_eight_opus_runs():
     assert matrix["replicas"] == [0, 1, 2]
     assert matrix["roles"]["train_fit"] == "reference760"
     shared = matrix["shared_inputs"]
+    assert shared["eval_mask_manifest_file_sha256"].startswith("2e2d8ff6")
+    assert shared["eval_mask_aggregate_payload_sha256"].startswith("7be78f35")
+    assert "mask_aggregate_sha256" not in shared
     for row in matrix["runs"]:
         assert row["status"] == "stopped_early_plateau"
         assert row["completed"] is False
@@ -170,3 +173,6 @@ def test_launcher_is_advanced_gpu_and_not_submitted_by_the_script():
     assert "cache_validation_kwargs" in eval_text
     assert '"test"' not in eval_text
     assert "evaluate_setting" in eval_text
+    assert "eval_mask_manifest_file_sha256" in eval_text
+    assert "eval_mask_aggregate_payload_sha256" in eval_text
+    assert "mask_aggregate_sha256" not in eval_text

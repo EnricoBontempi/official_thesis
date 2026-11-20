@@ -157,15 +157,21 @@ def _verify_inputs(entry: dict[str, Any], matrix: dict[str, Any]) -> dict[str, A
     stats_sha = sha256_file(stats)
     if stats_sha != shared["stats_sha256"]:
         raise SystemExit("normalizer sha mismatch")
-    from combustion_recon.data.sparse_eval_masks import verify_payload_against_manifest
+    from combustion_recon.data.sparse_eval_masks import (
+        EvalMaskContractError,
+        check_eval_mask_contract,
+    )
 
     mask_root = Path(shared["mask_root"])
-    mask_report = verify_payload_against_manifest(
-        payload_root=mask_root,
-        manifest_path=mask_root / "manifest.json",
-    )
-    if not mask_report["ok"] or mask_report["aggregate"] != shared["mask_aggregate_sha256"]:
-        raise SystemExit("eval-mask payload mismatch")
+    try:
+        mask_report = check_eval_mask_contract(
+            manifest_path=mask_root / "manifest.json",
+            payload_root=mask_root,
+            expected_manifest_file_sha256=shared["eval_mask_manifest_file_sha256"],
+            expected_aggregate_payload_sha256=shared["eval_mask_aggregate_payload_sha256"],
+        )
+    except EvalMaskContractError as exc:
+        raise SystemExit(f"eval-mask contract failed: {exc.reason}") from exc
     identity_path = Path(entry["training_dir"]) / "run_identity.json"
     identity = json.loads(identity_path.read_text())
     if identity.get("git_sha") != entry["training_git_sha"]:
@@ -177,7 +183,8 @@ def _verify_inputs(entry: dict[str, Any], matrix: dict[str, Any]) -> dict[str, A
         "cache_aggregate_sha256": verified["actual_aggregate_sha256"],
         "cache_id": expect_id,
         "stats_sha256": stats_sha,
-        "mask_aggregate_sha256": mask_report["aggregate"],
+        "eval_mask_manifest_file_sha256": mask_report["eval_mask_manifest_file_sha256"],
+        "eval_mask_aggregate_payload_sha256": mask_report["eval_mask_aggregate_payload_sha256"],
     }
 
 

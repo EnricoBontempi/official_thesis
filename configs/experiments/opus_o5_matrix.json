@@ -27,7 +27,9 @@
   "seen_selection_note": "best_seen_diagnostic minimized seen replica 0 during training. O5 evaluates replicas 0, 1 and 2 and keeps both identities.",
   "shared_inputs": {
     "mask_root": "/home/bontempi/projects/official_thesis_s5/data/processed/month2_sparse_eval_masks",
-    "mask_aggregate_sha256": "2e2d8ff6edabf62ad56702a155140d064c0b4014d06ee96debf52811efa5c75e",
+    "eval_mask_manifest_file_sha256": "2e2d8ff6edabf62ad56702a155140d064c0b4014d06ee96debf52811efa5c75e",
+    "eval_mask_aggregate_payload_sha256": "7be78f35ffea2ebc598adce8cec39dc719339aac17ecadde3137f2064891ffeb",
+    "eval_mask_legacy_note": "Training run_identity.mask_payload_sha256 and the slurm field MASK_MANIFEST_SHA256 stored the sha256 of manifest.json. They did not store aggregate_payload_sha256. Those historical records are unchanged.",
     "stats": "/home/bontempi/projects/official_thesis_s5/data/manifests/train_norm_stats_month2_fit.json",
     "stats_sha256": "678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e",
     "eval_mask_seed": 20261116,

@@ -387,6 +387,67 @@ def load_nested_sites(
     raise KeyError(f"no nested sites for {role}/{sim_id}/{frame_index}/r{replica_id}")
 
 
+class EvalMaskContractError(ValueError):
+    """Raised when an O5 eval-mask check fails. The historical files stay untouched."""
+
+    def __init__(self, reason: str, **details: Any):
+        self.reason = reason
+        self.details = details
+        super().__init__(reason)
+
+
+def check_eval_mask_contract(
+    *,
+    manifest_path: Path,
+    payload_root: Path,
+    expected_manifest_file_sha256: str,
+    expected_aggregate_payload_sha256: str,
+) -> dict[str, Any]:
+    """Three separate checks. Neither hash stands in for the other.
+
+    1. SHA-256 of the manifest file bytes.
+    2. Each payload file against ``payload_files_sha256`` in that manifest.
+    3. The aggregate recomputed from those file hashes, which must equal both
+       the manifest field and the expected aggregate.
+    """
+    manifest_path = Path(manifest_path)
+    file_sha = _file_sha256(manifest_path)
+    if file_sha != expected_manifest_file_sha256:
+        raise EvalMaskContractError(
+            "manifest_file_sha256_mismatch",
+            actual=file_sha,
+            expected=expected_manifest_file_sha256,
+        )
+    report = verify_payload_against_manifest(
+        payload_root=Path(payload_root),
+        manifest_path=manifest_path,
+    )
+    if not report["ok"]:
+        raise EvalMaskContractError(
+            "payload_file_mismatch",
+            mismatches=report["mismatches"],
+        )
+    declared = json.loads(manifest_path.read_text())
+    recomputed = _aggregate_sha(dict(declared["payload_files_sha256"]))
+    if recomputed != declared["aggregate_payload_sha256"]:
+        raise EvalMaskContractError(
+            "manifest_aggregate_field_disagrees_with_payload_hashes",
+            recomputed=recomputed,
+            declared=declared["aggregate_payload_sha256"],
+        )
+    if recomputed != expected_aggregate_payload_sha256:
+        raise EvalMaskContractError(
+            "aggregate_payload_sha256_mismatch",
+            actual=recomputed,
+            expected=expected_aggregate_payload_sha256,
+        )
+    return {
+        "eval_mask_manifest_file_sha256": file_sha,
+        "eval_mask_aggregate_payload_sha256": recomputed,
+        "payload_ok": True,
+    }
+
+
 def verify_payload_against_manifest(
     *,
     payload_root: Path = DEFAULT_PAYLOAD_ROOT,

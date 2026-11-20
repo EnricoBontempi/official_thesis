@@ -23,7 +23,7 @@ if [[ -z "${EXPECT_SHA:-}" ]]; then
   exit 78
 fi
 
-TIP="${TIP:-$HOME/projects/official_thesis_opus_o5}"
+TIP="${TIP:-$HOME/projects/official_thesis_opus_o5_v2}"
 PY="${PY:-$HOME/envs/official_thesis/bin/python}"
 OUT_ROOT="${OUT_ROOT:-$HOME/official_thesis_opus_o5_runs}"
 export PYTHONUNBUFFERED=1
