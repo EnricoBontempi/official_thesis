@@ -1,0 +1,414 @@
+{
+  "experiment_id": "month2_opus_o5_v1",
+  "status": "prepared_not_submitted",
+  "historical_s5_is_not_a_row": true,
+  "replay_does_not_cancel_shuffle_difference": true,
+  "loop_metrics_are_not_o5": true,
+  "no_test_split": true,
+  "no_refit": true,
+  "no_new_selection": true,
+  "roles": {
+    "train_fit": "reference760",
+    "seen_train_eval": "seen220",
+    "val_eval": "VAL123"
+  },
+  "coverages": [
+    0.01,
+    0.05,
+    0.2
+  ],
+  "replicas": [
+    0,
+    1,
+    2
+  ],
+  "coverage_note": "1% and 20% generalize the TRAIN density of 5%; they are not an optimal sensor-count curve.",
+  "reference760_note": "The train_fit diagnostic uses A38 frame indices only, including when the training pool is B19 or C149.",
+  "seen_selection_note": "best_seen_diagnostic minimized seen replica 0 during training. O5 evaluates replicas 0, 1 and 2 and keeps both identities.",
+  "shared_inputs": {
+    "mask_root": "/home/bontempi/projects/official_thesis_s5/data/processed/month2_sparse_eval_masks",
+    "mask_aggregate_sha256": "2e2d8ff6edabf62ad56702a155140d064c0b4014d06ee96debf52811efa5c75e",
+    "stats": "/home/bontempi/projects/official_thesis_s5/data/manifests/train_norm_stats_month2_fit.json",
+    "stats_sha256": "678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e",
+    "eval_mask_seed": 20261116,
+    "layout_id": "random_sparse_primary",
+    "historical_cache_id": "month2_dense_unet_cache_v1",
+    "historical_cache_root": "/home/bontempi/projects/official_thesis_s5/data/processed/month2_dense_unet_cache",
+    "historical_hash_file": "/home/bontempi/projects/official_thesis_s5/data/manifests/month2_dense_unet_cache_payload_hashes_s5_homecopy.json",
+    "historical_cache_aggregate_sha256": "710bab909a0efb6cc1b4b4a0d7f7dcc4889472b7adc8076abb94fd529576ab5d",
+    "c149_cache_id": "month2_dense_unet_cache_opus_c149_v1",
+    "c149_cache_root": "/orcd/pool/005/bontempi/official_thesis_data/month2_dense_unet_cache_c149",
+    "c149_hash_file": "/orcd/pool/005/bontempi/official_thesis_data/month2_dense_unet_cache_c149/payload_hashes.json",
+    "c149_cache_aggregate_sha256": "fa1c9358deb3bda0313cd74f9ab6855af87bc969c4069a463073d4c4120f03b4"
+  },
+  "runs": [
+    {
+      "array_index": 0,
+      "run_id": "O-B19-on-s0",
+      "pool_id": "B19",
+      "pool_size": 380,
+      "p_conditioning": true,
+      "model_seed": 0,
+      "shuffle_seed": 0,
+      "job_id": 29612012,
+      "training_git_sha": "969b6c78a84465eb89b63bb5b7a0187c908652e5",
+      "training_dir": "/home/bontempi/official_thesis_opus_runs/O-B19-on-s0",
+      "status": "stopped_early_plateau",
+      "completed": false,
+      "epochs_completed": 620,
+      "updates": 58900,
+      "checkpoints": {
+        "best": {
+          "epoch": 50,
+          "file_sha256": "3fcc504106fd6dd050bb7c0b5e6f30f86218a2b62241c0dff4fe077c816db366",
+          "weights_sha256": "c97be618b0a337b0a682af688281f15edaecace3360dca9953bc810277faff54",
+          "loop_metric_K": 43.9285310851373,
+          "loop_metric_source": "training_loop_not_o5",
+          "criterion": "first_absolute_min_val_mean_condition_rmse_K",
+          "reuse_forward_from": null,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1"
+        },
+        "best_seen_diagnostic": {
+          "epoch": 50,
+          "file_sha256": "d6d8a843e505a9b0f0ee890339dfaa195e3883a347f2d43b9ac5c9d80fe21bf9",
+          "weights_sha256": "c97be618b0a337b0a682af688281f15edaecace3360dca9953bc810277faff54",
+          "loop_metric_K": 57.52477276629909,
+          "loop_metric_source": "training_loop_not_o5",
+          "criterion": "min_seen_replica0_mean_condition_rmse_K",
+          "reuse_forward_from": "best",
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1"
+        },
+        "last": {
+          "epoch": 620,
+          "file_sha256": "209de4fb04f6bc60e1c8475744ccb00b9f702b8f5edafbaf68a144fd16fd58d8",
+          "weights_sha256": "36bdd21739df89059cea6eeb45ac854c026ea29cdd891c198fc90e33c3d22183",
+          "criterion": "early_stop_epoch",
+          "reuse_forward_from": null,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1"
+        }
+      }
+    },
+    {
+      "array_index": 1,
+      "run_id": "O-B19-off-s0",
+      "pool_id": "B19",
+      "pool_size": 380,
+      "p_conditioning": false,
+      "model_seed": 0,
+      "shuffle_seed": 0,
+      "job_id": 29612013,
+      "training_git_sha": "969b6c78a84465eb89b63bb5b7a0187c908652e5",
+      "training_dir": "/home/bontempi/official_thesis_opus_runs/O-B19-off-s0",
+      "status": "stopped_early_plateau",
+      "completed": false,
+      "epochs_completed": 630,
+      "updates": 59850,
+      "checkpoints": {
+        "best": {
+          "epoch": 60,
+          "file_sha256": "b3fac858fb133184026ed5e7a62a54e0f2cb4bb37d90b59846173171ab4f6390",
+          "weights_sha256": "9eb73a8fde7283e6e4f863b36d3d7f0928918e9369e1b9771d93cb4b65763adb",
+          "loop_metric_K": 46.73694602982858,
+          "loop_metric_source": "training_loop_not_o5",
+          "criterion": "first_absolute_min_val_mean_condition_rmse_K",
+          "reuse_forward_from": null,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1"
+        },
+        "best_seen_diagnostic": {
+          "epoch": 40,
+          "file_sha256": "6c72ac5dc1db757cb004ae5052c32bc979799aa6d2a3443c3b47544ae686d979",
+          "weights_sha256": "7478c39e6ed4df720929f6cc5be3d941342ff693ec58e163410e3ba455944c4b",
+          "loop_metric_K": 65.46639331686606,
+          "loop_metric_source": "training_loop_not_o5",
+          "criterion": "min_seen_replica0_mean_condition_rmse_K",
+          "reuse_forward_from": null,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1"
+        },
+        "last": {
+          "epoch": 630,
+          "file_sha256": "8082a1aa9ef9f67977be94f8f6c46c9b6a306b7c5eac137303094ac49e5d81a5",
+          "weights_sha256": "42e920ad6c6bb166feacd890acd2734f24b96c86a8636677f573f406a847e684",
+          "criterion": "early_stop_epoch",
+          "reuse_forward_from": null,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1"
+        }
+      }
+    },
+    {
+      "array_index": 2,
+      "run_id": "O-A38-on-s0",
+      "pool_id": "A38",
+      "pool_size": 760,
+      "p_conditioning": true,
+      "model_seed": 0,
+      "shuffle_seed": 0,
+      "job_id": 29671719,
+      "training_git_sha": "32a59cab21884d8c052f941f526c7cf09367b1f3",
+      "training_dir": "/home/bontempi/official_thesis_opus_a38s0_runs/O-A38-on-s0",
+      "status": "stopped_early_plateau",
+      "completed": false,
+      "epochs_completed": 630,
+      "updates": 59850,
+      "checkpoints": {
+        "best": {
+          "epoch": 120,
+          "file_sha256": "fb063aa0d05aeb1e325bb82513b2de901d92d90ae05e752c26bd5a96f15b5ef6",
+          "weights_sha256": "f8d802cdca750427ad59704e031cba45c9aa03dfd78b42dfa3abd993d970ad06",
+          "loop_metric_K": 42.38895744591938,
+          "loop_metric_source": "training_loop_not_o5",
+          "criterion": "first_absolute_min_val_mean_condition_rmse_K",
+          "reuse_forward_from": null,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1"
+        },
+        "best_seen_diagnostic": {
+          "epoch": 120,
+          "file_sha256": "5c304703600301a9562a6a75716570c75f83726b562bf97dd95218f8ae627732",
+          "weights_sha256": "f8d802cdca750427ad59704e031cba45c9aa03dfd78b42dfa3abd993d970ad06",
+          "loop_metric_K": 50.88126365540568,
+          "loop_metric_source": "training_loop_not_o5",
+          "criterion": "min_seen_replica0_mean_condition_rmse_K",
+          "reuse_forward_from": "best",
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1"
+        },
+        "last": {
+          "epoch": 630,
+          "file_sha256": "56e289dd8aebd06592f5bbb642be8093004a23e480404a5c5ce84fe6641e7be3",
+          "weights_sha256": "adff127af533e5b87d95c01238f085c9752a2b660b895fa27f1cba49c34aba69",
+          "criterion": "early_stop_epoch",
+          "reuse_forward_from": null,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1"
+        }
+      }
+    },
+    {
+      "array_index": 3,
+      "run_id": "O-A38-off-s0",
+      "pool_id": "A38",
+      "pool_size": 760,
+      "p_conditioning": false,
+      "model_seed": 0,
+      "shuffle_seed": 0,
+      "job_id": 29671721,
+      "training_git_sha": "32a59cab21884d8c052f941f526c7cf09367b1f3",
+      "training_dir": "/home/bontempi/official_thesis_opus_a38s0_runs/O-A38-off-s0",
+      "status": "stopped_early_plateau",
+      "completed": false,
+      "epochs_completed": 660,
+      "updates": 62700,
+      "checkpoints": {
+        "best": {
+          "epoch": 90,
+          "file_sha256": "44cadb1c024bc8b52904ee0c758229a32eb528243e078c0b07f7559a255ed1c2",
+          "weights_sha256": "bd623fb1975c84d141c2685bb8301e3040e10b137827e27bfa0ddc36016d9380",
+          "loop_metric_K": 42.91495246073354,
+          "loop_metric_source": "training_loop_not_o5",
+          "criterion": "first_absolute_min_val_mean_condition_rmse_K",
+          "reuse_forward_from": null,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1"
+        },
+        "best_seen_diagnostic": {
+          "epoch": 130,
+          "file_sha256": "5144a54c37337f6c772172b244701ab4a2b0142fa699ab808d2e7c07c4307c0c",
+          "weights_sha256": "2a922d6a08aadb1fd7adba29fb62bd6995b4bdfaebf9f235d262be46fe496137",
+          "loop_metric_K": 56.74969077911487,
+          "loop_metric_source": "training_loop_not_o5",
+          "criterion": "min_seen_replica0_mean_condition_rmse_K",
+          "reuse_forward_from": null,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1"
+        },
+        "last": {
+          "epoch": 660,
+          "file_sha256": "ad8e0ec523ee0fae7d523f8eae0be1bb2554a197767bd97cc4822463b9d29dbf",
+          "weights_sha256": "f45bc52763af13d515ca29386f0ed881a5998ec611dd5db6743803094f32dc9a",
+          "criterion": "early_stop_epoch",
+          "reuse_forward_from": null,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1"
+        }
+      }
+    },
+    {
+      "array_index": 4,
+      "run_id": "O-A38-on-s1",
+      "pool_id": "A38",
+      "pool_size": 760,
+      "p_conditioning": true,
+      "model_seed": 1,
+      "shuffle_seed": 1,
+      "job_id": 29612010,
+      "training_git_sha": "969b6c78a84465eb89b63bb5b7a0187c908652e5",
+      "training_dir": "/home/bontempi/official_thesis_opus_runs/O-A38-on-s1",
+      "status": "stopped_early_plateau",
+      "completed": false,
+      "epochs_completed": 630,
+      "updates": 59850,
+      "checkpoints": {
+        "best": {
+          "epoch": 60,
+          "file_sha256": "7910339a681bf251da49e87757ceaf85977027d5aff3dc8a95031c2eb4fa7eca",
+          "weights_sha256": "4247e6ea8a7792f785bb7b22a4d828349b96a1dc5952176111f607335164f333",
+          "loop_metric_K": 48.21924462547231,
+          "loop_metric_source": "training_loop_not_o5",
+          "criterion": "first_absolute_min_val_mean_condition_rmse_K",
+          "reuse_forward_from": null,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1"
+        },
+        "best_seen_diagnostic": {
+          "epoch": 60,
+          "file_sha256": "b0c818eaa94096c38e28f08c4238aa593e25f6001f29536d29a48eea4d9063e6",
+          "weights_sha256": "4247e6ea8a7792f785bb7b22a4d828349b96a1dc5952176111f607335164f333",
+          "loop_metric_K": 51.360780624773476,
+          "loop_metric_source": "training_loop_not_o5",
+          "criterion": "min_seen_replica0_mean_condition_rmse_K",
+          "reuse_forward_from": "best",
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1"
+        },
+        "last": {
+          "epoch": 630,
+          "file_sha256": "79eff48f8df757c51496dc6efd15aeabfc1580f282fe791d94ce06089c7b3c95",
+          "weights_sha256": "945b00d05ca661b12e108686eb74f5232ec7d603ac91865eb21a464546c43855",
+          "criterion": "early_stop_epoch",
+          "reuse_forward_from": null,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1"
+        }
+      }
+    },
+    {
+      "array_index": 5,
+      "run_id": "O-A38-off-s1",
+      "pool_id": "A38",
+      "pool_size": 760,
+      "p_conditioning": false,
+      "model_seed": 1,
+      "shuffle_seed": 1,
+      "job_id": 29612011,
+      "training_git_sha": "969b6c78a84465eb89b63bb5b7a0187c908652e5",
+      "training_dir": "/home/bontempi/official_thesis_opus_runs/O-A38-off-s1",
+      "status": "stopped_early_plateau",
+      "completed": false,
+      "epochs_completed": 610,
+      "updates": 57950,
+      "checkpoints": {
+        "best": {
+          "epoch": 40,
+          "file_sha256": "de697359e895b0056fa875c62ca883912577107793076a856931205d662819fb",
+          "weights_sha256": "1835f401eb546a8cde7be608063e45b00e2aec1b79429b8d3c99a45472f25e0f",
+          "loop_metric_K": 43.05638445130706,
+          "loop_metric_source": "training_loop_not_o5",
+          "criterion": "first_absolute_min_val_mean_condition_rmse_K",
+          "reuse_forward_from": null,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1"
+        },
+        "best_seen_diagnostic": {
+          "epoch": 110,
+          "file_sha256": "69c95a1c0170edfc6722e8c30c3956d996a3f57981748cb571fa2e8618f3bcaf",
+          "weights_sha256": "46c694bdaa9ddf5d652af86901138f8b559c8bd086a307cd3215a86f6cfbb4ef",
+          "loop_metric_K": 54.884237067713514,
+          "loop_metric_source": "training_loop_not_o5",
+          "criterion": "min_seen_replica0_mean_condition_rmse_K",
+          "reuse_forward_from": null,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1"
+        },
+        "last": {
+          "epoch": 610,
+          "file_sha256": "774d2d5d2632644d0d242837a0ed36268af64c1d5fbcd9c3760eb28ba84b5aea",
+          "weights_sha256": "7105b04a31fff2f5fff9a8cf9f076ddd9d881badda7b4cf085e1f99549d81870",
+          "criterion": "early_stop_epoch",
+          "reuse_forward_from": null,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1"
+        }
+      }
+    },
+    {
+      "array_index": 6,
+      "run_id": "O-C149-on-s0",
+      "pool_id": "C149",
+      "pool_size": 2980,
+      "p_conditioning": true,
+      "model_seed": 0,
+      "shuffle_seed": 0,
+      "job_id": 29645053,
+      "training_git_sha": "d6332000491ba0e8983b9e7fa09b34badb191ea4",
+      "training_dir": "/home/bontempi/official_thesis_opus_c149_attempt2_runs/O-C149-on-s0",
+      "status": "stopped_early_plateau",
+      "completed": false,
+      "epochs_completed": 660,
+      "updates": 62700,
+      "checkpoints": {
+        "best": {
+          "epoch": 90,
+          "file_sha256": "bed10229342bb664adfbd247fb018670fa2b947df26092804841a7dfdc97bd7e",
+          "weights_sha256": "530258d7f65d901f17fa21b493d746a3b63409ad7d91ba91316780fd558386f1",
+          "loop_metric_K": 38.71236153568071,
+          "loop_metric_source": "training_loop_not_o5",
+          "criterion": "first_absolute_min_val_mean_condition_rmse_K",
+          "reuse_forward_from": null,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1"
+        },
+        "best_seen_diagnostic": {
+          "epoch": 220,
+          "file_sha256": "bc25cd10f63c8249097d00f9c2b3d1a696595ce141f52332dbdeb2bb5871f9e6",
+          "weights_sha256": "b28fc314c0ad3e45034ee9c31187688db0eff19c21101c23413c2ceae3d19ffe",
+          "loop_metric_K": 39.168666304056515,
+          "loop_metric_source": "training_loop_not_o5",
+          "criterion": "min_seen_replica0_mean_condition_rmse_K",
+          "reuse_forward_from": null,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1"
+        },
+        "last": {
+          "epoch": 660,
+          "file_sha256": "66d59c6aec6f7ce7897ac5819438bcdf069cf306adb299f47aaf773f41ac41e0",
+          "weights_sha256": "fbbc66c2cbdef7093c36d284bb3aa7303eda1858710920836e58417f6633794a",
+          "criterion": "early_stop_epoch",
+          "reuse_forward_from": null,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1"
+        }
+      }
+    },
+    {
+      "array_index": 7,
+      "run_id": "O-C149-off-s0",
+      "pool_id": "C149",
+      "pool_size": 2980,
+      "p_conditioning": false,
+      "model_seed": 0,
+      "shuffle_seed": 0,
+      "job_id": 29645054,
+      "training_git_sha": "d6332000491ba0e8983b9e7fa09b34badb191ea4",
+      "training_dir": "/home/bontempi/official_thesis_opus_c149_attempt2_runs/O-C149-off-s0",
+      "status": "stopped_early_plateau",
+      "completed": false,
+      "epochs_completed": 710,
+      "updates": 67450,
+      "checkpoints": {
+        "best": {
+          "epoch": 260,
+          "file_sha256": "f7c515b0abea6e2d1491966e12750523d469a9210a0f47c9a209d95d5473a9df",
+          "weights_sha256": "dfc1e84dd00a79601cc023d556ceaa1bb51f41af7a79c6dc778967c5baf03687",
+          "loop_metric_K": 39.82431101710156,
+          "loop_metric_source": "training_loop_not_o5",
+          "criterion": "first_absolute_min_val_mean_condition_rmse_K",
+          "reuse_forward_from": null,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1"
+        },
+        "best_seen_diagnostic": {
+          "epoch": 240,
+          "file_sha256": "23a83e219dbcd1c2c7a9d4a29a187e59f5e58fd555c3d5b8797e4af8036eb588",
+          "weights_sha256": "4704344851db99e8fdfa6287bac0880755538ca4459df9fb7cee711f8a4237df",
+          "loop_metric_K": 41.21474163400718,
+          "loop_metric_source": "training_loop_not_o5",
+          "criterion": "min_seen_replica0_mean_condition_rmse_K",
+          "reuse_forward_from": null,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1"
+        },
+        "last": {
+          "epoch": 710,
+          "file_sha256": "16888d0a72038d4bb3375548c0a121736bb15ca3e76337330c10f62f45542758",
+          "weights_sha256": "b590413aa21497c31e895b77b5dddd1bc274f74d2555f7facb51b9708aec98a3",
+          "criterion": "early_stop_epoch",
+          "reuse_forward_from": null,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1"
+        }
+      }
+    }
+  ]
+}

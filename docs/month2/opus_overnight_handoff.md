@@ -154,3 +154,34 @@ ssh engaging 'tail -n 40 ~/official_thesis_opus_a38s0_runs/O-A38-on-s0/stdout.lo
 ssh engaging 'sacct -j 29670888 -X -o JobID,State,ExitCode,Elapsed,NodeList'
 ssh engaging 'cat ~/official_thesis_opus_bridge_runs/replay_unet_best_5pct.json'
 ```
+
+## 2026-11-19 verified outcomes and O5 preparation
+
+One read after the queue was empty. No forward on the login. The earlier PENDING lines above stay as the submission record.
+
+| Job | State | Exit | Elapsed | Node | Stop |
+| --- | --- | --- | ---: | --- | --- |
+| 29671719 O-A38-on-s0 | COMPLETED | 0:0 | 03:42:22 | node2804 | early-stop, 630 epochs, best VAL 42.389 K at epoch 120 |
+| 29671721 O-A38-off-s0 | COMPLETED | 0:0 | 03:55:50 | node3008 | early-stop, 660 epochs, best VAL 42.915 K at epoch 90; seen diagnostic epoch 130 |
+| 29670888 replay | COMPLETED | 0:0 | 00:06:26 | node2804 | inference only, both U-Net deltas 0.0 K, tolerance 0.05 K |
+
+`summary.completed` is false for both trainings. Histories contain the stop epoch and match the summary minima. Stderr is empty. No partial, NaN, OOM, or timeout. Executed SHA remains `32a59ca` on the frozen checkout. The replay report is `passed: true` with `training_equivalence: not_tested`. It does not cancel the S5/Opus shuffle difference.
+
+**O5 is prepared and not submitted.** Matrix: `configs/experiments/opus_o5_matrix.json`. Eight Opus-runner runs only. Index for Neon: `results/month2/opus_data_study/o5_prep/INDEX.md`. Loop curves in that directory are labeled `training_loop_not_o5`. R0 is unchanged. Launcher: `scripts/engaging/opus_o5_eval.sbatch`, array `0-7%4`, `mit_normal_gpu` / `mit_amf_advanced_gpu`, L40S×1, 8 CPU, 64G, wall 4h. It refuses without `AUTHORIZE_OPUS_O5=1` and `EXPECT_SHA`.
+
+Proposed paths, to be created only at submission:
+
+| Item | Path |
+| --- | --- |
+| Detached checkout | `/home/bontempi/projects/official_thesis_opus_o5` |
+| Output, one directory per run | `/home/bontempi/official_thesis_opus_o5_runs/<run_id>/` |
+| Logs | `/home/bontempi/official_thesis_opus_o5_runs/slurm-%A_%a.out` |
+
+Forward estimate from the measured replay: about 26 minutes per distinct checkpoint, about 9.2 GPU-hours for the 21 distinct weight sets, about 12 GPU-hours if every frame costs the reference760 rate. The 4h wall covers that slower estimate plus the cache rehash. Three pairs may share a forward because the weight hashes match: `O-B19-on-s0`, `O-A38-on-s0`, `O-A38-on-s1`. Their checkpoint files stay distinct.
+
+```bash
+# Not run. Create the log directory and a detached checkout of the O5 commit first.
+AUTHORIZE_OPUS_O5=1 EXPECT_SHA=<o5-commit> sbatch scripts/engaging/opus_o5_eval.sbatch
+```
+
+**Still open.** O5 execution, the post-job aggregation and common-scale figures, and the scientific report. O6 is not started. S7 is not chosen. A4 is not authorized. Opus is not closed.

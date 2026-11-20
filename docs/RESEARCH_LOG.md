@@ -474,3 +474,21 @@ Median9 migliora la RMSE macro rispetto ad AO9 su tutti gli otto metodi, e rispe
 **Rilievi non bloccanti di Neon.** Il filtro `anchor_col == 95` include tre siti, mentre alcune descrizioni parlano di due: la relativa quota non va attribuita ai soli due siti di bordo getto. Le colonne specifiche mean9/median9 sono non applicabili e NaN sulle righe degli altri trattamenti; le tabelle degli errori di offset usano la colonna comune senza tale lacuna. Nessun cambiamento a metriche o artefatti storici in questa entry.
 
 **Seguito concordato.** Attendere e verificare i riferimenti A38 seed0 e il replay Opus, completare O5 e analisi Opus; poi sintesi con Enrico di Astra+Opus, riesame delle proposte Neon già documentate e decisione esplicita su S7. Nessuna chiusura automatica sparse o Mese 2 e nessun nuovo training autorizzato da questa entry.
+
+---
+
+## 2026-11-19 — Esiti A38 seed 0 e replay; O5 preparata e non sottomessa
+
+**Tre job, una lettura.** Tutti COMPLETED con exit 0. Nessun partial, stderr vuoto, nessun NaN, OOM o timeout. I numeri del training sotto sono metriche del loop, non la valutazione O5.
+
+| Job | Run | Nodo | Durata | Arresto | Epoche / update | Best VAL | Best seen, replica 0 |
+| --- | --- | --- | ---: | --- | --- | --- | --- |
+| 29671719 | O-A38-on-s0 | node2804 | 03:42:22 | `early_stop_no_rel_improvement_0.001_for_15_evals` | 630 / 59850 | 42.389 K all'epoca 120 | stessa epoca, 50.881 K |
+| 29671721 | O-A38-off-s0 | node3008 | 03:55:50 | stesso motivo | 660 / 62700 | 42.915 K all'epoca 90 | epoca 130, 56.750 K |
+| 29670888 | replay U-Net S5 best 5% | node2804 | 00:06:26 | inferenza conclusa | — | delta 0.0 K, entro 0.05 K | non applicabile |
+
+SHA eseguito dei due training: `32a59cab21884d8c052f941f526c7cf09367b1f3`. Checkout lasciato fermo in `/home/bontempi/projects/official_thesis_opus_a38s0`. Output in `/home/bontempi/official_thesis_opus_a38s0_runs/`. Cache storica `710bab90…`, maschere `2e2d8ff6…`, normalizzatore `678263fb…`. Per on, `best.pt` e `best_seen_diagnostic.pt` hanno epoche uguali e pesi uguali, file diversi. Per off le epoche sono 90 e 130. Le history contengono l'epoca di arresto e il minimo coincide con il summary. `summary.completed` resta falso.
+
+Il replay ha confrontato i due best U-Net S5 al 5% con le macro registrate: delta 0.0 K, `passed` vero, `training_equivalence=not_tested`. I riferimenti non erano vuoti. Non cancella la differenza di ordine fra DataLoader S5 e stream Opus già scritta nel bridge.
+
+**O5 preparata, non lanciata.** La matrice è `configs/experiments/opus_o5_matrix.json`: otto run del runner Opus, con S5 tenuto fuori. reference760 usa gli indici A38 anche su B19 e C149. Coperture 1/5/20% e repliche 0/1/2, queste ultime presenti nel payload. I pesi identici di tre coppie best/best_seen possono condividere il forward e restano identità distinte. Indice: `results/month2/opus_data_study/o5_prep/INDEX.md`. Le curve del loop sono lì, etichettate come tali. R0 non è stata rifatta. Il report scientifico resta a Neon. Opus non è chiuso: O5 non è eseguita, O6 non è iniziata, S7 non è scelto, A4 non è autorizzata.
