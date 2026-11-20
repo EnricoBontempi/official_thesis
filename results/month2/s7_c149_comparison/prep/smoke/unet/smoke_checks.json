@@ -1,0 +1,213 @@
+{
+  "checks": {
+    "p_off": {
+      "c149_cache_opened": {
+        "cache_id": "month2_dense_unet_cache_opus_c149_v1",
+        "counts": {
+          "seen_train_eval": 220,
+          "train_fit": 2980,
+          "val_eval": 123
+        }
+      },
+      "checkpoint": "/home/bontempi/official_thesis_s7_smoke_runs/job29797847_unet/C/S7-C149-unet-off-s1/checkpoints/last.pt",
+      "evaluator_coverages": {
+        "0.01_r0": {
+          "frames": 8,
+          "mean_condition_rmse_K": 267.0020556620857,
+          "n_sites": 164,
+          "peak_gpu_mem_GiB": 0.159,
+          "seconds": 0.28
+        },
+        "0.01_r1": {
+          "frames": 8,
+          "mean_condition_rmse_K": 266.7706210040563,
+          "n_sites": 164,
+          "peak_gpu_mem_GiB": 0.159,
+          "seconds": 0.34
+        },
+        "0.01_r2": {
+          "frames": 8,
+          "mean_condition_rmse_K": 267.72048058189216,
+          "n_sites": 164,
+          "peak_gpu_mem_GiB": 0.159,
+          "seconds": 0.28
+        },
+        "0.05_r0": {
+          "frames": 8,
+          "mean_condition_rmse_K": 236.74282199955562,
+          "n_sites": 819,
+          "peak_gpu_mem_GiB": 0.159,
+          "seconds": 0.29
+        },
+        "0.05_r1": {
+          "frames": 8,
+          "mean_condition_rmse_K": 236.58178176825436,
+          "n_sites": 819,
+          "peak_gpu_mem_GiB": 0.159,
+          "seconds": 0.28
+        },
+        "0.05_r2": {
+          "frames": 8,
+          "mean_condition_rmse_K": 234.54645652659883,
+          "n_sites": 819,
+          "peak_gpu_mem_GiB": 0.159,
+          "seconds": 0.28
+        },
+        "0.2_r0": {
+          "frames": 8,
+          "mean_condition_rmse_K": 237.49678443651086,
+          "n_sites": 3277,
+          "peak_gpu_mem_GiB": 0.159,
+          "seconds": 0.29
+        },
+        "0.2_r1": {
+          "frames": 8,
+          "mean_condition_rmse_K": 236.69801687145977,
+          "n_sites": 3277,
+          "peak_gpu_mem_GiB": 0.159,
+          "seconds": 0.28
+        },
+        "0.2_r2": {
+          "frames": 8,
+          "mean_condition_rmse_K": 235.92804944768667,
+          "n_sites": 3277,
+          "peak_gpu_mem_GiB": 0.159,
+          "seconds": 0.29
+        }
+      },
+      "family": "sparse_unet",
+      "isolation": {
+        "hidden_mutation": {
+          "input_identical": true,
+          "prediction_identical": true,
+          "tokens_identical": true
+        },
+        "observed_mutation": {
+          "input_identical": false,
+          "prediction_identical": false,
+          "tokens_identical": false
+        }
+      },
+      "latency_batch1_20pct": {
+        "peak_gpu_mem_GiB": 0.036,
+        "seconds": 0.05
+      },
+      "p_behaviour": {
+        "input_changes_with_p": false,
+        "prediction_changes_with_p": false
+      },
+      "train_step_batch8_5pct": {
+        "grad_norm_pre_clip": 2.6015239735343605,
+        "loss": 0.3691592812538147,
+        "peak_gpu_mem_GiB": 0.487,
+        "seconds": 0.02
+      }
+    },
+    "p_on": {
+      "c149_cache_opened": {
+        "cache_id": "month2_dense_unet_cache_opus_c149_v1",
+        "counts": {
+          "seen_train_eval": 220,
+          "train_fit": 2980,
+          "val_eval": 123
+        }
+      },
+      "checkpoint": "/home/bontempi/official_thesis_s7_smoke_runs/job29797847_unet/A/S7-C149-unet-on-s1/checkpoints/last.pt",
+      "evaluator_coverages": {
+        "0.01_r0": {
+          "frames": 8,
+          "mean_condition_rmse_K": 274.64969591170507,
+          "n_sites": 164,
+          "peak_gpu_mem_GiB": 0.159,
+          "seconds": 0.3
+        },
+        "0.01_r1": {
+          "frames": 8,
+          "mean_condition_rmse_K": 275.66321555883746,
+          "n_sites": 164,
+          "peak_gpu_mem_GiB": 0.159,
+          "seconds": 0.28
+        },
+        "0.01_r2": {
+          "frames": 8,
+          "mean_condition_rmse_K": 278.16000113007766,
+          "n_sites": 164,
+          "peak_gpu_mem_GiB": 0.159,
+          "seconds": 0.28
+        },
+        "0.05_r0": {
+          "frames": 8,
+          "mean_condition_rmse_K": 240.54023488255777,
+          "n_sites": 819,
+          "peak_gpu_mem_GiB": 0.159,
+          "seconds": 0.28
+        },
+        "0.05_r1": {
+          "frames": 8,
+          "mean_condition_rmse_K": 238.6775078431492,
+          "n_sites": 819,
+          "peak_gpu_mem_GiB": 0.159,
+          "seconds": 0.28
+        },
+        "0.05_r2": {
+          "frames": 8,
+          "mean_condition_rmse_K": 238.07663514117039,
+          "n_sites": 819,
+          "peak_gpu_mem_GiB": 0.159,
+          "seconds": 0.28
+        },
+        "0.2_r0": {
+          "frames": 8,
+          "mean_condition_rmse_K": 225.79528305248982,
+          "n_sites": 3277,
+          "peak_gpu_mem_GiB": 0.159,
+          "seconds": 0.28
+        },
+        "0.2_r1": {
+          "frames": 8,
+          "mean_condition_rmse_K": 225.9458720912033,
+          "n_sites": 3277,
+          "peak_gpu_mem_GiB": 0.159,
+          "seconds": 0.28
+        },
+        "0.2_r2": {
+          "frames": 8,
+          "mean_condition_rmse_K": 225.14434935944334,
+          "n_sites": 3277,
+          "peak_gpu_mem_GiB": 0.159,
+          "seconds": 0.39
+        }
+      },
+      "family": "sparse_unet",
+      "isolation": {
+        "hidden_mutation": {
+          "input_identical": true,
+          "prediction_identical": true,
+          "tokens_identical": true
+        },
+        "observed_mutation": {
+          "input_identical": false,
+          "prediction_identical": false,
+          "tokens_identical": false
+        }
+      },
+      "latency_batch1_20pct": {
+        "peak_gpu_mem_GiB": 0.036,
+        "seconds": 0.07
+      },
+      "p_behaviour": {
+        "input_changes_with_p": true,
+        "prediction_changes_with_p": true
+      },
+      "train_step_batch8_5pct": {
+        "grad_norm_pre_clip": 2.4047357505401803,
+        "loss": 0.46735280752182007,
+        "peak_gpu_mem_GiB": 0.487,
+        "seconds": 0.14
+      }
+    }
+  },
+  "gpu": "NVIDIA L40S",
+  "init_hash_on_equals_off": true,
+  "non_scientific_smoke": true
+}

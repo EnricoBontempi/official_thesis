@@ -10,6 +10,21 @@ from pathlib import Path
 import torch
 
 
+def _close(a, b, rel: float = 1e-4) -> bool:
+    """Exact for ints/strings/structure; relative tolerance for floats (GPU run-to-run noise)."""
+    if isinstance(a, dict) and isinstance(b, dict):
+        return a.keys() == b.keys() and all(_close(a[k], b[k], rel) for k in a)
+    if isinstance(a, (list, tuple)) and isinstance(b, (list, tuple)):
+        return len(a) == len(b) and all(_close(x, y, rel) for x, y in zip(a, b))
+    if isinstance(a, float) or isinstance(b, float):
+        if a is None or b is None:
+            return a is b
+        if a == b:  # also covers inf == inf
+            return True
+        return abs(float(a) - float(b)) <= rel * max(1.0, abs(float(a)), abs(float(b)))
+    return a == b
+
+
 def _trace(p: Path):
     return [json.loads(x) for x in p.read_text().splitlines()] if p.is_file() else []
 
@@ -46,7 +61,10 @@ def main() -> int:
     rep["state_all_equal"] = all(a == b for a, b in rep["state_equal"].values())
     rep["lr"] = (c["optimizer_state_dict"]["param_groups"][0]["lr"], r["optimizer_state_dict"]["param_groups"][0]["lr"])
     rep["lr_equal"] = rep["lr"][0] == rep["lr"][1]
-    rep["scheduler_state_equal"] = c["plateau_scheduler_state_dict"] == r["plateau_scheduler_state_dict"]
+    # Integer counters (num_bad_epochs, last_epoch, cooldown) must match exactly; the float
+    # `best` follows the VAL score, which carries GPU run-to-run noise (see the control run).
+    rep["scheduler_state_equal"] = _close(c["plateau_scheduler_state_dict"], r["plateau_scheduler_state_dict"])
+    rep["scheduler_state_exactly_equal"] = c["plateau_scheduler_state_dict"] == r["plateau_scheduler_state_dict"]
     rep["sampler_state_equal"] = c["scientific_sampler_state"] == r["scientific_sampler_state"]
     rep["eval_history_epochs"] = ([e["epoch"] for e in c["eval_history"]], [e["epoch"] for e in r["eval_history"]])
     rep["val_scores_max_abs_diff"] = max(

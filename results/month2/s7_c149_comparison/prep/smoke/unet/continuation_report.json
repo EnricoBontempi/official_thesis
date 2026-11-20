@@ -1,0 +1,55 @@
+{
+  "PASS": true,
+  "events": [
+    [
+      "attempt_start",
+      "fresh",
+      "0",
+      null
+    ],
+    [
+      "attempt_end",
+      null,
+      "0",
+      "0"
+    ],
+    [
+      "continuation_requeue",
+      null,
+      null,
+      null
+    ],
+    [
+      "attempt_start",
+      "resume",
+      "1",
+      null
+    ],
+    [
+      "attempt_end",
+      null,
+      "1",
+      "0"
+    ]
+  ],
+  "first_action": "fresh",
+  "non_scientific_smoke": true,
+  "requeue_event_present": true,
+  "resume_identity": {
+    "resume_checkpoint_epoch": 32,
+    "resume_checkpoint_status": "running",
+    "resumed_from": "/home/bontempi/official_thesis_s7_smoke_runs/job29797847_unet/D/S7-C149-unet-on-s1/checkpoints/last.pt"
+  },
+  "second_action": "resume",
+  "stream_epoch_sequence_monotone_after_dedup": true,
+  "summary_attempt1": {
+    "epochs_completed": 32,
+    "status": "stopped_wall_time",
+    "updates": 192
+  },
+  "summary_final": {
+    "epochs_completed": 60,
+    "status": "stopped_wall_time",
+    "updates": 360
+  }
+}

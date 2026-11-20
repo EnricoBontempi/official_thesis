@@ -165,7 +165,10 @@ if [[ "$rc" == "0" && "$STATE" == *'"summary_status": "stopped_wall_time"'* ]]; 
   if [[ -n "${SLURM_JOB_ID:-}" && ( "$MODE" == "campaign" || "${S7_SMOKE_REAL_REQUEUE:-0}" == "1" ) ]]; then
     log "internal wall-time cap reached; scheduling a registered continuation (scontrol requeue); not a plateau"
     "$PY" "$HELPER" ledger "$OUT_ROOT" "$RUN_ID" event=continuation_requeue "slurm_job_id=$JOB_ID" || true
-    scontrol requeue "$SLURM_JOB_ID" && exit 0
+    REQ_ID="$SLURM_JOB_ID"
+    [[ -n "${SLURM_ARRAY_JOB_ID:-}" ]] && REQ_ID="${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}"
+    log "scontrol requeue $REQ_ID"
+    scontrol requeue "$REQ_ID" && exit 0
     log "scontrol requeue failed"; exit 9
   fi
 fi
