@@ -185,3 +185,20 @@ AUTHORIZE_OPUS_O5=1 EXPECT_SHA=<o5-commit> sbatch scripts/engaging/opus_o5_eval.
 ```
 
 **Still open.** O5 execution, the post-job aggregation and common-scale figures, and the scientific report. O6 is not started. S7 is not chosen. A4 is not authorized. Opus is not closed.
+
+## 2026-11-19 O5 submission refused before sbatch
+
+Enrico authorized `64d0cc321dc5bc77ae48e44b063ee7a05cd87e48`. No array was submitted. The queue stayed empty.
+
+The detached checkout `/home/bontempi/projects/official_thesis_opus_o5` is at that SHA, with `.git_commit` matching and no other porcelain. Training checkouts, Astra, and the bridge tip were read and left at their previous SHAs. `/home/bontempi/official_thesis_opus_o5_runs` was not created.
+
+Checks that passed: QoS `mit_amf_advanced_gpu` MaxTRESPU cpu=64, gres/gpu=4, mem=1T; partition `mit_normal_gpu` MaxTime 6h; both historical and C149 cache ids and recorded payload aggregates; normalizer file sha `678263fb…`; all 24 checkpoint file hashes; training `run_identity` git and pool. Mask payload files match `manifest.json` (`verify_payload_against_manifest` ok, replicas 0/1/2, 3309 instances). `require_eval_mask_payload` refuses seed regeneration.
+
+The blocking contrast is two different mask hashes:
+
+| Object | SHA-256 |
+| --- | --- |
+| `manifest.json` file, recorded by training as `MASK_MANIFEST_SHA256` and `mask_payload_sha256` | `2e2d8ff6edabf62ad56702a155140d064c0b4014d06ee96debf52811efa5c75e` |
+| Field `aggregate_payload_sha256` inside that manifest | `7be78f35ffea2ebc598adce8cec39dc719339aac17ecadde3137f2064891ffeb` |
+
+`configs/experiments/opus_o5_matrix.json` stores the file hash. `scripts/26_opus_o5_eval.py` compares it with `verify_payload_against_manifest()["aggregate"]`, which is the inner field. Each task would exit with `eval-mask payload mismatch` before creating its run directory. The matrix was not edited and the authorized SHA was not replaced.
