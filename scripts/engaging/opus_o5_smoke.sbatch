@@ -55,32 +55,6 @@ if [[ -n "$DIRTY" ]]; then
   exit 5
 fi
 
-# Light accessibility check of the cache roots this run will read. The timeout bounds
-# this stat only; it does not guarantee that a process stuck in D state can be stopped.
-echo "[$(date -Is)] launcher host=$(hostname) task=${SLURM_ARRAY_TASK_ID:-na}" >&2
-ACCESS_LIST="$(mktemp)"
-"$PY" - << 'PY' > "$ACCESS_LIST"
-import json
-from pathlib import Path
-shared = json.loads(Path("configs/experiments/opus_o5_matrix.json").read_text())["shared_inputs"]
-for key in ("c149_cache_root", "historical_cache_root", "mask_root"):
-    print(shared[key])
-PY
-ACCESS_FAIL=0
-while read -r P; do
-  if timeout 120 stat -c '%s' "$P/manifest.json" > /dev/null 2>&1; then
-    echo "[$(date -Is)] access ok: $P" >&2
-  else
-    echo "[$(date -Is)] ACCESS FAIL or timeout: $P" >&2
-    ACCESS_FAIL=1
-  fi
-done < "$ACCESS_LIST"
-rm -f "$ACCESS_LIST"
-if [[ "$ACCESS_FAIL" != "0" ]]; then
-  echo "REFUSE: a cache root is not reachable from $(hostname)" >&2
-  exit 6
-fi
-
 mapfile -t RUNS < <("$PY" - << 'PY'
 import json
 from pathlib import Path
@@ -90,6 +64,29 @@ for row in matrix["runs"]:
 PY
 )
 RUN_ID="${RUNS[$SLURM_ARRAY_TASK_ID]}"
+
+# Light accessibility check of the inputs this run consumes, taken from the matrix by
+# scripts/engaging/o5_preflight_paths.py. The timeout bounds each stat only; it does not
+# guarantee that a process stuck in D state can be stopped.
+echo "[$(date -Is)] launcher host=$(hostname) task=${SLURM_ARRAY_TASK_ID:-na} run=$RUN_ID" >&2
+NEEDED="$("$PY" scripts/engaging/o5_preflight_paths.py configs/experiments/opus_o5_matrix.json "$RUN_ID")"
+if [[ -z "$NEEDED" ]]; then
+  echo "REFUSE: empty input list for $RUN_ID" >&2
+  exit 6
+fi
+ACCESS_FAIL=0
+while read -r P; do
+  if timeout 120 stat -c '%s' "$P" > /dev/null 2>&1; then
+    echo "[$(date -Is)] access ok: $P" >&2
+  else
+    echo "[$(date -Is)] ACCESS FAIL or timeout: $P" >&2
+    ACCESS_FAIL=1
+  fi
+done <<< "$NEEDED"
+if [[ "$ACCESS_FAIL" != "0" ]]; then
+  echo "REFUSE: an input of $RUN_ID is not reachable from $(hostname)" >&2
+  exit 6
+fi
 OUT="$OUT_ROOT/$RUN_ID"
 mkdir -p "$OUT_ROOT"
 if [[ -e "$OUT" ]]; then
