@@ -316,3 +316,17 @@ ssh engaging 'cat ~/official_thesis_opus_o5_smoke_attempt2_runs/O-C149-on-s0/SMO
 ```
 
 The campaign stays authorized only after this smoke passes. If the new node also stalls, evidence goes to Enrico before any further attempt. No polling from this record.
+
+## 2026-11-19 C149 smoke passed, O5 campaign attempt2 submitted
+
+Smoke **29725163_6** (O-C149-on-s0, `918286809d3cbb33d155b70a6e03a9b898bcab9e`): COMPLETED 0:0 in 1:07 on node3302. Launcher access check ok for the C149 cache, historical cache, and mask roots. Phase log: checkpoints 1 s, cache 3 s, dataset 1 s, nine coverage forwards about 6 s each, read-back, `SMOKE_OK.json`. 81/81 settings, 81 CSV, 3 field files. All 81 CSV have finite RMSE, pool C149, model seed 0, the executed eval SHA, and 64-character mask hashes. Training SHA `d633200…`, job 29645053, last epoch 660. Fields are (3,128,128), finite, frame 1000. Provenance lists cache id `month2_dense_unet_cache_opus_c149_v1`, aggregate `fa1c9358…`, stats `678263fb…`, mask file hash `2e2d8ff6…`, mask aggregate `7be78f35…`. `scientific: false`, no `COMPLETE.json`. With the B19 smoke (job 29717341 task 0) both caches and the shared-forward path are covered. Outputs in `/home/bontempi/official_thesis_opus_o5_smoke_attempt2_runs/`.
+
+**Campaign submitted** 2026-11-19T23:28:19-05:00: array **29728465**, `0-7%4`. Executed SHA `918286809d3cbb33d155b70a6e03a9b898bcab9e`, frozen detached checkout `/home/bontempi/projects/official_thesis_opus_o5_v5` (clean except `.git_commit`, 27 tests passed). Preflight: queue empty, QoS cap cpu=64 gres/gpu=4 mem=1T, partition max 6h, attempt2 root empty. `TIP`, `EXPECT_SHA`, `AUTHORIZE_OPUS_O5`, `OUT_ROOT`, `PY` passed explicitly. `mit_normal_gpu`, account/QoS `mit_amf_advanced_gpu`, `gpu:l40s:1`, 8 CPU, 64G, wall 4h, `--exclude=node4108` (documented above). No general or preemptable fallback.
+
+Tasks 0-7 follow the matrix order: O-B19-on-s0, O-B19-off-s0, O-A38-on-s0, O-A38-off-s0, O-A38-on-s1, O-A38-off-s1, O-C149-on-s0, O-C149-off-s0. Output `/home/bontempi/official_thesis_opus_o5_attempt2_runs/<run_id>/`, logs `slurm-29728465_<task>.out/.err` in the same root. A scientific COMPLETE is `COMPLETE.json` per run after the in-script read-back; aggregation and Neon package wait for the outcome. Attempt1 directories `/home/bontempi/official_thesis_opus_o5_runs/` and the first smoke root are preserved.
+
+```bash
+ssh engaging 'squeue -j 29728465 -r -o "%.18i %.2t %.10M %R"'
+ssh engaging 'sacct -j 29728465 -X -o JobID,State,ExitCode,Elapsed,NodeList'
+ssh engaging 'tail -n 20 ~/official_thesis_opus_o5_attempt2_runs/slurm-29728465_0.out'
+```
