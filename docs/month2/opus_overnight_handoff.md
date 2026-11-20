@@ -202,3 +202,39 @@ The blocking contrast is two different mask hashes:
 | Field `aggregate_payload_sha256` inside that manifest | `7be78f35ffea2ebc598adce8cec39dc719339aac17ecadde3137f2064891ffeb` |
 
 `configs/experiments/opus_o5_matrix.json` stores the file hash. `scripts/26_opus_o5_eval.py` compares it with `verify_payload_against_manifest()["aggregate"]`, which is the inner field. Each task would exit with `eval-mask payload mismatch` before creating its run directory. The matrix was not edited and the authorized SHA was not replaced.
+
+## 2026-11-19 O5 submitted after the mask-hash correction
+
+The preparatory checkout `/home/bontempi/projects/official_thesis_opus_o5` stays at `64d0cc321dc5bc77ae48e44b063ee7a05cd87e48`. No job was launched from it.
+
+Cause: `mask_aggregate_sha256` in that matrix held the sha256 of `manifest.json` (`2e2d8ff6…`), while the evaluator compared it with `aggregate_payload_sha256` (`7be78f35…`). Historical `run_identity.mask_payload_sha256` and `MASK_MANIFEST_SHA256` keep the file hash. They were not rewritten.
+
+Correction in `c70565978b27ebdae7ad11a84dcefecf3845dde2`: the matrix and evaluator now name `eval_mask_manifest_file_sha256` and `eval_mask_aggregate_payload_sha256`. The job checks the manifest file, then the payload files against the manifest, then the aggregate recomputed from those file hashes. Tests `tests/test_opus_o5_mask_contract.py` plus the O5 and mask suites: 14 passed. The ambiguous key is no longer a gate.
+
+Submission after that preflight passed on the new checkout. Array **29716019**, `0-7%4`, submitted 2026-11-19T21:02:35-05:00, PENDING. Account and QoS `mit_amf_advanced_gpu`, partition `mit_normal_gpu`, `gpu:l40s:1`, 8 CPU, 64G, wall 4h. QoS cap remains cpu=64, gres/gpu=4, mem=1T.
+
+| Task | Run |
+| --- | --- |
+| 29716019_0 | O-B19-on-s0 |
+| 29716019_1 | O-B19-off-s0 |
+| 29716019_2 | O-A38-on-s0 |
+| 29716019_3 | O-A38-off-s0 |
+| 29716019_4 | O-A38-on-s1 |
+| 29716019_5 | O-A38-off-s1 |
+| 29716019_6 | O-C149-on-s0 |
+| 29716019_7 | O-C149-off-s0 |
+
+| Path | Role |
+| --- | --- |
+| `/home/bontempi/projects/official_thesis_opus_o5_v2` | executed checkout, detached at `c70565978b27ebdae7ad11a84dcefecf3845dde2` |
+| `/home/bontempi/official_thesis_opus_o5_runs/<run_id>/` | per-run output, created by the task, refused if it already exists |
+| `/home/bontempi/official_thesis_opus_o5_runs/slurm-29716019_<task>.out` | stdout |
+| `/home/bontempi/official_thesis_opus_o5_runs/slurm-29716019_<task>.err` | stderr |
+
+```bash
+ssh engaging 'squeue -j 29716019 -r -o "%.18i %.20P %.24a %.24q %.2t %.10M %b %R"'
+ssh engaging 'sacct -j 29716019 -X -o JobID,State,ExitCode,Elapsed,NodeList'
+ssh engaging 'tail -n 40 ~/official_thesis_opus_o5_runs/slurm-29716019_0.out'
+```
+
+Aggregation, figures, and the Neon package wait for the outcome check. No polling from this record.
