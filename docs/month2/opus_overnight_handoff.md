@@ -346,3 +346,19 @@ ssh engaging 'squeue -j 29732630 -r -o "%.18i %.2t %.10M %R"'
 ssh engaging 'sacct -j 29732630 -X -o JobID,State,ExitCode,Elapsed,NodeList'
 ssh engaging 'tail -n 20 ~/official_thesis_opus_o5_attempt2_runs/slurm-29732630_1.out'
 ```
+
+## 2026-11-20 unattended final gate submitted
+
+State at 00:34 (one read): 29728465 tasks 0 and 2 COMPLETED with `COMPLETE.json`; tasks 3, 4, 5, 6 RUNNING (5 and 6, the A38-off-s1 and C149-on-s0 runs, passed the preflight on node3302 and node3404 and reached the forward); task 7 (O-C149-off-s0) and the replacement 29732630_1 (O-B19-off-s0) PENDING behind the four-GPU QoS cap, an expected wait. Task 1 of the array stays FAILED (preflight on node4204) and is replaced by 29732630_1. An attempt to add `node4204` to the excluded nodes of pending task 7 was refused by Slurm (`ExcludeNodes` update not supported); task 7 keeps `node4108` excluded and relies on the preflight, which exits in about two minutes on a bad node. **No automatic recovery is implemented.** A failed task leaves a block report and waits for a diagnosis.
+
+**Final gate:** job **29735692**, CPU `mit_normal`, account/QoS `mit_amf_advanced_cpu`, 4 CPU, 32G, wall 1:30, `--dependency=afterany:29728465:29732630` (the failed task 1 does not block it). Frozen checkout `/home/bontempi/projects/official_thesis_opus_o5_v7` at `6cdb25d1b5e1190f0fa1c683e6abc8d97bac8518`, clean except `.git_commit`, 36 tests passed. It runs `scripts/30_opus_o5_finalize.py`: checks the eight runs (`COMPLETE.json`, 81 CSV and 3 fields each, provenance and hashes against the matrix, frame sets and mask hashes identical across runs, shared forwards equal to their source, evaluator SHA in `{918286809d…, 29b94345f0…}`). If every check passes it builds the package (`scripts/29_opus_o5_package.py`) and the VAL frame-1000 field figures (`scripts/28_opus_o5_figures.py`) and writes the index, ledger, and summary. Otherwise it writes `BLOCK_REPORT.md` and exits 3. Both paths were exercised on a synthetic root. It does not use Git, the IDE, or anything local.
+
+| Path | Content |
+| --- | --- |
+| `/home/bontempi/official_thesis_opus_o5_final/package_29735692/FINAL_SUMMARY.md` | readable summary, or absent if blocked |
+| `/home/bontempi/official_thesis_opus_o5_final/package_29735692/BLOCK_REPORT.md` | present only if blocked, with exact missing items |
+| `/home/bontempi/official_thesis_opus_o5_final/package_29735692/INDEX_FOR_NEON.md`, `LEDGER_O0_O6.md` | index and ledger |
+| `/home/bontempi/official_thesis_opus_o5_final/package_29735692/package/` | `tables/`, `figures/`, `TABLES.md`, `package_manifest.json` |
+| `/home/bontempi/official_thesis_opus_o5_final/slurm-29735692.out/.err` | job logs |
+
+Not done by the gate: visual check of the figures, scientific report, O6, copy of the artifacts into the repository and push (done from the local machine afterwards). Opus is not scientifically closed. The ledger source is `docs/month2/opus_ledger_o0_o6.md`; its two open O0 items (S6 figure/region check, stale roadmap summaries) are unresolved.
