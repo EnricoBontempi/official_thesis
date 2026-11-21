@@ -39,3 +39,27 @@ cat $R/S7-C149-glu-on-s1/progress.json; cat $R/_ledger/S7-C149-glu-on-s1.jsonl
 ls /home/bontempi/official_thesis_s7_eval_smoke_parity_v1/*/{PARITY_OK,PARITY_FAILED}.json
 ```
 Nessuno sweep K né training con T. STOP.
+
+---
+## AGGIORNAMENTO 21 novembre 2026, ~15:15 EST — valutazioni finali sottomesse
+Supera le sezioni «interrotta» sopra. Piano, controlli e stime: `docs/month2/s7_eval_plan.md`.
+- **SHA eseguito (valutazione):** `acc8e2b4071578a584accfbde8c3c1a2cb5e2bf1`, pushato su `origin/s7/c149-free-campaign` (fast-forward da f1e3947, verificato con `git ls-remote`). Checkout remoto congelato (detached, pulito): `/home/bontempi/projects/official_thesis_s7_final_eval`. Matrice: `configs/experiments/month2_s7_c149_eval_matrix.json`, SHA256 `a76bac9b88e9a8be3a363302c1b171f77a0c7de0c232c5056add762ff3cd8da3`.
+- **glu-on-s1 esteso:** early-stop a 1080, best 630 invariato, tranche 1 preservata e riverificata; training SHA 501d41a.
+- **Parity 11 run finiti (29968643):** 11/11 PARITY_OK, scarto macro e per-frame massimo 0.0.
+- **Job:**
+  - 29984795 — valutazione completa, 11 run (array 0–10 %3), 3 h/task. Mapping indice→run: 0 unet-on-s1, 1 unet-off-s1, 2 unet-on-s2, 3 unet-off-s2, 4 glu-on-s0, 5 glu-off-s0, 6 glu-off-s1, 7 glu-on-s2, 8 glu-off-s2, 9 O-C149-on-s0, 10 O-C149-off-s0.
+  - 29984793 — parity dei checkpoint finali di glu-on-s1 (1 GPU, 1 h), output `/home/bontempi/official_thesis_s7_eval_smoke_parity_s1_v1`.
+  - 29984812 — valutazione completa di glu-on-s1, 3 h, `--dependency=afterok:29984793` (parte solo se il parity passa; se fallisce resta non avviata, `--kill-on-invalid-dep=yes`).
+- **Risorse:** `mit_normal_gpu`, account/QoS `mit_amf_advanced_gpu`, 1×L40S, 8 CPU, 64G; max 4 GPU complessive (3 + 1 del run esteso, mai insieme al suo parity oltre il ceiling).
+- **Output:** `/home/bontempi/official_thesis_s7_c149_eval/<run_id>/` (log `slurm/`, `submission_*.json`); non sovrascrivibili. Per run: `per_frame/<ckpt>/cov*/<role>/rep*.csv` (81), `fields/`, `provenance.json`, `setting_costs.csv`, `gate.json`, `gate_macro.csv`, `gate_per_frame_diagnostic.csv`, e `COMPLETE.json` solo se readback e gate passano (altrimenti `GATE_FAILED.json`).
+- **Stima:** ~85–95 min per run (56–67 min con forward condiviso: glu-off-s0, glu-on-s2); 3 ondate; ~4–5 h dopo la coda.
+- **Non lanciato:** swap best@5%, residuo GappyPOD p_on/off S6, baseline C149, aggregazione/report/protocollo (vedi piano).
+- **Comandi manuali:** 
+```
+ssh engaging
+squeue -u bontempi -r -o "%i %j %T %M %r %N"
+sacct -D -X -j 29984793,29984795,29984812 -o JobID%16,State,ExitCode,Elapsed,NodeList
+O=/home/bontempi/official_thesis_s7_c149_eval
+ls $O/*/COMPLETE.json $O/*/GATE_FAILED.json 2>/dev/null
+tail -f $O/slurm/slurm-29984795_0.out
+```
