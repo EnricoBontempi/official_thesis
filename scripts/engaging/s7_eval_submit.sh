@@ -39,7 +39,7 @@ mkdir -p "$OUT/slurm"
 CONC=$(( MAXG < N ? MAXG : N ))
 ARGS=(--parsable --account "$ACCT" --partition "$PART" --qos "$QOS" --time "$TLIM" --array="0-$((N-1))%$CONC"
       --job-name="s7_eval_$MODE" --output="$OUT/slurm/slurm-%A_%a.out" --error="$OUT/slurm/slurm-%A_%a.err"
-      --export="ALL,S7_EVAL_TIP=$TIP,EXPECT_SHA=$SHA,S7_EVAL_MATRIX=$MAT,S7_EVAL_OUT_ROOT=$OUT,S7_EVAL_MODE=$MODE,S7_EVAL_RUN_IDS=${RUNS// /}${S7_EVAL_SMOKE_FRAMES:+,S7_EVAL_SMOKE_FRAMES=$S7_EVAL_SMOKE_FRAMES}")
+      --export="ALL,S7_EVAL_TIP=$TIP,EXPECT_SHA=$SHA,S7_EVAL_MATRIX=$MAT,S7_EVAL_OUT_ROOT=$OUT,S7_EVAL_MODE=$MODE,S7_EVAL_RUN_IDS=${IDS// /:}${S7_EVAL_SMOKE_FRAMES:+,S7_EVAL_SMOKE_FRAMES=$S7_EVAL_SMOKE_FRAMES}")  # ids joined by ":" (sbatch --export splits on commas)
 echo "[$(date -Is)] test-only: sbatch ${ARGS[*]} $TIP/scripts/engaging/s7_eval.sbatch"
 sbatch --test-only "${ARGS[@]}" "$TIP/scripts/engaging/s7_eval.sbatch" 2>&1 | grep -v '^$' || true
 [[ "$DRY" == "1" ]] && { echo "dry run: not submitted"; exit 0; }

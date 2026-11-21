@@ -34,7 +34,7 @@ RUN_ID="$("$PY" - <<PYIDX
 import json, os
 m = json.load(open(os.environ["S7_EVAL_MATRIX"]))
 ids = [r["run_id"] for r in m["runs"]]
-sel = [x for x in os.environ.get("S7_EVAL_RUN_IDS", "").split(",") if x] or ids
+sel = [x for x in os.environ.get("S7_EVAL_RUN_IDS", "").split(":") if x] or ids
 print(sel[int(os.environ["SLURM_ARRAY_TASK_ID"])])
 PYIDX
 )"
