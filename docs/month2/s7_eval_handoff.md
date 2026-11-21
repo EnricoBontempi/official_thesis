@@ -63,3 +63,11 @@ O=/home/bontempi/official_thesis_s7_c149_eval
 ls $O/*/COMPLETE.json $O/*/GATE_FAILED.json 2>/dev/null
 tail -f $O/slurm/slurm-29984795_0.out
 ```
+
+---
+## AGGIORNAMENTO 21 novembre 2026, ~16:00 EST — verifica esiti e aggregazione preparata
+- **Stato job (15:47):** 29984793 (parity glu-on-s1) COMPLETED, **PARITY_OK** sui checkpoint finali. 29984795 task 0–2 e 29984812 in esecuzione (~36 min su ~90; 29/81 CSV per run), task 3–10 in coda per il limite %3. Nessun fallimento. Nessun run ancora COMPLETE: matrice incompleta, nulla aggregato.
+- **Aggregazione (non eseguita, pronta):** `scripts/40_s7_aggregate.py` + `src/combustion_recon/evaluation/s7_package.py` (controlli: COMPLETE 81/81 e gate 18/18 per run, provenance e matrice, chiavi uniche/complete, `mask_hash` per riga contro il payload verificato 1/5/20%, identità dalla matrice congelata, forward condivisi bit-identici; poi tabelle per seed/condizione/macro, dispersione sui seed, contrasti appaiati famiglia e p, degradi per copertura/ruolo/selezione, peggior condizione VAL, regionali con NaN espliciti, figure, `INDEX.md`), `scripts/41_s7_costs.py` (calcolo vs attesa da sacct, tutti gli attempt), test `tests/test_s7_package.py` (10 test OK sul cluster). Il checker non è ancora stato esercitato su output reali completi (esce prima se manca COMPLETE.json).
+- **Job di aggregazione CPU 29988745** (`mit_normal`, `mit_amf_advanced_cpu`, 8 CPU, 64G, 1 h), `--dependency=afterok:29984795:29984812 --kill-on-invalid-dep=yes`: parte da solo solo se tutte le valutazioni finiscono con exit 0; rifiuta comunque una matrice non valida. Checkout `/home/bontempi/projects/official_thesis_s7_agg` @ `aadf05cc91dab49c11d59fae147f83b5e374e4d4`. Output: `/home/bontempi/official_thesis_s7_c149_package/` (+ `_costs/`), log `/home/bontempi/official_thesis_s7_c149_package_slurm/`.
+- **Da fare dopo:** leggere l'esito di 29988745 (se rifiuta, elencare i problemi), copiare tabelle/figure in `results/month2/s7_c149_comparison/package/`, commit e push. Se un task di valutazione fallisce: riportare causa e recupero prima di rilanciare.
+- **Impegni S7 ancora mancanti (nessun STOP F):** swap neurali best@5%, swap GappyPOD p_on/off S6, baseline C149, protocollo con regola di seguito da approvare, report 10.
