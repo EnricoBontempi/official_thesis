@@ -5,6 +5,8 @@ Subcommands (all print to stdout, machine readable):
   row    <matrix.json> <array_task_id|run_id>        -> shell KEY=VALUE lines
   paths  <matrix.json> <checkout> <run_id>           -> one path per line (inputs read by the task)
   plan   <out_root> <run_id> <job_id> <restart>      -> LaunchPlan JSON
+  plan-extend <out_root> <run_id> <job_id> <restart> <new_n_epochs> -> LaunchPlan JSON (extend|refuse)
+  preserve <out_root> <run_id> <tag> key=value ...   -> copy the finished tranche + MANIFEST.json
   ledger <out_root> <run_id> key=value ...           -> append one ledger event
   last   <run_dir>                                   -> progress summary (epoch/status) for logs
 """
@@ -19,7 +21,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
 
-from combustion_recon.training.s7_launch import ledger_append, plan_attempt  # noqa: E402
+from combustion_recon.training.s7_launch import (  # noqa: E402
+    ledger_append,
+    plan_attempt,
+    plan_extension,
+    preserve_tranche,
+)
 
 
 def _matrix(path: str) -> dict:
@@ -82,6 +89,17 @@ def main(argv: list[str]) -> int:
     if cmd == "plan":
         plan = plan_attempt(Path(argv[2]), argv[3], slurm_job_id=argv[4], restart_count=int(argv[5]))
         print(plan.to_json())
+        return 0
+    if cmd == "plan-extend":
+        plan = plan_extension(
+            Path(argv[2]), argv[3], slurm_job_id=argv[4], restart_count=int(argv[5]), new_n_epochs=int(argv[6])
+        )
+        print(plan.to_json())
+        return 0
+    if cmd == "preserve":
+        prov = dict(kv.split("=", 1) for kv in argv[5:])
+        man = preserve_tranche(Path(argv[2]) / argv[3], argv[4], prov)
+        print(json.dumps({"tag": man["tag"], "n_files": len(man["files"])}))
         return 0
     if cmd == "ledger":
         ev = dict(kv.split("=", 1) for kv in argv[4:])

@@ -133,6 +133,13 @@ def main() -> int:
     p.add_argument("--wall-hours", type=float, default=None, help="Optional override wall cap")
     p.add_argument("--resume-from", type=Path, default=None)
     p.add_argument("--allow-extend-max-epochs", action="store_true")
+    p.add_argument(
+        "--extend-n-epochs",
+        type=int,
+        default=None,
+        help="Resume only: raise n_epochs above the candidate YAML (needs --allow-extend-max-epochs). "
+        "Every other training key stays locked by the resume check.",
+    )
     p.add_argument("--git-sha", type=str, default="")
     args = p.parse_args()
 
@@ -159,6 +166,12 @@ def main() -> int:
                 raise SystemExit(f"S7 scientific launch requires --{need.replace('_', '-')}")
         if args.wall_hours is None:
             raise SystemExit("S7 launch requires an explicit --wall-hours (per attempt)")
+
+    if args.extend_n_epochs is not None:
+        if args.resume_from is None or not args.allow_extend_max_epochs:
+            raise SystemExit("--extend-n-epochs requires --resume-from and --allow-extend-max-epochs")
+        if args.smoke:
+            raise SystemExit("--extend-n-epochs is not valid with --smoke")
 
     cand = yaml.safe_load(Path(args.config).read_text())
     meta = assert_sparse_scientific_candidate_contract(cand)
@@ -227,6 +240,8 @@ def main() -> int:
             # scheduler path and its counters are exercised (non-scientific).
             "warmup_updates": 10,
         }
+    if args.extend_n_epochs is not None:
+        overrides = {**(overrides or {}), "n_epochs": int(args.extend_n_epochs)}
     cfg = config_from_candidate(
         cand, device=args.device, wall_time_cap_s=wall_s, overrides=overrides
     )

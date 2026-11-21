@@ -79,7 +79,13 @@ GPU_NAME="$("$PY" -c 'import torch;print(torch.cuda.get_device_name(0))' 2>/dev/
 
 # ---- attempt plan ------------------------------------------------------------------
 mkdir -p "$OUT_ROOT"
-PLAN="$("$PY" "$HELPER" plan "$OUT_ROOT" "$RUN_ID" "$JOB_ID" "$RESTART")" || die 8 "planner crashed"
+EXTEND_N="${S7_EXTEND_N_EPOCHS:-}"
+if [[ -n "$EXTEND_N" && "$RESTART" == "0" ]]; then
+  # Authorised continuation of a run that reached its initial tranche (never a plateau).
+  PLAN="$("$PY" "$HELPER" plan-extend "$OUT_ROOT" "$RUN_ID" "$JOB_ID" "$RESTART" "$EXTEND_N")" || die 8 "planner crashed"
+else
+  PLAN="$("$PY" "$HELPER" plan "$OUT_ROOT" "$RUN_ID" "$JOB_ID" "$RESTART")" || die 8 "planner crashed"
+fi
 ACTION="$("$PY" -c 'import json,sys;print(json.loads(sys.argv[1])["action"])' "$PLAN")"
 REASON="$("$PY" -c 'import json,sys;print(json.loads(sys.argv[1])["reason"])' "$PLAN")"
 RESUME_FROM="$("$PY" -c 'import json,sys;print(json.loads(sys.argv[1])["resume_from"] or "")' "$PLAN")"
@@ -93,18 +99,19 @@ case "$ACTION" in
     "$PY" "$HELPER" ledger "$OUT_ROOT" "$RUN_ID" event=already_terminal "slurm_job_id=$JOB_ID" "restart_count=$RESTART" || true
     log "run already terminal; nothing to do"
     exit 0 ;;
-  fresh|fresh_restart_no_checkpoint|resume) ;;
+  fresh|fresh_restart_no_checkpoint|resume|extend) ;;
   *) die 8 "unknown plan action $ACTION" ;;
 esac
 
-if [[ "$ACTION" == "resume" ]]; then
-  [[ -d "$OUT" ]] || die 4 "resume planned but $OUT missing"
+if [[ "$ACTION" == "resume" || "$ACTION" == "extend" ]]; then
+  [[ -d "$OUT" ]] || die 4 "$ACTION planned but $OUT missing"
 else
   [[ ! -e "$OUT" ]] || die 4 "fresh start but $OUT exists"
   mkdir -p "$OUT"
 fi
 CTX="$OUT/slurm_context.txt"
 [[ "$ACTION" == "resume" ]] && CTX="$OUT/slurm_context_attempt_restart${RESTART}.txt"
+[[ "$ACTION" == "extend" ]] && CTX="$OUT/slurm_context_attempt_extension_job${JOB_ID}.txt"
 {
   echo "SLURM_JOB_ID=$JOB_ID"; echo "SLURM_RESTART_COUNT=$RESTART"
   echo "SLURM_ARRAY_JOB_ID=${SLURM_ARRAY_JOB_ID:-}"; echo "SLURM_ARRAY_TASK_ID=${SLURM_ARRAY_TASK_ID:-}"
@@ -113,6 +120,18 @@ CTX="$OUT/slurm_context.txt"
   echo "GIT_SHA=$SHA_HEAD"; echo "CONFIG=$CONFIG"; echo "RUN_ID=$RUN_ID"; echo "PLAN_ACTION=$ACTION"
   echo "WALL_HOURS_PER_ATTEMPT=${S7_WALL_HOURS:-smoke}"; echo "MODE=$MODE"; date -Is
 } | tee "$CTX"
+
+if [[ "$ACTION" == "extend" ]]; then
+  PREV_SHA="$("$PY" -c 'import json,sys;print(json.load(open(sys.argv[1])).get("git_sha",""))' "$OUT/run_identity.json")"
+  PREV_EP="$("$PY" -c 'import json,sys;print(json.loads(sys.argv[1])["details"]["prev_n_epochs"])' "$PLAN")"
+  "$PY" "$HELPER" preserve "$OUT_ROOT" "$RUN_ID" "tranche1_epoch${PREV_EP}" \
+    "reason=authorised continuation past the initial n_epochs tranche (reached_max_epochs, not a plateau)" \
+    "authorised_by=Enrico Bontempi" "authorised_scope=glu-on-s1 only, n_epochs up to $EXTEND_N, state/scheduler/early-stop kept" \
+    "previous_git_sha=$PREV_SHA" "extension_git_sha=$SHA_HEAD" "extension_job_id=$JOB_ID" "new_n_epochs=$EXTEND_N" \
+    || die 8 "could not preserve the first tranche"
+  "$PY" "$HELPER" ledger "$OUT_ROOT" "$RUN_ID" event=extension_start "slurm_job_id=$JOB_ID" "new_n_epochs=$EXTEND_N" \
+    "previous_git_sha=$PREV_SHA" "extension_git_sha=$SHA_HEAD" || die 8 "ledger write failed"
+fi
 
 "$PY" "$HELPER" ledger "$OUT_ROOT" "$RUN_ID" event=attempt_start "slurm_job_id=$JOB_ID" "restart_count=$RESTART" \
   "action=$ACTION" "node=$(hostname)" "gpu=$GPU_NAME" "git_sha=$SHA_HEAD" "mode=$MODE" \
@@ -134,7 +153,9 @@ if [[ "$MODE" == "smoke" ]]; then
 else
   CMD+=(--wall-hours "$S7_WALL_HOURS")
 fi
-[[ "$ACTION" == "resume" ]] && CMD+=(--resume-from "$RESUME_FROM")
+[[ "$ACTION" == "resume" || "$ACTION" == "extend" ]] && CMD+=(--resume-from "$RESUME_FROM")
+# Every attempt of an extension job (including wall-time requeues) must carry the same n_epochs.
+[[ -n "$EXTEND_N" ]] && CMD+=(--allow-extend-max-epochs --extend-n-epochs "$EXTEND_N")
 log "exec: ${CMD[*]}"
 
 child=0

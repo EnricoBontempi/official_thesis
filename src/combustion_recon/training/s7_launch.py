@@ -15,6 +15,10 @@ new attempt may do:
                                 (never deleted) to ``_discarded_attempts`` and the
                                 run starts again from the seeded init. This is
                                 recorded as a fresh restart, never as a resume.
+* ``extend``                    a NEW job continues a run whose summary is ``completed`` /
+                                ``reached_max_epochs`` with a higher ``n_epochs`` (explicitly
+                                authorised, see ``plan_extension``). The first tranche is
+                                preserved byte-for-byte before anything is written.
 * ``refuse``                    anything else (existing directory of an unrelated
                                 submission, corrupt last.pt, stopped_error, ...).
 
@@ -24,6 +28,7 @@ resume sources.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import shutil
@@ -212,3 +217,118 @@ def plan_attempt(
         str(run_dir),
         details={"previous_attempt_moved_to": str(dest)},
     )
+
+
+# ---------------------------------------------------------------------------------------
+# Authorised extension of a run that reached its initial n_epochs tranche (never plateau).
+# ---------------------------------------------------------------------------------------
+TRANCHE_FILES = (
+    "summary.json",
+    "progress.json",
+    "eval_history.json",
+    "curves.csv.gz",
+    "stream_trace.jsonl",
+    "run_identity.json",
+    "effective_config.json",
+    "init_manifest.json",
+    "stdout.log",
+)
+TRANCHE_CHECKPOINTS = ("best.pt", "last.pt", "best_seen_diagnostic.pt")
+
+
+def _sha256_file(path: Path) -> str:
+    h = hashlib.sha256()
+    with open(path, "rb") as fh:
+        for block in iter(lambda: fh.read(1 << 20), b""):
+            h.update(block)
+    return h.hexdigest()
+
+
+def plan_extension(
+    out_root: Path,
+    run_id: str,
+    *,
+    slurm_job_id: str,
+    restart_count: int,
+    new_n_epochs: int,
+) -> LaunchPlan:
+    """Plan the one authorised continuation past the initial n_epochs tranche.
+
+    Only a run whose terminal state is ``completed``/``reached_max_epochs`` (NOT an early
+    stop) and whose ``last.pt`` is the complete epoch-boundary checkpoint of that very
+    epoch qualifies. The new job must not have started this run, and the run must not have
+    been extended before.
+    """
+    out_root = Path(out_root)
+    run_dir = out_root / run_id
+    if int(restart_count) != 0:
+        return LaunchPlan("refuse", "extension is planned only for the first attempt of its job", str(run_dir))
+    if not run_dir.is_dir():
+        return LaunchPlan("refuse", "extension requires an existing run directory", str(run_dir))
+    rows = read_ledger(out_root, run_id)
+    starts = [r for r in rows if r.get("event") == "attempt_start"]
+    if not starts:
+        return LaunchPlan("refuse", "ledger has no earlier attempt of this run", str(run_dir))
+    if any(str(r.get("slurm_job_id")) == str(slurm_job_id) for r in starts):
+        return LaunchPlan("refuse", "this job already started the run (use the requeue path)", str(run_dir))
+    if any(r.get("event") == "extension_start" for r in rows):
+        return LaunchPlan("refuse", "run was already extended once", str(run_dir))
+    try:
+        summary = json.loads((run_dir / "summary.json").read_text())
+    except (OSError, json.JSONDecodeError) as exc:
+        return LaunchPlan("refuse", f"summary.json unreadable: {exc}", str(run_dir))
+    if summary.get("status") != "completed" or summary.get("stop_reason") != "reached_max_epochs":
+        return LaunchPlan(
+            "refuse",
+            f"only completed/reached_max_epochs runs are extendable (status={summary.get('status')!r}, "
+            f"stop_reason={summary.get('stop_reason')!r})",
+            str(run_dir),
+        )
+    prev_epochs = int(summary.get("epochs_completed", -1))
+    if int(new_n_epochs) <= prev_epochs:
+        return LaunchPlan("refuse", f"new n_epochs {new_n_epochs} <= completed epochs {prev_epochs}", str(run_dir))
+    last = run_dir / "checkpoints" / "last.pt"
+    try:
+        info = inspect_last_checkpoint(last, run_id=run_id)
+    except Exception as exc:  # noqa: BLE001
+        return LaunchPlan("refuse", f"last.pt invalid: {type(exc).__name__}: {exc}", str(run_dir))
+    if info["epoch"] != prev_epochs:
+        return LaunchPlan("refuse", f"last.pt epoch {info['epoch']} != summary epochs {prev_epochs}", str(run_dir))
+    if info["status"] != "running":
+        return LaunchPlan("refuse", f"last.pt status {info['status']!r} is already terminal", str(run_dir))
+    return LaunchPlan(
+        "extend",
+        f"authorised extension {prev_epochs}->{int(new_n_epochs)} epochs from the complete last.pt",
+        str(run_dir),
+        resume_from=str(last),
+        details={**info, "prev_n_epochs": prev_epochs, "new_n_epochs": int(new_n_epochs)},
+    )
+
+
+def preserve_tranche(run_dir: Path, tag: str, provenance: dict[str, Any]) -> dict[str, Any]:
+    """Copy (never move) the finished tranche into ``run_dir/<tag>`` with a sha256 manifest."""
+    run_dir = Path(run_dir)
+    dest = run_dir / tag
+    dest.mkdir(parents=False, exist_ok=False)
+    entries: dict[str, dict[str, Any]] = {}
+    sources = [(run_dir / n, dest / n) for n in TRANCHE_FILES if (run_dir / n).is_file()]
+    (dest / "checkpoints").mkdir()
+    sources += [
+        (run_dir / "checkpoints" / n, dest / "checkpoints" / n)
+        for n in TRANCHE_CHECKPOINTS
+        if (run_dir / "checkpoints" / n).is_file()
+    ]
+    for src, dst in sources:
+        shutil.copy2(src, dst)
+        sha_src, sha_dst = _sha256_file(src), _sha256_file(dst)
+        if sha_src != sha_dst:
+            raise RuntimeError(f"copy of {src} is not byte-identical")
+        entries[str(dst.relative_to(dest))] = {"bytes": dst.stat().st_size, "sha256": sha_dst}
+    manifest = {
+        "tag": tag,
+        "created": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
+        "provenance": provenance,
+        "files": entries,
+    }
+    (dest / "MANIFEST.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
+    return manifest
