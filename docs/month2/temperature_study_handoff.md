@@ -43,5 +43,16 @@ cat $R/_ledger/TA-glu-on-s0.jsonl; tail -f $R/slurm/slurm-30034036_6.out
 scontrol release <jobid>        # solo se in hold per MaxBatchRequeue
 ```
 
+## Catena di valutazione finale automatica (a PC spento) — sottomessa il 22 novembre, ~01:05 EST
+Nessuna dipendenza dal monitor locale: tutto è in coda su Engaging.
+| Passo | Job | Cosa fa |
+|---|---|---|
+| 1. verifica + freeze + sottomissioni | **30037805** (CPU, `afterany:30034027:30034036`) | parte quando i due array di training sono finiti, qualunque esito. Controlla: tutti i task Slurm COMPLETED 0:0; per ognuno dei 12 run `summary.json` terminale (`completed`/`stopped_early_plateau`); nessun `refused` né `fresh_restart_no_checkpoint` nel ledger. Se qualcosa non va scrive `/home/bontempi/official_thesis_t_assisted_eval/INCOMPLETE.json` con le cause e SI FERMA (nessun recupero cieco, nessun rilancio di training). Se va tutto bene: congela la matrice (`matrix_frozen.json`, sola lettura: epoche, SHA file e pesi dei tre checkpoint, forward condivisi, riferimenti del loop) e sottomette 2 e 3 |
+| 2. valutazioni | array **dipendente dal passo 1** (id in `chain_submitted.json`), 12 task, `mit_normal_gpu` Advanced, concorrenza `min(3, 4 − GPU normal in uso)` | `scripts/55_t_eval.py` per run: best/last/best_seen distinti, K=0/1/4/9/16/32, reference760/seen220/VAL123, repliche 0/1/2, full-field + dominio comune + off-anchor + ancore; gate di parità col loop (macro RMSE di dominio comune entro 0.05 K per run/checkpoint/ruolo/replica e per K su VAL; riferimento mancante = fallimento); readback; `COMPLETE.json` solo dopo gate e readback, altrimenti `GATE_FAILED.json` |
+| 3. aggregazione | job CPU `afterok` sull'array (id in `chain_submitted.json`) | `scripts/56_t_aggregate.py`: rifiuta matrice incompleta o incoerente (hash matrice, chiavi, `mask_hash` vs payload verificato, forward condivisi); tabelle, figure, costi (calcolo/coda), `INDEX.md` |
+Output: `/home/bontempi/official_thesis_t_assisted_eval/` (`runs/<TA-run>/`, `package/`, `slurm/`, `matrix_frozen.json`, `chain_submitted.json` o `INCOMPLETE.json`). SHA della catena: `b7e3b1f52bb5beaa3c6494504e2cad0da444d87c` (checkout `/home/bontempi/projects/official_thesis_t_chain`).
+**Limiti residui:** (i) se un training fallisce o resta in hold oltre il watchdog, la catena resta in attesa o produce `INCOMPLETE.json`: serve intervento umano; (ii) una preemption ripetuta oltre MaxBatchRequeue richiede il rilascio da parte del watchdog (job 30034038, termina quando non restano job `t_assist`); (iii) la sottomissione dell'array di valutazione dipende dalla disponibilità di GPU normal (condivise con Cursor); (iv) il pacchetto resta sul cluster: va copiato nel repo e committato a mano; (v) se la valutazione fallisce il gate, nessun risultato è validato (diagnostica preservata).
+**Verifica dell'evaluator:** smoke su checkpoint in corso (U-Net e GLU, CPU, sottoinsieme di frame): output, readback, forward condivisi, aggregazione in modalità smoke OK; il gate di parità completo è stato provato su un run concluso (vedi sotto).
+
 ## Stato
 Contratto e training assisted pubblicati/sottomessi; nessun training completato al momento della scrittura. Aggiornamenti successivi in questo file.
