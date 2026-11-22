@@ -78,6 +78,7 @@ def main() -> int:
     ap.add_argument("--mode", choices=("full", "smoke"), default="full")
     ap.add_argument("--smoke-frames", type=int, default=9)
     ap.add_argument("--batch-size", type=int, default=8)
+    ap.add_argument("--device", default="cuda", help="cpu only for non-scientific smoke tests")
     ap.add_argument("--anchor-manifest", type=Path, default=ROOT / "configs/observations/month2_temperature_anchors_nested_v1.json")
     args = ap.parse_args()
     smoke = args.mode == "smoke"
@@ -96,9 +97,11 @@ def main() -> int:
         raise SystemExit("anchor manifest differs from the frozen matrix")
     torch.backends.cuda.matmul.allow_tf32 = False
     torch.backends.cudnn.allow_tf32 = False
-    if not torch.cuda.is_available():
+    if args.device == "cpu" and not smoke:
+        raise SystemExit("a scientific evaluation needs CUDA")
+    if args.device == "cuda" and not torch.cuda.is_available():
         raise SystemExit("CUDA required")
-    dev = torch.device("cuda")
+    dev = torch.device(args.device)
     sh = matrix["shared_inputs"]
     cache_root = Path(sh["c149_cache_root"])
     _log(f"start {args.run_id} family={fam} p_on={p_on} mode={args.mode}")
@@ -132,7 +135,7 @@ def main() -> int:
     for r in ROLES:
         if len(datasets[r]) != expected[r]:
             raise SystemExit(f"{r}: {len(datasets[r])} frames, expected {expected[r]}")
-    cfg = SparseScientificConfig(family=fam, p_conditioning=p_on, seed=seed, device="cuda", batch_size=8, decode_chunked_eval=True)
+    cfg = SparseScientificConfig(family=fam, p_conditioning=p_on, seed=seed, device=args.device, batch_size=8, decode_chunked_eval=True)
     torch.manual_seed(seed)
     if fam == "sparse_unet":
         model, queries = build_sparse_unet_assisted_from_config(init_seed=seed), None
@@ -279,7 +282,7 @@ def main() -> int:
     prov = {"run_id": args.run_id, "matrix_sha256": tags_base["matrix_sha256"], "mode": args.mode, "eval_git_sha": args.eval_git_sha, "family": fam,
             "p_conditioning": p_on, "consumed": {k: str(v) for k, v in consumed.items()}, "anchor_manifest_sha256": anchors.sha256, "scientific": not smoke,
             "loop_metrics_are_not_this_output": True, "no_test_split": True, "n_csv": n_csv, "issues": issues,
-            "numerics": {"precision": "fp32", "allow_tf32": False}, "max_memory_bytes": int(torch.cuda.max_memory_allocated())}
+            "numerics": {"precision": "fp32", "allow_tf32": False}, "max_memory_bytes": int(torch.cuda.max_memory_allocated()) if args.device == "cuda" else 0}
     (out_run / "provenance.json").write_text(json.dumps(prov, indent=2) + "\n")
     if smoke:
         (out_run / "SMOKE_OK.json").write_text(json.dumps({"ok": not issues, "gate": gate, "issues": issues}, indent=2) + "\n")
