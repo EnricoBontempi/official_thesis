@@ -75,11 +75,15 @@ def _log(msg: str) -> None:
 
 def _mask_index(mask_root: Path, role: str) -> dict[tuple[str, int, int], dict[str, Any]]:
     z = np.load(mask_root / f"{role}_nested_sites.npz", allow_pickle=True)
+    arr = {SITE_KEY[c]: np.asarray(z[SITE_KEY[c]], dtype=np.int64) for c in (0.01, 0.05, 0.2)}   # decompress once
+    hashes = {HASH_KEY[c]: [str(x) for x in z[HASH_KEY[c]]] for c in (0.01, 0.05, 0.2)}
+    sims, frames, reps = z["sim_id"].tolist(), np.asarray(z["frame_index"]), np.asarray(z["replica_id"])
+    z.close()
     out = {}
-    for i, (s, f, r) in enumerate(zip(z["sim_id"].tolist(), z["frame_index"], z["replica_id"])):
-        key = (str(s), int(f), int(r))
-        out[key] = {SITE_KEY[c]: np.asarray(z[SITE_KEY[c]][i], dtype=np.int64) for c in (0.01, 0.05, 0.2)}
-        out[key].update({HASH_KEY[c]: str(z[HASH_KEY[c]][i]) for c in (0.01, 0.05, 0.2)})
+    for i in range(len(sims)):
+        entry = {k: v[i] for k, v in arr.items()}
+        entry.update({k: v[i] for k, v in hashes.items()})
+        out[(str(sims[i]), int(frames[i]), int(reps[i]))] = entry
     return out
 
 
