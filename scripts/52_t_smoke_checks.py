@@ -118,7 +118,7 @@ def main() -> int:
         model = build_assisted_glu_from_config(domain_geometry_path=args.cache_root / "geometry.npz")
         queries = make_synthetic_query_grid(val_on.x, val_on.y)
     model.to(dev)
-    trainer = AssistedTrainer(model, cfg=cfg, normalizer=normalizer, n_train_samples=len(ref760[::3][:256]), query_coords_phys=queries, anchors=anchors)
+    trainer = AssistedTrainer(model, cfg=cfg, normalizer=normalizer, n_train_samples=256, query_coords_phys=queries, anchors=anchors)
     from combustion_recon.training.scientific_epoch_sampler import cache_indices_for_pool
 
     ref760 = cache_indices_for_pool(json.loads((args.cache_root / "train_fit" / "frames.json").read_text()), "A38")
