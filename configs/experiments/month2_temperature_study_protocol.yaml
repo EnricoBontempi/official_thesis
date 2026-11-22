@@ -1,0 +1,81 @@
+# Month 2 temperature study (Step 2.7): common contract for the correction sweep (Cursor) and the
+# temperature-assisted trainings (Sonnet). FROZEN before any assisted run. Free S7 results stay immutable.
+experiment_id: month2_temperature_study_v1
+status: contract_frozen_2026-11-21
+authorized_by: Enrico Bontempi
+parent_free_study: {branch: s7/c149-free-campaign, sha: 2879c1b5270be30fb10375f0b300a50cd37d5413}
+
+data:
+  pool: {id: C149, frames: 2980, frames_per_condition: 149, conditions: 20}
+  cache_aggregate_sha256: fa1c9358deb3bda0313cd74f9ab6855af87bc969c4069a463073d4c4120f03b4
+  normalizer: historical fit-only 760, frozen (sha256 678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e); not refitted
+  roles: {seen_train_eval: 220, val_eval: 123}      # unchanged from S7
+  velocity: {site_fraction: 0.05, payload: persisted nested eval masks, mask_manifest_file_sha256: 2e2d8ff6edabf62ad56702a155140d064c0b4014d06ee96debf52811efa5c75e, mask_aggregate_payload_sha256: 7be78f35ffea2ebc598adce8cec39dc719339aac17ecadde3137f2064891ffeb}
+  velocity_mask_replicas: [0, 1, 2]
+  no_test_split: true
+  no_instrumental_noise: true
+
+temperature_observations:
+  type: ideal numerical temperature values at the observed sites (noise-free), K in {0, 1, 4, 9, 16, 32}
+  manifest: configs/observations/month2_temperature_anchors_nested_v1.json
+  layouts: three uniform random layouts, FIXED across frames, conditions and roles; layout r pairs with velocity mask replica r
+  generator: combustion_recon.data.masks.nested_temperature_anchor_permutation (deterministic), namespace month2_temperature_anchors_nested_v1, base seed 20261121
+  nested: K=1 < 4 < 9 < 16 < 32 (prefix of the site order)
+  layout_selection: none; never selected using T values, errors or results
+  joint_variability_note: layout-T / velocity-mask pairs vary jointly; do not attribute their variability to the T sensors alone
+  historical_T9_grid: separate bridge for the correction sweep only; not part of the manifest or of the assisted evaluation
+
+domains:
+  full_field: whole 128x128 grid
+  common_domain: grid minus the 32 T sites of the layout (identical for every K; per replica/layout)
+  off_anchor_K: grid minus the first K sites of the layout
+  anchors: the K observed sites
+  report_side_by_side: [full_field, off_anchor_K, anchors]   # all on the common domain for cross-K comparisons
+
+# ---------------------------------------------------------------- correction sweep (Cursor) ----------
+correction_sweep:
+  owner: Cursor
+  models: the 12 free S7 checkpoints (frozen, unchanged) + C149 baselines
+  K: [0, 1, 4, 9, 16, 32]
+  corrections: [free, mean_K, median_K]   # as agreed in roadmap_month2.md 2.7; no new estimator, no tuning on VAL
+  must_use: this protocol and the same manifest, byte for byte
+  forbidden: modifying free checkpoints, free results or the manifest
+
+# ------------------------------------------------------------- assisted trainings (Sonnet) ----------
+assisted_training:
+  owner: Sonnet
+  matrix: {families: [sparse_unet, adapted_glu], p: [on, off], seeds: [0, 1, 2], runs: 12, from_scratch: true}
+  one_model_per_(family,p,seed): trained at variable K and evaluated on the whole sweep (NOT one training per K)
+  recipe_inherited_from_S7: [pool, stream 760 presentations / 95 updates per epoch, effective batch 8, fp32 no AMP/TF32/compile,
+                              full-field MSE on normalized T, AdamW lr 1e-3 wd 1e-4, clip 1, warmup 950 updates,
+                              ReduceLROnPlateau 0.5/5/rel .001/min 1e-5, eval every 10 epochs, early stop >= 200 epochs / 15 evals / rel .001 with reset on LR drop,
+                              tranche 1000 epochs (extension only by explicit decision)]
+  extra_input: ONLY observed T values + coordinates + validity (no hidden T, no hidden velocity, no mean/median correction)
+  unet_input: 7 free channels + T_norm + M_T (explicit mask); p handled by channel NAME (p_off zeroes the named p channels)
+  glu_input: typed T tokens (value, coordinate, type embedding) added to the velocity tokens; minimal documented adaptation, no other change
+  glu_numerics: new assisted path only - exact lattice-distance top-k with deterministic (distance, site) tie-break (free GLU untouched)
+  train_K: uniform over {0,1,4,9,16,32}, drawn per optimizer batch (same K for every microbatch); K(update) = f(namespace, base seed, update) - the same
+           sequence for every family, p and model seed
+  train_T_layouts: random per frame and epoch, namespace month2_assisted_t_train_layout_v1 (separate from eval), nested prefix of a permutation
+  eval_T_layouts: the frozen manifest layouts (same sites as Cursor)
+  selection: |
+    NEW criterion (differs from S7): mean over the six K of the macro VAL RMSE (frame->condition->mean over the 3 replicas) at 5% velocity,
+    computed on the common domain. One best checkpoint per run (no per-K checkpoints); the same quantity drives ReduceLROnPlateau and early stopping.
+    last and best_seen_diagnostic (seen replica 0, same quantity) are kept separately.
+  free_reference: S7 free results are an immutable reference; assisted(K=0) is a different model and may differ from the free original (no identity promised)
+
+evaluation:
+  K: [0, 1, 4, 9, 16, 32]
+  roles: [train_fit(reference760), seen_train_eval, val_eval]
+  velocity_coverage: 0.05
+  replicas: [0, 1, 2]
+  metrics: [rmse, mae, signed_bias, centered_rmse, regional] on full_field, off_anchor_K, anchors
+  parity: assisted evaluator at K=0 on the common domain must reproduce the training loop (macro 0.05 K) per run/checkpoint/role/replica
+
+compute_plan:
+  limits: {normal_advanced_gpu: 4, preemptable_gpu: 4, total_counts: smoke, sweep and the user's other jobs}
+  normal: partition mit_normal_gpu, account/QoS mit_amf_advanced_gpu, L40S preferred
+  preemptable: partition mit_preemptable, account mit_general (QoS normal); mit_amf_advanced_gpu on mit_preemptable is rejected - not retried
+  assignment: see docs/month2/temperature_study_handoff.md (one active submission per run, no duplicates)
+
+forbidden_in_this_study: [TEST split, instrumental noise, new split, multi-density velocity TRAIN, any modification of free results]
