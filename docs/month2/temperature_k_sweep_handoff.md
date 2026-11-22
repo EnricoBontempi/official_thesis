@@ -35,4 +35,6 @@ Codice del secondo tentativo: `54a3b4d3a177b731ed7eef45030c3a49b0986c16`, checko
 
 Alla submission GPU la coda Advanced conteneva due job Sonnet (`30032653`, `30032656`, `t_checks`). Lo sweep ne aggiunge due, di cui solo lo smoke può partire; il full resta `afterok`. Totale in coda: 4.
 
+Smoke GPU `30032664` completato, exit 0, `SMOKE_OK.json` per entrambi i task. U-Net on s1 e GLU on s0, best e last, seen e VAL, repliche 0/1/2: gate true, |macro| sotto 5e-6 K, scarto per-frame massimo sotto 2e-5 K. Il selettore smoke è quello di S7: 4 posizioni più, su VAL, i frame 1000, quindi 7 frame VAL. Lo sweep scientifico non usa quel sottoinsieme. Il task 0 dell’array `30032665` è partito dopo lo smoke.
+
 Forward neurale, quando partirà: `scripts/38` + `_forward` di `scripts/17`, batch 8, fp32, TF32 spento, una sola L40S, array `%1`. Il codice GLU non è modificato.
