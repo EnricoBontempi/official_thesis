@@ -79,6 +79,8 @@ def main() -> int:
     ap.add_argument("--smoke-frames", type=int, default=9)
     ap.add_argument("--batch-size", type=int, default=8)
     ap.add_argument("--device", default="cuda", help="cpu only for non-scientific smoke tests")
+    ap.add_argument("--reuse-matrix", type=Path, default=None, help="previous frozen eval matrix: unchanged checkpoints (same file/weights sha and epoch) reuse its verified per-frame CSVs")
+    ap.add_argument("--reuse-root", type=Path, default=None, help="runs directory of the previous evaluation")
     ap.add_argument("--anchor-manifest", type=Path, default=ROOT / "configs/observations/month2_temperature_anchors_nested_v1.json")
     args = ap.parse_args()
     smoke = args.mode == "smoke"
@@ -97,12 +99,29 @@ def main() -> int:
         raise SystemExit("anchor manifest differs from the frozen matrix")
     torch.backends.cuda.matmul.allow_tf32 = False
     torch.backends.cudnn.allow_tf32 = False
-    if args.device == "cpu" and not smoke:
-        raise SystemExit("a scientific evaluation needs CUDA")
-    if args.device == "cuda" and not torch.cuda.is_available():
-        raise SystemExit("CUDA required")
-    dev = torch.device(args.device)
     sh = matrix["shared_inputs"]
+    # ---- which checkpoints need a forward, which reuse verified earlier output, which share a forward
+    reuse_ok: dict[str, bool] = {}
+    v1_entry = None
+    if args.reuse_matrix is not None:
+        v1 = json.loads(args.reuse_matrix.read_text())
+        v1_entry = next((r for r in v1["runs"] if r["run_id"] == args.run_id), None)
+        v1_done = args.reuse_root / args.run_id / "COMPLETE.json"
+        v1_prov = args.reuse_root / args.run_id / "provenance.json"
+        v1_ok = bool(v1_entry and v1_done.exists() and json.loads(v1_done.read_text()).get("ok") is True and v1_prov.exists()
+                     and json.loads(v1_prov.read_text()).get("matrix_sha256") == _sha_file(args.reuse_matrix))
+        for name in CHECKPOINTS:
+            a, b = entry["checkpoints"][name], (v1_entry or {}).get("checkpoints", {}).get(name, {})
+            reuse_ok[name] = bool(v1_ok and a["file_sha256"] == b.get("file_sha256") and a["weights_sha256"] == b.get("weights_sha256") and a["epoch"] == b.get("epoch"))
+    mode_of = {n: ("shared" if entry["checkpoints"][n].get("reuse_forward_from") else ("reuse" if reuse_ok.get(n) else "compute")) for n in CHECKPOINTS}
+    need_compute = any(m == "compute" for m in mode_of.values())
+    _log(f"checkpoint plan: {mode_of}")
+    if need_compute:
+        if args.device == "cpu" and not smoke:
+            raise SystemExit("a scientific evaluation needs CUDA")
+        if args.device == "cuda" and not torch.cuda.is_available():
+            raise SystemExit("CUDA required")
+    dev = torch.device(args.device)
     cache_root = Path(sh["c149_cache_root"])
     _log(f"start {args.run_id} family={fam} p_on={p_on} mode={args.mode}")
     # ---- verify checkpoints against the frozen matrix
@@ -130,20 +149,24 @@ def main() -> int:
                                normalizer=normalizer, eval_mask_payload_root=sh["mask_root"], require_eval_mask_payload=True,
                                anchors=anchors, **kw)
 
-    datasets = {r: mk(r) for r in ROLES}
-    expected = {r: (len(datasets[r]) if smoke else ROLE_N_FRAMES[r]) for r in ROLES}
-    for r in ROLES:
-        if len(datasets[r]) != expected[r]:
-            raise SystemExit(f"{r}: {len(datasets[r])} frames, expected {expected[r]}")
-    cfg = SparseScientificConfig(family=fam, p_conditioning=p_on, seed=seed, device=args.device, batch_size=8, decode_chunked_eval=True)
-    torch.manual_seed(seed)
-    if fam == "sparse_unet":
-        model, queries = build_sparse_unet_assisted_from_config(init_seed=seed), None
-    else:
-        model = build_assisted_glu_from_config(domain_geometry_path=cache_root / "geometry.npz")
-        queries = make_synthetic_query_grid(datasets["val_eval"].x, datasets["val_eval"].y)
-    model.to(dev)
-    trainer = AssistedTrainer(model, cfg=cfg, normalizer=normalizer, n_train_samples=2980, query_coords_phys=queries, anchors=anchors)
+    datasets: dict = {}
+    trainer = None
+    expected = {r: (ROLE_N_FRAMES[r]) for r in ROLES}
+    if need_compute:
+        datasets = {r: mk(r) for r in ROLES}
+        expected = {r: (len(datasets[r]) if smoke else ROLE_N_FRAMES[r]) for r in ROLES}
+        for r in ROLES:
+            if len(datasets[r]) != expected[r]:
+                raise SystemExit(f"{r}: {len(datasets[r])} frames, expected {expected[r]}")
+        cfg = SparseScientificConfig(family=fam, p_conditioning=p_on, seed=seed, device=args.device, batch_size=8, decode_chunked_eval=True)
+        torch.manual_seed(seed)
+        if fam == "sparse_unet":
+            model, queries = build_sparse_unet_assisted_from_config(init_seed=seed), None
+        else:
+            model = build_assisted_glu_from_config(domain_geometry_path=cache_root / "geometry.npz")
+            queries = make_synthetic_query_grid(datasets["val_eval"].x, datasets["val_eval"].y)
+        model.to(dev)
+        trainer = AssistedTrainer(model, cfg=cfg, normalizer=normalizer, n_train_samples=2980, query_coords_phys=queries, anchors=anchors)
     out_run = args.out_root / args.run_id
     out_run.mkdir(parents=True, exist_ok=False)
     tags_base = {"run_id": args.run_id, "family": fam, "p_conditioning": p_on, "model_seed": seed, "pool_id": "C149", "site_fraction": 0.05,
@@ -162,6 +185,22 @@ def main() -> int:
             for k, v in tags.items():
                 df[k] = v
             stored[name] = df
+        elif mode_of[name] == "reuse":
+            frames_v1 = []
+            for role in ROLES:
+                for rep in REPLICAS:
+                    f1 = args.reuse_root / args.run_id / "per_frame" / name / role / f"rep{rep}.csv"
+                    d1 = pd.read_csv(f1)
+                    if set(d1["weights_sha256"]) != {spec["weights_sha256"]} or set(d1["file_sha256"]) != {spec["file_sha256"]} or set(d1["epoch"]) != {spec["epoch"]}:
+                        raise SystemExit(f"{f1}: identity differs from the frozen matrix; refusing to reuse")
+                    if len(d1) != ROLE_N_FRAMES[role] * len(K_VALUES):
+                        raise SystemExit(f"{f1}: {len(d1)} rows; refusing to reuse")
+                    frames_v1.append(d1)
+            d1 = pd.concat(frames_v1, ignore_index=True)
+            d1["reused_from_matrix_sha256"] = _sha_file(args.reuse_matrix)
+            d1["shared_forward_from"] = ""
+            stored[name] = d1
+            _log(f"{name}: reused {len(d1)} verified rows from the previous evaluation")
         else:
             payload = load_sparse_scientific_checkpoint(Path(entry["training_dir"]) / "checkpoints" / f"{name}.pt", model=model,
                                                         require_resumable=True, restore_rng=False)
@@ -210,16 +249,27 @@ def main() -> int:
                 n_files += 1
     # fields for figures (best ckpt and shared ones): val frame 1000, replica 0, six K
     (out_run / "fields").mkdir()
+    import shutil
+
     for name in CHECKPOINTS:
-        src = entry["checkpoints"][name].get("reuse_forward_from") or name
-        f = fields.get(src)
+        target = out_run / "fields" / f"val_frame1000_{name}_rep0.npz"
+        if mode_of[name] == "reuse":
+            shutil.copy2(args.reuse_root / args.run_id / "fields" / target.name, target)
+            continue
+        if mode_of[name] == "shared":
+            srcname = entry["checkpoints"][name]["reuse_forward_from"]
+            z = np.load(out_run / "fields" / f"val_frame1000_{srcname}_rep0.npz", allow_pickle=True)
+            np.savez_compressed(target, pred_T_K=z["pred_T_K"], true_T_K=z["true_T_K"], sim_id=z["sim_id"], K=z["K"],
+                                checkpoint_kind=np.array(name), run_id=np.array(args.run_id), shared_forward_from=np.array(srcname))
+            continue
+        f = fields.get(name)
         if not f:
             continue
         sims = sorted({s for s, _, _ in f[0]})
         pred = np.stack([np.stack([next(p for s2, p, _ in f[K] if s2 == s) for s in sims]) for K in K_VALUES])
         true = np.stack([next(t for s2, _, t in f[0] if s2 == s) for s in sims])
-        np.savez_compressed(out_run / "fields" / f"val_frame1000_{name}_rep0.npz", pred_T_K=pred, true_T_K=true, sim_id=np.array(sims),
-                            K=np.array(K_VALUES), checkpoint_kind=np.array(name), run_id=np.array(args.run_id))
+        np.savez_compressed(target, pred_T_K=pred, true_T_K=true, sim_id=np.array(sims), K=np.array(K_VALUES),
+                            checkpoint_kind=np.array(name), run_id=np.array(args.run_id))
     # ---- gate vs the training loop
     gate_rows = []
     for name in CHECKPOINTS:
@@ -282,7 +332,8 @@ def main() -> int:
     prov = {"run_id": args.run_id, "matrix_sha256": tags_base["matrix_sha256"], "mode": args.mode, "eval_git_sha": args.eval_git_sha, "family": fam,
             "p_conditioning": p_on, "consumed": {k: str(v) for k, v in consumed.items()}, "anchor_manifest_sha256": anchors.sha256, "scientific": not smoke,
             "loop_metrics_are_not_this_output": True, "no_test_split": True, "n_csv": n_csv, "issues": issues,
-            "numerics": {"precision": "fp32", "allow_tf32": False}, "max_memory_bytes": int(torch.cuda.max_memory_allocated()) if args.device == "cuda" else 0}
+            "numerics": {"precision": "fp32", "allow_tf32": False}, "max_memory_bytes": int(torch.cuda.max_memory_allocated()) if (need_compute and args.device == "cuda") else 0,
+            "checkpoint_plan": mode_of, "reuse_matrix_sha256": _sha_file(args.reuse_matrix) if args.reuse_matrix else None}
     (out_run / "provenance.json").write_text(json.dumps(prov, indent=2) + "\n")
     if smoke:
         (out_run / "SMOKE_OK.json").write_text(json.dumps({"ok": not issues, "gate": gate, "issues": issues}, indent=2) + "\n")

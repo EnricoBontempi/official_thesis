@@ -126,7 +126,7 @@ if [[ "$ACTION" == "extend" ]]; then
   PREV_EP="$("$PY" -c 'import json,sys;print(json.loads(sys.argv[1])["details"]["prev_n_epochs"])' "$PLAN")"
   "$PY" "$HELPER" preserve "$OUT_ROOT" "$RUN_ID" "tranche1_epoch${PREV_EP}" \
     "reason=authorised continuation past the initial n_epochs tranche (reached_max_epochs, not a plateau)" \
-    "authorised_by=Enrico Bontempi" "authorised_scope=glu-on-s1 only, n_epochs up to $EXTEND_N, state/scheduler/early-stop kept" \
+    "authorised_by=Enrico Bontempi" "authorised_scope=${S7_EXTEND_SCOPE:-this run only, n_epochs up to $EXTEND_N, state/scheduler/early-stop kept}" "previous_eval_matrix_sha256=${S7_PREV_EVAL_MATRIX_SHA:-}" \
     "previous_git_sha=$PREV_SHA" "extension_git_sha=$SHA_HEAD" "extension_job_id=$JOB_ID" "new_n_epochs=$EXTEND_N" \
     || die 8 "could not preserve the first tranche"
   "$PY" "$HELPER" ledger "$OUT_ROOT" "$RUN_ID" event=extension_start "slurm_job_id=$JOB_ID" "new_n_epochs=$EXTEND_N" \

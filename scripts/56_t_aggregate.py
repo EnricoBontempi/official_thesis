@@ -45,7 +45,7 @@ def load_and_check(eval_root: Path, matrix: dict, msha: str, payload, smoke: boo
     issues, frames, runs = [], [], []
     for e in matrix["runs"]:
         d = eval_root / e["run_id"]
-        info = {"run_id": e["run_id"], "family": e["family"], "p_conditioning": e["p_conditioning"], "model_seed": e["model_seed"], "complete": False, "gate_all_pass": False, "n_csv": 0, "gate_max_abs_delta_K": None}
+        info = {"run_id": e["run_id"], "family": e["family"], "p_conditioning": e["p_conditioning"], "model_seed": e["model_seed"], "training_status": e.get("status"), "stop_reason": e.get("stop_reason"), "epochs_completed": e.get("epochs_completed"), "n_training_attempts": e.get("n_attempts"), "complete": False, "gate_all_pass": False, "n_csv": 0, "gate_max_abs_delta_K": None}
         runs.append(info)
         marker = d / ("SMOKE_OK.json" if smoke else "COMPLETE.json")
         if not marker.exists():

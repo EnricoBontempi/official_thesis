@@ -32,4 +32,5 @@ echo "[$(date -Is)] t_eval launcher host=$(hostname) job=${SLURM_JOB_ID:-na} run
 mkdir -p "$T_EVAL_OUT"
 ARGS=(scripts/55_t_eval.py --matrix "$T_EVAL_MATRIX" --run-id "$RUN_ID" --out-root "$T_EVAL_OUT" --eval-git-sha "$EXPECT_SHA" --mode "$MODE")
 [[ -n "${T_EVAL_SMOKE_FRAMES:-}" ]] && ARGS+=(--smoke-frames "$T_EVAL_SMOKE_FRAMES")
+[[ -n "${T_EVAL_REUSE_MATRIX:-}" ]] && ARGS+=(--reuse-matrix "$T_EVAL_REUSE_MATRIX" --reuse-root "${T_EVAL_REUSE_ROOT:?}")
 "$PY" "${ARGS[@]}"
