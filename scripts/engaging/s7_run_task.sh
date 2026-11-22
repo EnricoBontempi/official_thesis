@@ -29,7 +29,7 @@ JOB_ID="${SLURM_JOB_ID:-nojob}"
 RESTART="${SLURM_RESTART_COUNT:-0}"
 [[ -z "$RESTART" ]] && RESTART=0
 HELPER="$S7_TIP/scripts/engaging/s7_plan.py"
-MATRIX_JSON="$S7_TIP/configs/experiments/month2_s7_c149_matrix.json"
+MATRIX_JSON="${S7_MATRIX:-$S7_TIP/configs/experiments/month2_s7_c149_matrix.json}"
 
 log "task start host=$(hostname) job=$JOB_ID array=${SLURM_ARRAY_JOB_ID:-na}_${SLURM_ARRAY_TASK_ID:-na} restart=$RESTART mode=$MODE"
 
@@ -153,6 +153,7 @@ if [[ "$MODE" == "smoke" ]]; then
 else
   CMD+=(--wall-hours "$S7_WALL_HOURS")
 fi
+[[ -n "${S7_EXTRA_TRAIN_ARGS:-}" ]] && CMD+=(${S7_EXTRA_TRAIN_ARGS})
 [[ "$ACTION" == "resume" || "$ACTION" == "extend" ]] && CMD+=(--resume-from "$RESUME_FROM")
 # Every attempt of an extension job (including wall-time requeues) must carry the same n_epochs.
 [[ -n "$EXTEND_N" ]] && CMD+=(--allow-extend-max-epochs --extend-n-epochs "$EXTEND_N")

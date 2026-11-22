@@ -1,0 +1,159 @@
+{
+ "anchor_manifest": "configs/observations/month2_temperature_anchors_nested_v1.json",
+ "campaign": "T-assisted",
+ "n_new_trainings": 12,
+ "new_runs": [
+  {
+   "array_index": 0,
+   "assisted": true,
+   "config": "configs/experiments/t_assisted/TA-unet-on-s0.yaml",
+   "family": "sparse_unet",
+   "out_dir": "/home/bontempi/official_thesis_t_assisted_runs/TA-unet-on-s0",
+   "p_conditioning": true,
+   "run_id": "TA-unet-on-s0",
+   "seed": 0,
+   "shuffle_seed": 0
+  },
+  {
+   "array_index": 1,
+   "assisted": true,
+   "config": "configs/experiments/t_assisted/TA-unet-on-s1.yaml",
+   "family": "sparse_unet",
+   "out_dir": "/home/bontempi/official_thesis_t_assisted_runs/TA-unet-on-s1",
+   "p_conditioning": true,
+   "run_id": "TA-unet-on-s1",
+   "seed": 1,
+   "shuffle_seed": 1
+  },
+  {
+   "array_index": 2,
+   "assisted": true,
+   "config": "configs/experiments/t_assisted/TA-unet-on-s2.yaml",
+   "family": "sparse_unet",
+   "out_dir": "/home/bontempi/official_thesis_t_assisted_runs/TA-unet-on-s2",
+   "p_conditioning": true,
+   "run_id": "TA-unet-on-s2",
+   "seed": 2,
+   "shuffle_seed": 2
+  },
+  {
+   "array_index": 3,
+   "assisted": true,
+   "config": "configs/experiments/t_assisted/TA-unet-off-s0.yaml",
+   "family": "sparse_unet",
+   "out_dir": "/home/bontempi/official_thesis_t_assisted_runs/TA-unet-off-s0",
+   "p_conditioning": false,
+   "run_id": "TA-unet-off-s0",
+   "seed": 0,
+   "shuffle_seed": 0
+  },
+  {
+   "array_index": 4,
+   "assisted": true,
+   "config": "configs/experiments/t_assisted/TA-unet-off-s1.yaml",
+   "family": "sparse_unet",
+   "out_dir": "/home/bontempi/official_thesis_t_assisted_runs/TA-unet-off-s1",
+   "p_conditioning": false,
+   "run_id": "TA-unet-off-s1",
+   "seed": 1,
+   "shuffle_seed": 1
+  },
+  {
+   "array_index": 5,
+   "assisted": true,
+   "config": "configs/experiments/t_assisted/TA-unet-off-s2.yaml",
+   "family": "sparse_unet",
+   "out_dir": "/home/bontempi/official_thesis_t_assisted_runs/TA-unet-off-s2",
+   "p_conditioning": false,
+   "run_id": "TA-unet-off-s2",
+   "seed": 2,
+   "shuffle_seed": 2
+  },
+  {
+   "array_index": 6,
+   "assisted": true,
+   "config": "configs/experiments/t_assisted/TA-glu-on-s0.yaml",
+   "family": "adapted_glu",
+   "out_dir": "/home/bontempi/official_thesis_t_assisted_runs/TA-glu-on-s0",
+   "p_conditioning": true,
+   "run_id": "TA-glu-on-s0",
+   "seed": 0,
+   "shuffle_seed": 0
+  },
+  {
+   "array_index": 7,
+   "assisted": true,
+   "config": "configs/experiments/t_assisted/TA-glu-on-s1.yaml",
+   "family": "adapted_glu",
+   "out_dir": "/home/bontempi/official_thesis_t_assisted_runs/TA-glu-on-s1",
+   "p_conditioning": true,
+   "run_id": "TA-glu-on-s1",
+   "seed": 1,
+   "shuffle_seed": 1
+  },
+  {
+   "array_index": 8,
+   "assisted": true,
+   "config": "configs/experiments/t_assisted/TA-glu-on-s2.yaml",
+   "family": "adapted_glu",
+   "out_dir": "/home/bontempi/official_thesis_t_assisted_runs/TA-glu-on-s2",
+   "p_conditioning": true,
+   "run_id": "TA-glu-on-s2",
+   "seed": 2,
+   "shuffle_seed": 2
+  },
+  {
+   "array_index": 9,
+   "assisted": true,
+   "config": "configs/experiments/t_assisted/TA-glu-off-s0.yaml",
+   "family": "adapted_glu",
+   "out_dir": "/home/bontempi/official_thesis_t_assisted_runs/TA-glu-off-s0",
+   "p_conditioning": false,
+   "run_id": "TA-glu-off-s0",
+   "seed": 0,
+   "shuffle_seed": 0
+  },
+  {
+   "array_index": 10,
+   "assisted": true,
+   "config": "configs/experiments/t_assisted/TA-glu-off-s1.yaml",
+   "family": "adapted_glu",
+   "out_dir": "/home/bontempi/official_thesis_t_assisted_runs/TA-glu-off-s1",
+   "p_conditioning": false,
+   "run_id": "TA-glu-off-s1",
+   "seed": 1,
+   "shuffle_seed": 1
+  },
+  {
+   "array_index": 11,
+   "assisted": true,
+   "config": "configs/experiments/t_assisted/TA-glu-off-s2.yaml",
+   "family": "adapted_glu",
+   "out_dir": "/home/bontempi/official_thesis_t_assisted_runs/TA-glu-off-s2",
+   "p_conditioning": false,
+   "run_id": "TA-glu-off-s2",
+   "seed": 2,
+   "shuffle_seed": 2
+  }
+ ],
+ "out_root": "/home/bontempi/official_thesis_t_assisted_runs",
+ "protocol": "configs/experiments/month2_temperature_study_protocol.yaml",
+ "schema": "month2_t_assisted_matrix_v1",
+ "shared_inputs": {
+  "cache_counts": {
+   "seen_train_eval": 220,
+   "train_fit": 2980,
+   "val_eval": 123
+  },
+  "cache_hash_file": "/home/bontempi/official_thesis_data/month2_dense_unet_cache_c149/payload_hashes.json",
+  "cache_id": "month2_dense_unet_cache_opus_c149_v1",
+  "cache_root": "/home/bontempi/official_thesis_data/month2_dense_unet_cache_c149",
+  "cache_root_pool_original": "/orcd/pool/005/bontempi/official_thesis_data/month2_dense_unet_cache_c149",
+  "expect_cache_aggregate_sha256": "fa1c9358deb3bda0313cd74f9ab6855af87bc969c4069a463073d4c4120f03b4",
+  "mask_aggregate_payload_sha256": "7be78f35ffea2ebc598adce8cec39dc719339aac17ecadde3137f2064891ffeb",
+  "mask_manifest_file_sha256": "2e2d8ff6edabf62ad56702a155140d064c0b4014d06ee96debf52811efa5c75e",
+  "mask_root": "/home/bontempi/projects/official_thesis_s5/data/processed/month2_sparse_eval_masks",
+  "stats_relpath": "data/manifests/train_norm_stats_month2_fit.json",
+  "stats_sha256": "678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e"
+ }
+}

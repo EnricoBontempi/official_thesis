@@ -1,0 +1,127 @@
+experiment_id: month2_t_assisted_TA-unet-on-s1_v1
+status: t_assisted_study_authorized
+scientific_training_authorized: true
+profiling_diagnostic_only: false
+family: sparse_unet
+decision:
+  by: Enrico
+  date: '2026-11-21'
+  summary: Enrico authorized the 12 temperature-assisted trainings (U-Net and GLU
+    x p_on/off x seed 0/1/2, variable K); recipe template = S7 free candidate; T input
+    via --assisted (see month2_temperature_study_protocol.yaml).
+inherits_protocol:
+  path: configs/experiments/month2_sparse_protocol.yaml
+model:
+  path: configs/models/unet_sparse.yaml
+  base_channels: 32
+  sparse_unet: configs/models/unet_sparse.yaml
+  adapted_glu: configs/models/glu_minimal.yaml
+training_candidate:
+  family: sparse_unet
+  p_conditioning: true
+  pool_id: C149
+  presentations_per_scientific_epoch: 760
+  require_eval_mask_payload: true
+  amp: false
+  torch_compile: false
+  save_best_seen_diagnostic: true
+  temporal_mode: single_frame
+  task_mode: temperature_free
+  K: 0
+  site_fraction: 0.05
+  seed: 1
+  shuffle_seed: 1
+  train_mask_seed: 20261118
+  eval_mask_seed: 20261116
+  layout_id: random_sparse_primary
+  val_replicas:
+  - 0
+  - 1
+  - 2
+  device: cuda
+  precision: fp32
+  allow_tf32: false
+  batch_size: 8
+  n_epochs: 1000
+  lr: 0.001
+  weight_decay: 0.0001
+  warmup_updates: 950
+  schedule_kind: warmup_then_reduce_on_plateau
+  plateau:
+    mode: min
+    factor: 0.5
+    patience_evals: 5
+    threshold_rel: 0.001
+    min_lr: 1.0e-05
+    metric: val_mean_condition_rmse_K
+  grad_clip_norm: 1.0
+  eval_every_epochs: 10
+  eval_roles:
+  - train_fit
+  - seen_train_eval
+  - val_eval
+  wall_time_cap_hours: 23.0
+  wall_time_cap_configurable: true
+  allow_automatic_lr_fallback_3e4: false
+  num_workers: 0
+  init: fresh_seed1_no_prior_weights_no_warm_start
+  decode_chunk_size: 512
+  decode_chunked_eval: true
+  microbatch_size: null
+  selection:
+    role: val_eval
+    coverage: 0.05
+    replicas:
+    - 0
+    - 1
+    - 2
+    metric: mean_over_replicas_of_mean_condition_full_field_RMSE_K
+    tie_break: first_absolute_minimum
+    also_keep:
+    - last
+    - best_seen_diagnostic
+    significant_ref_distinct_from_absolute_best: true
+  also_evaluate:
+  - seen_train_eval
+  - train_fit
+  early_stopping:
+    enabled: true
+    min_epochs: 200
+    patience_evals: 15
+    rel_improvement: 0.001
+    reset_patience_on_lr_reduce: true
+    metric: val_mean_condition_rmse_K
+    note: operational_convention_not_physical_certification
+  checkpoint:
+    boundary: epoch_complete_only
+    kinds:
+    - sparse_scientific_epoch_complete_v1
+    - sparse_scientific_epoch_partial_v1
+    partial_overwrite_last: false
+    save_optimizer_scheduler_rng_history: true
+    save_mask_epoch_set_epoch: true
+    save_glu_geometry_buffers: true
+  resume_policy:
+    boundary: epoch_complete_only
+    reject_incompatible_data_arch_science: true
+    allow_n_epochs_extension: explicit_flag_only
+artifacts:
+  results_root_engaging: /home/bontempi/official_thesis_t_assisted_runs
+  run_id: TA-unet-on-s1
+  scientific_run_id: TA-unet-on-s1
+  warm_start: false
+  refuse_overwrite_existing_run_dir: true
+  refuse_load_s5_or_wave1_checkpoints: true
+notes:
+- 'Temperature-assisted run: free S7 recipe template; K variable (train K uniform
+  per optimizer update) and the common-domain six-K selection criterion are applied
+  by --assisted (new criterion vs S7).'
+- Resume only from this run's own last.pt at an epoch boundary.
+s7_submission_authorized: true
+operational_s7:
+  campaign: T-assisted
+  scientific_run_id: TA-unet-on-s1
+  resources: decided at submission
+  pool_frames_per_condition: 149
+  pool_total_frames: 2980
+  normalizer: historical fit-only 760 frozen (not refit on C149)
