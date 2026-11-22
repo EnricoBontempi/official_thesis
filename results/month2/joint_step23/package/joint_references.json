@@ -1,0 +1,86 @@
+{
+  "assisted_chain_v2": {
+    "aggregate": "30083487",
+    "at": "2026-11-22T13:43:41-05:00",
+    "concurrency": 3,
+    "eval_array": "30083486",
+    "git_sha": "a86e39c61731586a3343d9d1489b4d3b22fa0547",
+    "matrix_v1_sha256": "1c91ce257e0ae93e6cb909bc23741f08ba7339ea9cb0b3e83677b3b15dff5042",
+    "matrix_v2_sha256": "3663d33820aac446b9621bf35ae49dec26ee4cc6a8379ad5363b0a81e8d922f7",
+    "ok": true,
+    "stage": "chain_v2_submitted"
+  },
+  "assisted_eval_root": "/home/bontempi/official_thesis_t_assisted_eval_v2",
+  "assisted_files_sha256": {
+    "INDEX.md": "98fcd018a7e23759f82bdc3f164f148631ec31a15e80a90f1f072036bcfc14db",
+    "completeness.csv": "ad2470fa5e146919fc571fcc6a2ded719913707d062f844e4be005d6d54468c1",
+    "eval_costs_by_task.csv": "98060f5972f02d644bd049230d248de7aca823f7611a93b04742e410bd6757ac",
+    "family_p_seed_dispersion.csv": "3da73f66bcf56b5455cc3937a12862620f345930d659577fa743381d24adaedc",
+    "free_S7_reference_vs_assisted_K0.csv": "49f252cd00714081acea83b9f2a87fe3a0b3e6d6051b2c8bca6ecbbcedcd36d7",
+    "gain_vs_K0_by_run.csv": "060994b940c02739bf78c6f701e6ff145171de667f8480b4761394be110e8db8",
+    "global_by_replica.csv": "17ab7b51ac2d10273c8895a9ffd8aed340707c8b5b2e30223f85e709bb975b49",
+    "global_by_setting.csv": "dfc2f19ee3145bb596f11481bd584075e7745c4f3b4b184a1e1bdc662ab2b6fd",
+    "package_manifest.json": "37d021afa022bea63a5647dc2632e60636ae8b37f1b99469bb14bf29132953c7",
+    "paired_contrasts.csv": "54b3ea0f71e1205286a0b1ac26d2d00ac93ad8480e1a4fd81674fa0eff8468f7",
+    "per_condition.csv": "a6a79aef7dc6255d19025f3acfa93f5fd33d16b5d159a267077f5d7044bc2f48",
+    "training_costs_by_attempt.csv": "330d10e3a5a24d943f88812f60a59c4955ce1395eec77f91401df3170b335563",
+    "training_costs_by_run.csv": "77446d2aee2969cc997fdd512c706e72400ca990de6713f650958cf4989af613"
+  },
+  "assisted_matrix_v2_sha256": "3663d33820aac446b9621bf35ae49dec26ee4cc6a8379ad5363b0a81e8d922f7",
+  "cursor_aggregation_sha": "30593985337f6367f5e974807cb54865b00d678f",
+  "cursor_files_sha256": {
+    "INDEX.md": "6b6582a141931f2e85f9512546e1a980c25ce67286d8e5b6bf4981b5362d85c9",
+    "across_seeds.csv": "e6daadc41191a9b278ac8057668d76d92653a6ed895be0994e45052749860003",
+    "by_seed.csv": "c9ce8a4056861600be3df469ef0965aa34768a221be3b71bd8fa5550794b8c74",
+    "checks.json": "75141b84521dcd0f89d41208e64b31f3bfb51bb449322d7da12bc4a54ff97df8",
+    "per_condition.csv": "2402984f764af82a21d76f954d03600334869c941130a8ef6e6eb7c73c181d1c",
+    "versus_free.csv": "6a9128ce894276cc1a7fa57b998f989b7429e35be80f723285b284bcac697c47"
+  },
+  "cursor_forward_sha": "54a3b4d3a177b731ed7eef45030c3a49b0986c16",
+  "cursor_package": "/home/bontempi/official_thesis_k_sweep_package_v1",
+  "cursor_published": {
+    "cursor_branch": "sweep/c149-temperature-k",
+    "cursor_sha": "be18ad007e66fbf2565ad3d5486c6513fc5c3e4c",
+    "files_sha256": {
+      "INDEX.md": "1747679256a5a6e9bfeaf31e62b50077fa7894cd3a4eb531b812f11a4a9fd62e",
+      "across_seeds.csv": "e6daadc41191a9b278ac8057668d76d92653a6ed895be0994e45052749860003",
+      "by_seed.csv": "c9ce8a4056861600be3df469ef0965aa34768a221be3b71bd8fa5550794b8c74",
+      "checks.json": "75141b84521dcd0f89d41208e64b31f3bfb51bb449322d7da12bc4a54ff97df8",
+      "figures/val_common_rmse_vs_K.png": "76f1257355e89bdc1e0de71d09634e49f0931c83f693ee8ce09df0ffdb79eca0",
+      "per_condition.csv": "2402984f764af82a21d76f954d03600334869c941130a8ef6e6eb7c73c181d1c",
+      "versus_free.csv": "6a9128ce894276cc1a7fa57b998f989b7429e35be80f723285b284bcac697c47"
+    }
+  },
+  "extended_runs": {
+    "TA-glu-off-s1": {
+      "checkpoint_plan": {
+        "best": "reuse",
+        "best_seen_diagnostic": "compute",
+        "last": "compute"
+      },
+      "last_epoch": null
+    },
+    "TA-glu-off-s2": {
+      "checkpoint_plan": {
+        "best": "reuse",
+        "best_seen_diagnostic": "compute",
+        "last": "compute"
+      },
+      "last_epoch": null
+    },
+    "TA-glu-on-s1": {
+      "checkpoint_plan": {
+        "best": "reuse",
+        "best_seen_diagnostic": "reuse",
+        "last": "compute"
+      },
+      "last_epoch": null
+    }
+  },
+  "joint_git_sha": "682fe29496d9852c82af2a5d6fb59f05eb329006",
+  "manifest_file_sha256": "a9c997c96cb44489dd1fc0d4484304b44d8beddbf00b73c25baf4e1922a19e54",
+  "no_new_training": true,
+  "no_test_split": true,
+  "ranking": "none",
+  "winner": "none"
+}

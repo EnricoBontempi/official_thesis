@@ -1,0 +1,83 @@
+{
+  "amp_enabled": false,
+  "best_seen_diagnostic_epoch": 1000,
+  "best_seen_diagnostic_metric": 51.61101771677871,
+  "best_val_epoch": 750,
+  "best_val_metric": 41.55547620544626,
+  "clip_events": 2720,
+  "completed": true,
+  "early_stop_bad_evals": 7,
+  "early_stop_ref_metric": 41.55547620544626,
+  "elapsed_s": 10520.892831869423,
+  "epochs_completed": 1000,
+  "family": "adapted_glu",
+  "n_epochs_planned": 1000,
+  "pool_id": "C149",
+  "pool_size": 2980,
+  "precision": "fp32",
+  "presentations_per_scientific_epoch": 760,
+  "samples_seen": 760000,
+  "selection": {
+    "best_val_metric": 41.55547620544626,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 41.55547620544626,
+    "epoch": 750,
+    "lr": 6.25e-05,
+    "lr_reduced": false,
+    "mask_epoch": 749,
+    "seen_mean_condition_rmse_K": 52.12527948901711,
+    "train_mean_condition_rmse_K": 40.571017437951774,
+    "update": 71250,
+    "val_mean_condition_rmse_K": 41.55547620544626,
+    "val_per_replica": [
+      {
+        "mean_condition_rmse_K": 41.50790219796918,
+        "per_K_common_rmse_K": {
+          "0": 42.501409337152104,
+          "1": 41.34000284282573,
+          "4": 41.192336511537896,
+          "9": 41.407377099256955,
+          "16": 41.30750900602404,
+          "32": 41.29877839101831
+        },
+        "replica_id": 0
+      },
+      {
+        "mean_condition_rmse_K": 41.44120113266607,
+        "per_K_common_rmse_K": {
+          "0": 43.03135520819537,
+          "1": 41.17561729701886,
+          "4": 40.91413402444865,
+          "9": 41.05588300495425,
+          "16": 41.300212448439325,
+          "32": 41.17000481294002
+        },
+        "replica_id": 1
+      },
+      {
+        "mean_condition_rmse_K": 41.717325285703524,
+        "per_K_common_rmse_K": {
+          "0": 43.30501439159277,
+          "1": 43.398451222255225,
+          "4": 40.64558816508616,
+          "9": 41.07419836425707,
+          "16": 40.92708194363077,
+          "32": 40.95361762739916
+        },
+        "replica_id": 2
+      }
+    ]
+  },
+  "status": "completed",
+  "stop_reason": "reached_max_epochs",
+  "tf32_policy": {
+    "allow_tf32": false,
+    "cuda_matmul_allow_tf32": false,
+    "cudnn_allow_tf32": false
+  },
+  "torch_compile": false,
+  "total_updates_planned": 95000,
+  "updates": 95000,
+  "updates_per_epoch": 95,
+  "use_scientific_stream": true
+}

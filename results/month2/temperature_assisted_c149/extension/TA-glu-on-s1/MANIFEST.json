@@ -1,0 +1,64 @@
+{
+  "created": "2026-11-22T13:26:48-0500",
+  "files": {
+    "checkpoints/best.pt": {
+      "bytes": 20312827,
+      "sha256": "666d0bcd0f765125432b769037ead8610306d8565e795fc44f57c45b4618c938"
+    },
+    "checkpoints/best_seen_diagnostic.pt": {
+      "bytes": 21606651,
+      "sha256": "70d5411242c351ae86f36210459b564278f9bcebd015bb3ff8eefd5f188308be"
+    },
+    "checkpoints/last.pt": {
+      "bytes": 21768251,
+      "sha256": "9af95b42d742e290340ab165bb5dfb2ec14b1bbfdcd4e59c20e9b14b62cd3691"
+    },
+    "curves.csv.gz": {
+      "bytes": 2072028,
+      "sha256": "7383da04bc1fe6519461744afcf077512e64530658840bd2ea403d5650d2658d"
+    },
+    "effective_config.json": {
+      "bytes": 6064,
+      "sha256": "8ec17cad2f3772e12524ed76f06f2cac00f5a7483d018dc56ec1deccd20f1016"
+    },
+    "eval_history.json": {
+      "bytes": 145865,
+      "sha256": "67b06a962bc6ba1d811530c8a281258ef6d8472eafabdea824fdcd3892de4873"
+    },
+    "init_manifest.json": {
+      "bytes": 549,
+      "sha256": "3b5a9c5b2cc09560788c0834a77db377030de9fefbf3c896c6dbd2a9cb54595e"
+    },
+    "progress.json": {
+      "bytes": 551,
+      "sha256": "0bfd699fcb56ee0b0a527a0a87591ff2c24f169896b6920f65bec438a8d8262d"
+    },
+    "run_identity.json": {
+      "bytes": 8904,
+      "sha256": "7b158d3932283dcf70705d1d4ea463438bb7788fb4133666c41a5596b2389563"
+    },
+    "stdout.log": {
+      "bytes": 1191,
+      "sha256": "03373cc99ace90aced0de65f90a443ae993780b72a9f66fa25b89de39e3e68b0"
+    },
+    "stream_trace.jsonl": {
+      "bytes": 235069,
+      "sha256": "7df207e77a82ad4c9991ad93aecaed0ca2c6601d087225ed1b3ba7e6709ce546"
+    },
+    "summary.json": {
+      "bytes": 2345,
+      "sha256": "a39b757d7fe500225d555e7682d0fca453d9d1e07b31f276b2a032ba7996da16"
+    }
+  },
+  "provenance": {
+    "authorised_by": "Enrico Bontempi",
+    "authorised_scope": "assisted runs TA-glu-on-s1 TA-glu-off-s1 TA-glu-off-s2 only; n_epochs up to 1100; state/scheduler/early-stop/K stream kept",
+    "extension_git_sha": "a86e39c61731586a3343d9d1489b4d3b22fa0547",
+    "extension_job_id": "30082571",
+    "new_n_epochs": "1100",
+    "previous_eval_matrix_sha256": "1c91ce257e0ae93e6cb909bc23741f08ba7339ea9cb0b3e83677b3b15dff5042",
+    "previous_git_sha": "e5136b69019b769fd5cd1107c78ce791191f8812",
+    "reason": "authorised continuation past the initial n_epochs tranche (reached_max_epochs, not a plateau)"
+  },
+  "tag": "tranche1_epoch1000"
+}

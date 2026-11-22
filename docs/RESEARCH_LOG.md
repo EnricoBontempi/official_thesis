@@ -540,3 +540,7 @@ Branch `s7/c149-free-campaign`. Valutazioni 12/12 (SHA `acc8e2b`, matrice `a76ba
 ## 2026-11-22 — Step 2.7-B: 12 training temperature-assisted conclusi e valutati
 
 Branch `temperature/assisted-c149`; contratto `10ff6e5`, training `e5136b6`, catena `b7e3b1f`. U-Net e GLU × p_on/off × seed 0/1/2, K variabile {0,1,4,9,16,32}, criterio di selezione a sei K sul dominio comune. 9 early-stop, 3 GLU a 1000 epoche senza plateau accertato; preemption GLU gestite con resume. Valutazioni 12/12, gate loop 69/69 (scarto max 0.0 K). Guadagno da T ≈ −3 K a K=32 solo per GLU p_off; ≲ 0.2 K per U-Net e GLU p_on. Report `docs/month2/12_temperature_input_study.md`. Sweep delle correzioni (Cursor) separato.
+
+## 2026-11-22 — Step 2.7-B: continuazione dei tre GLU, valutazioni v2 e consegna congiunta con lo sweep K
+
+Array 30082569 (glu-on-s1, glu-off-s1, glu-off-s2, da epoca 1000, max 1100): tutti e tre in plateau (1030, 1080, 1060 epoche), best VAL invariato (820/750/730). Catena v2 30082570 → valutazioni 30083486 (12/12, gate 69/69, scarto 0.0 K) → aggregazione 30083487; matrice v2 `3663d338…`, riuso per hash dei checkpoint invariati. Pacchetto `results/month2/temperature_assisted_c149/package_v2/`; il pacchetto v1 (`aa8f65f`) resta intatto. Consegna congiunta con Cursor `be18ad0`: launcher 30083178, post-processing 30083497, 26 controlli (tutti i bloccanti superati), `results/month2/joint_step23/package/INDEX.md`. Nessun nuovo training, nessun TEST, nessun vincitore.

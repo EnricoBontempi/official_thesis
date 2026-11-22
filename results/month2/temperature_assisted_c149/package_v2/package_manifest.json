@@ -1,0 +1,30 @@
+{
+  "matrix_sha256": "3663d33820aac446b9621bf35ae49dec26ee4cc6a8379ad5363b0a81e8d922f7",
+  "n_runs": 12,
+  "n_rows": 714744,
+  "gate_max_abs_delta_K": 0.0,
+  "smoke": false,
+  "ranking": "none",
+  "winner": "none",
+  "tables": [
+    "completeness.csv",
+    "eval_costs_by_task.csv",
+    "family_p_seed_dispersion.csv",
+    "free_S7_reference_vs_assisted_K0.csv",
+    "gain_vs_K0_by_run.csv",
+    "global_by_replica.csv",
+    "global_by_setting.csv",
+    "paired_contrasts.csv",
+    "per_condition.csv",
+    "training_costs_by_attempt.csv",
+    "training_costs_by_run.csv"
+  ],
+  "figures": [
+    "costs_compute_vs_queue.png",
+    "domains_vs_K_val_best.png",
+    "gain_vs_K0_val_best.png",
+    "rmse_vs_K_common_best.png",
+    "rmse_vs_K_common_best_seen_diagnostic.png",
+    "rmse_vs_K_common_last.png"
+  ]
+}

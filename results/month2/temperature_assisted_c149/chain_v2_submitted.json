@@ -1,0 +1,1 @@
+{"ok": true, "stage": "chain_v2_submitted", "at": "2026-11-22T13:43:41-05:00", "eval_array": "30083486", "aggregate": "30083487", "concurrency": 3, "matrix_v2_sha256": "3663d33820aac446b9621bf35ae49dec26ee4cc6a8379ad5363b0a81e8d922f7", "matrix_v1_sha256": "1c91ce257e0ae93e6cb909bc23741f08ba7339ea9cb0b3e83677b3b15dff5042", "git_sha": "a86e39c61731586a3343d9d1489b4d3b22fa0547"}

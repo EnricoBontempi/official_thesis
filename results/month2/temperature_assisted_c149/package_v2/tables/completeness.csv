@@ -1,0 +1,13 @@
+run_id,family,p_conditioning,model_seed,training_status,stop_reason,epochs_completed,n_training_attempts,complete,gate_all_pass,n_csv,gate_max_abs_delta_K
+TA-unet-on-s0,sparse_unet,True,0,stopped_early_plateau,early_stop_no_rel_improvement_0.001_for_15_evals,640,1,True,True,27,0.0
+TA-unet-on-s1,sparse_unet,True,1,stopped_early_plateau,early_stop_no_rel_improvement_0.001_for_15_evals,760,1,True,True,27,0.0
+TA-unet-on-s2,sparse_unet,True,2,stopped_early_plateau,early_stop_no_rel_improvement_0.001_for_15_evals,710,1,True,True,27,0.0
+TA-unet-off-s0,sparse_unet,False,0,stopped_early_plateau,early_stop_no_rel_improvement_0.001_for_15_evals,730,1,True,True,27,0.0
+TA-unet-off-s1,sparse_unet,False,1,stopped_early_plateau,early_stop_no_rel_improvement_0.001_for_15_evals,730,1,True,True,27,0.0
+TA-unet-off-s2,sparse_unet,False,2,stopped_early_plateau,early_stop_no_rel_improvement_0.001_for_15_evals,700,1,True,True,27,0.0
+TA-glu-on-s0,adapted_glu,True,0,stopped_early_plateau,early_stop_no_rel_improvement_0.001_for_15_evals,950,1,True,True,27,0.0
+TA-glu-on-s1,adapted_glu,True,1,stopped_early_plateau,early_stop_no_rel_improvement_0.001_for_15_evals,1030,2,True,True,27,0.0
+TA-glu-on-s2,adapted_glu,True,2,stopped_early_plateau,early_stop_no_rel_improvement_0.001_for_15_evals,770,1,True,True,27,0.0
+TA-glu-off-s0,adapted_glu,False,0,stopped_early_plateau,early_stop_no_rel_improvement_0.001_for_15_evals,930,2,True,True,27,0.0
+TA-glu-off-s1,adapted_glu,False,1,stopped_early_plateau,early_stop_no_rel_improvement_0.001_for_15_evals,1080,4,True,True,27,0.0
+TA-glu-off-s2,adapted_glu,False,2,stopped_early_plateau,early_stop_no_rel_improvement_0.001_for_15_evals,1060,7,True,True,27,0.0

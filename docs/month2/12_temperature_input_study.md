@@ -54,4 +54,33 @@ Nella ricetta studiata (perdita full-field invariata, K uniforme 0–32 per batc
 VAL123 usata nella selezione; tre coppie layout-maschera = variabilità congiunta; solo T ideali, nessun rumore; i tre GLU a 1000 epoche non hanno plateau accertato (§2); U-Net e GLU p_on non mostrano beneficio; le ancore non sono riprodotte; nessun TEST.
 
 ## 8. Cosa resta
-(a) Decisione su continuazione dei tre GLU a fine tranche (§2). (b) Diagnostici di sensibilità a T e dell'errore agli stessi siti a K=0 (inferenza, non eseguiti). (c) Confronto con i risultati dello sweep delle correzioni (Cursor), ancora da fare e non qui. (d) Nessuna nuova campagna autorizzata in questo incarico.
+(a) Decisione su continuazione dei tre GLU a fine tranche (§2). (b) Diagnostici di sensibilità a T e dell'errore agli stessi siti a K=0 (inferenza, non eseguiti). (c) Confronto con i risultati dello sweep delle correzioni (Cursor): eseguito, vedi §10 [aggiornamento 22 novembre]; (a) risolto, vedi §9. (d) Nessuna nuova campagna autorizzata in questo incarico.
+
+---
+## 9. Aggiornamento del 22 novembre 2026 (pacchetto v2): continuazione dei tre GLU
+Il testo e le tabelle sopra restano invariati (stato a 1000 epoche, pacchetto `results/month2/temperature_assisted_c149/package/`, SHA `aa8f65f`). Questo paragrafo registra l'esito della continuazione autorizzata.
+
+**Esecuzione.** Solo TA-glu-on-s1, TA-glu-off-s1, TA-glu-off-s2, da `last.pt` (epoca 1000) fino a un massimo di 1100 epoche, stesse regole (stesso early-stop, schedule, K di training), nessun restart; array 30082569 (task 7, 10, 11; tutti COMPLETED, 6:41, 16:38, 12:35; `mit_normal_gpu`). Tranche 1 preservata in `<run>/tranche1_epoch1000/` con `MANIFEST.json` (12 file, sha256 riverificati; `last.pt` della tranche = `last` della matrice v1 per tutti e tre). I nove altri run non sono stati toccati: checkpoint con sha256 identico alla matrice v1.
+
+| Run | Arresto | Epoche | Best VAL (invariato) | best_seen diagnostico | Tentativi |
+| --- | --- | --- | --- | --- | --- |
+| TA-glu-on-s1 | plateau (`early_stop_no_rel_improvement_0.001_for_15_evals`) | 1030 | 820 (43.23 K, loop) | 980 (invariato) | 2 |
+| TA-glu-off-s1 | idem | 1080 | 750 (41.56 K) | 1000 → 1050 | 4 |
+| TA-glu-off-s2 | idem | 1060 | 730 (41.47 K) | 890 → 1050 | 7 |
+
+Tutti e tre hanno raggiunto il criterio di plateau prima di 1100: la domanda aperta al §2 («plateau a 1000 epoche?») ha risposta, non è stata necessaria alcuna estensione oltre il limite. La prima tranche era dunque troncata dal tetto delle 1000 epoche, non da un andamento ancora in discesa che continui: dopo l'epoca 1000 il VAL non ha migliorato il minimo (best invariato a 820/750/730).
+
+**Valutazioni v2.** Matrice congelata `matrix_frozen_v2.json` (sha256 `3663d33820aac446b9621bf35ae49dec26ee4cc6a8379ad5363b0a81e8d922f7`; v1 `1c91ce25…`). Catena 30082570 → array di valutazione 30083486 (12 task COMPLETED) → aggregazione 30083487. Solo i checkpoint cambiati sono stati ricalcolati (`last` dei tre run; `best_seen_diagnostic` di glu-off-s1 e glu-off-s2); tutto il resto è stato riattestato per hash dal v1 (`checkpoint_plan` in `provenance.json`). Gate 69/69 per run, scarto massimo 0.0 K, 12/12 `COMPLETE.json`, 714744 righe. Pacchetto: `results/month2/temperature_assisted_c149/package_v2/` (INDEX nella cartella); tabelle v1 e v2 coincidono in 558 delle 648 celle di `global_by_setting.csv`; le 90 che cambiano sono tutte `last` o `best_seen_diagnostic` dei tre run.
+
+**Effetto numerico (RMSE macro di dominio comune, VAL123, K).** `best` invariato, quindi la lettura principale del §4 e §6 non cambia. `last`: glu-off-s1 K=0 42.85 → 42.60, K=32 41.64 → 41.50; glu-off-s2 K=0 44.58 → 44.12, K=32 40.59 → 40.34; glu-on-s1 K=0 43.75 → 43.71, K=32 43.91 → 43.87. Variazioni da 0.04 a 0.46 K, nello stesso ordine della dispersione tra seed; nessuna decisione ne dipende.
+
+Limiti: i tre run hanno più tentativi per preemption (2, 4, 7); ogni ripartenza da `last.pt` di propria appartenenza, flussi duplicati con hash identici (ledger in `results/month2/temperature_assisted_c149/extension/<run>/`). Il test misto di riuso+calcolo (30082577) è COMPLETED con gate 0.0 K; il riuso puro (30082576) idem.
+
+## 10. Confronto congiunto con lo sweep delle correzioni (passo 2, Cursor)
+Pacchetto congiunto: `results/month2/joint_step23/package/INDEX.md` (tabelle in `tables/`). Input: sweep K di Cursor, branch `sweep/c149-temperature-k`, SHA `be18ad007e66fbf2565ad3d5486c6513fc5c3e4c` (`results/month2/temperature_k_sweep/INDEX.md`, report `docs/month2/11_temperature_k_sweep.md`), e il pacchetto assisted v2. Job: launcher 30083178, post-processing 30083497 (COMPLETED, 35 s, CPU). 26 controlli, tutti i bloccanti superati: manifest T identico (`a9c997c9…`), K, repliche, layout `nested_r<replica>`, frame (220/123) identici, hash maschere di velocità identico su 1029 frame, dominio comune 16352 px, conteggi off-anchor 16384−K, unità K, definizione di macro riprodotta a ≤2e-14 K sulle tabelle pubblicate di entrambi i lati, tabelle di Cursor byte-identiche a quelle pubblicate a be18ad0. Nessun forward ripetuto.
+
+Letture descrittive (RMSE macro di dominio comune, VAL123, `best`, media su 3 seed e 3 repliche; tutte le tabelle nell'INDEX; nessun vincitore):
+- La media dei residui con K = 1 peggiora sempre (da 40–44 a 65–72 K): una sola ancora trasferisce il suo errore a tutto il campo. Con K ≥ 4 la correzione mediana abbassa il free di circa 5 K (U-Net p_on K=32: 39.70 → 34.54; U-Net p_off 40.57 → 35.40), di 2–3 K per GLU (p_off 44.48 → 41.16; p_on 42.72 → 41.24).
+- L'assisted rispetto al free: U-Net p_on 39.70 → 37.66 (già a K=0, quindi per il training diverso e non per le ancore: 37.55 a K=32), U-Net p_off 40.57 → 39.71, GLU p_off 44.48 → 41.43 (a K=32; 44.37 a K=0), GLU p_on 42.72 → 43.78 (peggiore).
+- A K=32 la mediana post hoc sul free è più bassa dell'assisted in tutte e quattro le combinazioni famiglia×p (U-Net p_on 34.54 vs 37.55, U-Net p_off 35.40 vs 39.71, GLU p_on 41.24 vs 43.78, GLU p_off 41.16 vs 41.43; quest'ultima entro 0.3 K): nelle condizioni misurate T in ingresso non ha battuto una correzione scalare della stessa informazione. Il confronto confonde però modello diverso e uso delle ancore: la parte dovuta alle ancore si legge solo a parità di modello, `gain_vs_K0_by_run.csv`.
+- Limiti: criteri di selezione diversi tra i due lati (S7 vs media su sei K), `best` e `last` non sono le stesse epoche; T ideali senza rumore; tre coppie layout-maschera; VAL123 usata nella selezione dell'assisted; nessun TEST.

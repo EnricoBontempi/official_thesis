@@ -1,0 +1,2194 @@
+{
+  "K_values": [
+    0,
+    1,
+    4,
+    9,
+    16,
+    32
+  ],
+  "anchor_manifest_sha256": "a9c997c96cb44489dd1fc0d4484304b44d8beddbf00b73c25baf4e1922a19e54",
+  "experiment_id": "month2_t_assisted_eval_v1",
+  "gate": {
+    "rule": "macro common-domain RMSE within 0.05 K of the training loop per run/checkpoint/role/replica (and per K on VAL); missing reference = failure",
+    "tolerance_K": 0.05
+  },
+  "no_test_split": true,
+  "protocol_sha256": "be9aa0d8a0508d2381ec9a8a72f97e633e60cdac5808aa18ffc57daa70cb4350",
+  "replicas": [
+    0,
+    1,
+    2
+  ],
+  "runs": [
+    {
+      "checkpoints": {
+        "best": {
+          "bytes": 59482267,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "first_absolute_min_val_mean_condition_rmse_K",
+          "epoch": 70,
+          "file_sha256": "a0085721f18fe3ccd83cb4cc749def734c6459b863f9c9b7fc42c77a7bf14e2f",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 47.9588632039067,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 42.11907908044325,
+            "val_mean_condition_rmse_K": 37.85375227339113,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 37.41923550525058,
+                "per_K_common_rmse_K": {
+                  "0": 37.48959947633279,
+                  "1": 37.47784357085652,
+                  "16": 37.37720007454549,
+                  "32": 37.29091324636356,
+                  "4": 37.4554338109419,
+                  "9": 37.42442285246323
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 38.22912122216091,
+                "per_K_common_rmse_K": {
+                  "0": 38.286536512845316,
+                  "1": 38.2809261890934,
+                  "16": 38.2220372451216,
+                  "32": 38.10160840428281,
+                  "4": 38.26490337028825,
+                  "9": 38.2187156113341
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 37.912900092761895,
+                "per_K_common_rmse_K": {
+                  "0": 37.94189977627435,
+                  "1": 37.97729856160178,
+                  "16": 37.894472832298355,
+                  "32": 37.78318704506095,
+                  "4": 37.953708659560725,
+                  "9": 37.92683368177524
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "50da225ec08a610cfb694be84424586c5127c06b781b700a192894c36593ba3c"
+        },
+        "best_seen_diagnostic": {
+          "bytes": 60468955,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "min_seen_replica0_mean_condition_rmse_K",
+          "epoch": 200,
+          "file_sha256": "8f66bfb0bb0c74c3941a5f3671dad76138c8cd47e744c386031a015d339aa52a",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 39.46589685330577,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 21.56518716464272,
+            "val_mean_condition_rmse_K": 40.64719783694077,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 40.17899954373624,
+                "per_K_common_rmse_K": {
+                  "0": 40.22002127745588,
+                  "1": 40.216634688666886,
+                  "16": 40.15442822612031,
+                  "32": 40.097773492813424,
+                  "4": 40.20407444007326,
+                  "9": 40.181065137287675
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 41.15692511976325,
+                "per_K_common_rmse_K": {
+                  "0": 41.187512413408754,
+                  "1": 41.185609355826564,
+                  "16": 41.12808334962677,
+                  "32": 41.11825254878682,
+                  "4": 41.17327950461884,
+                  "9": 41.14881354631173
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 40.605668847322804,
+                "per_K_common_rmse_K": {
+                  "0": 40.647124204296716,
+                  "1": 40.646756724541646,
+                  "16": 40.573167168195276,
+                  "32": 40.51729931536526,
+                  "4": 40.633152387399086,
+                  "9": 40.61651328413884
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "331b221dbf61cd6c0c5c9ac8a8b2110077dc3338ee40a1b7c38dc1c0575a6170"
+        },
+        "last": {
+          "bytes": 63901915,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "early_stop_epoch",
+          "epoch": 640,
+          "file_sha256": "9a6bad82c5bd8c44bbdf46c2fa8da335b5b2b427f1e9bcb0c3edaa9f5f9d3d01",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 40.60682510703234,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 15.63834995391656,
+            "val_mean_condition_rmse_K": 40.585323258029035,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 40.3657897667156,
+                "per_K_common_rmse_K": {
+                  "0": 40.38909024827208,
+                  "1": 40.386615800438335,
+                  "16": 40.352828344054444,
+                  "32": 40.31834785165517,
+                  "4": 40.38120365194461,
+                  "9": 40.366652703928935
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 40.74706904292598,
+                "per_K_common_rmse_K": {
+                  "0": 40.76586658934756,
+                  "1": 40.763636294763955,
+                  "16": 40.73498116622544,
+                  "32": 40.72378899327102,
+                  "4": 40.75126179377069,
+                  "9": 40.74287942017718
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 40.643110964445526,
+                "per_K_common_rmse_K": {
+                  "0": 40.66727141449496,
+                  "1": 40.66888854134754,
+                  "16": 40.61836415939834,
+                  "32": 40.590718118978266,
+                  "4": 40.66170260662911,
+                  "9": 40.65172094582493
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "9fe703fc3701153215a6bba6e6854c82f6d40f4d2bb2f664b2a14b21c214e160"
+        }
+      },
+      "epochs_completed": 640,
+      "family": "sparse_unet",
+      "model_seed": 0,
+      "n_attempts": 1,
+      "p_conditioning": true,
+      "run_id": "TA-unet-on-s0",
+      "status": "stopped_early_plateau",
+      "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+      "training_dir": "/home/bontempi/official_thesis_t_assisted_runs/TA-unet-on-s0",
+      "training_git_shas": [
+        "e5136b69019b769fd5cd1107c78ce791191f8812"
+      ],
+      "training_job_ids": [
+        "30034156"
+      ],
+      "updates": 60800
+    },
+    {
+      "checkpoints": {
+        "best": {
+          "bytes": 60841627,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "first_absolute_min_val_mean_condition_rmse_K",
+          "epoch": 250,
+          "file_sha256": "b25f8d39b41da936dea1edb205fdef57e8c8c0c2a6a7952ad5621b57767854a2",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 40.59197855703871,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 19.940554235432273,
+            "val_mean_condition_rmse_K": 35.36939138353981,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 35.17914024850234,
+                "per_K_common_rmse_K": {
+                  "0": 35.18683859963318,
+                  "1": 35.18686606906281,
+                  "16": 35.17001695993889,
+                  "32": 35.17640429335821,
+                  "4": 35.18214815110644,
+                  "9": 35.1725674179145
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 35.73068131178806,
+                "per_K_common_rmse_K": {
+                  "0": 35.74226349227168,
+                  "1": 35.74489898385688,
+                  "16": 35.73738426481692,
+                  "32": 35.67781718828764,
+                  "4": 35.74618212087831,
+                  "9": 35.735541820616966
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 35.19835259032906,
+                "per_K_common_rmse_K": {
+                  "0": 35.199552341361006,
+                  "1": 35.204758413127024,
+                  "16": 35.184667375787484,
+                  "32": 35.187571440217894,
+                  "4": 35.208762086304226,
+                  "9": 35.2048038851767
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "5e551fc58c1ca8d37dfc8cdbd4f84fb0a285bffd9aaa5e6a9cd23f806381f95b"
+        },
+        "best_seen_diagnostic": {
+          "bytes": 60771035,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "min_seen_replica0_mean_condition_rmse_K",
+          "epoch": 240,
+          "file_sha256": "ea9449798c549ba5117a6b7f278dc8ff55790fcf420ebf4444477372ca14f011",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 40.072055698411454,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 20.049417885279485,
+            "val_mean_condition_rmse_K": 36.78402500676689,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 36.47821195827677,
+                "per_K_common_rmse_K": {
+                  "0": 36.484648384033896,
+                  "1": 36.485267840829664,
+                  "16": 36.474724869707565,
+                  "32": 36.467735439227944,
+                  "4": 36.48261580179366,
+                  "9": 36.474279414067915
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 37.124880134139566,
+                "per_K_common_rmse_K": {
+                  "0": 37.134432115652906,
+                  "1": 37.13558151241033,
+                  "16": 37.12794259388849,
+                  "32": 37.09203179262712,
+                  "4": 37.136627405536636,
+                  "9": 37.122665384721905
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 36.74898292788433,
+                "per_K_common_rmse_K": {
+                  "0": 36.75023157405476,
+                  "1": 36.75374609971502,
+                  "16": 36.730510454809725,
+                  "32": 36.73845835860017,
+                  "4": 36.760447222591296,
+                  "9": 36.76050385753499
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "b5ecab85d9a1227c17a374688f8f1df670cb5f4661ecc37d9e9aa6feaea5a49d"
+        },
+        "last": {
+          "bytes": 64855707,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "early_stop_epoch",
+          "epoch": 760,
+          "file_sha256": "8b3c185aa1b6da078baa62d19defdb7b4b7a831f7bf314ed4786c219453a7acb",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 42.218968189967995,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 12.709130399418896,
+            "val_mean_condition_rmse_K": 37.15601155819326,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 37.122074490897695,
+                "per_K_common_rmse_K": {
+                  "0": 37.122201420386766,
+                  "1": 37.123395734757395,
+                  "16": 37.1183170937508,
+                  "32": 37.12875242068716,
+                  "4": 37.12226678955263,
+                  "9": 37.117513486251404
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 37.2422905710558,
+                "per_K_common_rmse_K": {
+                  "0": 37.2482021881135,
+                  "1": 37.24879981994576,
+                  "16": 37.2461543376911,
+                  "32": 37.22117394103726,
+                  "4": 37.2488010055836,
+                  "9": 37.240612133963545
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 37.103669612626305,
+                "per_K_common_rmse_K": {
+                  "0": 37.10283063593958,
+                  "1": 37.10609418889032,
+                  "16": 37.09343521164658,
+                  "32": 37.09664568537378,
+                  "4": 37.110445763964705,
+                  "9": 37.112566189942875
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "e3549c76b5436eb80cc9924b6e0b561314b938815b9952d6b44b30e334bf209a"
+        }
+      },
+      "epochs_completed": 760,
+      "family": "sparse_unet",
+      "model_seed": 1,
+      "n_attempts": 1,
+      "p_conditioning": true,
+      "run_id": "TA-unet-on-s1",
+      "status": "stopped_early_plateau",
+      "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+      "training_dir": "/home/bontempi/official_thesis_t_assisted_runs/TA-unet-on-s1",
+      "training_git_shas": [
+        "e5136b69019b769fd5cd1107c78ce791191f8812"
+      ],
+      "training_job_ids": [
+        "30034157"
+      ],
+      "updates": 72200
+    },
+    {
+      "checkpoints": {
+        "best": {
+          "bytes": 60464027,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "first_absolute_min_val_mean_condition_rmse_K",
+          "epoch": 200,
+          "file_sha256": "0c83e8b2e7afbde8aca78eba085fc028fc73960eb89d4f50c5772cfd3c03238e",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 40.20068089321282,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 22.38046455416399,
+            "val_mean_condition_rmse_K": 39.66396401570552,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 39.34773817105042,
+                "per_K_common_rmse_K": {
+                  "0": 39.37858532853786,
+                  "1": 39.379898913793426,
+                  "16": 39.31823955508278,
+                  "32": 39.29819022390532,
+                  "4": 39.3610558061593,
+                  "9": 39.35045919882385
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 39.76769806705516,
+                "per_K_common_rmse_K": {
+                  "0": 39.782702473434,
+                  "1": 39.784359757380116,
+                  "16": 39.789054472757066,
+                  "32": 39.693074316349445,
+                  "4": 39.79286901933176,
+                  "9": 39.76412836307854
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 39.87645580901097,
+                "per_K_common_rmse_K": {
+                  "0": 39.91757426732784,
+                  "1": 39.92531936194362,
+                  "16": 39.84968788528027,
+                  "32": 39.775008753268196,
+                  "4": 39.89730540477142,
+                  "9": 39.893839181474455
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "fff26a31bfea4aa31cc32b1ded88b70867701b7733fa736c7c4b148f903c385e"
+        },
+        "best_seen_diagnostic": {
+          "bytes": 61001691,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "min_seen_replica0_mean_condition_rmse_K",
+          "epoch": 270,
+          "file_sha256": "1e0276d2d0019350e4a60610d6bc05b697dd79ec8bdb2d618b68ef8fdb401b1c",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 39.554242029066785,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 17.888954645881224,
+            "val_mean_condition_rmse_K": 40.91555915656348,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 40.72740960618045,
+                "per_K_common_rmse_K": {
+                  "0": 40.747211872877536,
+                  "1": 40.747171165623016,
+                  "16": 40.71799969240781,
+                  "32": 40.68669180197392,
+                  "4": 40.734922901916896,
+                  "9": 40.73046020228356
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 40.94450330605293,
+                "per_K_common_rmse_K": {
+                  "0": 40.95376415731487,
+                  "1": 40.953387933746114,
+                  "16": 40.955778749248964,
+                  "32": 40.90976868435743,
+                  "4": 40.955669709887,
+                  "9": 40.93865060176322
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 41.07476455745705,
+                "per_K_common_rmse_K": {
+                  "0": 41.09459900211317,
+                  "1": 41.0919639121472,
+                  "16": 41.062542141892045,
+                  "32": 41.035548292575136,
+                  "4": 41.07766213616352,
+                  "9": 41.08627185985126
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "dd74e6d42fdff6c4c9d954f1645cdf41a746c979df1e2706d0f53b796f9c18a1"
+        },
+        "last": {
+          "bytes": 64454363,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "early_stop_epoch",
+          "epoch": 710,
+          "file_sha256": "6b49a5c7c4ee07d621857a7d5083dd930ec28994c26511698d010f6dbda170e4",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 41.53128996822655,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 13.621142148907971,
+            "val_mean_condition_rmse_K": 41.60022830715747,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 41.57210773166968,
+                "per_K_common_rmse_K": {
+                  "0": 41.580523531119916,
+                  "1": 41.58124937631169,
+                  "16": 41.569346144830796,
+                  "32": 41.54791681544936,
+                  "4": 41.57665091626176,
+                  "9": 41.57695960604456
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 41.39167929045434,
+                "per_K_common_rmse_K": {
+                  "0": 41.39717064678635,
+                  "1": 41.39575943039589,
+                  "16": 41.4037058466516,
+                  "32": 41.37032617542852,
+                  "4": 41.39684049757877,
+                  "9": 41.38627314588493
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 41.83689789934841,
+                "per_K_common_rmse_K": {
+                  "0": 41.848262707190365,
+                  "1": 41.85078681382586,
+                  "16": 41.824540191297906,
+                  "32": 41.812996388789394,
+                  "4": 41.84053570619946,
+                  "9": 41.844265588787444
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "52f96c107caa5f922849d0f1bf131d88d9e4d4786413034b07cb587a416747f8"
+        }
+      },
+      "epochs_completed": 710,
+      "family": "sparse_unet",
+      "model_seed": 2,
+      "n_attempts": 1,
+      "p_conditioning": true,
+      "run_id": "TA-unet-on-s2",
+      "status": "stopped_early_plateau",
+      "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+      "training_dir": "/home/bontempi/official_thesis_t_assisted_runs/TA-unet-on-s2",
+      "training_git_shas": [
+        "e5136b69019b769fd5cd1107c78ce791191f8812"
+      ],
+      "training_job_ids": [
+        "30034158"
+      ],
+      "updates": 67450
+    },
+    {
+      "checkpoints": {
+        "best": {
+          "bytes": 60615067,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "first_absolute_min_val_mean_condition_rmse_K",
+          "epoch": 220,
+          "file_sha256": "fca4e815fd7d5c20056a5f3197ff91cc1d1d80baac95e0476a8f5c76a6ce0b32",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 42.53797336795257,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 23.404694356166754,
+            "val_mean_condition_rmse_K": 40.149605585561964,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 40.054781838729554,
+                "per_K_common_rmse_K": {
+                  "0": 40.04093577512529,
+                  "1": 40.039484222927534,
+                  "16": 40.049813864982404,
+                  "32": 40.11874673177197,
+                  "4": 40.033838615713776,
+                  "9": 40.04587182185631
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 40.17102944642175,
+                "per_K_common_rmse_K": {
+                  "0": 40.18976338441748,
+                  "1": 40.190101365576105,
+                  "16": 40.16456161519094,
+                  "32": 40.09938762458986,
+                  "4": 40.193940708876944,
+                  "9": 40.18842197987917
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 40.22300547153457,
+                "per_K_common_rmse_K": {
+                  "0": 40.193888602314736,
+                  "1": 40.19976312199808,
+                  "16": 40.25750068441348,
+                  "32": 40.26118379260787,
+                  "4": 40.208045875066425,
+                  "9": 40.21765075280681
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "6e36eaf828d75f0ee73dc2a74b84df0b3fd26a93674eb05d66f8b86431e84aed"
+        },
+        "best_seen_diagnostic": {
+          "bytes": 61158427,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "min_seen_replica0_mean_condition_rmse_K",
+          "epoch": 290,
+          "file_sha256": "206933fb81f4ee3d1d3955e4edcef102a9968d8fc8ab4e7a12ab669ccf112e13",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 42.25120623352881,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 18.830906673760264,
+            "val_mean_condition_rmse_K": 41.760895178848074,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 41.40462331114077,
+                "per_K_common_rmse_K": {
+                  "0": 41.42068263783549,
+                  "1": 41.41700108770822,
+                  "16": 41.41247181764482,
+                  "32": 41.35333762050006,
+                  "4": 41.41277531877193,
+                  "9": 41.411471384384065
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 42.29641090550805,
+                "per_K_common_rmse_K": {
+                  "0": 42.36081072419464,
+                  "1": 42.35746727074701,
+                  "16": 42.286093767151876,
+                  "32": 42.10759529685052,
+                  "4": 42.34966117456182,
+                  "9": 42.31683719954245
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 41.5816513198954,
+                "per_K_common_rmse_K": {
+                  "0": 41.5677014311424,
+                  "1": 41.585057189525564,
+                  "16": 41.591763715586204,
+                  "32": 41.57173878670115,
+                  "4": 41.587042565315905,
+                  "9": 41.58660423110117
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "ee433a8014b6447f924b85a2778b911f3afe384db43b10fef8f369516683f279"
+        },
+        "last": {
+          "bytes": 64614875,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "early_stop_epoch",
+          "epoch": 730,
+          "file_sha256": "4cbd2c270bdb1b093fb710439990e6a042fb12ba5405540767a5c81c48257114",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 43.60579160149653,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 14.281128299621853,
+            "val_mean_condition_rmse_K": 42.75713188574246,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 42.584218383930626,
+                "per_K_common_rmse_K": {
+                  "0": 42.589991557258905,
+                  "1": 42.5879764534894,
+                  "16": 42.58786347377956,
+                  "32": 42.567654278110275,
+                  "4": 42.58566387998277,
+                  "9": 42.586160660962896
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 43.031291782817895,
+                "per_K_common_rmse_K": {
+                  "0": 43.06567313176154,
+                  "1": 43.06570486131242,
+                  "16": 43.020623179986494,
+                  "32": 42.92128997422514,
+                  "4": 43.06335841066132,
+                  "9": 43.05110113896046
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 42.65588549047886,
+                "per_K_common_rmse_K": {
+                  "0": 42.665985647281765,
+                  "1": 42.65979504718317,
+                  "16": 42.64579325978173,
+                  "32": 42.64131334993251,
+                  "4": 42.662433952685056,
+                  "9": 42.659991686008915
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "6659c55518c2ee1dc263bbe992d8709cc7893f751cd03ea64f87b035b96bd3d4"
+        }
+      },
+      "epochs_completed": 730,
+      "family": "sparse_unet",
+      "model_seed": 0,
+      "n_attempts": 1,
+      "p_conditioning": false,
+      "run_id": "TA-unet-off-s0",
+      "status": "stopped_early_plateau",
+      "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+      "training_dir": "/home/bontempi/official_thesis_t_assisted_runs/TA-unet-off-s0",
+      "training_git_shas": [
+        "e5136b69019b769fd5cd1107c78ce791191f8812"
+      ],
+      "training_job_ids": [
+        "30036924"
+      ],
+      "updates": 69350
+    },
+    {
+      "checkpoints": {
+        "best": {
+          "bytes": 60161947,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "first_absolute_min_val_mean_condition_rmse_K",
+          "epoch": 160,
+          "file_sha256": "c0d69a9e23ef31c62c9d89ab7f996b2e0fe7038d356eb896e17f82d95eb13d24",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 44.72048757028133,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 31.40544818235797,
+            "val_mean_condition_rmse_K": 38.6753560941146,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 38.57419917092367,
+                "per_K_common_rmse_K": {
+                  "0": 38.55870700710301,
+                  "1": 38.564665416243265,
+                  "16": 38.5868632157963,
+                  "32": 38.58337588688604,
+                  "4": 38.57147222176466,
+                  "9": 38.580111277748735
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 38.9580718954517,
+                "per_K_common_rmse_K": {
+                  "0": 38.992506146749214,
+                  "1": 38.982652361427135,
+                  "16": 38.98356402454553,
+                  "32": 38.82736688868834,
+                  "4": 38.984703209457116,
+                  "9": 38.977638741842895
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 38.49379721596842,
+                "per_K_common_rmse_K": {
+                  "0": 38.51225531985398,
+                  "1": 38.499263250268605,
+                  "16": 38.49581497639281,
+                  "32": 38.4792652472575,
+                  "4": 38.4894966995679,
+                  "9": 38.486687802469774
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "7964234536c41dc9db89857d24173cea85230cdfe462a718fbf0d5c333402f3e"
+        },
+        "best_seen_diagnostic": {
+          "bytes": 60923291,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "min_seen_replica0_mean_condition_rmse_K",
+          "epoch": 260,
+          "file_sha256": "fa6a908594eccb977f36a571a7983819b0c8de8ae0756f3bd7d711ea1578947c",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 42.28247695086879,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 20.932552188591036,
+            "val_mean_condition_rmse_K": 42.67454295759611,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 41.911261588425354,
+                "per_K_common_rmse_K": {
+                  "0": 41.91480445051776,
+                  "1": 41.919687908228155,
+                  "16": 41.925890264281776,
+                  "32": 41.86989809791671,
+                  "4": 41.91815060522874,
+                  "9": 41.919138204378974
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 43.32372673954117,
+                "per_K_common_rmse_K": {
+                  "0": 43.33902515261041,
+                  "1": 43.33760687831276,
+                  "16": 43.339346999870145,
+                  "32": 43.26153313214811,
+                  "4": 43.331912323868494,
+                  "9": 43.332935950437104
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 42.78864054482179,
+                "per_K_common_rmse_K": {
+                  "0": 42.83829750962614,
+                  "1": 42.81971093042116,
+                  "16": 42.74130300045974,
+                  "32": 42.72062694293792,
+                  "4": 42.80787966344365,
+                  "9": 42.8040252220421
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "f128de8540a6867426d09e9acc05e39929ef7013fd236319f09fe3133f43f78b"
+        },
+        "last": {
+          "bytes": 64614875,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "early_stop_epoch",
+          "epoch": 730,
+          "file_sha256": "6ae1bcdbd9d43f43bffabb9e4908fb6e498e50305ecac8ba61f718c9f4a59cf1",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 43.5448793352696,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 14.709053493458498,
+            "val_mean_condition_rmse_K": 44.22316632653806,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 43.77638726258342,
+                "per_K_common_rmse_K": {
+                  "0": 43.776036318423444,
+                  "1": 43.777628458240166,
+                  "16": 43.77318736244271,
+                  "32": 43.780775718043856,
+                  "4": 43.77347202925096,
+                  "9": 43.77722368909938
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 44.89451449064282,
+                "per_K_common_rmse_K": {
+                  "0": 44.905806296561074,
+                  "1": 44.90550734900654,
+                  "16": 44.90955908110834,
+                  "32": 44.84435139262615,
+                  "4": 44.89995555200405,
+                  "9": 44.901907272550744
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 43.99859722638794,
+                "per_K_common_rmse_K": {
+                  "0": 43.99757496290109,
+                  "1": 44.00509776997503,
+                  "16": 43.98936083087826,
+                  "32": 43.988985411760275,
+                  "4": 44.00272643661737,
+                  "9": 44.00783794619562
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "2a65ba14000248d5f7d627c497bab40d0d832123992cb0257657555b99f63ffd"
+        }
+      },
+      "epochs_completed": 730,
+      "family": "sparse_unet",
+      "model_seed": 1,
+      "n_attempts": 1,
+      "p_conditioning": false,
+      "run_id": "TA-unet-off-s1",
+      "status": "stopped_early_plateau",
+      "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+      "training_dir": "/home/bontempi/official_thesis_t_assisted_runs/TA-unet-off-s1",
+      "training_git_shas": [
+        "e5136b69019b769fd5cd1107c78ce791191f8812"
+      ],
+      "training_job_ids": [
+        "30037226"
+      ],
+      "updates": 69350
+    },
+    {
+      "checkpoints": {
+        "best": {
+          "bytes": 59935387,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "first_absolute_min_val_mean_condition_rmse_K",
+          "epoch": 130,
+          "file_sha256": "2dab82a7dda8c146c3c27ddcd5bdfc5418efd292c858ca17e93938f6d8240732",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 46.361151694413614,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 33.42536258179826,
+            "val_mean_condition_rmse_K": 40.38519167392963,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 40.282258765435806,
+                "per_K_common_rmse_K": {
+                  "0": 40.27862781107964,
+                  "1": 40.27972000473075,
+                  "16": 40.266621084114625,
+                  "32": 40.326474194558195,
+                  "4": 40.2727527381325,
+                  "9": 40.269356759999106
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 40.78638609684509,
+                "per_K_common_rmse_K": {
+                  "0": 40.83020606554547,
+                  "1": 40.826797184275286,
+                  "16": 40.74648587726997,
+                  "32": 40.696036347007265,
+                  "4": 40.82159604632645,
+                  "9": 40.79719506064613
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 40.08693015950801,
+                "per_K_common_rmse_K": {
+                  "0": 40.10980464092337,
+                  "1": 40.12804183310407,
+                  "16": 40.03561403382961,
+                  "32": 40.021120218131664,
+                  "4": 40.121832950521444,
+                  "9": 40.105167280537906
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "45a6e8d64052e2b6933df81b4a493ae1d6bc5b6e3fdfe5a890f3f1fe90c65fbe"
+        },
+        "best_seen_diagnostic": {
+          "bytes": 61001691,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "min_seen_replica0_mean_condition_rmse_K",
+          "epoch": 270,
+          "file_sha256": "09cc96cc00083486b129d96b060de8d6c8649335fa68f66033191230e88c4e2a",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 42.238942696116546,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 19.549579812845298,
+            "val_mean_condition_rmse_K": 41.18687233187352,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 40.43989299083102,
+                "per_K_common_rmse_K": {
+                  "0": 40.46129490831376,
+                  "1": 40.452406617798935,
+                  "16": 40.44481610874686,
+                  "32": 40.397009399109415,
+                  "4": 40.44354416452143,
+                  "9": 40.44028674649572
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 42.23378286884136,
+                "per_K_common_rmse_K": {
+                  "0": 42.27418294982535,
+                  "1": 42.26999456869689,
+                  "16": 42.250727903271496,
+                  "32": 42.09897509433938,
+                  "4": 42.25885004708743,
+                  "9": 42.24996664982759
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 40.886941135948184,
+                "per_K_common_rmse_K": {
+                  "0": 40.910808403350295,
+                  "1": 40.92749025574708,
+                  "16": 40.83356371379912,
+                  "32": 40.8181910024217,
+                  "4": 40.91885552864259,
+                  "9": 40.91273791172835
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "93d0f7cd12e20bb4637c6270fa8bfd294911405a0dbe3175b9faf89bd00ad55f"
+        },
+        "last": {
+          "bytes": 64374043,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "early_stop_epoch",
+          "epoch": 700,
+          "file_sha256": "5a6eb8bd45eb3b3203fbcd77114c6e33adab1eaefe580725bc12a0fc223b48c8",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 43.45629031837703,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 15.051649984744955,
+            "val_mean_condition_rmse_K": 44.01783580357488,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 43.18422846573524,
+                "per_K_common_rmse_K": {
+                  "0": 43.20755034274756,
+                  "1": 43.20078227808083,
+                  "16": 43.185026810513705,
+                  "32": 43.127872981617884,
+                  "4": 43.19515020852713,
+                  "9": 43.18898817292433
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 44.59094157906373,
+                "per_K_common_rmse_K": {
+                  "0": 44.62106789926889,
+                  "1": 44.61709676483898,
+                  "16": 44.592579838080475,
+                  "32": 44.503864163911224,
+                  "4": 44.609577837147356,
+                  "9": 44.601462971135476
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 44.278337365925665,
+                "per_K_common_rmse_K": {
+                  "0": 44.327203848438955,
+                  "1": 44.31479191455162,
+                  "16": 44.22277110503484,
+                  "32": 44.20970848154974,
+                  "4": 44.30477602603514,
+                  "9": 44.290772819943705
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "ccb6182d4b40002cc71cfa920964e7ad2adb02d1feb448111d799293e6f2d338"
+        }
+      },
+      "epochs_completed": 700,
+      "family": "sparse_unet",
+      "model_seed": 2,
+      "n_attempts": 1,
+      "p_conditioning": false,
+      "run_id": "TA-unet-off-s2",
+      "status": "stopped_early_plateau",
+      "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+      "training_dir": "/home/bontempi/official_thesis_t_assisted_runs/TA-unet-off-s2",
+      "training_git_shas": [
+        "e5136b69019b769fd5cd1107c78ce791191f8812"
+      ],
+      "training_job_ids": [
+        "30034027"
+      ],
+      "updates": 66500
+    },
+    {
+      "checkpoints": {
+        "best": {
+          "bytes": 17780155,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "first_absolute_min_val_mean_condition_rmse_K",
+          "epoch": 500,
+          "file_sha256": "fff5eeeef3b84c4bb9029a722a13f3c64512c32d0d07321790100cae16629f48",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 48.23640691585991,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 39.59513000882435,
+            "val_mean_condition_rmse_K": 41.54154622641918,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 41.80505424449145,
+                "per_K_common_rmse_K": {
+                  "0": 41.81794213138318,
+                  "1": 41.816958176082885,
+                  "16": 41.83618142275415,
+                  "32": 41.7081818608982,
+                  "4": 41.836798290278686,
+                  "9": 41.81426358555161
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 41.57581091860113,
+                "per_K_common_rmse_K": {
+                  "0": 41.56755376676558,
+                  "1": 41.57483689761761,
+                  "16": 41.59036011236277,
+                  "32": 41.55864069218137,
+                  "4": 41.5655732403833,
+                  "9": 41.59790080229613
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 41.243773516164964,
+                "per_K_common_rmse_K": {
+                  "0": 41.20294498640552,
+                  "1": 41.22649011989272,
+                  "16": 41.19899412398516,
+                  "32": 41.383270471160245,
+                  "4": 41.237959208291066,
+                  "9": 41.21298218725508
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "a062f3045993ad5a1711b63f29c783b6b86047d2d4c8b8ca359d3475b824e9b2"
+        },
+        "best_seen_diagnostic": {
+          "bytes": 21365883,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "min_seen_replica0_mean_condition_rmse_K",
+          "epoch": 950,
+          "file_sha256": "22cacd1bd20c86779522fb18fea4584aff0941aa907255a7392a2f113a22c593",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 45.63126075860739,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 35.16726396499786,
+            "val_mean_condition_rmse_K": 42.20753685565854,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 42.235744103128816,
+                "per_K_common_rmse_K": {
+                  "0": 42.201055779330346,
+                  "1": 42.21203051346705,
+                  "16": 42.32721496169876,
+                  "32": 42.16009886616609,
+                  "4": 42.255583172072576,
+                  "9": 42.25848132603806
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 42.285007277906466,
+                "per_K_common_rmse_K": {
+                  "0": 42.22668948406619,
+                  "1": 42.2350772267278,
+                  "16": 42.38003742286522,
+                  "32": 42.3374998670711,
+                  "4": 42.24312348072929,
+                  "9": 42.287616185979175
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 42.101859185940334,
+                "per_K_common_rmse_K": {
+                  "0": 42.07373315173519,
+                  "1": 42.05760677952023,
+                  "16": 42.06105734763998,
+                  "32": 42.24007086346195,
+                  "4": 42.08218766210117,
+                  "9": 42.0964993111835
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "edd4277cfbf9501f32e86b2129ee24385498b8048a0b8b77140c7e933eb846af"
+        },
+        "last": {
+          "bytes": 21366971,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "early_stop_epoch",
+          "epoch": 950,
+          "file_sha256": "2a8b7466f6bd6dfc60e8ee6ab9676ab5f22e963f949311341e460f669c371207",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 45.63126075860739,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 35.16726396499786,
+            "val_mean_condition_rmse_K": 42.20753685565854,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 42.235744103128816,
+                "per_K_common_rmse_K": {
+                  "0": 42.201055779330346,
+                  "1": 42.21203051346705,
+                  "16": 42.32721496169876,
+                  "32": 42.16009886616609,
+                  "4": 42.255583172072576,
+                  "9": 42.25848132603806
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 42.285007277906466,
+                "per_K_common_rmse_K": {
+                  "0": 42.22668948406619,
+                  "1": 42.2350772267278,
+                  "16": 42.38003742286522,
+                  "32": 42.3374998670711,
+                  "4": 42.24312348072929,
+                  "9": 42.287616185979175
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 42.101859185940334,
+                "per_K_common_rmse_K": {
+                  "0": 42.07373315173519,
+                  "1": 42.05760677952023,
+                  "16": 42.06105734763998,
+                  "32": 42.24007086346195,
+                  "4": 42.08218766210117,
+                  "9": 42.0964993111835
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": "best_seen_diagnostic",
+          "weights_sha256": "edd4277cfbf9501f32e86b2129ee24385498b8048a0b8b77140c7e933eb846af"
+        }
+      },
+      "epochs_completed": 950,
+      "family": "adapted_glu",
+      "model_seed": 0,
+      "n_attempts": 1,
+      "p_conditioning": true,
+      "run_id": "TA-glu-on-s0",
+      "status": "stopped_early_plateau",
+      "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+      "training_dir": "/home/bontempi/official_thesis_t_assisted_runs/TA-glu-on-s0",
+      "training_git_shas": [
+        "e5136b69019b769fd5cd1107c78ce791191f8812"
+      ],
+      "training_job_ids": [
+        "30034047"
+      ],
+      "updates": 90250
+    },
+    {
+      "checkpoints": {
+        "best": {
+          "bytes": 20312827,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "first_absolute_min_val_mean_condition_rmse_K",
+          "epoch": 820,
+          "file_sha256": "666d0bcd0f765125432b769037ead8610306d8565e795fc44f57c45b4618c938",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 49.26506457465742,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 38.05875232403144,
+            "val_mean_condition_rmse_K": 43.23034362854772,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 43.28614698784539,
+                "per_K_common_rmse_K": {
+                  "0": 43.22806833119899,
+                  "1": 43.24313038727991,
+                  "16": 43.37541634692847,
+                  "32": 43.2950213021229,
+                  "4": 43.28157719890843,
+                  "9": 43.29366836063366
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 43.5434256911841,
+                "per_K_common_rmse_K": {
+                  "0": 43.51484741830015,
+                  "1": 43.521276635070826,
+                  "16": 43.613133447638226,
+                  "32": 43.509253726645824,
+                  "4": 43.547472857810696,
+                  "9": 43.55457006163882
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 42.861458206613655,
+                "per_K_common_rmse_K": {
+                  "0": 42.75047172505281,
+                  "1": 42.81178032255671,
+                  "16": 42.87473133311348,
+                  "32": 43.05462056355011,
+                  "4": 42.82562219548851,
+                  "9": 42.85152309992031
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "0f38e398841514933d77f6745ae189f281661a0e78a326e2a665344618e6e68b"
+        },
+        "best_seen_diagnostic": {
+          "bytes": 21606651,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "min_seen_replica0_mean_condition_rmse_K",
+          "epoch": 980,
+          "file_sha256": "70d5411242c351ae86f36210459b564278f9bcebd015bb3ff8eefd5f188308be",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 49.14319754885548,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 37.85246232303644,
+            "val_mean_condition_rmse_K": 43.66710383870509,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 43.78057108067349,
+                "per_K_common_rmse_K": {
+                  "0": 43.7169384056298,
+                  "1": 43.732142565854076,
+                  "16": 43.87447441822974,
+                  "32": 43.799481047931984,
+                  "4": 43.77178481150013,
+                  "9": 43.788605234895186
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 43.946365317864725,
+                "per_K_common_rmse_K": {
+                  "0": 43.91084965736645,
+                  "1": 43.91738577802921,
+                  "16": 44.012412010564766,
+                  "32": 43.93785146551582,
+                  "4": 43.9448339173539,
+                  "9": 43.95485907835823
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 43.27437511757705,
+                "per_K_common_rmse_K": {
+                  "0": 43.15689913608879,
+                  "1": 43.222777259989776,
+                  "16": 43.29000344872424,
+                  "32": 43.47372470636764,
+                  "4": 43.23746178005053,
+                  "9": 43.265384374241364
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "a6986ba4dcb9c633fac23d1465e77886c4fe502ca2f42c6107f0b7110edfd5e7"
+        },
+        "last": {
+          "bytes": 22011643,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "early_stop_epoch",
+          "epoch": 1030,
+          "file_sha256": "67441cf0a5fae55a780b1128dc35509ae3a3425c1a74363ddc2c0d468c106143",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 49.15894284124861,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 37.80720092564709,
+            "val_mean_condition_rmse_K": 43.79042778773779,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 43.94529359230776,
+                "per_K_common_rmse_K": {
+                  "0": 43.87770705150848,
+                  "1": 43.89413562633249,
+                  "16": 44.046746735703216,
+                  "32": 43.959853816130284,
+                  "4": 43.93474426775176,
+                  "9": 43.95857405642034
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 44.00952724751332,
+                "per_K_common_rmse_K": {
+                  "0": 43.96625191348844,
+                  "1": 43.97409005881738,
+                  "16": 44.075983375156504,
+                  "32": 44.014043691671354,
+                  "4": 44.004930498649706,
+                  "9": 44.021863947296545
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 43.41646252339228,
+                "per_K_common_rmse_K": {
+                  "0": 43.28665343549729,
+                  "1": 43.35748711780949,
+                  "16": 43.44150504010661,
+                  "32": 43.63734345720396,
+                  "4": 43.37211361795372,
+                  "9": 43.40367247178265
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "63bf2c25c8ab5ee97b668697ec20f130b9fdea397cf2f319a2f7e534260f18df"
+        }
+      },
+      "epochs_completed": 1030,
+      "family": "adapted_glu",
+      "model_seed": 1,
+      "n_attempts": 2,
+      "p_conditioning": true,
+      "run_id": "TA-glu-on-s1",
+      "status": "stopped_early_plateau",
+      "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+      "training_dir": "/home/bontempi/official_thesis_t_assisted_runs/TA-glu-on-s1",
+      "training_git_shas": [
+        "a86e39c61731586a3343d9d1489b4d3b22fa0547",
+        "e5136b69019b769fd5cd1107c78ce791191f8812"
+      ],
+      "training_job_ids": [
+        "30034048",
+        "30082571"
+      ],
+      "updates": 97850
+    },
+    {
+      "checkpoints": {
+        "best": {
+          "bytes": 16369467,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "first_absolute_min_val_mean_condition_rmse_K",
+          "epoch": 320,
+          "file_sha256": "66282f4639a26a7a156682bef6c48e364bc84fe6048c1b19eff74e442f37975d",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 54.34322239139569,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 47.899842962085415,
+            "val_mean_condition_rmse_K": 46.92865372983072,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 47.19202882521052,
+                "per_K_common_rmse_K": {
+                  "0": 47.348119639084864,
+                  "1": 47.31630895673919,
+                  "16": 47.23292883729554,
+                  "32": 46.70995936745564,
+                  "4": 47.294441396564515,
+                  "9": 47.250414754123405
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 46.46091653834967,
+                "per_K_common_rmse_K": {
+                  "0": 46.69138825958115,
+                  "1": 46.668759087204116,
+                  "16": 46.41937436239947,
+                  "32": 45.70019509102684,
+                  "4": 46.64638523078444,
+                  "9": 46.63939719910204
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 47.133015825931956,
+                "per_K_common_rmse_K": {
+                  "0": 47.073085544767366,
+                  "1": 47.16596623823657,
+                  "16": 47.12098311019176,
+                  "32": 47.07147362943291,
+                  "4": 47.186742703725,
+                  "9": 47.179843729238165
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "45e3f33fe747fb37d0b2a8563e75486a6350f020c9b498bd2cabece6ff1ce26b"
+        },
+        "best_seen_diagnostic": {
+          "bytes": 19840699,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "min_seen_replica0_mean_condition_rmse_K",
+          "epoch": 760,
+          "file_sha256": "3755677f4fb29a6599ec753b59ce6f112cfba875fa5d15fa5184d1394ba8437d",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 50.25422406425765,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 41.63420144620824,
+            "val_mean_condition_rmse_K": 48.61478504272929,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 49.003425462252245,
+                "per_K_common_rmse_K": {
+                  "0": 49.16271450354907,
+                  "1": 49.12811702584046,
+                  "16": 49.020468118085255,
+                  "32": 48.52885470405565,
+                  "4": 49.09689556413897,
+                  "9": 49.083502857844046
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 48.433748309172984,
+                "per_K_common_rmse_K": {
+                  "0": 48.66832754078711,
+                  "1": 48.63907385323546,
+                  "16": 48.37243506413592,
+                  "32": 47.73056700536881,
+                  "4": 48.60886912903982,
+                  "9": 48.58321726247075
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 48.40718135676264,
+                "per_K_common_rmse_K": {
+                  "0": 48.53668481391978,
+                  "1": 48.517071905630296,
+                  "16": 48.21884353073935,
+                  "32": 48.11874017083045,
+                  "4": 48.53651006596511,
+                  "9": 48.51523765349089
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "fa27cfda42f2cd1251202582210a52740f5499460c0f8622ec76cf7d23e51a0d"
+        },
+        "last": {
+          "bytes": 19922107,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "early_stop_epoch",
+          "epoch": 770,
+          "file_sha256": "68a8792a42b9b7c894d0fab6f8a3ea774353adec3a59bbb787663f54c86074d8",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 50.312176522726304,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 41.674194689586834,
+            "val_mean_condition_rmse_K": 48.73963967895559,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 49.15830522128499,
+                "per_K_common_rmse_K": {
+                  "0": 49.31690461783894,
+                  "1": 49.28306269111564,
+                  "16": 49.184138916648784,
+                  "32": 48.66683550231903,
+                  "4": 49.25357909899058,
+                  "9": 49.245310500797
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 48.55626876243583,
+                "per_K_common_rmse_K": {
+                  "0": 48.78909010969724,
+                  "1": 48.76024410208134,
+                  "16": 48.497908743412324,
+                  "32": 47.848981224893116,
+                  "4": 48.73053663812495,
+                  "9": 48.710851756405994
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 48.50434505314595,
+                "per_K_common_rmse_K": {
+                  "0": 48.64784310134968,
+                  "1": 48.61239204316811,
+                  "16": 48.30650756297097,
+                  "32": 48.214794933689596,
+                  "4": 48.63348878747987,
+                  "9": 48.61104389021741
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "e15109eee0c380696cc09eca45e35cf80507a0d7e249d4f178bcc932f5f083d9"
+        }
+      },
+      "epochs_completed": 770,
+      "family": "adapted_glu",
+      "model_seed": 2,
+      "n_attempts": 1,
+      "p_conditioning": true,
+      "run_id": "TA-glu-on-s2",
+      "status": "stopped_early_plateau",
+      "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+      "training_dir": "/home/bontempi/official_thesis_t_assisted_runs/TA-glu-on-s2",
+      "training_git_shas": [
+        "e5136b69019b769fd5cd1107c78ce791191f8812"
+      ],
+      "training_job_ids": [
+        "30034049"
+      ],
+      "updates": 73150
+    },
+    {
+      "checkpoints": {
+        "best": {
+          "bytes": 19513019,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "first_absolute_min_val_mean_condition_rmse_K",
+          "epoch": 720,
+          "file_sha256": "ae61a164c80509ab513448844627b0e463615dcab774bdf0563e5f2131a6f846",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 52.49046432952261,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 41.40500532245554,
+            "val_mean_condition_rmse_K": 44.250603613400926,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 44.434602633440704,
+                "per_K_common_rmse_K": {
+                  "0": 46.48901866306627,
+                  "1": 44.66258851603086,
+                  "16": 43.818769034204216,
+                  "32": 43.3920251744718,
+                  "4": 44.13614710277474,
+                  "9": 44.10906731009636
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 44.120418124081105,
+                "per_K_common_rmse_K": {
+                  "0": 45.850277527558724,
+                  "1": 44.18261617060782,
+                  "16": 43.744093945936584,
+                  "32": 43.118994871956794,
+                  "4": 43.9994417528975,
+                  "9": 43.82708447552918
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 44.196790082680955,
+                "per_K_common_rmse_K": {
+                  "0": 45.69020772622423,
+                  "1": 45.671029939315495,
+                  "16": 43.5643368017781,
+                  "32": 42.95959380374787,
+                  "4": 43.503199081502466,
+                  "9": 43.79237314351755
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "95cebb297e65fb424a94a0f19327e96aafc54364e8c716e5ad69d478dbb5ee60"
+        },
+        "best_seen_diagnostic": {
+          "bytes": 21208251,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "min_seen_replica0_mean_condition_rmse_K",
+          "epoch": 930,
+          "file_sha256": "59092a43f73368f92a7da845d1d9b3caf3d29ed2860834d146e5d5320df7ba3e",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 52.24143182044233,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 41.085805291118824,
+            "val_mean_condition_rmse_K": 44.290245965493796,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 44.39955164363497,
+                "per_K_common_rmse_K": {
+                  "0": 46.485190288582906,
+                  "1": 44.59126717922143,
+                  "16": 43.77743445841967,
+                  "32": 43.38947721183674,
+                  "4": 44.083387622326285,
+                  "9": 44.0705531014228
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 44.19625749946457,
+                "per_K_common_rmse_K": {
+                  "0": 45.94145624448047,
+                  "1": 44.24164414998118,
+                  "16": 43.834784061310586,
+                  "32": 43.180987957286256,
+                  "4": 44.06660840906034,
+                  "9": 43.91206417466859
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 44.27492875338186,
+                "per_K_common_rmse_K": {
+                  "0": 45.81128265926046,
+                  "1": 45.78327236324279,
+                  "16": 43.63765982728767,
+                  "32": 43.0244002674853,
+                  "4": 43.51712835208164,
+                  "9": 43.87582905093327
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "6fbd5f40c310abb5fd5aaccd14636d5d76bd44ce430033895ec85a645609fd38"
+        },
+        "last": {
+          "bytes": 21208891,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "early_stop_epoch",
+          "epoch": 930,
+          "file_sha256": "5f5498ac8daa9528d92fab1f8d2e58e11009bd1cef83599f3cb7bad8488568fc",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 52.24143182044233,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 41.085805291118824,
+            "val_mean_condition_rmse_K": 44.290245965493796,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 44.39955164363497,
+                "per_K_common_rmse_K": {
+                  "0": 46.485190288582906,
+                  "1": 44.59126717922143,
+                  "16": 43.77743445841967,
+                  "32": 43.38947721183674,
+                  "4": 44.083387622326285,
+                  "9": 44.0705531014228
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 44.19625749946457,
+                "per_K_common_rmse_K": {
+                  "0": 45.94145624448047,
+                  "1": 44.24164414998118,
+                  "16": 43.834784061310586,
+                  "32": 43.180987957286256,
+                  "4": 44.06660840906034,
+                  "9": 43.91206417466859
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 44.27492875338186,
+                "per_K_common_rmse_K": {
+                  "0": 45.81128265926046,
+                  "1": 45.78327236324279,
+                  "16": 43.63765982728767,
+                  "32": 43.0244002674853,
+                  "4": 43.51712835208164,
+                  "9": 43.87582905093327
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": "best_seen_diagnostic",
+          "weights_sha256": "6fbd5f40c310abb5fd5aaccd14636d5d76bd44ce430033895ec85a645609fd38"
+        }
+      },
+      "epochs_completed": 930,
+      "family": "adapted_glu",
+      "model_seed": 0,
+      "n_attempts": 2,
+      "p_conditioning": false,
+      "run_id": "TA-glu-off-s0",
+      "status": "stopped_early_plateau",
+      "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+      "training_dir": "/home/bontempi/official_thesis_t_assisted_runs/TA-glu-off-s0",
+      "training_git_shas": [
+        "e5136b69019b769fd5cd1107c78ce791191f8812"
+      ],
+      "training_job_ids": [
+        "30034050"
+      ],
+      "updates": 88350
+    },
+    {
+      "checkpoints": {
+        "best": {
+          "bytes": 19753787,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "first_absolute_min_val_mean_condition_rmse_K",
+          "epoch": 750,
+          "file_sha256": "19286591aa3396f5767eae29edb89acd15482d0c8c93b8c9378d9a9eac03b395",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 52.12527948901711,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 40.571017437951774,
+            "val_mean_condition_rmse_K": 41.55547620544626,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 41.50790219796918,
+                "per_K_common_rmse_K": {
+                  "0": 42.501409337152104,
+                  "1": 41.34000284282573,
+                  "16": 41.30750900602404,
+                  "32": 41.29877839101831,
+                  "4": 41.192336511537896,
+                  "9": 41.407377099256955
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 41.44120113266607,
+                "per_K_common_rmse_K": {
+                  "0": 43.03135520819537,
+                  "1": 41.17561729701886,
+                  "16": 41.300212448439325,
+                  "32": 41.17000481294002,
+                  "4": 40.91413402444865,
+                  "9": 41.05588300495425
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 41.717325285703524,
+                "per_K_common_rmse_K": {
+                  "0": 43.30501439159277,
+                  "1": 43.398451222255225,
+                  "16": 40.92708194363077,
+                  "32": 40.95361762739916,
+                  "4": 40.64558816508616,
+                  "9": 41.07419836425707
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "0d7b27642eea2f5b1215956e01d91019f415342bb48ee69afacb6540cc0352f8"
+        },
+        "best_seen_diagnostic": {
+          "bytes": 22171899,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "min_seen_replica0_mean_condition_rmse_K",
+          "epoch": 1050,
+          "file_sha256": "a7806fa6d08b22b968a5928f8602118740fb8c4ff67111ac2395c085fab60287",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 51.51546295559222,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 39.480602755396326,
+            "val_mean_condition_rmse_K": 41.82440130432686,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 41.787913252254974,
+                "per_K_common_rmse_K": {
+                  "0": 42.33296330047834,
+                  "1": 41.714865979302154,
+                  "16": 41.6752709899207,
+                  "32": 41.58319505205714,
+                  "4": 41.58133317929255,
+                  "9": 41.83985101247893
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 41.75316887225934,
+                "per_K_common_rmse_K": {
+                  "0": 42.70962243397457,
+                  "1": 41.403501634213804,
+                  "16": 41.92787114514494,
+                  "32": 41.574956798577425,
+                  "4": 41.32558694909841,
+                  "9": 41.57747427254688
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 41.93212178846629,
+                "per_K_common_rmse_K": {
+                  "0": 42.994137532326,
+                  "1": 43.077158344995325,
+                  "16": 41.4528323566791,
+                  "32": 41.38993443369528,
+                  "4": 41.02271481460251,
+                  "9": 41.655953248499536
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "7cfb598f1ac7714ee79e6dc3e2dd3457630d09d17ad0538c0b95989a6b505eeb"
+        },
+        "last": {
+          "bytes": 22413371,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "early_stop_epoch",
+          "epoch": 1080,
+          "file_sha256": "cc3bdf679d9e7e76fa7cfbadc8978064795253807d184107f43c3071d1216af6",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 51.56341548228078,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 39.44047914063714,
+            "val_mean_condition_rmse_K": 41.78262760299032,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 41.75098668236243,
+                "per_K_common_rmse_K": {
+                  "0": 42.283155081456606,
+                  "1": 41.655609527616804,
+                  "16": 41.65351101502924,
+                  "32": 41.55224341968485,
+                  "4": 41.54446587325459,
+                  "9": 41.816935177132486
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 41.70663655951464,
+                "per_K_common_rmse_K": {
+                  "0": 42.619772018297375,
+                  "1": 41.36304538858426,
+                  "16": 41.89428373870557,
+                  "32": 41.54040178908594,
+                  "4": 41.289105151524865,
+                  "9": 41.53321127088986
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 41.89025956709387,
+                "per_K_common_rmse_K": {
+                  "0": 42.89654119585787,
+                  "1": 42.98572711925315,
+                  "16": 41.447440190367246,
+                  "32": 41.40157770690107,
+                  "4": 40.9864932267794,
+                  "9": 41.62377796340448
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "7b98392addefa713d78474917bb7874b85ce5dabaf4b6f4b5efbb8614adca8d4"
+        }
+      },
+      "epochs_completed": 1080,
+      "family": "adapted_glu",
+      "model_seed": 1,
+      "n_attempts": 4,
+      "p_conditioning": false,
+      "run_id": "TA-glu-off-s1",
+      "status": "stopped_early_plateau",
+      "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+      "training_dir": "/home/bontempi/official_thesis_t_assisted_runs/TA-glu-off-s1",
+      "training_git_shas": [
+        "a86e39c61731586a3343d9d1489b4d3b22fa0547",
+        "e5136b69019b769fd5cd1107c78ce791191f8812"
+      ],
+      "training_job_ids": [
+        "30034051",
+        "30082572"
+      ],
+      "updates": 102600
+    },
+    {
+      "checkpoints": {
+        "best": {
+          "bytes": 19594107,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "first_absolute_min_val_mean_condition_rmse_K",
+          "epoch": 730,
+          "file_sha256": "fb77ac97857732677e7cd18b7d7882b480c28e5881827c55e8a41f6111622369",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 51.66684273238724,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 41.73520991051527,
+            "val_mean_condition_rmse_K": 41.472571749258314,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 41.4090069978023,
+                "per_K_common_rmse_K": {
+                  "0": 44.25197853030023,
+                  "1": 41.97068454370518,
+                  "16": 40.38576268125861,
+                  "32": 40.1059870957227,
+                  "4": 41.08488067270701,
+                  "9": 40.6547484631201
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 41.468677538144405,
+                "per_K_common_rmse_K": {
+                  "0": 44.020975110622636,
+                  "1": 41.96899609846795,
+                  "16": 40.787525129558865,
+                  "32": 40.12819979550496,
+                  "4": 41.13152818673679,
+                  "9": 40.77484090797521
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 41.540030711828216,
+                "per_K_common_rmse_K": {
+                  "0": 44.178761964836816,
+                  "1": 44.35041881239119,
+                  "16": 40.02266671177855,
+                  "32": 39.767545901778526,
+                  "4": 40.55646896361759,
+                  "9": 40.36432191656658
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "f466ba838f99f4f0063c2fbf86b0b95e4dbfc7e04650214afdacfacc80ea2b72"
+        },
+        "best_seen_diagnostic": {
+          "bytes": 22172731,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "min_seen_replica0_mean_condition_rmse_K",
+          "epoch": 1050,
+          "file_sha256": "74e6a15d943a7eae64bb1cb49632fb50426230c5ef62d4ac97a9b32364f9e345",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 50.69745836812903,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 40.469332541645024,
+            "val_mean_condition_rmse_K": 41.84040639560457,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 41.71101123721485,
+                "per_K_common_rmse_K": {
+                  "0": 44.56756208897972,
+                  "1": 42.27432303645019,
+                  "16": 40.6862918552361,
+                  "32": 40.41943870321928,
+                  "4": 41.36624263590531,
+                  "9": 40.95220910349849
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 41.86802926473692,
+                "per_K_common_rmse_K": {
+                  "0": 44.23405918441628,
+                  "1": 42.34591199386264,
+                  "16": 41.28260932530245,
+                  "32": 40.54879055479622,
+                  "4": 41.5600148573343,
+                  "9": 41.23678967270962
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 41.94217868486193,
+                "per_K_common_rmse_K": {
+                  "0": 44.48147462983482,
+                  "1": 44.61350652980622,
+                  "16": 40.472046732178796,
+                  "32": 40.180541494063164,
+                  "4": 41.032552390404675,
+                  "9": 40.872950332883896
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "3619b4302337ba9300589faaa97d4c65204c661d02cd83f9aa8838c30b4f7209"
+        },
+        "last": {
+          "bytes": 22253691,
+          "checkpoint_kind": "sparse_scientific_epoch_complete_v1",
+          "criterion": "early_stop_epoch",
+          "epoch": 1060,
+          "file_sha256": "4a046e4ca1a13dc051096ba825de9c298a8e9301efac882e4bf729adf12bafbc",
+          "loop_reference": {
+            "seen_mean_condition_rmse_K": 50.7666777754306,
+            "source": "training_loop_not_final_eval",
+            "train_mean_condition_rmse_K": 40.453726270471385,
+            "val_mean_condition_rmse_K": 41.72590505718055,
+            "val_per_replica": [
+              {
+                "mean_condition_rmse_K": 41.64448295836494,
+                "per_K_common_rmse_K": {
+                  "0": 44.29641828311154,
+                  "1": 42.218108487843814,
+                  "16": 40.66185755004036,
+                  "32": 40.399509646947166,
+                  "4": 41.35724319955452,
+                  "9": 40.93376058269222
+                },
+                "replica_id": 0
+              },
+              {
+                "mean_condition_rmse_K": 41.77784922099692,
+                "per_K_common_rmse_K": {
+                  "0": 43.94255782645456,
+                  "1": 42.22899723887003,
+                  "16": 41.2531052415357,
+                  "32": 40.51669997775228,
+                  "4": 41.52602440684165,
+                  "9": 41.199710634527285
+                },
+                "replica_id": 1
+              },
+              {
+                "mean_condition_rmse_K": 41.75538299217978,
+                "per_K_common_rmse_K": {
+                  "0": 44.10676582875025,
+                  "1": 44.22748317037328,
+                  "16": 40.38036897734123,
+                  "32": 40.11303269395164,
+                  "4": 40.92470697843198,
+                  "9": 40.779940304230315
+                },
+                "replica_id": 2
+              }
+            ]
+          },
+          "reuse_forward_from": null,
+          "weights_sha256": "5d8f37ac3c12e242315da63eb647a59d2f5379a8b8802ed9658e3a1e092d410a"
+        }
+      },
+      "epochs_completed": 1060,
+      "family": "adapted_glu",
+      "model_seed": 2,
+      "n_attempts": 7,
+      "p_conditioning": false,
+      "run_id": "TA-glu-off-s2",
+      "status": "stopped_early_plateau",
+      "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+      "training_dir": "/home/bontempi/official_thesis_t_assisted_runs/TA-glu-off-s2",
+      "training_git_shas": [
+        "a86e39c61731586a3343d9d1489b4d3b22fa0547",
+        "e5136b69019b769fd5cd1107c78ce791191f8812"
+      ],
+      "training_job_ids": [
+        "30034036",
+        "30082569"
+      ],
+      "updates": 100700
+    }
+  ],
+  "shared_inputs": {
+    "c149_cache_aggregate_sha256": "fa1c9358deb3bda0313cd74f9ab6855af87bc969c4069a463073d4c4120f03b4",
+    "c149_cache_id": "month2_dense_unet_cache_opus_c149_v1",
+    "c149_cache_root": "/home/bontempi/official_thesis_data/month2_dense_unet_cache_c149",
+    "c149_hash_file": "/home/bontempi/official_thesis_data/month2_dense_unet_cache_c149/payload_hashes.json",
+    "eval_mask_aggregate_payload_sha256": "7be78f35ffea2ebc598adce8cec39dc719339aac17ecadde3137f2064891ffeb",
+    "eval_mask_manifest_file_sha256": "2e2d8ff6edabf62ad56702a155140d064c0b4014d06ee96debf52811efa5c75e",
+    "eval_mask_seed": 20261116,
+    "layout_id": "random_sparse_primary",
+    "mask_root": "/home/bontempi/projects/official_thesis_s5/data/processed/month2_sparse_eval_masks",
+    "stats": "/home/bontempi/projects/official_thesis_s5/data/manifests/train_norm_stats_month2_fit.json",
+    "stats_sha256": "678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e"
+  },
+  "status": "frozen_for_evaluation",
+  "velocity_coverage": 0.05
+}

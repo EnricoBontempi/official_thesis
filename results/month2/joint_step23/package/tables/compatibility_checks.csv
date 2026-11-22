@@ -1,0 +1,27 @@
+check,pass,blocking,detail
+manifest file in repo is the frozen one,True,True,a9c997c96cb44489dd1fc0d4484304b44d8beddbf00b73c25baf4e1922a19e54
+Cursor: manifest sha256 on all 12 runs,True,True,"12 runs, mismatches []"
+assisted: matrix v2 refers to the same manifest sha256,True,True,matrix_v2 sha256 3663d33820aac446b9621bf35ae49dec26ee4cc6a8379ad5363b0a81e8d922f7
+"assisted: v2 package built on the v2 matrix, 12 runs, not smoke, no ranking",True,True,"package matrix 3663d33820aac446b9621bf35ae49dec26ee4cc6a8379ad5363b0a81e8d922f7, n_runs 12, gate max 0.0"
+assisted: 12 COMPLETE.json with gate ok,True,True,gate macro tolerance 0.05 K
+Cursor: 12 COMPLETE.json with gate ok,True,True,free-gate vs S7 CSV tolerance 0.05 K
+Cursor: K=0 identities and K=1 mean=median at 0,True,True,"{""k0_ao_full"": 0.0, ""k0_mean_full"": 0.0, ""k0_median_full"": 0.0, ""k0_ao_centered"": 0.0, ""k0_mean_centered"": 0.0, ""k0_median_centered"": 0.0, ""k1_mean_median"": 0.0}"
+Cursor: SHAs readable from its INDEX,True,True,"forward 54a3b4d3a177b731ed7eef45030c3a49b0986c16, aggregation 30593985337f6367f5e974807cb54865b00d678f"
+Cursor package file equals the version published at be18ad0: INDEX.md,False,False,cluster 6b6582a14193 vs published 1747679256a5 (text/figure regenerated after the tables; tables identical)
+Cursor package file equals the version published at be18ad0: across_seeds.csv,True,True,identical
+Cursor package file equals the version published at be18ad0: by_seed.csv,True,True,identical
+Cursor package file equals the version published at be18ad0: checks.json,True,True,identical
+Cursor package file equals the version published at be18ad0: figures/val_common_rmse_vs_K.png,False,False,cluster f4bde939dd66 vs published 76f1257355e8 (text/figure regenerated after the tables; tables identical)
+Cursor package file equals the version published at be18ad0: per_condition.csv,True,True,identical
+Cursor package file equals the version published at be18ad0: versus_free.csv,True,True,identical
+K sets equal,True,True,"Cursor [0, 1, 4, 9, 16, 32], assisted [0, 1, 4, 9, 16, 32]"
+replicas equal,True,True,0/1/2 on both sides
+Cursor layout is nested_r<replica> (manifest layout paired to the velocity replica),True,True,"{""0"": [""nested_r0""], ""1"": [""nested_r1""], ""2"": [""nested_r2""]}"
+"frame counts per role equal (seen220, VAL123)",True,True,"Cursor {'seen_train_eval': 220, 'val_eval': 123}, assisted {'seen_train_eval': 220, 'val_eval': 123}"
+"frame keys (sim_id, frame_index) identical per role",True,True,seen_train_eval: identical; val_eval: identical
+"velocity mask hash identical per (role, replica, frame)",True,True,"1029 matched, 0 different, 0 unmatched"
+common domain = 16384 - 32 layout sites on both sides,True,True,"Cursor [16352], assisted [16352]"
+Cursor off-anchor count is 16384-K and anchor count K,True,True,"{""0"": [16384], ""1"": [16383], ""4"": [16380], ""9"": [16375], ""16"": [16368], ""32"": [16352]}"
+units: both sides RMSE in kelvin on the same order (median frame RMSE 5-300 K),True,True,"Cursor median 39.8 K, assisted 39.1 K"
+macro definition reproduces Cursor's by_seed.csv (full and common),True,True,"4320 of 4320 cells, max|diff| full 0.00e+00 K, common 0.00e+00 K"
+macro definition reproduces the assisted v2 global_by_replica.csv (full and common),True,True,"864 of 864 cells, max|diff| full 2.13e-14 K, common 2.13e-14 K"
