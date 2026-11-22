@@ -23,8 +23,8 @@ from combustion_recon.evaluation.temperature_k import (  # noqa: E402
 )
 
 _KEYS = [
-    "run_id", "method", "checkpoint", "role", "mask_replica_id",
-    "sim_id", "frame_index", "layout_id",
+    "run_id", "method", "p_conditioning", "model_seed", "checkpoint", "role",
+    "mask_replica_id", "sim_id", "frame_index", "layout_id",
 ]
 
 
@@ -43,9 +43,15 @@ def _same(frame: pd.DataFrame, treatment: str, other: str, column: str, k: int) 
     keys = _KEYS
     left = frame[(frame["K"] == k) & (frame["treatment"] == treatment)][keys + [column]]
     right = frame[(frame["K"] == k) & (frame["treatment"] == other)][keys + [column]]
+    if left.empty or right.empty:
+        raise SystemExit(f"missing rows at K={k}: {treatment}={len(left)} {other}={len(right)}")
+    if left.duplicated(keys).any() or right.duplicated(keys).any():
+        raise SystemExit(f"duplicate identity for {treatment} or {other} at K={k}")
     merged = left.merge(right, on=keys, suffixes=("_a", "_b"))
-    if merged.empty or len(merged) != len(left) or len(merged) != len(right):
-        raise SystemExit(f"{treatment} and {other} do not share rows at K={k}")
+    if len(merged) != len(left) or len(merged) != len(right):
+        raise SystemExit(
+            f"{treatment} and {other} do not share rows at K={k}: {len(left)} vs {len(right)} joined {len(merged)}"
+        )
     return float((merged[f"{column}_a"] - merged[f"{column}_b"]).abs().max())
 
 
