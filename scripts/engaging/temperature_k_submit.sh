@@ -49,7 +49,7 @@ CPU_FULL=$(sbatch --parsable --dependency="afterok:${CPU_SMOKE}" --kill-on-inval
 AGG=$(sbatch --parsable --dependency="afterok:${GPU_FULL}:${CPU_FULL}" --kill-on-invalid-dep=yes \
   --account mit_amf_advanced_cpu --partition mit_normal --qos mit_amf_advanced_cpu \
   --time 00:40:00 --output "$AGG_OUT/slurm/agg-%j.out" --error "$AGG_OUT/slurm/agg-%j.err" \
-  --export=ALL,EXPECT_SHA="$SHA",K_TIP="$TIP",K_NEURAL="$FULL_OUT",K_BASE="$BASE_FULL",K_DEST="$AGG_OUT" \
+  --export=ALL,EXPECT_SHA="$SHA",K_FORWARD_SHA="$SHA",K_TIP="$TIP",K_NEURAL="$FULL_OUT",K_BASE="$BASE_FULL",K_DEST="$AGG_OUT" \
   "$TIP/scripts/engaging/temperature_k_aggregate.sbatch")
 
 echo "gpu_smoke=$GPU_SMOKE partition=mit_normal_gpu account=mit_amf_advanced_gpu qos=mit_amf_advanced_gpu gres=gpu:l40s:1 array=0-1%1 out=$SMOKE_OUT"
