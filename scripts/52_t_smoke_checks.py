@@ -112,7 +112,10 @@ def main() -> int:
         queries = make_synthetic_query_grid(val_on.x, val_on.y)
     model.to(dev)
     trainer = AssistedTrainer(model, cfg=cfg, normalizer=normalizer, n_train_samples=16, query_coords_phys=queries, anchors=anchors)
-    tr = mk("train_fit", "training", True, indices=list(range(0, 2980, 2980 // 16))[:16])
+    from combustion_recon.training.scientific_epoch_sampler import cache_indices_for_pool
+
+    ref760 = cache_indices_for_pool(json.loads((args.cache_root / "train_fit" / "frames.json").read_text()), "A38")
+    tr = mk("train_fit", "training", True, indices=ref760[:: len(ref760) // 16][:16])   # reference760 frames: they have eval payloads
     tr.set_epoch(0)
     trainer._set_lr(1e-3)
     losses = {}
