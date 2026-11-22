@@ -372,3 +372,39 @@ def build_sparse_unet_from_config(
         head_bias=float(cfg["init"]["head_bias"]),
         init_seed=init_seed,
     )
+
+
+# --------------------------------------------------------------------------------------------------
+# Temperature-assisted U-Net (temperature study). Same backbone; two extra named input channels.
+# --------------------------------------------------------------------------------------------------
+ASSISTED_CHANNEL_ORDER = (
+    "vi_obs_norm", "vj_obs_norm", "Mv", "x_scaled", "y_scaled", "T_obs_norm", "M_T", "nh3_norm", "phi_norm",
+)
+ASSISTED_P_CHANNELS = ("nh3_norm", "phi_norm")
+
+
+class SparseUNetAssisted(SparseUNet):
+    """SparseUNet with 9 input channels: the 7 free ones plus observed T (normalized, zero when hidden) and M_T.
+
+    p channels keep their NAMES (``ASSISTED_P_CHANNELS``); p_off zeroes them by name. First-layer weights of the
+    shared channels use the same init stream as the free U-Net for the same seed is NOT promised (new fan-in).
+    """
+
+    def __init__(self, *, base_channels: int = 32, out_channels: int = 1, groups: int = 8, bias: bool = True,
+                 head_weight_std: float = 1e-3, head_bias: float = 0.0, init_seed: int | None = None):
+        super().__init__(in_channels=7, base_channels=base_channels, out_channels=out_channels, groups=groups,
+                         bias=bias, head_weight_std=head_weight_std, head_bias=head_bias, init_seed=init_seed)
+        self.in_channels = 9
+        self.channel_order = list(ASSISTED_CHANNEL_ORDER)
+        self.enc1 = DoubleConv(9, int(base_channels), groups=groups, bias=bias)
+        self._init_weights(init_seed=init_seed, head_bias=head_bias)
+
+
+def build_sparse_unet_assisted_from_config(path: str | Path | None = None, *, base_channels: int | None = None,
+                                           init_seed: int | None = 0) -> SparseUNetAssisted:
+    cfg = load_sparse_unet_config(path)
+    b = int(base_channels) if base_channels is not None else int(cfg["encoder"]["base_channels"])
+    return SparseUNetAssisted(
+        base_channels=b, out_channels=int(cfg["output"]["channels"]), groups=int(cfg["block"]["groups"]),
+        bias=bool(cfg["block"].get("bias", True)), head_weight_std=float(cfg["init"]["head_weight_std"]),
+        head_bias=float(cfg["init"]["head_bias"]), init_seed=init_seed)

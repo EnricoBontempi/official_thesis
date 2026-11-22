@@ -47,6 +47,11 @@ from combustion_recon.training.scientific_epoch_sampler import (  # noqa: E402
     cache_indices_for_pool,
 )
 from combustion_recon.training.sparse_dataset import SparseUNetCacheDataset  # noqa: E402
+from combustion_recon.data.t_anchors import AnchorManifest  # noqa: E402
+from combustion_recon.models.glu_assisted import build_assisted_glu_from_config  # noqa: E402
+from combustion_recon.models.unet import build_sparse_unet_assisted_from_config  # noqa: E402
+from combustion_recon.training.assisted_dataset import AssistedDataset  # noqa: E402
+from combustion_recon.training.assisted_trainer import AssistedTrainer  # noqa: E402
 from combustion_recon.training.sparse_scientific_loop import (  # noqa: E402
     SparseScientificTrainer,
     assert_sparse_scientific_candidate_contract,
@@ -141,6 +146,9 @@ def main() -> int:
         "Every other training key stays locked by the resume check.",
     )
     p.add_argument("--git-sha", type=str, default="")
+    p.add_argument("--assisted", action="store_true", help="temperature study: variable-K temperature-assisted training")
+    p.add_argument("--anchor-manifest", type=Path, default=ROOT / "configs/observations/month2_temperature_anchors_nested_v1.json")
+    p.add_argument("--assisted-protocol", type=Path, default=ROOT / "configs/experiments/month2_temperature_study_protocol.yaml")
     args = p.parse_args()
 
     auth_flags = [
@@ -317,7 +325,13 @@ def main() -> int:
         raise SystemExit(f"reference760 resolved {len(ref760_indices)} != 760")
 
     require_payload = bool(cfg.require_eval_mask_payload)
-    train_ds = SparseUNetCacheDataset(
+    anchors = AnchorManifest.load(args.anchor_manifest) if args.assisted else None
+    DS = SparseUNetCacheDataset
+    if args.assisted:
+        import functools
+
+        DS = functools.partial(AssistedDataset, anchors=anchors)
+    train_ds = DS(
         "train_fit",
         cache_root=cache_root,
         indices=train_indices,
@@ -331,7 +345,7 @@ def main() -> int:
         **cache_kwargs,
     )
     # Historical 760-frame reference for TRAIN diagnostic (B19/C149 included).
-    train_eval_ds = SparseUNetCacheDataset(
+    train_eval_ds = DS(
         "train_fit",
         cache_root=cache_root,
         indices=ref760_indices,
@@ -346,7 +360,7 @@ def main() -> int:
         require_eval_mask_payload=require_payload,
         **cache_kwargs,
     )
-    val_ds = SparseUNetCacheDataset(
+    val_ds = DS(
         "val_eval",
         cache_root=cache_root,
         mask_mode="evaluation",
@@ -359,7 +373,7 @@ def main() -> int:
         require_eval_mask_payload=require_payload,
         **cache_kwargs,
     )
-    seen_ds = SparseUNetCacheDataset(
+    seen_ds = DS(
         "seen_train_eval",
         cache_root=cache_root,
         mask_mode="evaluation",
@@ -382,10 +396,12 @@ def main() -> int:
     _log("datasets_ready", train=len(train_ds), val=len(val_ds), seen=len(seen_ds), p_conditioning=cfg.p_conditioning)
 
     if cfg.family == "sparse_unet":
-        model = build_sparse_unet_from_config(init_seed=int(cfg.seed))
+        model = (build_sparse_unet_assisted_from_config(init_seed=int(cfg.seed)) if args.assisted
+                 else build_sparse_unet_from_config(init_seed=int(cfg.seed)))
         queries = None
     else:
-        model = build_glu_from_config(domain_geometry_path=cache_root / "geometry.npz")
+        model = (build_assisted_glu_from_config(domain_geometry_path=cache_root / "geometry.npz") if args.assisted
+                 else build_glu_from_config(domain_geometry_path=cache_root / "geometry.npz"))
         queries = make_synthetic_query_grid(train_ds.x, train_ds.y)
 
     init_sha = _state_dict_sha256(model)
@@ -417,13 +433,17 @@ def main() -> int:
     _log("model_ready", family=cfg.family, init_sha=init_sha[:16],
          n_params=sum(p_.numel() for p_ in model.parameters()))
 
-    trainer = SparseScientificTrainer(
-        model,
-        cfg=cfg,
-        normalizer=normalizer,
-        n_train_samples=len(train_ds),
-        query_coords_phys=queries,
-    )
+    if args.assisted:
+        trainer = AssistedTrainer(model, cfg=cfg, normalizer=normalizer, n_train_samples=len(train_ds),
+                                  query_coords_phys=queries, anchors=anchors)
+    else:
+        trainer = SparseScientificTrainer(
+            model,
+            cfg=cfg,
+            normalizer=normalizer,
+            n_train_samples=len(train_ds),
+            query_coords_phys=queries,
+        )
     identity = {
         "run_id": run_id,
         "family": cfg.family,
@@ -489,6 +509,21 @@ def main() -> int:
         or cand.get("operational_provisional_pending_s4_profiling"),
         "contract_meta": meta,
     }
+    if args.assisted:
+        identity["assisted"] = {
+            "study": "month2_temperature_study_v1",
+            "protocol_sha256": sha256_file(args.assisted_protocol),
+            "anchor_manifest_sha256": anchors.sha256,
+            "k_values": [0, 1, 4, 9, 16, 32],
+            "train_k_rule": "uniform per optimizer update, function of (namespace, base seed, update)",
+            "selection": "mean over the six K of the common-domain macro VAL RMSE at 5% (new criterion vs S7)",
+            "diag_K_train_seen": [0, 9, 32],
+            "free_reference_unchanged": True,
+        }
+        if resuming:
+            prev = json.loads((out_dir / "run_identity.json").read_text()).get("assisted") or {}
+            if prev.get("anchor_manifest_sha256") != anchors.sha256 or prev.get("protocol_sha256") != identity["assisted"]["protocol_sha256"]:
+                raise SystemExit("resume refused: anchor manifest or protocol differs from the original run")
     if not resuming:
         write_json(out_dir / "effective_config.json", {"candidate": cand, "runtime_cfg": cfg.__dict__})
     else:

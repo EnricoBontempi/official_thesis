@@ -648,6 +648,10 @@ class SparseScientificTrainer:
             self.query_coords_phys = None
         self._set_lr(0.0)
 
+    def _train_sampler(self, epoch_indices: Any, epoch: int) -> Any:
+        """Hook: the free trainer yields plain indices; the assisted trainer overrides it to add the batch K."""
+        return ListSampler(epoch_indices)
+
     def _set_lr(self, lr: float) -> None:
         for group in self.optimizer.param_groups:
             group["lr"] = float(lr)
@@ -1097,7 +1101,7 @@ class SparseScientificTrainer:
                     train_loader = DataLoader(
                         train_ds,
                         batch_size=self.cfg.batch_size,
-                        sampler=ListSampler(epoch_indices),
+                        sampler=self._train_sampler(epoch_indices, epoch),
                         shuffle=False,
                         num_workers=self.cfg.num_workers,
                         collate_fn=collate_sparse_batch,
