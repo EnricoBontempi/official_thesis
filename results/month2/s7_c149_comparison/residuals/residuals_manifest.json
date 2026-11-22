@@ -1,0 +1,22 @@
+{
+  "n_swap_runs": 12,
+  "baselines_control_ok": true,
+  "tables": [
+    "baselines_a38_historical_5pct.csv",
+    "baselines_c149_macro.csv",
+    "baselines_pool_effect_c149_vs_a38_5pct.csv",
+    "batch_diagnostic_rows.csv.gz",
+    "batch_diagnostic_summary.csv",
+    "c149_baseline_fit_provenance.json",
+    "neural_best_family_p_summary.csv",
+    "swap_gappypod_a38.csv",
+    "swap_neural_by_condition.csv",
+    "swap_neural_by_run.csv",
+    "swap_neural_family_p_seed_dispersion.csv"
+  ],
+  "figures": [
+    "neural_vs_baselines_c149_coverage.png",
+    "swap_aligned_vs_swapped.png",
+    "swap_by_condition_val.png"
+  ]
+}

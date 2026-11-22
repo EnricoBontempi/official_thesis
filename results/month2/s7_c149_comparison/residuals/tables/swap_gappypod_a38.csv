@@ -1,0 +1,5 @@
+context,role,p_conditioning,n_frames,aligned_macro_K,swapped_macro_K,donor_reference_macro_K,aligned_replay_vs_s6_max_abs_frame_delta_K,delta_swap_minus_aligned_K,artifact_sha256
+A38 historical frozen artifact (760-frame fit),seen_train_eval,False,220,113.21926313547513,153.6198740744256,153.9428835130821,0.0,40.40061093895048,a6fbdfd2a0409cd11995247ab93db694d0c440d677f810b433daf2fe10a74ac9
+A38 historical frozen artifact (760-frame fit),seen_train_eval,True,220,108.44281001205101,130.8171106861216,153.9428835130821,0.0,22.374300674070582,a6fbdfd2a0409cd11995247ab93db694d0c440d677f810b433daf2fe10a74ac9
+A38 historical frozen artifact (760-frame fit),val_eval,False,123,95.14137525034057,128.98851291246183,97.3623737897553,0.0,33.847137662121256,a6fbdfd2a0409cd11995247ab93db694d0c440d677f810b433daf2fe10a74ac9
+A38 historical frozen artifact (760-frame fit),val_eval,True,123,70.53835123010798,98.3657176241938,97.3623737897553,0.0,27.82736639408583,a6fbdfd2a0409cd11995247ab93db694d0c440d677f810b433daf2fe10a74ac9

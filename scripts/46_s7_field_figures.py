@@ -80,7 +80,8 @@ def main() -> int:
     vmin = min(float(t.min()) for t in truth.values())
     vmax = max(float(t.max()) for t in truth.values())
     emax = max(float(np.abs(data[k][1][i] - data[k][2][i]).max()) for k in data for i in range(3))
-    emax = float(np.ceil(emax / 50.0) * 50.0)
+    emax_true = emax
+    emax = 300.0   # declared display scale (clipped); the true maximum is reported in field_summary.json
     for ck in CKPTS:
         fig, axes = plt.subplots(len(runs) + 1, 2 * len(conds), figsize=(2.0 * 2 * len(conds) + 1.2, 1.55 * (len(runs) + 1)),
                                  layout="constrained", squeeze=False)
@@ -103,10 +104,10 @@ def main() -> int:
         for ax in axes.ravel():
             ax.set_xticks([])
             ax.set_yticks([])
-        fig.colorbar(imT, ax=axes[:, :: 2].ravel().tolist(), shrink=0.3, label="T (K)", location="right")
-        fig.colorbar(imE, ax=axes[:, 1:: 2].ravel().tolist(), shrink=0.3, label="signed error pred-truth (K)", location="right")
+        fig.colorbar(imT, ax=axes.ravel().tolist(), shrink=0.25, label="T (K)", location="right", pad=0.01)
+        fig.colorbar(imE, ax=axes.ravel().tolist(), shrink=0.25, label="signed error pred-truth (K, clipped)", location="right", pad=0.01)
         fig.suptitle(f"VAL frame 1000, 5% coverage, mask replica 0, checkpoint {ck}: all 12 runs\n"
-                     f"T scale [{vmin:.0f}, {vmax:.0f}] K (pred clipped), error scale +-{emax:.0f} K, common to every panel", fontsize=9)
+                     f"T scale [{vmin:.0f}, {vmax:.0f}] K (pred clipped), error scale +-{emax:.0f} K (display clip; true max |error| {emax_true:.0f} K), common to every panel", fontsize=9)
         fig.savefig(args.dest / f"fields_val_frame1000_{ck}.png", dpi=110)
         plt.close(fig)
     # ---- corrected centered-vs-bias figure from the package tables
@@ -116,7 +117,7 @@ def main() -> int:
     glob = pd.read_csv(args.package_tables / "global_by_setting.csv")
     glob["p_conditioning"] = glob["p_conditioning"].astype(bool)
     mod.fig_error_parts(glob, args.dest / "centered_vs_bias_5pct_best.png")
-    summary = {"n_runs": len(runs), "t_scale_K": [vmin, vmax], "error_scale_K": emax,
+    summary = {"n_runs": len(runs), "t_scale_K": [vmin, vmax], "error_scale_display_K": emax, "max_abs_error_K": emax_true,
                "max_abs_delta_field_vs_csv_K": float(cdf["delta_K"].abs().max()),
                "by_family_max_abs_delta_K": {f: float(g["delta_K"].abs().max()) for f, g in
                                              cdf.assign(f=cdf["run_id"].str.contains("glu").map({True: "adapted_glu", False: "sparse_unet"})).groupby("f")}}
