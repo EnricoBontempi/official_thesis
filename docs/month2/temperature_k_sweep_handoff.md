@@ -21,14 +21,14 @@ Ruoli: seen220 e VAL123. Checkpoint neurali: best e last. Nessun best_seen, ness
 
 ## Esecuzione
 
-Il codice è committato prima dei job. Gli id compaiono sotto quando la submission è avvenuta. Output nuovi, checkout detached. Nessun polling stretto: lo smoke GPU è prerequisito (`afterok`) dell’array scientifico, concorrenza 1.
+Codice eseguito: `e9f355feb53e7a16e431f355fa540b1e5d6bb5a9`. Checkout detached `/home/bontempi/projects/official_thesis_k_sweep`. Alla submission la coda Advanced conteneva già i job Sonnet `30032014` e `30032016` (`t_checks`, pending). Questo sweep chiede una sola L40S alla volta.
 
 | Job | Cosa | Risorse |
 | --- | --- | --- |
-| da compilare | smoke GPU, 2 run, 4 frame | `mit_normal_gpu` / `mit_amf_advanced_gpu`, 1×L40S, array `%1` |
-| da compilare | smoke CPU baseline | `mit_normal` / `mit_amf_advanced_cpu` |
-| da compilare | sweep GPU 12 run, dopo lo smoke | stessa GPU, array `0-11%1`, 3 h per task |
-| da compilare | baseline CPU, dopo lo smoke CPU | stessa CPU, 2 h |
-| da compilare | aggregazione, dopo i due full | CPU |
+| 30032017 array 0–1 %1 | smoke GPU, U-Net on s1 e GLU on s0, 4 frame | `mit_normal_gpu` / `mit_amf_advanced_gpu`, 1×L40S, 40 min |
+| 30032019 | smoke CPU baseline, 4 frame | `mit_normal` / `mit_amf_advanced_cpu`, 8 CPU, 64G, 30 min |
+| 30032021 array 0–11 %1 | sweep GPU 12 run, `afterok:30032017` | stessa GPU, 3 h per task |
+| 30032023 | baseline CPU completo, `afterok:30032019` | stessa CPU, 2 h |
+| 30032025 | aggregazione, `afterok:30032021:30032023` | CPU, 40 min |
 
-Forward neurale: `scripts/38` + `_forward` di `scripts/17`, batch 8, fp32, TF32 spento. Il codice GLU non è modificato.
+Se lo smoke fallisce, i job dipendenti vengono annullati (`kill-on-invalid-dep`) e non vengono rilanciati da soli. Forward neurale: `scripts/38` + `_forward` di `scripts/17`, batch 8, fp32, TF32 spento. Il codice GLU non è modificato.
