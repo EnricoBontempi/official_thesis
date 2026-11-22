@@ -139,7 +139,7 @@ def fig_error_parts(glob: pd.DataFrame, dest: Path) -> None:
         ax.set_xlabel("centered RMSE (K)")
         ax.set_title(ROLE_LABEL[role])
         ax.grid(alpha=0.25)
-    axes[0].set_ylabel("|mean signed error| (K)")
+    axes[0].set_ylabel("mean over frames of per-frame |bias| (K)")
     handles = [plt.Line2D([], [], marker="o", ls="", color=COLOR[f], mfc="none" if not p else COLOR[f], label=_cfg(f, p)) for f in COLOR for p in (True, False)]
     fig.legend(handles=handles, loc="outside lower center", ncol=4, frameon=False)
     fig.savefig(dest, dpi=140)

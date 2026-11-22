@@ -135,10 +135,15 @@ def main() -> int:
         meta["runs"][run_id] = {"family": family, "p_on": p_on, "best_epoch": spec["epoch"], "weights_sha256": spec["weights_sha256"],
                                 "n_frames": len(pool), "frames_per_role": expected}
 
-        def make_batch(items: list[dict[str, Any]], ds, mutate: set[int] | None = None):
+        ds_of = {id(it): d for _, d, it in pool}
+
+        def make_batch(items: list[dict[str, Any]], ds_unused, mutate: set[int] | None = None):
             batch = s6.collate_sparse_batch(items)
             if family == "adapted_glu":
-                s6._attach_p(batch, ds)
+                # p of each example from ITS OWN dataset (items may come from different roles)
+                batch["p_norm_tensor"] = torch.tensor(
+                    [[float(ds_of[id(it)].p_norm[int(m["cache_index"]), 0]), float(ds_of[id(it)].p_norm[int(m["cache_index"]), 1])]
+                     for it, m in zip(items, batch["metadata"])], dtype=torch.float32)
             if mutate:
                 for i in mutate:
                     if family == "adapted_glu":
