@@ -266,17 +266,20 @@ def main() -> int:
     disp.to_csv(tdir / "family_p_seed_dispersion.csv", index=False)
     # paired contrasts (descriptive)
     rows = []
-    gi = g.set_index(["family", "p_conditioning", "model_seed", "checkpoint_kind", "role", "K"])
+    gi = g.set_index(["family", "p_conditioning", "model_seed", "checkpoint_kind", "role", "K"])["common_rmse_K"]
+    have = set(gi.index)
     for ck in CHECKPOINTS:
         for role in ROLES:
             for K in K_VALUES:
-                for s in (0, 1, 2):
+                for s_ in (0, 1, 2):
                     for p in (True, False):
-                        rows.append({"contrast": "family_GLU_minus_UNet", "p_conditioning": p, "seed": s, "checkpoint_kind": ck, "role": role, "K": K,
-                                     "delta_common_rmse_K": gi.loc[("adapted_glu", p, s, ck, role, K), "common_rmse_K"] - gi.loc[("sparse_unet", p, s, ck, role, K), "common_rmse_K"]})
+                        a, b = ("adapted_glu", p, s_, ck, role, K), ("sparse_unet", p, s_, ck, role, K)
+                        if a in have and b in have:
+                            rows.append({"contrast": "family_GLU_minus_UNet", "p_conditioning": p, "seed": s_, "checkpoint_kind": ck, "role": role, "K": K, "delta_common_rmse_K": gi[a] - gi[b]})
                     for f in ("sparse_unet", "adapted_glu"):
-                        rows.append({"contrast": f"p_on_minus_off_{f}", "p_conditioning": None, "seed": s, "checkpoint_kind": ck, "role": role, "K": K,
-                                     "delta_common_rmse_K": gi.loc[(f, True, s, ck, role, K), "common_rmse_K"] - gi.loc[(f, False, s, ck, role, K), "common_rmse_K"]})
+                        a, b = (f, True, s_, ck, role, K), (f, False, s_, ck, role, K)
+                        if a in have and b in have:
+                            rows.append({"contrast": f"p_on_minus_off_{f}", "p_conditioning": None, "seed": s_, "checkpoint_kind": ck, "role": role, "K": K, "delta_common_rmse_K": gi[a] - gi[b]})
     pd.DataFrame(rows).to_csv(tdir / "paired_contrasts.csv", index=False)
     # free S7 reference (different models; no identity promised)
     fp = args.free_package_tables / "global_by_setting.csv"
