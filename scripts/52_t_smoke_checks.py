@@ -40,7 +40,7 @@ def main() -> int:
     ap.add_argument("--stats", type=Path, default=Path("/home/bontempi/projects/official_thesis_s5/data/manifests/train_norm_stats_month2_fit.json"))
     ap.add_argument("--anchor-manifest", type=Path, default=ROOT / "configs/observations/month2_temperature_anchors_nested_v1.json")
     ap.add_argument("--out", type=Path, required=True)
-    ap.add_argument("--overfit-updates", type=int, default=250)
+    ap.add_argument("--overfit-updates", type=int, default=800)
     args = ap.parse_args()
     fam = "sparse_unet" if args.family == "unet" else "adapted_glu"
     dev = torch.device("cuda")
@@ -159,7 +159,21 @@ def main() -> int:
             res[tag] = (pred, float(((pred - y) ** 2).mean()))
     rep["positive_control"] = {k: v[1] for k, v in res.items()}
     rep["positive_control"]["max_abs_pred_change_when_T_shifted"] = float((res["K32"][0] - res["K32_shifted_T"][0]).abs().max())
-    rep["checks"]["observed_T_are_used_after_learning"] = bool(rep["positive_control"]["max_abs_pred_change_when_T_shifted"] > 1e-3 and res["K32"][1] < res["K0"][1])
+    # direct evidence of use: at the 32 observed sites the K=32 model reproduces T far better than the same model without T
+    s32 = torch.as_tensor(anchors.sites(1, 32), dtype=torch.long)
+    y_flat = batch["target_T_norm"].reshape(8, -1)
+    # the last `batch` is K0; rebuild K32 and K0 predictions on the same frames for the anchor-site error
+    anc = {}
+    with torch.no_grad():
+        for tag, K in (("K32", 32), ("K0", 0)):
+            tr.eval_K = K
+            b2 = collate_sparse_batch([tr[j] for j in range(8)])
+            if fam == "adapted_glu":
+                b2["p_norm_tensor"] = torch.tensor([[float(tr.p_norm[int(m["cache_index"]), 0]), float(tr.p_norm[int(m["cache_index"]), 1])] for m in b2["metadata"]])
+            pr = trainer._forward_norm(b2, decode_chunked=True).cpu().reshape(8, -1)
+            anc[tag] = float(((pr[:, s32] - y_flat[:, s32]) ** 2).mean().sqrt())
+    rep["positive_control"]["anchor_site_rmse_norm"] = anc
+    rep["checks"]["observed_T_are_used_after_learning"] = bool(rep["positive_control"]["max_abs_pred_change_when_T_shifted"] > 1e-3 and anc["K32"] < 0.8 * anc["K0"])
     # ---- six-K evaluation on a VAL subset, read back from disk
     val_on.indices = val_on.indices[:: max(1, len(val_on.indices) // 12)][:12]
     out = trainer.evaluate_dataset(val_on, role="val_eval", replica_id=0, method=fam, variant="smoke", model_seed=11)
