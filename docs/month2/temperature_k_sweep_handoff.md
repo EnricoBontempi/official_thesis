@@ -21,14 +21,14 @@ Ruoli: seen220 e VAL123. Checkpoint neurali: best e last. Nessun best_seen, ness
 
 ## Esecuzione
 
-Codice eseguito: `e9f355feb53e7a16e431f355fa540b1e5d6bb5a9`. Checkout detached `/home/bontempi/projects/official_thesis_k_sweep`. Alla submission la coda Advanced conteneva già i job Sonnet `30032014` e `30032016` (`t_checks`, pending). Questo sweep chiede una sola L40S alla volta.
+Primo tentativo `e9f355f`, checkout `/home/bontempi/projects/official_thesis_k_sweep`. Smoke GPU `30032017` e smoke CPU `30032019` sono falliti prima di qualunque `COMPLETE`: la macro del gate rinominava `s7_rmse_K` sopra `full_rmse_K` già presente, e la directory baseline esisteva perché conteneva solo `slurm/`. I dipendenti `30032021`, `30032023`, `30032025` sono stati annullati dallo scheduler, non rilanciati.
+
+Codice del secondo tentativo: `54a3b4d3a177b731ed7eef45030c3a49b0986c16`, checkout detached `/home/bontempi/projects/official_thesis_k_sweep_v2`. Alla submission i quattro slot normal Advanced erano già occupati in coda dai job Sonnet `30032333`, `30032338` (`t_checks`), `30032339` (`t_prof_unet`), `30032341` (`t_prof_glu`). Nessuna GPU è stata sottomessa sopra quel tetto.
 
 | Job | Cosa | Risorse |
 | --- | --- | --- |
-| 30032017 array 0–1 %1 | smoke GPU, U-Net on s1 e GLU on s0, 4 frame | `mit_normal_gpu` / `mit_amf_advanced_gpu`, 1×L40S, 40 min |
-| 30032019 | smoke CPU baseline, 4 frame | `mit_normal` / `mit_amf_advanced_cpu`, 8 CPU, 64G, 30 min |
-| 30032021 array 0–11 %1 | sweep GPU 12 run, `afterok:30032017` | stessa GPU, 3 h per task |
-| 30032023 | baseline CPU completo, `afterok:30032019` | stessa CPU, 2 h |
-| 30032025 | aggregazione, `afterok:30032021:30032023` | CPU, 40 min |
+| 30032411 | smoke CPU baseline, 4 frame | `mit_normal` / `mit_amf_advanced_cpu`, 8 CPU, 64G, 30 min |
+| 30032412 | baseline CPU completo, `afterok:30032411` | stessa CPU, 2 h |
+| non sottomesso | smoke e sweep GPU | in attesa che i job Advanced di Sonnet scendano sotto 4 |
 
-Se lo smoke fallisce, i job dipendenti vengono annullati (`kill-on-invalid-dep`) e non vengono rilanciati da soli. Forward neurale: `scripts/38` + `_forward` di `scripts/17`, batch 8, fp32, TF32 spento. Il codice GLU non è modificato.
+Forward neurale, quando partirà: `scripts/38` + `_forward` di `scripts/17`, batch 8, fp32, TF32 spento, una sola L40S, array `%1`. Il codice GLU non è modificato.
