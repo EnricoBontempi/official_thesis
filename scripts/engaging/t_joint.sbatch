@@ -16,4 +16,4 @@ unset PYTHONPATH
 cd "$T_TIP"
 [[ "$(git rev-parse HEAD)" == "$EXPECT_SHA" ]] || { echo "REFUSE: HEAD != $EXPECT_SHA" >&2; exit 5; }
 "$PY" -I scripts/57_t_joint_package.py --cursor-package "$T_CURSOR_PACKAGE" --cursor-neural-root "$T_CURSOR_NEURAL" \
-  --cursor-baseline-root "$T_CURSOR_BASELINE" --assisted-eval-root "$T_V2_ROOT" --dest "$T_JOINT_DEST" --git-sha "$EXPECT_SHA"
+  --cursor-baseline-root "$T_CURSOR_BASELINE" --assisted-eval-root "$T_V2_ROOT" --dest "$T_JOINT_DEST" --git-sha "$EXPECT_SHA" --cursor-published-hashes "$T_TIP/results/month2/joint_step23/cursor_published_be18ad0_sha256.json"

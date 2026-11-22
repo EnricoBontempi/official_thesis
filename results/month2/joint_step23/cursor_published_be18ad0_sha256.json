@@ -1,0 +1,13 @@
+{
+ "cursor_branch": "sweep/c149-temperature-k",
+ "cursor_sha": "be18ad007e66fbf2565ad3d5486c6513fc5c3e4c",
+ "files_sha256": {
+  "INDEX.md": "1747679256a5a6e9bfeaf31e62b50077fa7894cd3a4eb531b812f11a4a9fd62e",
+  "across_seeds.csv": "e6daadc41191a9b278ac8057668d76d92653a6ed895be0994e45052749860003",
+  "by_seed.csv": "c9ce8a4056861600be3df469ef0965aa34768a221be3b71bd8fa5550794b8c74",
+  "checks.json": "75141b84521dcd0f89d41208e64b31f3bfb51bb449322d7da12bc4a54ff97df8",
+  "figures/val_common_rmse_vs_K.png": "76f1257355e89bdc1e0de71d09634e49f0931c83f693ee8ce09df0ffdb79eca0",
+  "per_condition.csv": "2402984f764af82a21d76f954d03600334869c941130a8ef6e6eb7c73c181d1c",
+  "versus_free.csv": "6a9128ce894276cc1a7fa57b998f989b7429e35be80f723285b284bcac697c47"
+ }
+}

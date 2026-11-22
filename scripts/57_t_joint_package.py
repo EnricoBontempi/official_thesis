@@ -155,6 +155,8 @@ def main() -> int:
     parser.add_argument("--assisted-eval-root", type=Path, required=True)
     parser.add_argument("--dest", type=Path, required=True)
     parser.add_argument("--git-sha", required=True)
+    parser.add_argument("--cursor-published-hashes", type=Path, default=None,
+                        help="JSON with the sha256 of the files Cursor published in git; the cluster package must match them")
     parser.add_argument("--manifest", type=Path, default=ROOT / "configs/observations/month2_temperature_anchors_nested_v1.json")
     args = parser.parse_args()
     dest: Path = args.dest
@@ -197,6 +199,16 @@ def main() -> int:
     a = re.search(r"Aggregation SHA `([0-9a-f]{40})`", index_text)
     cursor_fwd_sha, cursor_agg_sha = (m.group(1) if m else None), (a.group(1) if a else None)
     checks.add("Cursor: SHAs readable from its INDEX", bool(cursor_fwd_sha and cursor_agg_sha), f"forward {cursor_fwd_sha}, aggregation {cursor_agg_sha}")
+
+    published = None
+    if args.cursor_published_hashes is not None:
+        published = json.loads(args.cursor_published_hashes.read_text())
+        for name, want in sorted(published["files_sha256"].items()):
+            have = sha256_file(pkg / name)
+            data_file = name.endswith((".csv", ".json"))
+            checks.add(f"Cursor package file equals the version published at {published['cursor_sha'][:7]}: {name}", have == want,
+                       "identical" if have == want else f"cluster {have[:12]} vs published {want[:12]}" + ("" if data_file else " (text/figure regenerated after the tables; tables identical)"),
+                       blocking=data_file)
 
     # ---- load per-frame data (authoritative)
     cur = load_cursor(args.cursor_neural_root)
@@ -326,6 +338,7 @@ def main() -> int:
     own_epochs.to_csv(dest / "tables" / "assisted_checkpoint_epochs.csv", index=False)
     refs = {
         "cursor_package": str(pkg),
+        "cursor_published": published,
         "cursor_forward_sha": cursor_fwd_sha, "cursor_aggregation_sha": cursor_agg_sha,
         "cursor_files_sha256": {p.name: sha256_file(p) for p in sorted(pkg.glob("*.csv")) + [pkg / "INDEX.md", pkg / "checks.json"]},
         "assisted_eval_root": str(ev),
@@ -377,6 +390,7 @@ def build_index(refs: dict[str, Any], checks: Checks, agg: pd.DataFrame, own_epo
         "",
         "## Inputs, exact references",
         "",
+        (f"- Step 2 as published by Cursor: branch `{refs['cursor_published']['cursor_branch']}`, SHA `{refs['cursor_published']['cursor_sha']}`, index `results/month2/temperature_k_sweep/INDEX.md`, report `docs/month2/11_temperature_k_sweep.md`; the tables used here are byte-identical to the published ones (hashes in `joint_references.json`)." if refs.get("cursor_published") else "- Step 2 published version: not checked."),
         f"- Step 2 package (Cursor), `{refs['cursor_package']}`: forward/correction SHA `{refs['cursor_forward_sha']}`, aggregation SHA `{refs['cursor_aggregation_sha']}`. Tables `by_seed.csv`, `across_seeds.csv`, `per_condition.csv`, `versus_free.csv`, `checks.json`, `INDEX.md`; file hashes in `joint_references.json`. Per-frame CSV: `{args.cursor_neural_root}/<run>/per_frame/<ckpt>/<role>/rep<r>.csv`.",
         f"- Step 3 package v2 (Sonnet), `{refs['assisted_eval_root']}/package`: matrix v2 sha256 `{refs['assisted_matrix_v2_sha256']}`, chain v2 eval array `{chain.get('eval_array')}`, aggregation `{chain.get('aggregate')}`, chain SHA `{chain.get('git_sha')}`. Per-frame CSV: `{refs['assisted_eval_root']}/runs/<run>/per_frame/<ckpt>/<role>/rep<r>.csv`. The v1 package published at `aa8f65f` is unchanged and remains the reference for the 1000-epoch state of the three extended runs.",
         f"- Anchor manifest `configs/observations/month2_temperature_anchors_nested_v1.json`, file sha256 `{refs['manifest_file_sha256']}`, identical on both sides.",
