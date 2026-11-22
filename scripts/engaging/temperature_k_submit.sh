@@ -17,9 +17,9 @@ if (( BUSY + 1 > 4 )); then
   exit 7
 fi
 
-SMOKE_OUT="$HOME/official_thesis_k_sweep_smoke_v1"
+SMOKE_OUT="$HOME/official_thesis_k_sweep_smoke_v2"
 FULL_OUT="$HOME/official_thesis_k_sweep_v1"
-BASE_SMOKE="$HOME/official_thesis_k_sweep_baselines_smoke"
+BASE_SMOKE="$HOME/official_thesis_k_sweep_baselines_smoke_v2"
 BASE_FULL="$HOME/official_thesis_k_sweep_baselines_v1"
 AGG_OUT="$HOME/official_thesis_k_sweep_package_v1"
 mkdir -p "$SMOKE_OUT/slurm" "$FULL_OUT/slurm" "$BASE_SMOKE/slurm" "$BASE_FULL/slurm" "$AGG_OUT/slurm"

@@ -179,6 +179,9 @@ def test_empty_reference_is_not_a_pass_and_per_frame_deltas_are_kept():
             "sim_id": ["a", "a", "b"],
             "frame_index": [0, 1, 0],
             "s7_rmse_K": [10.02, 12.01, 20.04],
+            # The sweep rows already carry full_rmse_K. The gate must not rename
+            # s7_rmse_K onto that name: pandas then averages two columns.
+            "full_rmse_K": [99.0, 99.0, 99.0],
         }
     )
     passed = gate_free_against_reference(cand, ref, reference_path="ref.csv", reference_sha256="abc")

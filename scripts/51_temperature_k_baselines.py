@@ -143,7 +143,12 @@ def main() -> int:
         True: models["pod_on"].with_hyperparams(**tblock["p_on"]),
     }
     out = args.out_root
-    out.mkdir(parents=True, exist_ok=False)
+    if out.exists():
+        extras = sorted(path.name for path in out.iterdir() if path.name != "slurm")
+        if extras:
+            raise SystemExit(f"refusing to write into a non-empty output: {extras[:8]}")
+    else:
+        out.mkdir(parents=True)
     masks = {role: base._mask_index(args.mask_root, role) for role in SWEEP_ROLES}
     issues: list[str] = []
     gates: list[dict[str, Any]] = []

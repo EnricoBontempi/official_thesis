@@ -634,9 +634,12 @@ def macro_rmse(frame: pd.DataFrame, column: str = "full_rmse_K") -> float:
     """Mean over conditions of the per-condition mean. One weight per condition."""
     if frame.empty or column not in frame.columns:
         raise ValueError("macro RMSE requires a non-empty frame and the metric column")
-    if not np.isfinite(frame[column].to_numpy(dtype=float)).all():
+    selected = frame.loc[:, column]
+    if isinstance(selected, pd.DataFrame):
+        raise ValueError(f"{column} is duplicated; refusing to average two columns of the same name")
+    if not np.isfinite(selected.to_numpy(dtype=float)).all():
         raise ValueError(f"{column} has a non-finite value; refusing a global NaN")
-    return float(frame.groupby("sim_id")[column].mean().mean())
+    return float(selected.groupby(frame["sim_id"]).mean().mean())
 
 
 def gate_free_against_reference(
@@ -692,8 +695,10 @@ def gate_free_against_reference(
     per_frame["candidate_rmse_K"] = merged[candidate_column].to_numpy(dtype=float)
     per_frame["reference_rmse_K"] = merged["rmse_K"].to_numpy(dtype=float)
     per_frame["delta_rmse_K"] = delta
-    macro_c = macro_rmse(merged.rename(columns={candidate_column: "full_rmse_K"}), "full_rmse_K")
-    macro_r = macro_rmse(merged.rename(columns={"rmse_K": "full_rmse_K"}), "full_rmse_K")
+    # Do not rename onto full_rmse_K: the candidate already has that column, and a
+    # duplicated name makes groupby.mean() return a Series.
+    macro_c = macro_rmse(merged, candidate_column)
+    macro_r = macro_rmse(merged, "rmse_K")
     macro_delta = float(macro_c - macro_r)
     ok = abs(macro_delta) <= float(atol_K) and not missing and not extra
     return {
