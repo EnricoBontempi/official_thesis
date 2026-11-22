@@ -173,7 +173,7 @@ Il risultato minimo originario del Mese 2 è una pipeline riproducibile, baselin
 
 ### Step 2.6 — Ricostruzione temperature-free da velocità sparsa
 
-- **Stato:** primo confronto A38 seed 0 eseguito e consegnato a STOP E; **conferma C149 estesa approvata e ancora da eseguire**. Classe I + E. [roadmapsparse.md](roadmapsparse.md) è il piano operativo S7 (10 nuovi training + 2 riusi), autorizzato esplicitamente da Enrico il 20 novembre; questo commit documentale non lancia job.
+- **Stato:** primo confronto A38 seed 0 eseguito e consegnato a STOP E; **conferma C149 eseguita: S7/STOP F concluso nel perimetro temperature-free il 21 novembre** (report `docs/month2/10_s7_c149_model_comparison.md`; U-Net p_on candidato operativo free per decisione di sviluppo post-risultati, p_off e GLU restano nel confronto); Mese 2 resta aperto, prossimo blocco sweep K su entrambe le famiglie e p_on/off. Classe I + E. [roadmapsparse.md](roadmapsparse.md) è il piano operativo S7 (10 nuovi training + 2 riusi), autorizzato esplicitamente da Enrico il 20 novembre; questo commit documentale non lancia job.
 - **Problema:** quanto errore aggiungono osservazioni incomplete e rappresentazione/architettura, rispetto al diagnostico denso?
 - **Motivazione/dipendenze:** 2.4, e 2.5 per GLU. Serve prima una baseline sparse neurale semplice, poi il candidato del laboratorio con gli stessi input.
 - **Attività concrete:**

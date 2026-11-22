@@ -4,7 +4,8 @@
     208.43777465820312,
     2652.4931640625
   ],
-  "error_scale_K": 750.0,
+  "error_scale_display_K": 300.0,
+  "max_abs_error_K": 720.3968505859375,
   "max_abs_delta_field_vs_csv_K": 2.0800273638599265e-05,
   "by_family_max_abs_delta_K": {
     "adapted_glu": 2.0800273638599265e-05,

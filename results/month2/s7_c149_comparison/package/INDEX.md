@@ -2,7 +2,7 @@
 
 **Provenienza.** Tabelle, figure e `package_manifest.json` sono output grezzi del job CPU 29988745 (21 novembre 2026, 48 s; codice `aadf05c`, evaluator `acc8e2b`) sulle valutazioni complete 29984795 (11 run) e 29984812 (glu-on-s1 esteso). I costi vengono da `sacct`. Questo `INDEX.md` è stato rivisto a mano dopo la generazione (sezioni «validati» e «mancanti», verifiche del revisore tecnico): tabelle e figure non sono state toccate. Output completi sul cluster: `/home/bontempi/official_thesis_s7_c149_eval/` (per-frame, campi, provenance) e `/home/bontempi/official_thesis_s7_c149_package/`.
 
-Pacchetto tecnico per il revisore. Descrittivo: nessuna classifica, nessun vincitore, nessuna regola di selezione applicata (la proposta Opus non è approvata).
+Pacchetto tecnico per il revisore (completato con i residui in `../residuals/` e `../fields/`). Descrittivo: nessuna classifica, nessun vincitore, nessuna regola di selezione applicata (la proposta Opus non è approvata).
 Metriche = valutazione finale S7, non metriche del loop. VAL123 già usata nella selezione del best: non è conferma indipendente.
 
 ## Completezza
@@ -53,14 +53,16 @@ Utilizzabili ora per l'analisi descrittiva (nessun vincitore indicato qui):
 - `rmse_vs_coverage_last.png`
 - `val_by_condition_5pct_best.png`
 
-## Attività ancora MANCANTI per STOP F (non eseguite, non dichiarate complete)
+## Attività S7 per STOP F — stato finale (21 novembre 2026)
 
 | # | Attività | Stato |
 |---|---|---|
-| 1 | Snapshot-swap neurali, best@5% replica 0, seen e VAL, stesso pairing/osservazioni/riferimento donatore, 12 run | NON eseguito (funzioni S6 `evaluate_swap`/`build_within_condition_swap_pairs` family-aware; manca il wrapper S7 guidato dalla matrice, con readback e gate) |
-| 2 | Residuo swap GappyPOD p_on/off di S6 (CPU) | NON eseguito né verificato |
-| 3 | Baseline C149 con pool e ricetta di fit versionati (nessun refit A38; baseline A38 = riferimenti storici) | NON eseguite |
-| 4 | Specifica `month2_s7_c149_protocol.yaml` con regola di scelta del seguito (da approvare), report `docs/month2/10_s7_c149_model_comparison.md`, decisione sul seguito | NON creati |
-| 5 | Altri controlli: `own_pool_train` (opzionale, separato) non calcolato; analisi interpretativa, pannelli di campo su tutte le VAL, tabelle di regioni con conteggi validi commentate | NON eseguiti (il pacchetto è tecnico, non interpretativo) |
+| 1 | Snapshot-swap neurali, 12 best, 5% replica 0, seen/VAL | ESEGUITO e verificato (`../residuals/`, job 30027646; aligned riusati con identità/hash/mask_hash verificati) |
+| 2 | Swap GappyPOD p_on/off S6 (oggetti A38 congelati) | ESEGUITO (job 30027643), contesto A38 distinto |
+| 3 | Baseline C149 (GlobalMean, ParamMean, GappyPOD R=32 p_on/off) | ESEGUITE (job 30027642), controllo sottoinsieme A38 ok (scarto max 2.5e-8 K) |
+| 4 | Diagnostico batch GLU | ESEGUITO (job 30027668): nessuna dipendenza dagli altri esempi; sensibilità numerica dei pareggi top-k alla forma del batch |
+| 5 | Figure dei campi (3 VAL, 12 run) ed etichetta centered-vs-bias | ESEGUITE (`../fields/`, figura corretta in `figures/`) |
+| 6 | Report `docs/month2/10_s7_c149_model_comparison.md`, roadmap/registro/README | ESEGUITI |
+| — | own_pool_train | opzionale, NON eseguito |
 
-**STOP F non è dichiarato.** Mese 2 e assisted restano aperti. Nessuno sweep K, nessun training con T, nessun TEST.
+**STOP F concluso nel perimetro temperature-free.** Mese 2 e assisted restano aperti. Lettura dei revisori e decisione del coordinatore: report 10 §9 (decisione di sviluppo post-risultati, non regola preregistrata). Residui: `../residuals/` (tabelle `swap_*`, `baselines_*`, `batch_diagnostic_*`; figure). Nessuno sweep K, nessun training con T, nessun TEST.

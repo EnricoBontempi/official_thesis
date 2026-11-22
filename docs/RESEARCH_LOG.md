@@ -526,3 +526,10 @@ L'import in `scripts/26_opus_o5_eval.py` chiede `combustion_recon.training.norma
 ## 2026-11-20 — S7: preparazione, smoke e submission dei dieci training free C149
 
 Branch `s7/c149-free-campaign`, SHA eseguito `f792b73388d43f008e8979f1aad0d1fa961cb559`. Preemptable con account Advanced non consentito dallo scheduler (`mit_amf_advanced_gpu` valido solo su `mit_normal_gpu`); Enrico sceglie `mit_normal_gpu` + Advanced non preemptable. Smoke reali U-Net (29797847) e GLU (29797848): PASS, dopo due errori reali corretti (automount `/orcd/pool` in timeout sui nodi → copia in home con stessi hash; RNG di resume su GPU da riportare su CPU). Array **29799680** (`0-9%4`, L40S, 6h, cap interno 5.5 h): task 0–3 (U-Net) in esecuzione con epoche reali; task 4–9 (GLU) pending. Dettagli e comandi in [s7_training_handoff.md](month2/s7_training_handoff.md). Nessun training concluso, nessuna valutazione; S7, sparse e Mese 2 restano aperti.
+
+
+---
+
+## 2026-11-21 — S7: valutazioni, residui e chiusura STOP F (temperature-free)
+
+Branch `s7/c149-free-campaign`. Valutazioni 12/12 (SHA `acc8e2b`, matrice `a76bac9b…`), gate loop 18/18 con scarto 0 K; continuazione di glu-on-s1 chiusa a epoca 1080 (best 630 invariato). Residui: swap neurali sui 12 best (job 30027646), swap GappyPOD con oggetti A38 congelati (30027643), baseline C149 con iperparametri congelati e controllo sul sottoinsieme A38 (30027642), diagnostico batch GLU (30027668: nessuna dipendenza dagli altri esempi a B=8 fisso; sensibilità numerica dei pareggi top-k alla forma del batch). Figure dei campi e correzione dell'etichetta centered-vs-bias. Revisori Opus/Neon: U-Net complessivamente preferibile nella ricetta free; decisione del coordinatore: U-Net p_on candidato operativo free, p_off nel confronto, sweep K su entrambe le famiglie e p_on/off, matrice con T dopo lo sweep (decisione di sviluppo post-risultati, non regola preregistrata). **STOP F concluso nel perimetro temperature-free; Mese 2 aperto.** Indice: `results/month2/s7_c149_comparison/package/INDEX.md`; report `docs/month2/10_s7_c149_model_comparison.md`.
