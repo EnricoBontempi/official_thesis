@@ -12,6 +12,7 @@
 set -uo pipefail
 : "${EXPECT_SHA:?}" "${T_TIP:?}" "${T_TRAIN_JOBS:?}" "${T_EVAL_ROOT:?}"
 PY="${PY:-$HOME/envs/official_thesis/bin/python}"
+TJ="${T_TRAIN_JOBS//:/,}"      # sbatch --export splits on commas: the list arrives colon-separated
 export PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
 unset PYTHONPATH
 export PYTHONPATH="$T_TIP/src"
@@ -25,7 +26,7 @@ import json, subprocess
 m = json.load(open("$M"))
 root = m["out_root"]
 reasons = []
-for j in "$T_TRAIN_JOBS".split(","):
+for j in "$TJ".split(","):
     out = subprocess.run(["sacct", "-X", "-n", "-P", "-j", j, "-o", "JobID,State,ExitCode"], capture_output=True, text=True).stdout
     for line in out.strip().splitlines():
         jid, st, ec = line.split("|")
@@ -50,7 +51,7 @@ print("\n".join(reasons))
 PYV
 )"
 if [[ -n "$REASONS" ]]; then
-  printf '{"ok": false, "stage": "verify_training", "checked_at": "%s", "train_jobs": "%s", "reasons": %s}\n' "$(date -Is)" "$T_TRAIN_JOBS" "$("$PY" -c 'import json,sys;print(json.dumps(sys.stdin.read().strip().splitlines()))' <<<"$REASONS")" > "$OUT/INCOMPLETE.json"
+  printf '{"ok": false, "stage": "verify_training", "checked_at": "%s", "train_jobs": "%s", "reasons": %s}\n' "$(date -Is)" "$TJ" "$("$PY" -c 'import json,sys;print(json.dumps(sys.stdin.read().strip().splitlines()))' <<<"$REASONS")" > "$OUT/INCOMPLETE.json"
   echo "INCOMPLETE: $REASONS" >&2
   exit 1
 fi
@@ -63,7 +64,7 @@ EV=$(sbatch --parsable --account mit_amf_advanced_gpu --partition mit_normal_gpu
   --job-name=t_eval_full --output="$OUT/slurm/eval-%A_%a.out" --error="$OUT/slurm/eval-%A_%a.err" \
   --export=ALL,T_TIP="$T_TIP",EXPECT_SHA="$EXPECT_SHA",T_EVAL_MATRIX="$FROZEN",T_EVAL_OUT="$OUT/runs",T_EVAL_MODE=full "$T_TIP/scripts/engaging/t_eval.sbatch") || { echo '{"ok": false, "stage": "submit_eval"}' > "$OUT/INCOMPLETE.json"; exit 1; }
 AG=$(sbatch --parsable --dependency=afterok:$EV --kill-on-invalid-dep=yes --output="$OUT/slurm/aggregate-%j.out" --error="$OUT/slurm/aggregate-%j.err" \
-  --export=ALL,T_TIP="$T_TIP",EXPECT_SHA="$EXPECT_SHA",T_EVAL_MATRIX="$FROZEN",T_EVAL_OUT="$OUT/runs",T_PACKAGE_DEST="$OUT/package",T_TRAIN_JOBS="$T_TRAIN_JOBS",T_EVAL_JOBS="$EV" "$T_TIP/scripts/engaging/t_aggregate.sbatch") || { echo '{"ok": false, "stage": "submit_aggregate"}' > "$OUT/INCOMPLETE.json"; exit 1; }
+  --export=ALL,T_TIP="$T_TIP",EXPECT_SHA="$EXPECT_SHA",T_EVAL_MATRIX="$FROZEN",T_EVAL_OUT="$OUT/runs",T_PACKAGE_DEST="$OUT/package",T_TRAIN_JOBS="${TJ//,/:}",T_EVAL_JOBS="$EV" "$T_TIP/scripts/engaging/t_aggregate.sbatch") || { echo '{"ok": false, "stage": "submit_aggregate"}' > "$OUT/INCOMPLETE.json"; exit 1; }
 printf '{"ok": true, "stage": "chain_submitted", "at": "%s", "eval_array": "%s", "aggregate": "%s", "concurrency": %s, "matrix_sha256": "%s", "git_sha": "%s"}\n' \
   "$(date -Is)" "$EV" "$AG" "$CONC" "$(sha256sum "$FROZEN" | cut -d' ' -f1)" "$EXPECT_SHA" > "$OUT/chain_submitted.json"
 echo "chain submitted: eval array $EV, aggregation $AG (concurrency $CONC)"

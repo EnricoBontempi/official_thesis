@@ -16,7 +16,7 @@ export PYTHONPATH="$T_TIP/src"
 cd "$T_TIP"
 [[ "$(git rev-parse HEAD)" == "$EXPECT_SHA" ]] || { echo "REFUSE: HEAD != $EXPECT_SHA" >&2; exit 5; }
 ARGS=(scripts/56_t_aggregate.py --matrix "$T_EVAL_MATRIX" --eval-root "$T_EVAL_OUT" --dest "$T_PACKAGE_DEST")
-[[ -n "${T_TRAIN_JOBS:-}" ]] && ARGS+=(--train-jobs "$T_TRAIN_JOBS")
+[[ -n "${T_TRAIN_JOBS:-}" ]] && ARGS+=(--train-jobs "${T_TRAIN_JOBS//:/,}")
 [[ -n "${T_EVAL_JOBS:-}" ]] && ARGS+=(--eval-jobs "$T_EVAL_JOBS")
 [[ "${T_AGG_SMOKE:-0}" == "1" ]] && ARGS+=(--smoke)
 "$PY" "${ARGS[@]}"
