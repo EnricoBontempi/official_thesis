@@ -108,7 +108,7 @@ def main() -> int:
             rec = by_epoch[epoch]
             if name == "best" and epoch != int(summary["best_val_epoch"]):
                 raise SystemExit(f"{it['run_id']}: best.pt epoch != summary best_val_epoch")
-            if name == "best_seen_diagnostic" and epoch != int(summary["best_seen_diagnostic_epoch"]):
+            if name == "best_seen_diagnostic" and summary.get("best_seen_diagnostic_epoch") is not None and epoch != int(summary["best_seen_diagnostic_epoch"]):
                 raise SystemExit(f"{it['run_id']}: best_seen epoch != summary")
             if name == "last" and epoch != int(summary["epochs_completed"]) and not args.allow_non_terminal:
                 raise SystemExit(f"{it['run_id']}: last.pt epoch != epochs_completed")
