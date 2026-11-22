@@ -50,7 +50,7 @@ echo "[$(date -Is)] input access ok" >&2
 mkdir -p "$S7_EVAL_OUT_ROOT"
 [[ ! -e "$S7_EVAL_OUT_ROOT/$RUN_ID" ]] || { echo "REFUSE: output already exists: $S7_EVAL_OUT_ROOT/$RUN_ID" >&2; exit 4; }
 
-ARGS=(scripts/38_s7_eval.py --matrix "$S7_EVAL_MATRIX" --run-id "$RUN_ID" --out-root "$S7_EVAL_OUT_ROOT"
+ARGS=("${S7_EVAL_SCRIPT:-scripts/38_s7_eval.py}" --matrix "$S7_EVAL_MATRIX" --run-id "$RUN_ID" --out-root "$S7_EVAL_OUT_ROOT"
       --eval-git-sha "$SHA_HEAD" --device cuda --mode "$MODE")
 [[ -n "${S7_EVAL_SMOKE_FRAMES:-}" ]] && ARGS+=(--smoke-frames "$S7_EVAL_SMOKE_FRAMES")
 "$PY" "${ARGS[@]}"
