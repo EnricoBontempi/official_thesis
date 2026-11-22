@@ -28,7 +28,7 @@ from combustion_recon.models.unet import ASSISTED_CHANNEL_ORDER, build_sparse_un
 from combustion_recon.training.assisted_dataset import AssistedDataset  # noqa: E402
 from combustion_recon.training.assisted_trainer import AssistedTrainer  # noqa: E402
 from combustion_recon.training.dense_cache import cache_validation_kwargs  # noqa: E402
-from combustion_recon.training.sparse_dataset import collate_sparse_batch  # noqa: E402
+from combustion_recon.training.sparse_dataset import SparseUNetCacheDataset, collate_sparse_batch  # noqa: E402
 from combustion_recon.training.sparse_scientific_loop import SparseScientificConfig  # noqa: E402
 
 
@@ -78,6 +78,13 @@ def main() -> int:
     val_off.eval_K = 4
     xo = val_off[5]["model_inputs"]["input_tensor"].numpy()
     rep["checks"]["p_off_channels_zero_by_name"] = bool(not xo[7:9].any() and xo[6].sum() == 4)
+    eq = True
+    for j in range(0, len(val_on), 17):
+        meta = dict(val_on.frames[val_on.indices[j]])
+        a_ = val_on._resolve_sites(val_on.indices[j], meta)
+        b_ = SparseUNetCacheDataset._resolve_sites(val_on, val_on.indices[j], meta)
+        eq &= bool(np.array_equal(a_[0], b_[0]) and a_[1] == b_[1] and a_[2] == b_[2])
+    rep["checks"]["payload_cache_equals_free_loader"] = eq
     # ---- hidden-T and hidden-velocity isolation (mutate the stored arrays where nothing is observed)
     val_on.eval_K = 16
     a = val_on[7]

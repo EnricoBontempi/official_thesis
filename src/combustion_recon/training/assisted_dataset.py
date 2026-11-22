@@ -12,6 +12,24 @@ from combustion_recon.models.unet import ASSISTED_CHANNEL_ORDER
 from combustion_recon.training.sparse_dataset import SparseUNetCacheDataset
 
 
+_PAYLOAD_CACHE: dict[tuple[str, str], dict[str, Any]] = {}
+
+
+def _payload_table(root, role: str) -> dict[str, Any]:
+    """Persisted nested eval sites (5%) decompressed ONCE per process: the free loader reopens the npz for every frame."""
+    key = (str(root), role)
+    if key not in _PAYLOAD_CACHE:
+        z = np.load(f"{root}/{role}_nested_sites.npz", allow_pickle=True)
+        sims, frames, reps = z["sim_id"].tolist(), np.asarray(z["frame_index"]), np.asarray(z["replica_id"])
+        _PAYLOAD_CACHE[key] = {
+            "sites": np.asarray(z["sites_5pct"], dtype=np.int64), "hash": [str(x) for x in z["hash_5pct"]],
+            "seed": np.asarray(z["velocity_mask_seed"], dtype=np.int64),
+            "row": {(str(s), int(f), int(r)): i for i, (s, f, r) in enumerate(zip(sims, frames, reps))},
+        }
+        z.close()
+    return _PAYLOAD_CACHE[key]
+
+
 class AssistedDataset(SparseUNetCacheDataset):
     """Items are ``ds[pos]`` (K = ``eval_K``, eval layout of ``replica_id``) or ``ds[(pos, K)]`` (TRAIN: random anchors).
 
@@ -23,6 +41,15 @@ class AssistedDataset(SparseUNetCacheDataset):
         super().__init__(*args, **kwargs)
         self.anchors = anchors
         self.eval_K = int(eval_K)
+
+    def _resolve_sites(self, idx: int, meta: dict[str, Any]):  # type: ignore[override]
+        if self.mask_mode == "evaluation" and abs(float(self.site_fraction) - 0.05) < 1e-12 and self.require_eval_mask_payload:
+            tab = _payload_table(self.eval_mask_payload_root, self.role)
+            row = tab["row"].get((str(meta["sim_id"]), int(meta["frame_index"]), int(self.replica_id)))
+            if row is None:
+                raise KeyError(f"required eval mask payload missing for {self.role}/{meta['sim_id']}/{meta['frame_index']}/r{self.replica_id}")
+            return tab["sites"][row].copy(), int(tab["seed"][row]), tab["hash"][row]
+        return super()._resolve_sites(idx, meta)
 
     def _anchor_sites(self, meta: dict[str, Any], K: int) -> np.ndarray:
         if K not in K_VALUES:
