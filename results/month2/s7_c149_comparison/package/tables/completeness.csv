@@ -1,0 +1,13 @@
+run_id,family,p_conditioning,model_seed,complete_json,gate_all_pass,n_csv,gate_max_abs_delta_K,eval_git_sha
+S7-C149-unet-on-s1,sparse_unet,True,1,True,True,81,0.0,acc8e2b4071578a584accfbde8c3c1a2cb5e2bf1
+S7-C149-unet-off-s1,sparse_unet,False,1,True,True,81,0.0,acc8e2b4071578a584accfbde8c3c1a2cb5e2bf1
+S7-C149-unet-on-s2,sparse_unet,True,2,True,True,81,0.0,acc8e2b4071578a584accfbde8c3c1a2cb5e2bf1
+S7-C149-unet-off-s2,sparse_unet,False,2,True,True,81,0.0,acc8e2b4071578a584accfbde8c3c1a2cb5e2bf1
+S7-C149-glu-on-s0,adapted_glu,True,0,True,True,81,0.0,acc8e2b4071578a584accfbde8c3c1a2cb5e2bf1
+S7-C149-glu-off-s0,adapted_glu,False,0,True,True,81,0.0,acc8e2b4071578a584accfbde8c3c1a2cb5e2bf1
+S7-C149-glu-on-s1,adapted_glu,True,1,True,True,81,0.0,acc8e2b4071578a584accfbde8c3c1a2cb5e2bf1
+S7-C149-glu-off-s1,adapted_glu,False,1,True,True,81,0.0,acc8e2b4071578a584accfbde8c3c1a2cb5e2bf1
+S7-C149-glu-on-s2,adapted_glu,True,2,True,True,81,0.0,acc8e2b4071578a584accfbde8c3c1a2cb5e2bf1
+S7-C149-glu-off-s2,adapted_glu,False,2,True,True,81,0.0,acc8e2b4071578a584accfbde8c3c1a2cb5e2bf1
+O-C149-on-s0,sparse_unet,True,0,True,True,81,0.0,acc8e2b4071578a584accfbde8c3c1a2cb5e2bf1
+O-C149-off-s0,sparse_unet,False,0,True,True,81,0.0,acc8e2b4071578a584accfbde8c3c1a2cb5e2bf1

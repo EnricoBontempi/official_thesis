@@ -71,3 +71,10 @@ tail -f $O/slurm/slurm-29984795_0.out
 - **Job di aggregazione CPU 29988745** (`mit_normal`, `mit_amf_advanced_cpu`, 8 CPU, 64G, 1 h), `--dependency=afterok:29984795:29984812 --kill-on-invalid-dep=yes`: parte da solo solo se tutte le valutazioni finiscono con exit 0; rifiuta comunque una matrice non valida. Checkout `/home/bontempi/projects/official_thesis_s7_agg` @ `aadf05cc91dab49c11d59fae147f83b5e374e4d4`. Output: `/home/bontempi/official_thesis_s7_c149_package/` (+ `_costs/`), log `/home/bontempi/official_thesis_s7_c149_package_slurm/`.
 - **Da fare dopo:** leggere l'esito di 29988745 (se rifiuta, elencare i problemi), copiare tabelle/figure in `results/month2/s7_c149_comparison/package/`, commit e push. Se un task di valutazione fallisce: riportare causa e recupero prima di rilanciare.
 - **Impegni S7 ancora mancanti (nessun STOP F):** swap neurali best@5%, swap GappyPOD p_on/off S6, baseline C149, protocollo con regola di seguito da approvare, report 10.
+
+---
+## AGGIORNAMENTO 21 novembre 2026, 22:15 EST — valutazioni concluse e pacchetto consegnato
+- **Esiti:** 29984795 (11 run) tutti COMPLETED 0:0 (53–82 min ciascuno), 29984793 parity glu-on-s1 PARITY_OK, 29984812 glu-on-s1 esteso COMPLETED (81 min), 29988745 aggregazione CPU COMPLETED (48 s). **12/12 run COMPLETE, gate 18/18 per run, nessun GATE_FAILED, nessun problema tecnico.**
+- **Pacchetto:** `results/month2/s7_c149_comparison/package/` (INDEX.md, `tables/`, `figures/`, `package_manifest.json`); 357372 righe, 972 CSV. Verifiche indipendenti (ricalcolo di 4 macro dai CSV grezzi: scarto 0), figure ispezionate. INDEX rivisto a mano (provenienza dichiarata).
+- **Costi** (da sacct): training compute 3.7–4.2 h U-Net, 5.5–7.8 h GLU (glu-on-s1: 3 attempt, 7.76 h); evaluation 53–82 min a run, GLU e U-Net equivalenti. L'attesa include il limite %4/%3 degli array.
+- **Mancano per STOP F:** swap neurali, swap GappyPOD, baseline C149, protocollo con regola di scelta (da approvare), report 10. STOP F non dichiarato.

@@ -1,0 +1,13 @@
+run_id,family,p_conditioning,model_seed,reused_not_relaunched,training_git_sha,status,epochs_completed,extended_past_initial_tranche
+S7-C149-unet-on-s1,sparse_unet,True,1,False,f792b73388d43f008e8979f1aad0d1fa961cb559,stopped_early_plateau,750,False
+S7-C149-unet-off-s1,sparse_unet,False,1,False,f792b73388d43f008e8979f1aad0d1fa961cb559,stopped_early_plateau,740,False
+S7-C149-unet-on-s2,sparse_unet,True,2,False,f792b73388d43f008e8979f1aad0d1fa961cb559,stopped_early_plateau,690,False
+S7-C149-unet-off-s2,sparse_unet,False,2,False,f792b73388d43f008e8979f1aad0d1fa961cb559,stopped_early_plateau,700,False
+S7-C149-glu-on-s0,adapted_glu,True,0,False,f792b73388d43f008e8979f1aad0d1fa961cb559,stopped_early_plateau,800,False
+S7-C149-glu-off-s0,adapted_glu,False,0,False,f792b73388d43f008e8979f1aad0d1fa961cb559,stopped_early_plateau,980,False
+S7-C149-glu-on-s1,adapted_glu,True,1,False,501d41a0be44709c69cf320737bd8d263fdb5216,stopped_early_plateau,1080,True
+S7-C149-glu-off-s1,adapted_glu,False,1,False,f792b73388d43f008e8979f1aad0d1fa961cb559,stopped_early_plateau,910,False
+S7-C149-glu-on-s2,adapted_glu,True,2,False,f792b73388d43f008e8979f1aad0d1fa961cb559,stopped_early_plateau,850,False
+S7-C149-glu-off-s2,adapted_glu,False,2,False,f792b73388d43f008e8979f1aad0d1fa961cb559,stopped_early_plateau,910,False
+O-C149-on-s0,sparse_unet,True,0,True,d6332000491ba0e8983b9e7fa09b34badb191ea4,stopped_early_plateau,660,False
+O-C149-off-s0,sparse_unet,False,0,True,d6332000491ba0e8983b9e7fa09b34badb191ea4,stopped_early_plateau,710,False

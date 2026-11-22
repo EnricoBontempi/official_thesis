@@ -1,0 +1,42 @@
+{
+  "eval_git_shas": [
+    "acc8e2b4071578a584accfbde8c3c1a2cb5e2bf1"
+  ],
+  "matrix_sha256": "a76bac9b88e9a8be3a363302c1b171f77a0c7de0c232c5056add762ff3cd8da3",
+  "n_runs": 12,
+  "n_rows": 357372,
+  "n_csv": 972,
+  "gate_max_abs_delta_K": 0.0,
+  "tables": [
+    "completeness.csv",
+    "coverage_degradation.csv",
+    "eval_costs_by_task.csv",
+    "family_p_seed_dispersion.csv",
+    "global_by_replica.csv",
+    "global_by_setting.csv",
+    "headline_best_5pct_by_run.csv",
+    "paired_by_condition.csv.gz",
+    "paired_summary.csv",
+    "per_condition.csv",
+    "regional_by_setting.csv",
+    "role_gap.csv",
+    "run_matrix.csv",
+    "selection_shift.csv",
+    "training_costs_by_attempt.csv",
+    "training_costs_by_run.csv",
+    "undefined_regional_metric_frames.csv",
+    "worst_val_condition.csv"
+  ],
+  "figures": [
+    "centered_vs_bias_5pct_best.png",
+    "costs_compute_vs_queue.png",
+    "paired_differences_val5.png",
+    "rmse_points_5pct.png",
+    "rmse_vs_coverage_best.png",
+    "rmse_vs_coverage_best_seen_diagnostic.png",
+    "rmse_vs_coverage_last.png",
+    "val_by_condition_5pct_best.png"
+  ],
+  "ranking": "none",
+  "winner": "none"
+}
