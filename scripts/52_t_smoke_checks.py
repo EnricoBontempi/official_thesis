@@ -40,7 +40,7 @@ def main() -> int:
     ap.add_argument("--stats", type=Path, default=Path("/home/bontempi/projects/official_thesis_s5/data/manifests/train_norm_stats_month2_fit.json"))
     ap.add_argument("--anchor-manifest", type=Path, default=ROOT / "configs/observations/month2_temperature_anchors_nested_v1.json")
     ap.add_argument("--out", type=Path, required=True)
-    ap.add_argument("--overfit-updates", type=int, default=800)
+    ap.add_argument("--overfit-updates", type=int, default=1500)
     args = ap.parse_args()
     fam = "sparse_unet" if args.family == "unet" else "adapted_glu"
     dev = torch.device("cuda")
@@ -111,18 +111,18 @@ def main() -> int:
         model = build_assisted_glu_from_config(domain_geometry_path=args.cache_root / "geometry.npz")
         queries = make_synthetic_query_grid(val_on.x, val_on.y)
     model.to(dev)
-    trainer = AssistedTrainer(model, cfg=cfg, normalizer=normalizer, n_train_samples=16, query_coords_phys=queries, anchors=anchors)
+    trainer = AssistedTrainer(model, cfg=cfg, normalizer=normalizer, n_train_samples=256, query_coords_phys=queries, anchors=anchors)
     from combustion_recon.training.scientific_epoch_sampler import cache_indices_for_pool
 
     ref760 = cache_indices_for_pool(json.loads((args.cache_root / "train_fit" / "frames.json").read_text()), "A38")
-    tr = mk("train_fit", "training", True, indices=ref760[:: len(ref760) // 16][:16])   # reference760 frames: they have eval payloads
+    tr = mk("train_fit", "training", True, indices=ref760[::3][:256])   # reference760 frames (they have eval payloads); 256 frames so T cannot be bypassed by memorization
     tr.set_epoch(0)
     trainer._set_lr(1e-3)
     losses = {}
     t0 = time.perf_counter()
     upd = 0
     while upd < args.overfit_updates:
-        for start in range(0, 16, 8):
+        for start in range(0, 256, 8):
             upd += 1
             K = train_K_for_update(upd)
             items = [tr[(start + j, K)] for j in range(8)]
@@ -138,8 +138,8 @@ def main() -> int:
     rep["checks"]["overfit_loss_decreases"] = bool(rep["overfit"]["mean_loss_last20"] < 0.7 * rep["overfit"]["mean_loss_first20"])
     # positive control on the TRAIN frames the model has seen: same frames, T true vs T shifted vs K=0
     trainer.eval_mode()
-    tr.mask_mode = "evaluation"
-    tr.replica_id = 1
+    tr = val_on                     # held-out frames: the control must hold off the TRAIN frames
+    tr.indices = tr.indices[:16]
     res = {}
     with torch.no_grad():
         for tag, K, shift in (("K32", 32, 0.0), ("K32_shifted_T", 32, 1.0), ("K0", 0, 0.0)):
