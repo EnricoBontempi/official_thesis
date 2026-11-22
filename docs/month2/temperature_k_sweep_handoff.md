@@ -34,10 +34,18 @@ Codice del secondo tentativo: `54a3b4d3a177b731ed7eef45030c3a49b0986c16`, checko
 | 30032666 | aggregazione, `afterok:30032665` (il baseline `30032412` è già `COMPLETE`) | CPU, 40 min |
 | 30035232 | chiusura, `afterany:30032666`, senza nuovi calcoli | `mit_normal` / `mit_amf_advanced_cpu`, 2 CPU, 8G, 20 min |
 
-`30035232` scrive solo file. Se i dodici run, il baseline e il pacchetto ci sono, il testo è `~/official_thesis_k_sweep_chiusura_v1/RIEPILOGO.md`. Altrimenti è `BLOCCO.md` nello stesso directory, e nessun job viene rilanciato. `STATO.md` dice quale dei due è stato scritto. Il checkout dei calcoli resta `54a3b4d` e non va spostato finché `30032665` e `30032666` non sono terminati.
+Esito riletto da `sacct`, non dalla coda. `30032411`, `30032412`, `30032664` (task 0 e 1) e `30032665` (task 0–11) sono `COMPLETED` exit 0. I dodici `COMPLETE.json` e il baseline `COMPLETE.json` ci sono. Gate: 144 neurali e 24 baseline, tutti `ok`, macro 0 K, scarto per-frame 0 K.
+
+`30032666` è `FAILED` in 13 s: `no per-frame CSV under .../official_thesis_k_sweep_v1`. I CSV stanno in `<run>/per_frame/` (144 file, circa 1.1 GB) e in `baselines_v1/per_frame/` (36 file). `30035232` ha scritto `BLOCCO.md` per l’assenza del pacchetto e non ha rilanciato nulla. Quel file resta come verbale del primo aggregato.
+
+La lettura dei CSV già scritti è il job `30081928`, `COMPLETED` exit 0, codice `30593985337f6367f5e974807cb54865b00d678f`, checkout `/home/bontempi/projects/official_thesis_k_sweep_agg`. Il checkout dei forward è rimasto `54a3b4d`. `30081718` è una lettura precedente, `FAILED` prima di scrivere, perché la chiave univa p_on e p_off. Nessun forward è stato rifatto.
+
+Pacchetto cluster `/home/bontempi/official_thesis_k_sweep_package_v1`: `INDEX.md`, `checks.json`, `by_seed.csv`, `versus_free.csv`, `across_seeds.csv`, `per_condition.csv`, `figures/val_common_rmse_vs_K.png`. La copia in git è `results/month2/temperature_k_sweep/`. La figura in git è ridisegnata dagli stessi `by_seed.csv`: il PNG del job aveva la legenda solo sul pannello GappyPOD. `checks.json` ha differenza 0 a K=0 per AO, media e mediana, e media uguale a mediana a K=1.
+
+Il manifest dei forward, SHA256 `a9c997c96cb44489dd1fc0d4484304b44d8beddbf00b73c25baf4e1922a19e54`, coincide con i file negli checkout assisted `official_thesis_t`, `official_thesis_t_run`, `official_thesis_t_chain` e `official_thesis_t_eval`. Nessun file di Sonnet è stato modificato. Nessuno stimatore è stato scelto.
 
 Alla submission GPU la coda Advanced conteneva due job Sonnet (`30032653`, `30032656`, `t_checks`). Lo sweep ne aggiunge due, di cui solo lo smoke può partire; il full resta `afterok`. Totale in coda: 4.
 
 Smoke GPU `30032664` completato, exit 0, `SMOKE_OK.json` per entrambi i task. U-Net on s1 e GLU on s0, best e last, seen e VAL, repliche 0/1/2: gate true, |macro| sotto 5e-6 K, scarto per-frame massimo sotto 2e-5 K. Il selettore smoke è quello di S7: 4 posizioni più, su VAL, i frame 1000, quindi 7 frame VAL. Lo sweep scientifico non usa quel sottoinsieme. Il task 0 dell’array `30032665` è partito dopo lo smoke.
 
-Forward neurale, quando partirà: `scripts/38` + `_forward` di `scripts/17`, batch 8, fp32, TF32 spento, una sola L40S, array `%1`. Il codice GLU non è modificato.
+I forward usano `scripts/38` e `_forward` di `scripts/17`, batch 8, fp32, TF32 spento, una L40S. Il codice GLU non è stato modificato. Il documento dei numeri è `docs/month2/11_temperature_k_sweep.md`.

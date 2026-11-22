@@ -95,25 +95,35 @@ def _figure(by_seed: pd.DataFrame, dest: Path) -> None:
     primary = by_seed[(by_seed["layout_kind"] == "primary") & (by_seed["checkpoint"].isin(["best", "fitted"]))]
     primary = primary[primary["role"] == "val_eval"]
     treatments = ["free", "ao", "mean", "median"]
-    families = list(primary["method"].drop_duplicates())
-    if not families:
+    colors = {"free": "#4d4d4d", "ao": "#d95f02", "mean": "#1b9e77", "median": "#7570b3"}
+    methods = [method for method in ("sparse_unet", "adapted_glu", "GappyPOD_free", "ParamConditionedMean", "GlobalTrainMean") if method in set(primary["method"])]
+    if not methods:
         return
-    fig, axes = plt.subplots(len(families), 1, figsize=(8, 2.4 * len(families)), sharex=True, squeeze=False)
-    for ax, method in zip(axes[:, 0], families):
+    fig, axes = plt.subplots(len(methods), 1, figsize=(8.2, 2.3 * len(methods)), sharex=True, squeeze=False)
+    for ax, method in zip(axes[:, 0], methods):
         part = primary[primary["method"] == method]
-        for (p_on, seed, treatment), grp in part.groupby(["p_conditioning", "model_seed", "treatment"]):
+        for (p_on, _seed, treatment), grp in part.groupby(["p_conditioning", "model_seed", "treatment"]):
             if treatment not in treatments:
                 continue
             curve = grp.groupby("K")["common_rmse_K"].mean().sort_index()
-            ax.plot(curve.index, curve.values, marker="o", label=f"p={int(p_on)} s={seed} {treatment}")
+            ax.plot(
+                curve.index, curve.values, color=colors[treatment],
+                linestyle="--" if bool(p_on) else "-", marker="o", markersize=3.5, linewidth=1.1,
+            )
         ax.set_ylabel("common RMSE (K)")
         ax.set_title(str(method))
         ax.grid(True, alpha=0.3)
+        ax.set_xticks([0, 1, 4, 9, 16, 32])
     axes[-1, 0].set_xlabel("K")
-    axes[0, 0].legend(fontsize=7, ncol=2)
+    handles = [plt.Line2D([0], [0], color=colors[name], marker="o", label=name) for name in treatments]
+    handles += [
+        plt.Line2D([0], [0], color="black", linestyle="-", label="p_off"),
+        plt.Line2D([0], [0], color="black", linestyle="--", label="p_on"),
+    ]
+    axes[0, 0].legend(handles=handles, fontsize=8, ncol=3, loc="upper right")
     fig.tight_layout()
     dest.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(dest, dpi=120)
+    fig.savefig(dest, dpi=140)
     plt.close(fig)
 
 
