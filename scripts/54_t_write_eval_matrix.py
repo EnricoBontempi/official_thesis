@@ -67,8 +67,15 @@ def main() -> int:
     entries = []
     for it in items:
         d = Path(it["out_dir"])
-        summary = json.loads((d / "summary.json").read_text())
         ident = json.loads((d / "run_identity.json").read_text())
+        if (d / "summary.json").exists():
+            summary = json.loads((d / "summary.json").read_text())
+        elif args.allow_non_terminal:          # smoke only: a running run has no summary yet
+            pr = json.loads((d / "progress.json").read_text())
+            summary = {"status": pr["status"], "stop_reason": None, "epochs_completed": pr["epoch"], "updates": pr["update"],
+                       "best_val_epoch": pr["best_val_epoch"], "best_seen_diagnostic_epoch": ident.get("_best_seen_epoch")}
+        else:
+            raise SystemExit(f"{it['run_id']}: summary.json missing")
         hist = json.loads((d / "eval_history.json").read_text())
         if not args.allow_non_terminal and summary["status"] not in TERMINAL:
             raise SystemExit(f"{it['run_id']}: status {summary['status']!r} is not terminal")
