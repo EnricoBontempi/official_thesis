@@ -56,3 +56,7 @@ Output: `/home/bontempi/official_thesis_t_assisted_eval/` (`runs/<TA-run>/`, `pa
 
 ## Stato
 Contratto e training assisted pubblicati/sottomessi; nessun training completato al momento della scrittura. Aggiornamenti successivi in questo file.
+
+---
+## AGGIORNAMENTO 22 novembre 2026, ~13:30 EST — esito reale
+Training 12/12 COMPLETED (9 early-stop, 3 a 1000 epoche senza plateau: glu-on-s1, glu-off-s1, glu-off-s2), preemption GLU gestite con resume (nessun restart nascosto). Catena: verifica 30037805 (06:41) → array 30060516 (12/12 COMPLETE, gate 69/69, scarto max 0.0 K) → aggregazione 30060517. Pacchetto in `results/month2/temperature_assisted_c149/package/` (INDEX), report `docs/month2/12_temperature_input_study.md`. Finding principale: guadagno da T apprezzabile solo per GLU p_off (≈ −3 K a K=32); U-Net e GLU p_on ≲ 0.2 K. Residui: continuazione dei tre run a fine tranche (da autorizzare), sensibilità a T, confronto con lo sweep di Cursor.

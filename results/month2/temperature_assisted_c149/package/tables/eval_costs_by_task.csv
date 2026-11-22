@@ -1,0 +1,13 @@
+run_id,State,compute_s,queue_wait_s
+TA-unet-on-s0,COMPLETED,144.0,38.0
+TA-unet-on-s1,COMPLETED,140.0,38.0
+TA-unet-on-s2,COMPLETED,139.0,93.0
+TA-unet-off-s0,COMPLETED,140.0,196.0
+TA-unet-off-s1,COMPLETED,136.0,196.0
+TA-unet-off-s2,COMPLETED,135.0,248.0
+TA-glu-on-s0,COMPLETED,286.0,353.0
+TA-glu-on-s1,COMPLETED,366.0,353.0
+TA-glu-on-s2,COMPLETED,359.0,407.0
+TA-glu-off-s0,COMPLETED,275.0,667.0
+TA-glu-off-s1,COMPLETED,262.0,769.0
+TA-glu-off-s2,COMPLETED,359.0,769.0

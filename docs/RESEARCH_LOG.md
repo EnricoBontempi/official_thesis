@@ -533,3 +533,10 @@ Branch `s7/c149-free-campaign`, SHA eseguito `f792b73388d43f008e8979f1aad0d1fa96
 ## 2026-11-21 — S7: valutazioni, residui e chiusura STOP F (temperature-free)
 
 Branch `s7/c149-free-campaign`. Valutazioni 12/12 (SHA `acc8e2b`, matrice `a76bac9b…`), gate loop 18/18 con scarto 0 K; continuazione di glu-on-s1 chiusa a epoca 1080 (best 630 invariato). Residui: swap neurali sui 12 best (job 30027646), swap GappyPOD con oggetti A38 congelati (30027643), baseline C149 con iperparametri congelati e controllo sul sottoinsieme A38 (30027642), diagnostico batch GLU (30027668: nessuna dipendenza dagli altri esempi a B=8 fisso; sensibilità numerica dei pareggi top-k alla forma del batch). Figure dei campi e correzione dell'etichetta centered-vs-bias. Revisori Opus/Neon: U-Net complessivamente preferibile nella ricetta free; decisione del coordinatore: U-Net p_on candidato operativo free, p_off nel confronto, sweep K su entrambe le famiglie e p_on/off, matrice con T dopo lo sweep (decisione di sviluppo post-risultati, non regola preregistrata). **STOP F concluso nel perimetro temperature-free; Mese 2 aperto.** Indice: `results/month2/s7_c149_comparison/package/INDEX.md`; report `docs/month2/10_s7_c149_model_comparison.md`.
+
+
+---
+
+## 2026-11-22 — Step 2.7-B: 12 training temperature-assisted conclusi e valutati
+
+Branch `temperature/assisted-c149`; contratto `10ff6e5`, training `e5136b6`, catena `b7e3b1f`. U-Net e GLU × p_on/off × seed 0/1/2, K variabile {0,1,4,9,16,32}, criterio di selezione a sei K sul dominio comune. 9 early-stop, 3 GLU a 1000 epoche senza plateau accertato; preemption GLU gestite con resume. Valutazioni 12/12, gate loop 69/69 (scarto max 0.0 K). Guadagno da T ≈ −3 K a K=32 solo per GLU p_off; ≲ 0.2 K per U-Net e GLU p_on. Report `docs/month2/12_temperature_input_study.md`. Sweep delle correzioni (Cursor) separato.
