@@ -32,6 +32,9 @@ Codice del secondo tentativo: `54a3b4d3a177b731ed7eef45030c3a49b0986c16`, checko
 | 30032664 array 0–1 %1 | smoke GPU, U-Net on s1 e GLU on s0, 4 frame | `mit_normal_gpu` / `mit_amf_advanced_gpu`, 1×L40S, 40 min |
 | 30032665 array 0–11 %1 | sweep GPU 12 run, `afterok:30032664` | stessa GPU, 3 h per task, una alla volta |
 | 30032666 | aggregazione, `afterok:30032665` (il baseline `30032412` è già `COMPLETE`) | CPU, 40 min |
+| 30035232 | chiusura, `afterany:30032666`, senza nuovi calcoli | `mit_normal` / `mit_amf_advanced_cpu`, 2 CPU, 8G, 20 min |
+
+`30035232` scrive solo file. Se i dodici run, il baseline e il pacchetto ci sono, il testo è `~/official_thesis_k_sweep_chiusura_v1/RIEPILOGO.md`. Altrimenti è `BLOCCO.md` nello stesso directory, e nessun job viene rilanciato. `STATO.md` dice quale dei due è stato scritto. Il checkout dei calcoli resta `54a3b4d` e non va spostato finché `30032665` e `30032666` non sono terminati.
 
 Alla submission GPU la coda Advanced conteneva due job Sonnet (`30032653`, `30032656`, `t_checks`). Lo sweep ne aggiunge due, di cui solo lo smoke può partire; il full resta `afterok`. Totale in coda: 4.
 
