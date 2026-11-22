@@ -8,6 +8,7 @@ set -euo pipefail
 : "${K_NEURAL:?}"
 : "${K_BASE:?}"
 : "${K_DEST:?}"
+: "${K_FORWARD_SHA:?}"
 PY="${PY:-$HOME/envs/official_thesis/bin/python}"
 cd "$K_TIP"
 [[ "$(git rev-parse HEAD)" == "$EXPECT_SHA" ]] || { echo "REFUSE: HEAD" >&2; exit 5; }
@@ -17,4 +18,4 @@ for run in "${RUNS[@]}"; do
 done
 [[ -f "$K_BASE/COMPLETE.json" ]] || { echo "REFUSE: baseline sweep has no COMPLETE marker" >&2; exit 3; }
 export PYTHONPATH="$K_TIP/src"
-"$PY" scripts/52_temperature_k_aggregate.py --neural-root "$K_NEURAL" --baseline-root "$K_BASE" --dest "$K_DEST" --git-sha "$EXPECT_SHA"
+"$PY" scripts/52_temperature_k_aggregate.py --neural-root "$K_NEURAL" --baseline-root "$K_BASE" --dest "$K_DEST" --git-sha "$EXPECT_SHA" --forward-sha "$K_FORWARD_SHA"

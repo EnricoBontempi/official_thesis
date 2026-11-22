@@ -23,6 +23,7 @@ from combustion_recon.evaluation.temperature_k import (
     load_frozen_manifest,
     load_historical_tblock,
     ordinary_median,
+    per_frame_csv_paths,
     rows_for_historical_t9,
     rows_for_prediction,
     sites_for_k,
@@ -221,6 +222,19 @@ def test_summary_keeps_seeds_worsenings_and_declares_empty_anchors():
     assert np.isnan(out["by_seed"]["anchor_rmse_K"]).all()
     assert np.isnan(out["by_seed"]["full_hot_rmse_K"]).all()
     assert (out["by_seed"]["full_hot_n_empty"] == 2).all()
+
+
+def test_per_frame_tables_include_a_run_directory_and_a_flat_baseline(tmp_path):
+    nested = tmp_path / "neural" / "S7-C149-unet-on-s1" / "per_frame" / "best" / "val_eval"
+    nested.mkdir(parents=True)
+    (nested / "rep0.csv").write_text("a\n")
+    flat = tmp_path / "baseline" / "per_frame" / "GlobalTrainMean_p_off" / "val_eval"
+    flat.mkdir(parents=True)
+    (flat / "rep0.csv").write_text("a\n")
+    (tmp_path / "neural" / "S7-C149-unet-on-s1" / "gate").mkdir()
+    (tmp_path / "neural" / "S7-C149-unet-on-s1" / "gate" / "best_val_eval_rep0_frames.csv").write_text("a\n")
+    assert [path.name for path in per_frame_csv_paths(tmp_path / "neural")] == ["rep0.csv"]
+    assert [path.name for path in per_frame_csv_paths(tmp_path / "baseline")] == ["rep0.csv"]
 
 
 def test_protocol_text_names_the_frozen_manifest_and_is_not_a_site_list():

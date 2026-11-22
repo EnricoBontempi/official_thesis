@@ -630,6 +630,16 @@ def summarize_sweep(frame: pd.DataFrame) -> dict[str, pd.DataFrame]:
     return {"by_seed": by_seed, "per_condition": pd.DataFrame(condition_rows), "versus_free": worsen, "across_seeds": across}
 
 
+def per_frame_csv_paths(root: Path) -> list[Path]:
+    """Return sweep tables wherever the writer nested them.
+
+    A neural run writes ``<root>/<run_id>/per_frame/...``. A baseline sweep
+    writes ``<root>/per_frame/...``. A glob that starts at ``per_frame`` sees
+    only the second layout.
+    """
+    return sorted(Path(root).glob("**/per_frame/**/*.csv"))
+
+
 def macro_rmse(frame: pd.DataFrame, column: str = "full_rmse_K") -> float:
     """Mean over conditions of the per-condition mean. One weight per condition."""
     if frame.empty or column not in frame.columns:
