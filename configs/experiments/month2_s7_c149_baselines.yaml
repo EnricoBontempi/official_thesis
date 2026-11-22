@@ -1,0 +1,45 @@
+# S7: baselines fitted on the C149 pool (2980 frames), evaluated with the S7 contract.
+# Every hyperparameter is FROZEN from the Month 2 / S6 selection on A38 (760 frames). No sweep, no
+# tuning on VAL, no refit of any A38 artifact: the A38 objects stay a separate historical context.
+experiment_id: month2_s7_c149_baselines_v1
+status: authorized_cpu_fit_and_eval
+retune_anything: false
+
+fit_pool:
+  pool_id: C149
+  n_frames: 2980            # 149 frames x 20 TRAIN conditions
+  source: train_fit role of the verified C149 cache (aggregate sha fa1c9358...)
+  control_pool_a38_subset: true   # gate: the same code on the A38 760 subset must reproduce the historical 5% rows
+
+fields_and_preprocessing:
+  fields: [Velocity_i, Velocity_j, Temperature]   # 2C, velocity physical m/s, temperature K
+  normalizer: historical fit-only 760 (Month2FitOnlyNormalizer), used ONLY to denormalize the cached
+              normalized velocities; it is not refitted on C149
+  temperature_units: K (cache target_T_K is physical)
+
+recipes:
+  GlobalTrainMean:
+    fit: mean temperature field over the fit pool (no parameters, no sensors)
+  ParamConditionedMean:
+    p_conditioning: true
+    basis: piecewise_phi1          # frozen (results/meta/month2_baseline_run_manifest.json selected.param_mean)
+    ridge_alpha: 0.01              # frozen
+    fit: per-condition mean temperature fields of the fit pool (20 conditions)
+  GappyPOD_free:
+    R: 32
+    n_velocity_components: 2
+    seed: 0
+    w_T: 5.0                       # fit value of the S6 nested refit; irrelevant at K=0 (no temperature block)
+    ridge_lambda: {p_off: 0.001, p_on: 0.01}   # frozen at the 5% selection
+    centering: p_off -> global mean temperature of the fit pool; p_on -> ParamConditionedMean prediction
+    block_scales: std of the fit pool (T, vi, vj)
+    criterion: none (hyperparameters frozen; modes = truncated SVD of the centered, scaled fit snapshots)
+
+evaluation:
+  coverages: [0.01, 0.05, 0.20]
+  roles: [train_fit, seen_train_eval, val_eval]   # train_fit = reference760 (A38 frame indices inside the C149 pool)
+  replicas: [0, 1, 2]
+  layout_id: random_sparse_primary
+  eval_mask_seed: 20261116
+  masks: persisted nested payload, identical to the neural evaluation; mask_hash per row checked against it
+  task: temperature_free (K=0)
