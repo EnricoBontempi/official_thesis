@@ -9,6 +9,7 @@ from combustion_recon.models import glu_reconstructor as G
 from combustion_recon.models.unet import ASSISTED_CHANNEL_ORDER, ASSISTED_P_CHANNELS, build_sparse_unet_assisted_from_config
 
 H = W = 128
+DEV = "cuda" if torch.cuda.is_available() else "cpu"
 
 
 @pytest.fixture(scope="module")
@@ -34,7 +35,7 @@ def _batch(x, y, B, K, seed=0, N=64):
     p = torch.randn(B, 2, generator=g)
     xx, yy = torch.meshgrid(xt, yt, indexing="xy")
     Y = torch.stack([xx.reshape(-1), yy.reshape(-1)], -1).unsqueeze(0).expand(B, -1, -1).contiguous()
-    return co(sites), vals, sites, p, Y, co(tsite), tv, tsite
+    return tuple(t.to(DEV) for t in (co(sites), vals, sites, p, Y, co(tsite), tv, tsite))
 
 
 def test_unet_assisted_has_named_channels_and_runs():
@@ -47,10 +48,12 @@ def test_unet_assisted_has_named_channels_and_runs():
 def test_glu_shared_weights_equal_free_and_k0_matches_free_forward(geom):
     p, x, y = geom
     torch.manual_seed(7)
-    free = G.build_glu_from_config(domain_geometry_path=p).eval()
+    free = G.build_glu_from_config(domain_geometry_path=p).to(DEV).eval()
     torch.manual_seed(7)
-    asst = GA.build_assisted_glu_from_config(domain_geometry_path=p).eval()
+    asst = GA.build_assisted_glu_from_config(domain_geometry_path=p).to(DEV).eval()
     fs, as_ = free.state_dict(), asst.state_dict()
+    fs = {k: v.cpu() for k, v in fs.items()}
+    as_ = {k: v.cpu() for k, v in as_.items()}
     assert all(torch.equal(fs[k], as_[k]) for k in fs)                       # shared weights bit-identical at init
     co, vals, sites, pn, Y, tco, tv, ts = _batch(x, y, 2, 0)
     with torch.no_grad():
@@ -62,7 +65,7 @@ def test_glu_shared_weights_equal_free_and_k0_matches_free_forward(geom):
 def test_glu_uses_observed_t_and_p_off_ignores_p(geom):
     p, x, y = geom
     torch.manual_seed(1)
-    m = GA.build_assisted_glu_from_config(domain_geometry_path=p).eval()
+    m = GA.build_assisted_glu_from_config(domain_geometry_path=p).to(DEV).eval()
     co, vals, sites, pn, Y, tco, tv, ts = _batch(x, y, 2, 9)
     with torch.no_grad():
         base = m(co, vals, sites, pn, Y, t_coords_phys=tco, t_values_norm=tv, t_site_index=ts)
@@ -77,7 +80,7 @@ def test_glu_uses_observed_t_and_p_off_ignores_p(geom):
 def test_glu_neighbours_and_predictions_do_not_depend_on_batch_shape_or_mates(geom):
     p, x, y = geom
     torch.manual_seed(2)
-    m = GA.build_assisted_glu_from_config(domain_geometry_path=p).eval()
+    m = GA.build_assisted_glu_from_config(domain_geometry_path=p).to(DEV).eval()
     rec = {}
 
     def run(B, mates, tag):
