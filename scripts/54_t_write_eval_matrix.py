@@ -103,9 +103,9 @@ def main() -> int:
             idn = (pl.get("extra") or {}).get("run_identity") or {}
             if idn.get("run_id") != it["run_id"] or int(pl["epoch_config"]["seed"]) != int(it["seed"]):
                 raise SystemExit(f"{it['run_id']}/{name}: identity/seed mismatch")
-            if epoch not in by_epoch:
+            if epoch not in by_epoch and not args.allow_non_terminal:
                 raise SystemExit(f"{it['run_id']}/{name}: no loop eval at epoch {epoch}")
-            rec = by_epoch[epoch]
+            rec = by_epoch.get(epoch, {})      # smoke only: a running run's last.pt need not sit on an eval epoch
             if name == "best" and epoch != int(summary["best_val_epoch"]):
                 raise SystemExit(f"{it['run_id']}: best.pt epoch != summary best_val_epoch")
             if name == "best_seen_diagnostic" and summary.get("best_seen_diagnostic_epoch") is not None and epoch != int(summary["best_seen_diagnostic_epoch"]):
