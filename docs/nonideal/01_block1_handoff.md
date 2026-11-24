@@ -36,3 +36,6 @@
 - Convenzioni di i/j/k non dichiarate: irrilevanti per operatori isotropi.
 - VAL123 già usata per selezione e sviluppo: studio descrittivo.
 - Non è una validazione PIV realistica.
+
+## Aggiornamento Blocco II (24 novembre 2026)
+Ampliamento a 12 modelli (p_on e p_off, seed 0/1/2): revisione `degradation_spec_v1_12models.yaml`; batching uniforme per famiglia (GLU batch 1 anche per R0, replay tecnico a batching S7); gate R0 ≤ 0.05 K dal riferimento S7. Codice e test CPU pronti; smoke GPU e campagna da eseguire: vedi [02_block2_runbook.md](02_block2_runbook.md).

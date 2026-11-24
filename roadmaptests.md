@@ -22,6 +22,8 @@
    - il troncamento al minimo numero di siti del batch (§10, III.0) **non è una scelta definitiva**: si decide nel Blocco III;
    - l'asse S (media a finestra), il campionamento regolare, le lacune dipendenti da T, gli spuri come errori di valore e le temperature osservate **restano fuori** dal primo blocco e non si aggiungono automaticamente.
 
+7. **Ampliamento del Blocco II a 12 modelli (autorizzato da Enrico il 24 novembre 2026).** U-Net/GLU × p_on/p_off × seed 0/1/2, tutti `best` della matrice S7 finale (nessun `last`/`best_seen`, nessuna scelta del seed). Specifica originale preservata; revisione distinta [configs/nonideal/degradation_spec_v1_12models.yaml](configs/nonideal/degradation_spec_v1_12models.yaml) con operatori, livelli, geometrie e generatori invariati (test). Valutazioni nominali: 12 × 6 × 3 × 343 = 74 088 (replay tecnici aggiuntivi contati a parte). Domanda aggiuntiva: conoscere phi e NH3 (p_on) attenua il peggioramento? p non viene mai degradato; nessuna T in input. Batching uniforme per famiglia (U-Net 8, GLU 1 anche per R0); gate R0 entro 0.05 K dal riferimento S7 per ruolo/replica; se fallisce la campagna si ferma e si diagnostica. Runbook: [docs/nonideal/02_block2_runbook.md](docs/nonideal/02_block2_runbook.md).
+
 ## 1. Obiettivo e legame con la tesi
 
 Domanda della tesi: quanto si può ricostruire la temperatura della singola istantanea da osservazioni sparse di velocità, e come cambia il risultato quando osservazioni e condizioni diventano meno favorevoli.
@@ -259,7 +261,7 @@ Dopo il Blocco II si riportano, senza giudizio automatico: variazioni appaiate (
 
 ## 9. Matrice del Blocco II (congelata nella specifica v1)
 
-Base: sei checkpoint `best` free p_on; siti 5% storici, repliche 0/1/2; ruoli seen220 e VAL123 (separati); T numerica originale come target. Specifica: [configs/nonideal/degradation_spec_v1.yaml](configs/nonideal/degradation_spec_v1.yaml). Tutti i valori sono **default di scenario**, non misure del nostro combustore.
+Base: dodici checkpoint `best` free (U-Net/GLU × p_on/p_off × seed 0/1/2; ampliamento approvato, originariamente sei p_on); siti 5% storici, repliche 0/1/2; ruoli seen220 e VAL123 (separati); T numerica originale come target. Specifica: [configs/nonideal/degradation_spec_v1.yaml](configs/nonideal/degradation_spec_v1.yaml). Tutti i valori sono **default di scenario**, non misure del nostro combustore.
 
 | ID | Contenuto | Parametri | Classe | Ruolo |
 |---|---|---|---|---|
@@ -270,7 +272,7 @@ Base: sei checkpoint `best` free p_on; siti 5% storici, repliche 0/1/2; ruoli se
 | G1-eq | Rimozione casuale uniforme dello stesso numero di siti di G1 | per frame e replica | controllo | Contiguità vs informazione |
 | N2 | Rumore severo | σ = 1.5 m/s (stessa realizzazione standardizzata di N1, ×3) | C | Stress |
 
-Definizione completa di G1 (costruzione, area richiesta/effettiva, bordi, posizioni, seed, rifiuti) e qualificazione su TRAIN: spec e [handoff](docs/nonideal/01_block1_handoff.md). Dimensione: 6 celle × 6 modelli × 3 repliche × 343 frame ≈ 37 000 forward (più il replay R0 a batch 1 per il GLU). Nessun prodotto cartesiano.
+Definizione completa di G1 (costruzione, area richiesta/effettiva, bordi, posizioni, seed, rifiuti) e qualificazione su TRAIN: spec e [handoff](docs/nonideal/01_block1_handoff.md). Dimensione: 6 celle × 12 modelli × 3 repliche × 343 frame = 74 088 valutazioni nominali (più 6 174 righe di replay tecnico GLU a batching S7). Nessun prodotto cartesiano.
 
 Assi **separati, non nel core**: S (media a finestra), campionamento regolare a passo PIV, lacune dipendenti da T, spuri come errori di valore, temperature osservate. Non si aggiungono automaticamente; ciascuno richiede decisione e un proprio controllo.
 
