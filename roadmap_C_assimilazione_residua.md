@@ -1,3 +1,7 @@
+> **Nota del 24 novembre 2026.** **SOSPESA — NON ESEGUIRE.** La priorità corrente è la definizione del problema applicativo e lo studio di robustezza a osservazioni non ideali descritto in [roadmaptests.md](roadmaptests.md). Eventuale riattivazione soltanto dopo riesame e decisione esplicita di Enrico.
+>
+> Il piano storico sotto questa nota è conservato integralmente. Secondo quanto riferito da Enrico, non è stato eseguito.
+
 # Roadmap C — Assimilazione spaziale dei residui di temperatura
 
 **Studio preparatorio successivo al Mese 2 · 22 novembre 2026 · America/New_York**  

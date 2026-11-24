@@ -3,6 +3,7 @@
 **Author:** Enrico Bontempi  
 **Host Group:** Deng Lab, Massachusetts Institute of Technology (MIT)  
 **Thesis Proposal:** [docs/proposal.md](docs/proposal.md)  
+**Current priority (24 Nov 2026):** [roadmaptests.md](roadmaptests.md) — robustness to non-ideal velocity observations (audit → frozen-model evaluation → conditional retraining). Roadmaps A/B/C are **suspended, not executed**. No job launched by this planning update.  
 **Month 1 Roadmap:** [roadmap_month1.md](roadmap_month1.md)  
 **Month 2 Roadmap:** [roadmap_month2.md](roadmap_month2.md) — updated plan approved by Enrico on **2026-11-20**: C149 multi-seed U-Net/GLU comparison → matched K sweep of mean/median corrections → learned T-input experiment → final review. Supervisor ratification tracked separately; Month 2 remains open  
 **Month 2 Protocol:** [configs/splits/month2_frame_protocol.yaml](configs/splits/month2_frame_protocol.yaml), [configs/experiments/month2_pilot.yaml](configs/experiments/month2_pilot.yaml)  

@@ -544,3 +544,13 @@ Branch `temperature/assisted-c149`; contratto `10ff6e5`, training `e5136b6`, cat
 ## 2026-11-22 — Step 2.7-B: continuazione dei tre GLU, valutazioni v2 e consegna congiunta con lo sweep K
 
 Array 30082569 (glu-on-s1, glu-off-s1, glu-off-s2, da epoca 1000, max 1100): tutti e tre in plateau (1030, 1080, 1060 epoche), best VAL invariato (820/750/730). Catena v2 30082570 → valutazioni 30083486 (12/12, gate 69/69, scarto 0.0 K) → aggregazione 30083487; matrice v2 `3663d338…`, riuso per hash dei checkpoint invariati. Pacchetto `results/month2/temperature_assisted_c149/package_v2/`; il pacchetto v1 (`aa8f65f`) resta intatto. Consegna congiunta con Cursor `be18ad0`: launcher 30083178, post-processing 30083497, 26 controlli (tutti i bloccanti superati), `results/month2/joint_step23/package/INDEX.md`. Nessun nuovo training, nessun TEST, nessun vincitore.
+
+---
+
+## 2026-11-24 — Nuova priorità: osservazioni di velocità non ideali; A/B/C sospese
+
+**Pianificazione, nessuna esecuzione.** Dopo il report del Mese 2 (inviato il 22 novembre), Linzheng ha chiesto di privilegiare la rilevanza applicativa e il contributo di un domain expert rispetto a nuove ablation sullo stesso benchmark. Secondo quanto riferito da Enrico, il colloquio del 24 novembre con il Prof. D'Errico (ICE, PoliMi) indica interesse, dati soprattutto RANS motoristici, LES e condivisibilità da verificare, nessuna competenza diretta su PIV in combustori ottici; suggeriti EngineBench e archivi Sandia come riferimenti. La scelta tra motori e combustore non è presa.
+
+Pubblicate [roadmaptests.md](../roadmaptests.md) (Blocco I audit e modello dell'osservazione; Blocco II robustezza dei sei checkpoint best free p_on; Blocco III retraining condizionato a una regola fissata prima) e la nota [docs/nonideal/00_ricognizione_osservazioni.md](nonideal/00_ricognizione_osservazioni.md). Verificati: assenza di PIV e di T misurata nella combustione RealPDEBench; vettori mancanti codificati a zero e lacune artificiali in EngineBench (codice letto); nessun dato TNF letto con velocità e T simultanee co-localizzate; canale Mv della U-Net come validità nativa; divieto di N eterogeneo nel batch GLU. Controlli leggeri solo su frame TRAIN.
+
+Roadmap A/B/C (`plan/abc-preparatory-studies` @ `9d2c3af`) **sospese, non cancellate**: nota datata in testa a ciascuna, piano storico integro; secondo Enrico non erano state eseguite. Il vecchio incarico amministrativo A/B/C è superato. Nessun training, inferenza, submission Slurm o accesso a TEST. Termocoppie all'uscita restano un tema separato.
