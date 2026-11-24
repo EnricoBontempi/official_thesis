@@ -1,0 +1,257 @@
+# Degradation specification v1 -- sensitivity study of frozen models to degraded velocity observations.
+# Block I deliverable. NOT a validation against real PIV. Values below are SCENARIO DEFAULTS,
+# not measurements of our combustor. See docs/nonideal/00_ricognizione_osservazioni.md.
+format: nonideal_degradation_spec_v1
+spec_id: nonideal_v1
+version: 1
+status: frozen_for_block2_pending_enrico_review   # numeric levels do not change after seeing any result
+created: "2026-11-24"
+authorization:
+  block: I
+  executed_here: [cpu_unit_tests, cpu_g1_qualification_on_train_geometry]
+  not_executed: [slurm, gpu_smoke, model_forward, training, test_split]
+  block3_retraining: planned_not_authorized
+  suspended_roadmaps: [A, B, C]
+
+scope:
+  purpose: >
+    Measure, descriptively, how six frozen free p_on checkpoints respond to degraded planar
+    velocity observations. VAL123 was already used for selection and development: this is a
+    descriptive study, not an independent confirmation.
+  target: original numerical T (LES field), never a degraded T
+  not_claimed:
+    - realistic PIV validation
+    - any measurement uncertainty of our combustor (none is available)
+    - any transfer to engines
+
+provenance:
+  base_branch: plan/nonideal-observations
+  base_commit: 8d72a8151f2e20ae0650ec77c813107f860ae9c5
+  c149_cache_id: month2_dense_unet_cache_opus_c149_v1
+  c149_cache_aggregate_sha256: fa1c9358deb3bda0313cd74f9ab6855af87bc969c4069a463073d4c4120f03b4
+  eval_mask_manifest_file_sha256: 2e2d8ff6edabf62ad56702a155140d064c0b4014d06ee96debf52811efa5c75e
+  eval_mask_aggregate_payload_sha256: 7be78f35ffea2ebc598adce8cec39dc719339aac17ecadde3137f2064891ffeb
+  historical_mask_seed: 20261116          # base sites: 5% random_sparse_primary, replicas 0/1/2 (unchanged)
+  historical_layout_id: random_sparse_primary
+  normalizer:
+    stats_path: data/manifests/train_norm_stats_month2_fit.json
+    stats_sha256: 678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e
+    refit: never
+    velocity_zscore_ms:
+      Velocity_i: {mean: -0.059971279319043884, std: 5.673608459887564}
+      Velocity_j: {mean: 4.272026277961735, std: 11.909608552613038}
+
+seeds:
+  namespace: nonideal_degradation_v1
+  degradation_seed: 20261125
+  forbidden_historical_seeds: [20261114, 20261116, 20261118]   # eval default, eval masks, train masks
+  derivation: >
+    stable_seed("nonideal_degradation_v1", degradation_seed, operator, sim_id, frame_index,
+    replica_id[, attempt]) with operator in {noise, g1, g1_eq}. The string prefix and the operator
+    tag make collisions with observation_mask_seed / training_mask_seed layouts structurally
+    impossible; the numeric degradation_seed is also distinct from every historical seed.
+  level_not_in_key: >
+    The noise level is deliberately NOT part of the seed key: N1 and N2 use the same standardized
+    realization scaled by sigma (N2 noise = 3 x N1 noise, perfectly correlated). Reason: paired
+    level comparison without confounding by a new draw. Consequence: N1 and N2 are not independent
+    samples of the noise, and one replica of N2 does not add variance information beyond N1.
+  same_for_all_models_and_training_seeds: true
+
+roles:
+  evaluation: [seen_train_eval, val_eval]      # seen220 (20 x 11), VAL123 (3 x 41), reported SEPARATELY
+  qualification: [train_fit]                   # generator qualification only, no model
+  forbidden: [test]
+  val_status: used_for_selection_and_development_not_independent
+
+observation_model:
+  order:
+    - dense physical field (m/s, 128x128, from frozen cache)
+    - historical sites (5%, replicas 0/1/2; identical sites and frames for all cells)
+    - noise in m/s, generated for ALL original sites before invalidation
+    - invalidation (removal of sites; no filling)
+    - frozen normalization (z-score; implemented as value_norm + noise_ms/std, mean cancels)
+    - model input
+  spatial_averaging: disabled
+  model_inputs:
+    unet: invalid sites -> exact 0 in normalized value channels AND Mv=0 (7-channel layout unchanged)
+    glu: invalid tokens removed; no padding, no fake tokens, no filling with true velocity
+  never_filled_with_hidden_velocity: true
+  replica_semantics: >
+    A replica id jointly selects: the historical site set, the noise realization and the G1 region.
+    These sources of variability change together between replicas 0/1/2 and cannot be separated
+    from the replica alone. Within a replica, they are identical across cells and models.
+
+operators:
+  noise:
+    id: N
+    kind: iid_gaussian_per_component
+    unit: m/s
+    standardized_reference_sigma_ms: 1.0
+    applied_to: [Velocity_i, Velocity_j]
+    correlation: none            # no spatial correlation, bias or peak locking modelled
+    conversion_to_normalized: {Velocity_i: "1/5.673608459887564", Velocity_j: "1/11.909608552613038"}
+    sigma_ms_to_normalized_examples:
+      "0.5": {Velocity_i: 0.0881, Velocity_j: 0.0420}
+      "1.5": {Velocity_i: 0.2644, Velocity_j: 0.1259}
+    documentary_support: >
+      Literature (Sciacchitano 2015; Wieneke 2015; Sciacchitano 2019) supports the existence and
+      the order of magnitude of random PIV error in pixel units (about 0.03-0.1 px typical, up to
+      several tenths of px in difficult conditions). The conversion px -> m/s needs a design
+      displacement and a full-scale velocity of the experiment (hypothesis, class B).
+    hypothesis: >
+      sigma = 0.5 and 1.5 m/s are scenario values. They are NOT verified for our combustor and
+      "moderate noise" does not mean "validated experimental uncertainty".
+    does_not_allow_claiming: [error of a PIV in this burner, spatial correlation, bias, peak locking]
+    noise_not_estimated_from_turbulent_variance: true
+  g1:
+    id: G1
+    family: union_of_discs
+    purpose: contiguous gaps independent of T (stress test)
+    dependence_on_temperature: false
+    dependence_on_model_error: false
+    dependence_on_velocity: false
+    area_fraction: 0.25                 # requested fraction of the 128x128 cell area
+    area_definition: covered cells / 16384 (grid uniform; cell area 0.581 x 0.758 mm constant)
+    diameter_mm: {min: 3.0, max: 10.0, distribution: uniform}
+    centre_distribution: uniform over the bounding box of cell centres (x in [-36.9, 36.9] mm, y in [62.9, 159.1] mm)
+    metric: euclidean distance in physical mm (anisotropic cells handled)
+    construction: >
+      Draw discs sequentially (diameter, cx, cy from one RNG in that order) and OR them into the
+      region until covered cells >= ceil(0.25*16384)=4096. The disc that crosses the target is kept,
+      so the effective area is >= requested; it is reported per packet.
+    boundaries: >
+      Discs are clipped by the domain edges (no wrap, no reflection). Centres may lie anywhere in
+      the bounding box, so border cells are covered less often than interior cells (measured in
+      the qualification). Not corrected.
+    max_discs: 500
+    site_selection: >
+      A historical site is removed iff its cell lies in the region. The region is defined on the
+      dense grid and does not look at which sites exist.
+    variation: new region for every (sim_id, frame_index, replica_id); identical across cells and models
+    rejection:
+      conditions: [zero_removed_sites, surviving_sites_below_min]
+      min_surviving_sites: 16           # = GLU top_k; code itself needs only >= 1 (k_eff=min(16,N))
+      max_attempts: 20                  # attempt index enters the seed; exhaustion raises an error
+      note: rejection depends only on seeds, geometry and the site set (never on T, velocity or model)
+    stress_test_status: >
+      Class C synthetic stress test motivated by experimental gaps (reflections, shadows, seeding,
+      field of view). It is not a mask measured on our combustor. Geometry is a single arbitrary
+      choice, fixed before looking at any reconstruction metric.
+  g1_eq:
+    id: G1-eq
+    kind: uniform_random_site_removal
+    count: same number of removed sites as G1 for the same (frame, replica)
+    selection: uniform without replacement among the original sites
+    purpose: control that separates contiguity (geometry) from the amount of removed information
+
+cells:
+  - {id: R0,    noise_sigma_ms: null, gap: null,    role: ideal_reference}
+  - {id: N1,    noise_sigma_ms: 0.5,  gap: null,    role: core_noise_scenario}
+  - {id: G1,    noise_sigma_ms: null, gap: g1,      role: core_gap_stress_test}
+  - {id: N1G1,  noise_sigma_ms: 0.5,  gap: g1,      role: core_combination_same_realizations}
+  - {id: G1-eq, noise_sigma_ms: null, gap: g1_eq,   role: control_equal_site_count}
+  - {id: N2,    noise_sigma_ms: 1.5,  gap: null,    role: severe_noise_stress}
+cell_relations:
+  N1_vs_N1G1: same noise at the surviving sites (noise drawn before invalidation, keyed by flat site index)
+  N1_vs_N2: same standardized realization, N2 = 3 x N1
+  G1_vs_N1G1_vs_G1eq: G1 and N1G1 share the same region; G1-eq removes the same count
+
+excluded_axes_not_in_this_block:
+  - spatial averaging / interrogation window
+  - regular resampling at PIV pitch
+  - T-dependent gaps (leakage risk)
+  - spurious vectors as large value errors (invalidation only)
+  - observed temperatures / outlet thermocouples
+  - EngineBench mask (not downloaded)
+
+models:
+  checkpoint: best
+  conditioning: p_on        # NH3 fraction and phi given as inputs
+  excluded: [p_off, assisted, last, best_seen_diagnostic]
+  no_best_seed_selection: true
+  runs:
+    - run_id: O-C149-on-s0
+      family: sparse_unet
+      model_seed: 0
+      best_epoch: 90
+      best_file_sha256: bed10229342bb664adfbd247fb018670fa2b947df26092804841a7dfdc97bd7e
+      best_weights_sha256: 530258d7f65d901f17fa21b493d746a3b63409ad7d91ba91316780fd558386f1
+    - run_id: S7-C149-unet-on-s1
+      family: sparse_unet
+      model_seed: 1
+      best_epoch: 240
+      best_file_sha256: 008b1913cc5af2adbeb9bac403c41e38600da5d7313caef2e1d5b79e6cdac338
+      best_weights_sha256: 0eb2d31847b5dd934294bed85b7f6c6e7deec85c90aa8635b88eafd25f4bff46
+    - run_id: S7-C149-unet-on-s2
+      family: sparse_unet
+      model_seed: 2
+      best_epoch: 180
+      best_file_sha256: f11be53fe70ef51b48c6a8b1ad548aba8fb9fe9d3852d86cc0c811ce516b91b2
+      best_weights_sha256: c826830122e3818e1f2c2b7d4ddf6765b0a6941dc118e250c18582ead9e698cc
+    - run_id: S7-C149-glu-on-s0
+      family: adapted_glu
+      model_seed: 0
+      best_epoch: 290
+      best_file_sha256: e1aad6019663d6137ff8abc5fc0acbc53f739d4037699b541e497a124b2802b3
+      best_weights_sha256: 0377fbb32e310026adc76af3c87221500898a9955717b25f9d199464300fcfcb
+    - run_id: S7-C149-glu-on-s1
+      family: adapted_glu
+      model_seed: 1
+      best_epoch: 630
+      best_file_sha256: e33673b5b2e18be8b10347459b4f0d86f6aa114c233e79ccfa6be3021204ff6a
+      best_weights_sha256: 8e5f74937b7827eb1e7d5bc04a6fba6dda3b42fdcf16c7276c5a3bd21e0b0c56
+    - run_id: S7-C149-glu-on-s2
+      family: adapted_glu
+      model_seed: 2
+      best_epoch: 400
+      best_file_sha256: d5034d497adf352302ae4f02e005ae09e9d3da2b5d61b88c519f930db2b61cb2
+      best_weights_sha256: 3615131abcdbe02bca1ea7e98a025a23a3b55e5efc41c7e50e2767a69407d309
+  availability_on_cluster: not_verified (first check of Block II)
+
+inference_batching:
+  unet: batch of 8 consecutive frames as in S7 (per-sample convolution input, no site-count dependence)
+  glu:
+    constraint: >
+      The existing wrapper forbids padding_mask and ragged batches (homogeneous N required).
+      No fake padding, no new architecture.
+    R0_N1_N2: constant N (819 sites) -> batch of 8 consecutive frames, exactly the S7 evaluation batching
+    G1_N1G1_G1eq: N varies per frame -> homogeneous batches, in practice batch size 1
+    paired_reference: >
+      Differences of a cell are taken against the ideal replay (R0) obtained with the SAME batching
+      as the cell: R0 at batch 8 for R0/N1/N2, R0 at batch 1 (extra replay of R0) for G1/N1G1/G1-eq.
+      The GLU top-k tie-break is numerically sensitive to batch shape (documented in the S7
+      diagnostic; 0.04 K per frame was an observed value, not a bound). A replay discrepancy is
+      diagnosed, not accepted by quoting that historical figure. Model and neighbour tie-break are not modified.
+  retraining_truncation_to_batch_minimum: undecided_deferred_to_block3
+
+replay_reference:
+  unet_gate_inherited_from_s7: macro RMSE within 0.05 K of the frozen S7 evaluation (existing S7 gate)
+  glu_gate: none_fixed_here   # diagnose any discrepancy; report batch-shape effect explicitly
+
+reporting_block2:
+  quantities: [rmse_K, mae_K, bias_K, abs_bias_K, centered_rmse_K, jets_T_lt_1800K, hot_zone_T_ge_2100K, hot_zone_iou]
+  g_cells_also: rmse inside vs outside the G1 region (region defined geometrically, not by T)
+  paired_differences: vs ideal replay of the same model/frame/replica/batching
+  report: magnitudes, dispersion across seeds, regions, per-condition values, worst frames
+  decision_rule: none      # no automatic threshold; Enrico decides explicitly after Block II whether to proceed
+  figure_frames_rule: >
+    For each role and each condition, the frame with the lowest frame_index, replica 0, all models.
+    Fixed here, independent of any error value.
+  seen_and_val_reported_separately: true
+
+batch_counts:
+  seen220: {conditions: 20, frames_per_condition: 11}
+  val123: {conditions: 3, frames_per_condition: 41}
+  replicas: 3
+  expected_forward_per_model: 6 cells x 3 replicas x 343 frames = 6174   # 6 models -> 37044 (R0 at batch 1 for GLU is extra)
+
+documentary_notes:
+  realpdebench_combustion: >
+    The released fields are a LES slice (Appendix B.2: "three-dimensional, implicit, unsteady
+    Large Eddy Simulation"); slice plane, interpolation to 128x128, component/axis definition,
+    mesh and SGS model are not declared in the sources consulted. Combustion experiment: OH*
+    chemiluminescence only; no PIV for combustion.
+  direction_convention: >
+    Not needed: all operators are isotropic on the two components (noise i.i.d. per component,
+    discs in Euclidean mm). Sign and axis of vi/vj are not declared by the sources; the TRAIN
+    statistics only suggest that vj is the stronger component along columns (inference).
