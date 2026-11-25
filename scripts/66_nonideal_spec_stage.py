@@ -26,8 +26,14 @@ def main() -> int:
     ap.add_argument("--matrix", type=Path, required=True)
     ap.add_argument("--dest", type=Path)
     ap.add_argument("--git-sha", default="")
+    ap.add_argument("--smoke-root", type=Path, default=None, help="chain test on non-scientific smoke runs only (output must be named *smoke*)")
+    ap.add_argument("--smoke-runs", default="")
     a = ap.parse_args()
     m, root, runs = load(a.matrix)
+    if a.smoke_root is not None:
+        assert "smoke" in str(a.smoke_root) and a.dest is not None and "smoke" in str(a.dest)
+        root = a.smoke_root
+        runs = [r for r in runs if r["run_id"] in a.smoke_runs.split(",")]
     if a.cmd in ("status", "extension"):
         cls = {r["run_id"]: nc.classify_run(root, r["run_id"]) for r in runs}
         if a.cmd == "status":
@@ -47,7 +53,7 @@ def main() -> int:
     spec_sha = m["degradation_spec_sha256"]
     frozen, problems = {}, []
     for r in runs:
-        res = nc.validate_and_freeze_run(root, r, expect_git_sha=a.git_sha, expect_spec_sha=spec_sha)
+        res = nc.validate_and_freeze_run(root, r, expect_git_sha=a.git_sha, expect_spec_sha=spec_sha, smoke=a.smoke_root is not None)
         res["ledger"] = nc.ledger_summary(root, r["run_id"])
         frozen[r["run_id"]] = res
         if not res["valid"]:

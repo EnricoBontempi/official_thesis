@@ -73,11 +73,16 @@ def weights_sha256(state_dict: dict[str, Any]) -> str:
 
 
 def validate_and_freeze_run(out_root: Path, entry: dict[str, Any], *, expect_git_sha: str, expect_spec_sha: str,
-                            load_checkpoints: bool = True) -> dict[str, Any]:
-    """Validity checks of one finished run + frozen identity of best/last. Returns {valid, problems, ...}."""
+                            load_checkpoints: bool = True, smoke: bool = False) -> dict[str, Any]:
+    """Validity checks of one finished run + frozen identity of best/last. Returns {valid, problems, ...}.
+
+    ``smoke=True`` (tests of the chain on non-scientific runs only) accepts any completed state and smoke identities.
+    """
     run_id = entry["run_id"]
     d = Path(out_root) / run_id
     cls = classify_run(out_root, run_id)
+    if smoke and cls.get("summary_status") == "completed":
+        cls = {**cls, "state": PLATEAU, "smoke_state_override": True}
     problems: list[str] = []
     if cls["state"] not in (PLATEAU, BUDGET_EXHAUSTED):
         problems.append(f"state {cls['state']}: {cls.get('why', '')}")
@@ -91,12 +96,12 @@ def validate_and_freeze_run(out_root: Path, entry: dict[str, Any], *, expect_git
         problems.append(f"regime {spec_block.get('regime')} != {entry['regime']}")
     if ident.get("family") != entry["family"] or not ident.get("p_conditioning"):
         problems.append("family / p_on mismatch")
-    if ident.get("git_sha") != expect_git_sha and expect_git_sha:
+    if ident.get("git_sha") != expect_git_sha and expect_git_sha and not smoke:
         # continuations of the same run may run at the same frozen SHA only
         problems.append(f"git_sha {ident.get('git_sha')} != frozen {expect_git_sha}")
     if spec_block.get("degradation_spec_sha256") != expect_spec_sha:
         problems.append("degradation spec hash differs from the frozen one")
-    if ident.get("non_scientific_smoke"):
+    if ident.get("non_scientific_smoke") and not smoke:
         problems.append("run_identity marks a smoke run")
     ck_dir = d / "checkpoints"
     out: dict[str, Any] = {"run_id": run_id, "family": entry["family"], "regime": entry["regime"], "seed": entry["seed"], **cls,

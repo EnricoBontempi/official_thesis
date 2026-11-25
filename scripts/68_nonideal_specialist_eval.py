@@ -50,6 +50,7 @@ def main() -> int:
     ap.add_argument("--device", default="cuda")
     ap.add_argument("--mode", choices=("full", "smoke"), default="full")
     ap.add_argument("--smoke-frames", type=int, default=8)
+    ap.add_argument("--train-root", type=Path, default=None, help="smoke only: directory holding the run (default: matrix out_root)")
     a = ap.parse_args()
     smoke = a.mode == "smoke"
     if smoke != ("smoke" in a.out_root.name.lower()):
@@ -75,7 +76,9 @@ def main() -> int:
     if spec_sha != freeze["degradation_spec_sha256"]:
         raise SystemExit("evaluation spec differs from the training spec")
     smatrix = s7e.load_matrix(a.s7_eval_matrix)
-    run_dir = Path(json.loads(a.matrix.read_text())["out_root"]) / a.run_id
+    if a.train_root is not None and not smoke:
+        raise SystemExit("--train-root is for smoke only")
+    run_dir = (a.train_root or Path(json.loads(a.matrix.read_text())["out_root"])) / a.run_id
     ident = json.loads((run_dir / "run_identity.json").read_text())
     entry = {"run_id": a.run_id, "pool_id": "C149", "family": fr["family"], "p_conditioning": True, "training_dir": str(run_dir),
              "training_git_shas": [ident["git_sha"]], "model_seed": fr["seed"]}
