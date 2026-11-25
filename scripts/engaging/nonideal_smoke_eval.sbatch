@@ -16,8 +16,8 @@ for FAM in unet glu; do
   RID="NI-${FAM}-on-N1G1-s${SEED}"
   "$PY" scripts/66_nonideal_spec_stage.py freeze --matrix configs/experiments/nonideal_specialist_matrix.json --smoke-root "$PREV/N1G1" --smoke-runs "$RID" --dest "$SM/freeze_$FAM" --git-sha "$EXPECT_SHA"
   # smoke freeze lists one run; the evaluator reads that entry
-  "$PY" scripts/68_nonideal_specialist_eval.py --run-id "$RID" --out-root "$SM/eval_$FAM" --freeze "$SM/freeze_$FAM/freeze.json" \
+  "$PY" scripts/68_nonideal_specialist_eval.py --run-id "$RID" --out-root "$SM/eval_smoke_$FAM" --freeze "$SM/freeze_$FAM/freeze.json" \
      --train-root "$PREV/N1G1" --eval-git-sha "$EXPECT_SHA" --device cuda --mode smoke --smoke-frames 8
   echo "[$(date -Is)] spec-eval smoke $FAM rc=$?"
-  ls "$SM/eval_$FAM/$RID/best" "$SM/eval_$FAM/$RID/last"
+  ls "$SM/eval_smoke_$FAM/$RID/best" "$SM/eval_smoke_$FAM/$RID/last"
 done
