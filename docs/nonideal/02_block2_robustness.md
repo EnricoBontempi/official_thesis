@@ -36,7 +36,7 @@ Tutti i 12 modelli peggiorano in tutte le celle, su entrambi i ruoli, a livello 
 
 ### 2.1 Rumore, lacune, combinazione
 - **N1 (0.5 m/s):** +0.1…+0.5 K (0.2–1.3 %). Trascurabile in tutti i modelli; per valore assoluto non cambia nulla di apprezzabile.
-- **N2 (1.5 m/s, stessa realizzazione ×3):** +1.3…+4.7 K (3.4–9.3 %). Triplicare σ moltiplica l'effetto di circa 8–20 volte: la risposta è fortemente non lineare, quindi N1 è lontano dal regime in cui il rumore conta.
+- **N2 (1.5 m/s, stessa realizzazione ×3):** +1.3…+4.7 K (3.4–9.3 %). Triplicare σ moltiplica l'effetto di circa 8–40 volte (rapporto N2/N1 dei Δ medi): la risposta è fortemente non lineare, quindi N1 è lontano dal regime in cui il rumore conta.
 - **G1 (lacune a dischi, ~207 siti persi):** +4.1…+8.1 K (10–15 %), la perdita più grande in ogni modello.
 - **N1G1:** +4.4…+8.4 K; ≈ G1 + 0.2–0.5 K. Interazione `N1G1 − N1 − G1 + R0` tra −0.09 e +0.23 K: effetti **additivi**, il rumore a 0.5 m/s non aggrava le lacune.
 - **G1-eq (stesso numero di siti persi, casuali):** +1.3…+3.6 K (3–9 %).
@@ -46,7 +46,7 @@ Il GLU parte più alto (R0: 42.7–53.3 K contro 39.7–44.8 K) e si deteriora d
 
 ### 2.3 p_on contro p_off
 - A R0, p_on è migliore di p_off: −3.3 K (GLU seen), −2.5 (U-Net seen), −1.8 (GLU VAL), −0.9 (U-Net VAL).
-- Deterioramento (p_on − p_off, media dei tre confronti per indice di seed, descrittivo: i seed hanno inizializzazioni diverse): G1 −0.6…−1.5 K, N1G1 −0.6…−1.7, N2 −0.6…−2.9 (GLU seen −1.5, U-Net VAL −1.7), G1-eq −0.2…−1.6, N1 ≈ 0. **Quindi conoscere phi e NH₃ attenua il peggioramento** in media, di circa 0.6–2.9 K, ma **non in modo uniforme**: per G1/N1G1 su seen il massimo dei tre confronti è positivo (+0.6…+0.8 K), cioè in qualche coppia di seed p_on peggiora di più. Sull'attenuazione di N1 non c'è nulla da dire (effetto nullo).
+- Deterioramento (p_on − p_off, media dei tre confronti per indice di seed, descrittivo: i seed hanno inizializzazioni diverse): G1 −0.6…−1.5 K, N1G1 −0.6…−1.7, N2 −0.6…−1.7 (GLU seen −1.5, U-Net VAL −1.7), G1-eq −0.2…−1.6, N1 ≈ 0. **Quindi conoscere phi e NH₃ attenua il peggioramento** in media, di circa 0.6–1.7 K (media sui seed), ma **non in modo uniforme**: per G1/N1G1 su seen il massimo dei tre confronti è positivo (+0.6…+0.8 K), cioè in qualche coppia di seed p_on peggiora di più. Sull'attenuazione di N1 non c'è nulla da dire (effetto nullo).
 
 ### 2.4 G1 contro G1-eq: contiguità o numero di siti?
 G1 − G1-eq è positivo in tutti i 12 modelli su entrambi i ruoli: +2.0…+5.6 K. G1-eq riproduce solo il 26–37 % del deterioramento di G1 per i GLU e per la U-Net su seen; per la U-Net su VAL il 44–75 %. In sintesi:
@@ -59,9 +59,9 @@ Rumore a 0.5 m/s: ≤ 0.5 K. Rumore a 1.5 m/s: 1.3–4.7 K, dello stesso ordine 
 
 ### 2.6 seen contro VAL e dispersione dei seed
 - seen220 si deteriora generalmente di più di VAL123 per G1 (GLU 7.5–8.1 contro 4.3–5.6 K) e per N2 della U-Net p_on (2.6 contro 1.3 K); eccezione: G1-eq U-Net p_off (2.1 contro 3.6 K) per la condizione sopra. seen e VAL sono diversi per condizioni e numero di frame (20 contro 3 condizioni): il confronto è descrittivo.
-- Dispersione fra i tre seed del Δ: N1 ≤ 0.15 K; G1 fino a 2.6 K (GLU p_on seen 5.84–8.49; U-Net p_on seen 4.86–6.46); N2 fino a 1.7 K (GLU p_on seen 2.73–4.05). Variazioni fra seed paragonabili alle differenze fra p_on e p_off: nessuna conclusione di ordinamento fra modelli dai singoli seed.
+- Dispersione fra i tre seed del Δ: N1 ≤ 0.2 K; G1 fino a 2.7 K (GLU p_on seen 5.84–8.49; GLU p_off VAL 4.49–6.86; U-Net p_on seen 4.86–6.46); N2 fino a 1.3 K (GLU p_on seen 2.73–4.05). Variazioni fra seed paragonabili alle differenze fra p_on e p_off: nessuna conclusione di ordinamento fra modelli dai singoli seed.
 - Condizioni più colpite da G1 su seen: `80NH3_1.05`, `40NH3_1.2`, `80NH3_1.15` (+11…+12 K in media); meno colpite `0NH3_0.9`, `20NH3_0.85`, `0NH3_1` (+2.4…+3.7 K). Su VAL, `40NH3_0.9` è la più sensibile (U-Net p_off G1 +9.8 K, N2 GLU p_off +7.4 K).
-- Getti freddi: G1 aumenta l'RMSE nei getti (T < 1800 K) di +8…+22 K (seen) contro +4…+9 K sull'RMSE globale della zona calda; picco e IoU della zona calda peggiorano poco (IoU −0.01…−0.09).
+- Getti freddi: con G1 l'RMSE nei getti (T < 1800 K) cresce di +14.9…+22.5 K su seen e +8.3…+14.9 K su VAL (medie sui seed), molto più dell'RMSE della zona calda (+1.5…+4.6 K) e del picco (+2.2…+8.3 K); IoU della zona calda −0.008…−0.088. Il danno delle lacune si concentra nei getti.
 
 ## 3. Quali configurazioni meritano considerazione per il retraining (descrittivo, non decisione)
 Nessuna soglia automatica: elenco ragionato per Enrico.
