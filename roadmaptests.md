@@ -24,6 +24,8 @@
 
 7. **Ampliamento del Blocco II a 12 modelli (autorizzato da Enrico il 24 novembre 2026).** U-Net/GLU × p_on/p_off × seed 0/1/2, tutti `best` della matrice S7 finale (nessun `last`/`best_seen`, nessuna scelta del seed). Specifica originale preservata; revisione distinta [configs/nonideal/degradation_spec_v1_12models.yaml](configs/nonideal/degradation_spec_v1_12models.yaml) con operatori, livelli, geometrie e generatori invariati (test). Valutazioni nominali: 12 × 6 × 3 × 343 = 74 088 (replay tecnici aggiuntivi contati a parte). Domanda aggiuntiva: conoscere phi e NH3 (p_on) attenua il peggioramento? p non viene mai degradato; nessuna T in input. Batching uniforme per famiglia (U-Net 8, GLU 1 anche per R0); gate R0 entro 0.05 K dal riferimento S7 per ruolo/replica; se fallisce la campagna si ferma e si diagnostica. Runbook: [docs/nonideal/02_block2_runbook.md](docs/nonideal/02_block2_runbook.md).
 
+8. **Blocco III autorizzato da Enrico il 24 novembre 2026 con matrice esplicita di 30 training specialistici.** 2 famiglie (U-Net masked, GLU adattato) × solo p_on × seed 0/1/2 × 5 regimi (N1, N2, G1, G1-eq, N1G1), da zero, un solo regime per modello, nessun campione pulito, nessun training misto. **La precedente limitazione a «al massimo 6 training» (§10, III.0) è superata esplicitamente da questa decisione, non reinterpretata.** Selezione invariata (primo minimo assoluto della macro RMSE VAL pulita al 5 %); la metrica VAL dello scenario specialistico è solo registrata. GLU: microbatch 1 con accumulo a batch effettivo 8 (nessun troncamento al minimo del batch). Valutazione di best e last su tutti i sei scenari contro le baseline pulite. Contratto: [configs/nonideal/specialist_protocol_v1.yaml](configs/nonideal/specialist_protocol_v1.yaml); matrice: `configs/experiments/nonideal_specialist_matrix.json`; baseline: `configs/nonideal/specialist_baselines_v1.json`; handoff: [docs/nonideal/03_specialist_handoff.md](docs/nonideal/03_specialist_handoff.md).
+
 ## 1. Obiettivo e legame con la tesi
 
 Domanda della tesi: quanto si può ricostruire la temperatura della singola istantanea da osservazioni sparse di velocità, e come cambia il risultato quando osservazioni e condizioni diventano meno favorevoli.
@@ -43,7 +45,7 @@ Il Blocco II **misura** il problema; non modifica i modelli per farli funzionare
 | Ricognizione, roadmap, nota di ricognizione, note di sospensione A/B/C | Eseguite con l'incarico del 24 novembre 2026 |
 | Blocco I (step I.1–I.5) | Eseguito il 24 novembre 2026 con incarico separato: ricognizione documentale completata nei limiti registrati, specifica scritta, operatori e test CPU, qualificazione G1 su TRAIN. Nessun calcolo GPU, nessun download EngineBench. STOP I: revisione di Enrico |
 | Blocco II | Eseguito il 24 novembre 2026 su 12 modelli (gate R0 12/12, 74 088 valutazioni): [docs/nonideal/02_block2_robustness.md](docs/nonideal/02_block2_robustness.md). STOP II: decisione di Enrico sul Blocco III |
-| Blocco III | Previsto, non autorizzato: decisione esplicita di Enrico dopo il Blocco II (§8, nessuna soglia automatica) |
+| Blocco III | Autorizzato il 24 novembre 2026 nella forma dei 30 training specialistici (voce 8 del riepilogo); nessun'altra configurazione |
 | TEST | Chiuso. La storia dei TEST esaminati nel Mese 1 va preservata e non va estesa |
 | Termocoppie all'uscita | Tema separato, fuori da questa roadmap |
 | `documents_thesis`, HONF, presentazioni, contatti con persone (incl. Franzelli) | Fuori perimetro |
@@ -281,7 +283,7 @@ Assi **separati, non nel core**: S (media a finestra), campionamento regolare a 
 ### III.0 Contratto (prima di qualunque training)
 
 Da congelare e approvare:
-- **Famiglie e seed:** solo le famiglie che Enrico decide esplicitamente di attivare (§8); seed 0/1/2 come gli originali. Al massimo 2 famiglie × 3 seed = **6 training**. Nessun training per singola intensità o geometria.
+- **Famiglie e seed:** solo le famiglie che Enrico decide esplicitamente di attivare (§8); seed 0/1/2 come gli originali. ~~Al massimo 2 famiglie × 3 seed = 6 training.~~ **Superato dalla decisione esplicita di Enrico del 24 novembre 2026: 30 training specialistici (2 famiglie × p_on × 3 seed × 5 regimi).** Nessun training per altre intensità o geometrie.
 - **Da zero, non fine-tuning (default):** stessa architettura, budget, cadenza di valutazione, early stopping (nessun miglioramento relativo 0.001 per 15 valutazioni) e selezione degli originali. Il fine-tuning è un'alternativa che richiede un controllo dedicato: stesso numero di epoche aggiuntive su input ideali.
 - **Distribuzione TRAIN delle degradazioni (proposta, non autorizzata):** per campione, probabilità 0.25 ideale; altrimenti σ ~ U[0, 1.5] m/s e frazione di area invalidata ~ U[0, 0.35] con il generatore di lacune in un namespace TRAIN distinto da quello di valutazione; siti di base come nel training originale (5% ricampionati per epoca). Asse S incluso solo se attivato nel Blocco II.
 - **Normalizzazione:** statistiche storiche congelate.
