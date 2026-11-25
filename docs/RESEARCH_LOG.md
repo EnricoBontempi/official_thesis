@@ -594,3 +594,54 @@ Roadmap A/B/C (`plan/abc-preparatory-studies` @ `9d2c3af`) **sospese, non cancel
 **Submission (24 novembre 2026, 20:22 Boston).** Codice eseguito `b6fc9fefda5a1d4776c87c9285d7187c0d89fc48` (checkout `/home/bontempi/projects/official_thesis_nonideal_spec_run`). Array normal 30405180 (11 GLU, concorrenza 4, 12 h per tentativo), array preemptable 30405220 (19 run: 4 GLU seed 2 e 15 U-Net, concorrenza 4, tentativi da 40 h), stage B 30405221 dopo entrambi; stage B, stage C, valutazione e aggregazione creano da sole i job successivi (ID in `/home/bontempi/official_thesis_nonideal_spec_pkg/chain_ids.json`). Nessun risultato di training ancora disponibile.
 
 **Aggiornamento di verifica/aggregazione (24 novembre 2026).** Documentati separatamente i due criteri GLU non superati dallo smoke (identità contro l'originale; resume) con evidenze e limiti (i controlli CPU non provano l'equivalenza della traiettoria GPU), e fissata la politica `budget_exhausted` a 1200 epoche (incluso ed etichettato se gli artefatti sono validi, mai dichiarato convergente; errori tecnici, continuazione mancante e gate falliti bloccano): `docs/nonideal/04_specialist_smoke_criteria_and_budget_policy.md`. Verifica, freeze e aggregazione corrette in una versione tracciata (`b1c0955`) eseguita da un checkout separato; i training restano sul checkout `b6fc9fe`. Lo stage B pendente (30405221) è stato annullato e sostituito (30406321, stessa dipendenza sui due array); nessun training toccato.
+
+
+---
+
+## 2026-11-25 — Indicazioni dei supervisori e organizzazione delle missioni del Mese 3
+
+### Contesto e stato dello studio in corso
+
+Enrico ha condiviso i messaggi di Linzheng e Jason e ha approvato una struttura di missioni separate, ciascuna da discutere in una propria chat di brainstorming. La conversazione principale resta il quartier generale per priorità, decisioni scientifiche e coordinamento. È approvata la struttura descrittiva; **non sono ancora approvate le nuove roadmap operative né nuove campagne**.
+
+Secondo la ricognizione SSH riportata da Enrico alle circa 17:10 del 25 novembre: 14 dei 30 specialisti conclusi per plateau, 4 in esecuzione, 12 pending dopo preemption, nessun fallimento tecnico. Il presente aggiornamento documentale non è una nuova verifica del cluster e non dichiara conclusi training, valutazioni, grafici o pacchetto. Rimangono i limiti già documentati, inclusa la differenza di batching GLU tra specialisti e originali. La chiusura dello studio aggiuntivo sulle degradazioni sarà distinta dalla consegna precedente del Mese 2.
+
+### Indicazioni di Linzheng (messaggio riportato da Enrico)
+
+> Thanks for the update and for discussing the possible directions with your PoliMi advisor. I also find the two CNF papers from Jason very useful, as they demonstrate how meaningful ML research can emerge from actual measurement limitations and diagnostic needs, using either experimental or simulation-based data. You can read them carefully.
+>
+> I suggest that we continue with our current turbulent combustion reconstruction problem for now. We should still explore what engine data are available from PoliMi, including RANS/URANS, but there is no need to change the thesis direction before identifying a concrete and feasible engine problem.
+> Given your progress with sparse reconstruction, we are now ready to move beyond the initial learning and benchmarking stage and focus on application-driven methodological research. I see three connected stages:
+>
+> 1. Measurement-aware reconstruction and uncertainty quantification. Start by developing a simplified virtual PIV observation model inspired by EngineBench, accounting for measurement layouts, spatial resolution, missing regions and measurement uncertainty.Please read Sciacchitano’s 2019 review (https://iopscience.iop.org/article/10.1088/1361-6501/ab1db8) on PIV uncertainty quantification to understand how actual PIV measurements differ from ideal numerical point observations. Evaluate our existing U-Net and GLU models under these conditions.We can also explore DMF-Gen (https://doi.org/10.48550/arXiv.2610.34709, see code: https://github.com/cosmos2w/DMF-Gen) for generative reconstruction and uncertainty quantification, particularly when the available observations cannot uniquely determine the hidden state.
+>
+> 2. Multi-timescale measurement fusion. Investigate whether fast velocity measurements and slower, spatially limited thermal measurements can provide complementary information.
+> Your existing results on RealPDEBench suggest that velocity contains substantial information about instantaneous spatial structures, while sparse temperatures can help correct the overall thermal level.
+> We can build on the current U-Net/GLU models and investigate a simple thermal-state correction mechanism that accounts for realistic sensor locations, response times and measurement uncertainty.
+>
+> 3. Reconstruction from indirect optical observations. Explore how OH* chemiluminescence, PLIF and other optical diagnostics could constrain hidden thermochemical states.
+> RealPDEBench already provides an interesting starting point, although we need to understand the differences between the numerical fields, synthetic optical signals and actual measurements. The reconstruction targets do not necessarily need to be limited to the full instantaneous temperature field.
+>
+> Over the next month, I would like you to actively work on the first two stages, and do the literature investigation for the third. In parallel, please develop an Observation–State Matrix for turbulent combustion diagnostics, summarizing what can actually be measured, the characteristics and limitations of these measurements, what physical states we would like to recover, and how the reconstruction can be validated.
+> I also think a scientific discussion with Franzelli could be valuable, particularly for understanding realistic optical diagnostics and identifying meaningful reconstruction problems. We can discuss this with Prof. Deng before reaching out.
+
+### Indicazioni di Jason (messaggio riportato da Enrico)
+
+> Here are two papers in Combustion and Flame that are two different flavors of domain problems that people care about. The first one is a paper on experimental data/diagnostics similar to the other paper I sent. Realistically we can easily measure one modality spatially but it’s much harder to measure another so we try to infer the other one (in this case temperature). The second paper uses simulation and synthetic data that mimics the planar measurements that you would get experimentally and then tries to reconstruct the flame in 3-D (a tomography problem). These are both examples of domain problems that are feasible. So here if we want to do IC engines still, the goal here is to think about what we can do with the data available before we get too ahead of ourselves. With the RANS data, how much of it is available? What does it contain? In my opinion, it’s always nicer to have some experimental data like measurements but my ammonia DT paper was done completely with RANS/URANS data.
+
+Paper identificati dagli screenshot condivisi: Nie et al., *Combustion and Flame* 259 (2024) 113182, DOI 10.1016/j.combustflame.2023.113182; Liu et al., *Combustion and Flame* 281 (2025) 114454, DOI 10.1016/j.combustflame.2025.114454. La distinzione tra ricostruzione da piani e da proiezioni ottiche andrà mantenuta nella ricognizione.
+
+### Decisioni organizzative approvate da Enrico
+
+- Creare [mese3/README.md](../mese3/README.md) come indice descrittivo e sei sottocartelle: chiusura studio degradazioni; Observation–State Matrix; PIV virtuale; DMF-Gen; fusione termica; diagnostiche ottiche.
+- Ogni sottocartella contiene per ora soltanto il proprio README descrittivo. La roadmap specifica sarà costruita nella rispettiva chat, con discussione di obiettivi, dipendenze e verifiche prima dell’esecuzione.
+- Nessuna roadmap generale duplicata: l’indice coordina le missioni; le future roadmap saranno locali alle missioni.
+- La matrice nasce come versione iniziale e viene alimentata dalle ricognizioni. Non è un prerequisito da completare integralmente prima delle letture parallele.
+- Proseguire sulla combustione turbolenta; esplorare disponibilità e contenuto dei dati motore in parallelo, senza cambiare applicazione prima di un problema fattibile.
+- La campagna attuale resta uno studio sintetico preliminare: i suoi scenari non sono già una validazione PIV sperimentale qualificata.
+- Trattare DMF-Gen come candidato da studiare, non come sostituzione già decisa delle reti; distinguere accuratezza, incertezza della ricostruzione e dispersione tra seed.
+- Prima della fusione termica, verificare fattibilità temporale e vincoli delle misure. Nessun numero o posizionamento universale di termocoppie è stato fissato. Le idee di contrastive learning/fusione delle feature restano opzioni da valutare.
+- Per l’ottica, per ora ricognizione bibliografica. L’eventuale coinvolgimento di Franzelli va discusso con Deng prima del contatto; nessun contatto è stato effettuato in questa attività.
+- Le vecchie roadmap A/B/C restano sospese. TEST non viene aperto. Report dei supervisori, codice e checkout della campagna non vengono modificati.
+
+**Attività effettuata:** sola organizzazione documentale e aggiornamento del diario. Nessun job, training, inferenza, download di dataset o nuova esecuzione scientifica.
