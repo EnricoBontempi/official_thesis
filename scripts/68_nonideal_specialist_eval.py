@@ -18,7 +18,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from combustion_recon.data.month2_normalizer import Month2FitOnlyNormalizer  # noqa: E402
 from combustion_recon.data.nonideal_observations import file_sha256, load_degradation_spec, load_velocity_scale  # noqa: E402
 from combustion_recon.evaluation import nonideal_eval as ne  # noqa: E402
-from combustion_recon.evaluation.s7_eval_plan import gate_rows, loop_reference, summarize_gate  # noqa: E402
+from combustion_recon.evaluation.s7_eval_plan import gate_rows, loop_reference  # noqa: E402
 from combustion_recon.models.glu_reconstructor import make_synthetic_query_grid  # noqa: E402
 
 
@@ -144,6 +144,13 @@ def main() -> int:
     val_keys = {(m["sim_id"], int(m["frame_index"])): True for m in val_metas if int(m["frame_index"]) == FIG_FRAME}
     if not smoke and len({k[0] for k in val_keys}) != 3:
         raise SystemExit(f"expected frame {FIG_FRAME} in the 3 VAL conditions, found {sorted(val_keys)}")
+    base_pairs = {(m["sim_id"], int(m["frame_index"])) for m in val_metas}
+    if smoke:  # smoke only: add the frame-1000 rows so the field capture can be exercised; the gate still uses the original subset
+        vds = datasets["val_eval"]
+        extra = [i for i, m in enumerate(vds.frames) if int(m["frame_index"]) == FIG_FRAME and i not in vds.indices]
+        vds.indices = sorted(set(vds.indices) | set(extra))
+        expected["val_eval"] = len(vds.indices)
+        val_keys = {(vds.frames[i]["sim_id"], int(vds.frames[i]["frame_index"])): True for i in vds.indices if int(vds.frames[i]["frame_index"]) == FIG_FRAME}
     keep = {"seen_train_eval": {}, "val_eval": val_keys}
     results: dict[str, Any] = {}
     for kind in ("best", "last"):
@@ -189,12 +196,19 @@ def main() -> int:
             for rep in ne.REPLICAS:
                 run_cell(spec.cells["R0"], role, rep)
         r0 = pd.DataFrame(rows)
-        macro = {(role, rep): ne.macro_rmse(r0[(r0["role"] == role) & (r0["replica"] == rep)]) for role in ne.EVAL_ROLES for rep in ne.REPLICAS}
+        in_base = [(c, int(f)) in base_pairs for c, f in zip(r0["condition"], r0["frame_index"])]
+        r0g = r0[(r0["role"] != "val_eval") | np.array(in_base)]   # = r0 outside smoke
+        macro = {(role, rep): ne.macro_rmse(r0g[(r0g["role"] == role) & (r0g["replica"] == rep)]) for role in ne.EVAL_ROLES for rep in ne.REPLICAS}
         rec = fr["loop_at_best"] if kind == "best" else fr["loop_at_last"]
         ref = loop_reference([rec], int(info["epoch"]))
         grows = gate_rows(checkpoint=kind, epoch=int(info["epoch"]), o5_macro={("seen_train_eval", 0): macro[("seen_train_eval", 0)],
                           **{("val_eval", r): macro[("val_eval", r)] for r in ne.REPLICAS}}, reference=ref)
-        gate = {**summarize_gate(grows, n_checkpoints=1), "rows": grows, "reference": "training-loop metric at the evaluated epoch",
+        grows = [r for r in grows if r["role"] != "train_fit"]   # the specialists are evaluated on seen220 and VAL123 only
+        deltas = [abs(r["delta_K"]) for r in grows if r["delta_K"] is not None]
+        gate = {"tolerance_K": ne.GATE_TOLERANCE_K, "n_expected": 5, "n_comparisons": len(grows),
+                "n_within_tolerance": int(sum(bool(r["within_tolerance"]) for r in grows)), "max_abs_delta_K": max(deltas) if deltas else None,
+                "all_pass": bool(len(grows) == 5 and all(r["within_tolerance"] and r["reference_present"] for r in grows)),
+                "rows": grows, "reference": "training-loop metric at the evaluated epoch (seen replica 0, VAL replicas 0/1/2 and their mean)",
                 "p_check": p_check}
         _wj(kdir / "gate.json", gate)
         _log(f"{kind}: gate all_pass={gate['all_pass']} max|d|={gate['max_abs_delta_K']}")
