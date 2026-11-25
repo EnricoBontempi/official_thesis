@@ -35,3 +35,10 @@ JG="$(sbatch --parsable --dependency=afterany:"$JE" --output="$NI_DEST/slurm/agg
   --export="ALL,EXPECT_SHA=$EXPECT_SHA,NI_TIP=$NI_TIP,NI_DEST=$NI_DEST,NI_EVAL_ROOT=$EVAL_ROOT" "$NI_TIP/scripts/engaging/nonideal_aggregate_spec.sbatch")" \
   || { echo "aggregate submit failed" > "$NI_DEST/BLOCK_REPORT.md"; exit 1; }
 echo "eval=$JE aggregate=$JG runs=$N" | tee -a "$NI_DEST/stageC.log"
+"$PY" - "$NI_DEST/chain_ids.json" "$SLURM_JOB_ID" "$JE" "$JG" <<'PYI'
+import json, os, sys
+p, c, e, g = sys.argv[1:]
+d = json.load(open(p)) if os.path.exists(p) else {}
+d.update({"stage_c": c, "specialist_eval_array": e, "aggregate": g})
+json.dump(d, open(p, "w"), indent=1)
+PYI

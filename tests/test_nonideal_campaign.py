@@ -131,12 +131,17 @@ def test_aggregate_refuses_incomplete_and_accepts_complete(tmp_path, monkeypatch
                     p.parent.mkdir(parents=True, exist_ok=True)
                     g.to_csv(p, index=False)
                 (kdir / "gate.json").write_text(json.dumps({"all_pass": True}))
+                npz = kdir / "fields_val_frame1000_best.npz"
+                np.savez_compressed(npz, x=np.zeros(3))
+                ents = [{"cell": c, "condition": f"v{j}", "rmse_K_from_fields": 40.0, "rmse_K_per_frame_csv": 40.0} for c in ne.CELL_ORDER for j in range(3)]
+                (kdir / "fields_manifest.json").write_text(json.dumps({"file": npz.name, "file_sha256": hashlib.sha256(npz.read_bytes()).hexdigest(),
+                    "entries": ents, "identity": {"run_id": rid, "checkpoint_weights_sha256": "w"}}))
                 (kdir / "COMPLETE.json").write_text("{}")
                 (eval_root / rid / "last").mkdir(parents=True, exist_ok=True)
                 (eval_root / rid / "last" / "SAME_AS_BEST.json").write_text("{}")
                 freeze_runs[rid] = {"valid": True, "family": fam, "regime": regime, "seed": seed, "problems": [], "state": "plateau",
                                     "epochs_completed": 300, "best_val_epoch": 250, "best_val_metric": 40.0, "specialist_val_at_best": 41.0,
-                                    "n_evals": 30, "clip_events": 1, "last_same_as_best": True, "best": {"epoch": 250}, "last": {"epoch": 300},
+                                    "n_evals": 30, "clip_events": 1, "last_same_as_best": True, "best": {"epoch": 250, "weights_sha256": "w"}, "last": {"epoch": 300},
                                     "ledger": {"attempts": 1, "extension": False, "signals": 0}}
                 i += 1
     freeze = {"n_runs": 30, "n_valid": 30, "problems": [], "degradation_spec_sha256": spec_sha, "runs": freeze_runs}
@@ -163,3 +168,5 @@ def test_aggregate_refuses_incomplete_and_accepts_complete(tmp_path, monkeypatch
     assert c["clean_cost_K__mean"] == pytest.approx(0.5, abs=0.3)
     assert (dest / "COMPLETE.json").exists() and (dest / "FINAL_SUMMARY.md").exists()
     assert len(list((dest / "figures").glob("*.png"))) == 4
+    fi = json.loads((dest / "fields_index.json").read_text())
+    assert fi["n_runs"] == 30 and all(Path(r["fields_npz"]).is_file() for r in fi["runs"])

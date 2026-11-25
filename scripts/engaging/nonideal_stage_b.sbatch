@@ -40,3 +40,10 @@ if (( ${#EXT_JOBS[@]} > 0 )); then DEP="--dependency=afterany:$(IFS=:; echo "${E
 JC="$(sbatch --parsable $DEP --output="$NI_DEST/slurm/stage_c-%j.out" --error="$NI_DEST/slurm/stage_c-%j.err" \
   --export=ALL "$NI_TIP/scripts/engaging/nonideal_stage_c.sbatch")" || { echo "stage C submit failed" > "$NI_DEST/BLOCK_REPORT.md"; exit 1; }
 echo "stage C job=$JC dep=${DEP:-none}" | tee -a "$NI_DEST/stageB.log"
+"$PY" - "$NI_DEST/chain_ids.json" "$SLURM_JOB_ID" "$JC" "${EXT_JOBS[*]:-}" <<'PYI'
+import json, os, sys
+p, b, c, ext = sys.argv[1:]
+d = json.load(open(p)) if os.path.exists(p) else {}
+d.update({"stage_b": b, "stage_c_submitted": c, "extension_arrays": ext.split()})
+json.dump(d, open(p, "w"), indent=1)
+PYI

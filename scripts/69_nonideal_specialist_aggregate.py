@@ -76,6 +76,37 @@ def load_specialists(freeze: dict, eval_root: Path) -> pd.DataFrame:
     return allf
 
 
+def check_fields(freeze: dict, eval_root: Path) -> list[dict]:
+    """Figure fields of the 30 best checkpoints: present, hash-correct, 6 cells x 3 VAL conditions, RMSE consistent with the CSVs."""
+    idx, problems = [], []
+    for rid, fr in freeze["runs"].items():
+        d = eval_root / rid / "best"
+        mp = d / "fields_manifest.json"
+        if not mp.is_file():
+            problems.append(f"{rid}: fields_manifest.json missing")
+            continue
+        m = json.loads(mp.read_text())
+        npz = d / m["file"]
+        if not npz.is_file() or hashlib.sha256(npz.read_bytes()).hexdigest() != m["file_sha256"]:
+            problems.append(f"{rid}: fields file missing or hash differs")
+            continue
+        ents = m["entries"]
+        if len(ents) != 18 or len({e["cell"] for e in ents}) != 6 or len({e["condition"] for e in ents}) != 3:
+            problems.append(f"{rid}: fields entries {len(ents)} (expected 6 cells x 3 VAL conditions)")
+            continue
+        if any(abs(e["rmse_K_from_fields"] - e["rmse_K_per_frame_csv"]) > 5e-3 for e in ents):
+            problems.append(f"{rid}: field RMSE disagrees with the per-frame CSV")
+            continue
+        if m["identity"]["checkpoint_weights_sha256"] != fr["best"]["weights_sha256"] or m["identity"]["run_id"] != rid:
+            problems.append(f"{rid}: fields identity differs from the freeze")
+            continue
+        idx.append({"run_id": rid, "family": fr["family"], "regime": fr["regime"], "seed": fr["seed"], "fields_npz": str(npz),
+                    "fields_manifest": str(mp), "fields_sha256": m["file_sha256"], "n_entries": len(ents)})
+    if problems:
+        raise Refuse("\n".join(problems))
+    return idx
+
+
 def load_baselines() -> tuple[pd.DataFrame, dict]:
     man = json.loads(BASELINES.read_text())
     p = Path(man["block2_per_frame_csv"])
@@ -199,6 +230,7 @@ def main() -> int:
         if freeze["n_valid"] != freeze["n_runs"] or freeze["problems"]:
             raise Refuse("training validation problems:\n" + "\n".join(freeze["problems"]))
         sp = load_specialists(freeze, a.eval_root)
+        fields_idx = check_fields(freeze, a.eval_root)
         base, bman = load_baselines()
         t = build(sp, base, freeze)
     except Refuse as exc:
@@ -209,6 +241,10 @@ def main() -> int:
     (a.dest / "tables").mkdir()
     for k, v in t.items():
         v.to_csv(a.dest / "tables" / f"{k}.csv", index=False)
+    (a.dest / "fields_index.json").write_text(json.dumps({
+        "format": "nonideal_specialist_fields_index_v1", "n_runs": len(fields_idx), "eval_root": str(a.eval_root),
+        "per_frame_csvs": "<eval_root>/<run_id>/best/per_frame/<cell>/<role>/rep<k>.csv (best); last: metrics only (SAME_AS_BEST.json when identical)",
+        "freeze": str(a.freeze), "tables": str(a.dest / "tables"), "runs": fields_idx}, indent=1) + "\n")
     figs = [heatmaps(t["seed_summary"], a.dest, "best"), heatmaps(t["seed_summary"], a.dest, "last")] + own_and_clean(t["per_run_scenario"], a.dest)
     s = t["seed_summary"]
     lines = ["# Specialist retraining — recovery, clean cost and transfer", "",

@@ -214,6 +214,8 @@ def evaluate_cell(
                     "true_T_K": np.asarray(true_K[j, 0], dtype=np.float32),
                     "kept_sites": np.asarray(deg.obs.sites, dtype=np.int64),
                     "removed_sites": np.asarray(deg.removed_sites, dtype=np.int64),
+                    "original_sites": np.asarray(deg.original_sites, dtype=np.int64),
+                    "rmse_K_csv": np.asarray(row["rmse_K"], dtype=np.float64),
                     "region_mask": (np.zeros((0, 0), bool) if region is None else np.asarray(region, dtype=bool)),
                 }
     return {"rows": rows, "wall_s": time.perf_counter() - t0, "n_frames": len(rows), "kept": kept}

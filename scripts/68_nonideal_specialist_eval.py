@@ -38,6 +38,52 @@ def _wj(p: Path, o: Any) -> None:
     p.write_text(json.dumps(o, indent=2, default=str) + "\n")
 
 
+def _save_fields(kdir: Path, fields: dict[str, np.ndarray], *, frames_csv_dir: Path, ds, tags: dict[str, Any], spec, smoke: bool) -> None:
+    """Figure fields of the best checkpoint: VAL conditions, frame 1000, replica 0, six cells.
+
+    Per (cell, condition): predicted T, true T, signed error (pred - true), the original / surviving / removed site indices
+    (flat = row*128 + col; rows follow y, columns follow x) and the G1 region (empty for cells without a region), plus the
+    RMSE recomputed from the stored fields next to the RMSE written in the per-frame CSV (must agree).
+    """
+    entries, arrays = [], {}
+    cells = sorted({k.split("|")[0] for k in fields}, key=ne.CELL_ORDER.index)
+    conds = sorted({k.split("|")[2] for k in fields if k.split("|")[1] == "val_eval"})
+    for cell in cells:
+        for sim in conds:
+            pre = [k for k in fields if k.startswith(f"{cell}|val_eval|{sim}|")]
+            if not pre:
+                continue
+            frm = int(pre[0].split("|")[3])
+            f = {k.split("|")[4]: fields[k] for k in pre}
+            pred, true = f["pred_T_K"].astype(np.float32), f["true_T_K"].astype(np.float32)
+            err = (pred - true).astype(np.float32)
+            rmse = float(np.sqrt(np.mean(err.astype(np.float64) ** 2)))
+            rmse_csv = float(f["rmse_K_csv"])
+            if abs(rmse - rmse_csv) > 5e-3:
+                raise SystemExit(f"field RMSE {rmse} != CSV RMSE {rmse_csv} for {cell}/{sim}")
+            key = f"{cell}|{sim}"
+            arrays[f"{key}|pred_T_K"], arrays[f"{key}|true_T_K"], arrays[f"{key}|error_signed_K"] = pred, true, err
+            arrays[f"{key}|original_sites"], arrays[f"{key}|surviving_sites"], arrays[f"{key}|removed_sites"] = f["original_sites"], f["kept_sites"], f["removed_sites"]
+            arrays[f"{key}|g1_region_mask"] = f["region_mask"]
+            entries.append({"key": key, "cell": cell, "condition": sim, "frame_index": frm, "replica": 0, "role": "val_eval",
+                            "rmse_K_from_fields": rmse, "rmse_K_per_frame_csv": rmse_csv, "n_original": int(f["original_sites"].size),
+                            "n_surviving": int(f["kept_sites"].size), "n_removed": int(f["removed_sites"].size),
+                            "has_g1_region": bool(f["region_mask"].size)})
+    arrays["x_m"], arrays["y_m"] = np.asarray(ds.x, dtype=np.float64), np.asarray(ds.y, dtype=np.float64)
+    path = kdir / "fields_val_frame1000_best.npz"
+    np.savez_compressed(path, **arrays)
+    import hashlib
+    manifest = {"format": "nonideal_specialist_fields_v1", "file": path.name, "file_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+                "identity": {k: tags[k] for k in ("run_id", "family", "variant", "model_seed", "checkpoint_kind", "checkpoint_epoch",
+                                                    "checkpoint_file_sha256", "checkpoint_weights_sha256", "train_regime", "spec_sha256", "eval_git_sha")},
+                "frame_index": 1000, "replica": 0, "role": "val_eval", "conditions": conds, "cells": cells,
+                "array_keys": "<cell>|<condition>|<field>; fields: pred_T_K, true_T_K, error_signed_K (pred-true, K), original_sites, surviving_sites, removed_sites (flat index row*128+col), g1_region_mask (bool 128x128, empty array when the cell has no region)",
+                "axes": "x_m (128, columns), y_m (128, rows) in metres; images are (row=y, col=x)",
+                "dtype": {"fields": "float32", "sites": "int64", "region": "bool"},
+                "entries": entries, "scientific": not smoke}
+    (kdir / "fields_manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--run-id", required=True)
@@ -92,7 +138,13 @@ def main() -> int:
     out_run.mkdir(parents=True, exist_ok=False)
     model, _ = s6._load_model(family, consumed["cache_root"], device)
     query = make_synthetic_query_grid(datasets["val_eval"].x, datasets["val_eval"].y).to(device) if family == "adapted_glu" else None
-    keep = {role: n60._figure_frames(datasets[role], role) for role in ne.EVAL_ROLES}
+    # Figure fields (best checkpoint only, captured inside the forwards already planned): the three VAL conditions, frame 1000, replica 0.
+    FIG_FRAME = 1000
+    val_metas = [datasets["val_eval"].frames[i] for i in datasets["val_eval"].indices]
+    val_keys = {(m["sim_id"], int(m["frame_index"])): True for m in val_metas if int(m["frame_index"]) == FIG_FRAME}
+    if not smoke and len({k[0] for k in val_keys}) != 3:
+        raise SystemExit(f"expected frame {FIG_FRAME} in the 3 VAL conditions, found {sorted(val_keys)}")
+    keep = {"seen_train_eval": {}, "val_eval": val_keys}
     results: dict[str, Any] = {}
     for kind in ("best", "last"):
         info = fr[kind]
@@ -154,8 +206,8 @@ def main() -> int:
             for role in ne.EVAL_ROLES:
                 for rep in ne.REPLICAS:
                     run_cell(spec.cells[cid], role, rep)
-        if fields:
-            np.savez_compressed(kdir / "fields_figure_frames.npz", **fields)
+        if fields and kind == "best":
+            _save_fields(kdir, fields, frames_csv_dir=kdir / "per_frame", ds=datasets["val_eval"], tags=tags, spec=spec, smoke=smoke)
         pd.DataFrame(costs).to_csv(kdir / "setting_costs.csv", index=False)
         frames = pd.concat([pd.read_csv(p) for p in sorted((kdir / "per_frame").rglob("rep*.csv"))], ignore_index=True)
         if len(frames) != len(rows) or frames.duplicated(ne.KEY_COLS).any():
