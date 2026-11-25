@@ -582,3 +582,11 @@ Roadmap A/B/C (`plan/abc-preparatory-studies` @ `9d2c3af`) **sospese, non cancel
 **Esito sintetico (descrittivo, scenari sintetici).** Rumore 0.5 m/s: ≤ 0.5 K (≤ 1.3 %); 1.5 m/s: 1.3–4.7 K (3–9 %); lacune a dischi: 4.1–8.1 K (10–15 %); combinazione ≈ lacune + 0.2–0.5 K (additiva). A pari numero di siti persi, la rimozione casuale spiega circa un terzo del danno delle lacune per i GLU e per la U-Net su seen (la contiguità i due terzi), circa metà per la U-Net su VAL. p_on attenua il peggioramento in media di 0.6–1.7 K, non in modo uniforme fra i seed.
 
 **Limiti.** Degradazioni di classe B/C, VAL123 già usata per selezione, tre seed, repliche non indipendenti. Nessun TEST, nessun training. Decisione sul Blocco III a Enrico.
+
+---
+
+## 2026-11-24 — Blocco III: preparazione dei 30 specialisti, smoke GPU e submission
+
+**Cosa è stato fatto.** Con la matrice autorizzata da Enrico (2 famiglie × p_on × seed 0/1/2 × regimi N1, N2, G1, G1-eq, N1G1 = 30 training da zero; la precedente soglia di 6 retraining è superata esplicitamente) è stato preparato su `nonideal/specialist-retraining`: dataset di training con regime fisso e realizzazioni nuove per epoca in un namespace TRAIN distinto da selezione e valutazione; trainer con metrica VAL specialistica registrata (mai usata per decidere); GLU con microbatch 1 e accumulo a batch effettivo 8; protocollo, matrice, manifest delle baseline; catena (training → stage B con la singola continuazione a 1200 → freeze e validazione → valutazione di best e last sui sei scenari con gate → aggregazione). Test CPU, smoke GPU condivisi sui percorsi (due job di training, tre di controllo, uno per la catena di valutazione) con esiti nel documento di handoff `docs/nonideal/03_specialist_handoff.md`. Nessun risultato scientifico esiste ancora.
+
+**Limiti.** Gli scenari restano sintetici (non una PIV validata del combustore); i training GLU specialistici differiscono da quelli originali per ordine numerico (batch 1 con accumulo); VAL123 continua a essere usata per la selezione; nessun TEST, A/B/C sospese.
