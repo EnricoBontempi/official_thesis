@@ -17,6 +17,8 @@ NEEDS_EXTENSION = "needs_extension"      # reached the initial 1000 epochs witho
 BUDGET_EXHAUSTED = "budget_exhausted"    # reached 1200 epochs without plateau
 INCOMPLETE = "incomplete"                # wall-time stop or still running / no summary
 ERROR = "error"
+OUTCOME_PLATEAU = "plateau_by_operational_early_stop_rule"
+OUTCOME_BUDGET = "budget_exhausted_not_declared_converged"
 INITIAL_EPOCHS = 1000
 FINAL_EPOCHS = 1200
 
@@ -146,6 +148,18 @@ def validate_and_freeze_run(out_root: Path, entry: dict[str, Any], *, expect_git
             out["last_same_as_best"] = out["best"]["weights_sha256"] == out["last"]["weights_sha256"]
             if out["loop_at_last"] is None:
                 problems.append("last epoch is not an evaluation epoch (no loop reference for the replay gate)")
+    # Explicit outcome label. budget_exhausted = 1200 epochs without the early-stop plateau after the single authorised
+    # continuation: valid artifacts, included in the package, NEVER declared convergent. The plateau rule is an operational
+    # convention, not a physical certification of convergence.
+    out["training_outcome"] = OUTCOME_BUDGET if cls["state"] == BUDGET_EXHAUSTED else OUTCOME_PLATEAU
+    out["budget_exhausted"] = cls["state"] == BUDGET_EXHAUSTED
+    out["declared_converged"] = False if out["budget_exhausted"] else None  # plateau: converged by the operational rule only
+    if cls["state"] == BUDGET_EXHAUSTED and not smoke:
+        led = ledger_summary(out_root, run_id)
+        if not led["extension"]:
+            problems.append("1200 epochs reached without a registered continuation (ledger has no extension_start)")
+        if "last" in out and out["last"]["epoch"] != FINAL_EPOCHS:
+            problems.append(f"budget_exhausted but last epoch is {out['last']['epoch']} != {FINAL_EPOCHS}")
     out["valid"] = not problems
     out["problems"] = problems
     return out

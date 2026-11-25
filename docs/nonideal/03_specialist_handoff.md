@@ -31,3 +31,6 @@ Per ciascuno dei 30 run, checkpoint `best`: `<eval_root>/<run_id>/best/fields_va
 
 ## Aggancio del job grafico
 Nessuna catena duplicata. L'aggregazione, a fine corsa, sottomette l'eventuale script indicato in `<dest>/post_hook.path` (una riga: percorso dello sbatch), con variabili `NI_DEST`, `NI_EVAL_ROOT`, `NI_PACKAGE`, `NI_FIELDS_INDEX`, `NI_FREEZE`. Gli ID della catena sono scritti in `<dest>/chain_ids.json` (stage_b, stage_c, specialist_eval_array, aggregate) man mano che i job vengono creati; `submission.json` contiene gli array di training e lo stage B.
+
+## Aggiornamento (24 novembre 2026, dopo la submission)
+Criteri GLU non superati dallo smoke e politica `budget_exhausted` (inclusione etichettata, mai dichiarato convergente; errori e gate falliti bloccano): [04_specialist_smoke_criteria_and_budget_policy.md](04_specialist_smoke_criteria_and_budget_policy.md). Verifica/aggregazione corrette in una versione tracciata separata dal checkout dei training.

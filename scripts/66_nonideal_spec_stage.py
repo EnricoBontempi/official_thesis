@@ -25,7 +25,8 @@ def main() -> int:
     ap.add_argument("cmd", choices=("status", "extension", "freeze"))
     ap.add_argument("--matrix", type=Path, required=True)
     ap.add_argument("--dest", type=Path)
-    ap.add_argument("--git-sha", default="")
+    ap.add_argument("--git-sha", default="", help="frozen SHA of the TRAINING checkout (run_identity.git_sha must equal it)")
+    ap.add_argument("--post-git-sha", default="", help="SHA of the verification/aggregation checkout (recorded in freeze.json)")
     ap.add_argument("--smoke-root", type=Path, default=None, help="chain test on non-scientific smoke runs only (output must be named *smoke*)")
     ap.add_argument("--smoke-runs", default="")
     a = ap.parse_args()
@@ -67,7 +68,9 @@ def main() -> int:
     for k, v in by.items():
         if len(v) != 1:
             problems.append(f"init differs across regimes for {k}")
-    out = {"n_runs": len(runs), "n_valid": sum(bool(v["valid"]) for v in frozen.values()), "git_sha": a.git_sha,
+    n_budget = sum(1 for v in frozen.values() if v.get("valid") and v.get("budget_exhausted"))
+    out = {"n_budget_exhausted_valid": n_budget, "n_plateau_valid": sum(1 for v in frozen.values() if v.get("valid") and not v.get("budget_exhausted")),
+           "n_runs": len(runs), "n_valid": sum(bool(v["valid"]) for v in frozen.values()), "git_sha": a.git_sha, "training_git_sha": a.git_sha, "post_processing_git_sha": a.post_git_sha,
            "degradation_spec_sha256": spec_sha, "problems": problems, "runs": frozen}
     (a.dest / "freeze.json").write_text(json.dumps(out, indent=1, sort_keys=True, default=str) + "\n")
     if problems:

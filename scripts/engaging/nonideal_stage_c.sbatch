@@ -14,10 +14,11 @@ set -uo pipefail
 PY="${PY:-$HOME/envs/official_thesis/bin/python}"
 export PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1; unset PYTHONPATH; export PYTHONPATH="$NI_TIP/src"; cd "$NI_TIP"
 [[ "$(git rev-parse HEAD)" == "$EXPECT_SHA" ]] || { echo "REFUSE: HEAD != $EXPECT_SHA" >&2; exit 5; }
+NI_TRAIN_SHA="${NI_TRAIN_SHA:-$EXPECT_SHA}"
 M=configs/experiments/nonideal_specialist_matrix.json
 EVAL_ROOT="$NI_DEST/eval"
 mkdir -p "$NI_DEST/slurm"
-"$PY" scripts/66_nonideal_spec_stage.py freeze --matrix "$M" --dest "$NI_DEST" --git-sha "$EXPECT_SHA" || { echo "freeze failed" > "$NI_DEST/BLOCK_REPORT.md"; exit 1; }
+"$PY" scripts/66_nonideal_spec_stage.py freeze --matrix "$M" --dest "$NI_DEST" --git-sha "$NI_TRAIN_SHA" --post-git-sha "$EXPECT_SHA" || { echo "freeze failed" > "$NI_DEST/BLOCK_REPORT.md"; exit 1; }
 LIST="$("$PY" - "$NI_DEST/freeze.json" <<'PYL'
 import json, sys
 f = json.load(open(sys.argv[1]))

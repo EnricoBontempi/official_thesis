@@ -62,6 +62,54 @@ def test_validate_checks_identity_fields(tmp_path):
     assert "regime" in text and "git_sha" in text and "spec hash" in text
 
 
+def _identity(root, rid, regime="G1", git="G", spec="S"):
+    d = root / rid
+    (d / "run_identity.json").write_text(json.dumps({"run_id": rid, "family": "sparse_unet", "p_conditioning": True, "git_sha": git,
+                                                     "nonideal_specialist": {"regime": regime, "degradation_spec_sha256": spec}}))
+    (d / "init_manifest.json").write_text(json.dumps({"init_state_dict_sha256": "i"}))
+
+
+def _ledger(root, rid, extension):
+    (root / "_ledger").mkdir(exist_ok=True)
+    ev = [{"event": "attempt_start", "action": "fresh", "partition": "p"}]
+    if extension:
+        ev += [{"event": "extension_start"}, {"event": "attempt_start", "action": "extend", "partition": "p"}]
+    (root / "_ledger" / f"{rid}.jsonl").write_text("\n".join(json.dumps(e) for e in ev) + "\n")
+
+
+def test_budget_exhausted_is_valid_labelled_and_never_declared_converged(tmp_path):
+    entry = {"run_id": "b", "regime": "G1", "family": "sparse_unet", "seed": 0}
+    _summary(tmp_path, "b", "completed", "reached_max_epochs", 1200)
+    _identity(tmp_path, "b")
+    _ledger(tmp_path, "b", extension=True)
+    out = nc.validate_and_freeze_run(tmp_path, entry, expect_git_sha="G", expect_spec_sha="S", load_checkpoints=False)
+    assert out["valid"] and out["state"] == nc.BUDGET_EXHAUSTED and out["budget_exhausted"] is True
+    assert out["training_outcome"] == nc.OUTCOME_BUDGET and out["declared_converged"] is False
+    # plateau run: labelled by the operational rule only
+    _summary(tmp_path, "p", "stopped_early_plateau", "early_stop", 410)
+    _identity(tmp_path, "p")
+    pl = nc.validate_and_freeze_run(tmp_path, {**entry, "run_id": "p"}, expect_git_sha="G", expect_spec_sha="S", load_checkpoints=False)
+    assert pl["valid"] and pl["training_outcome"] == nc.OUTCOME_PLATEAU and pl["budget_exhausted"] is False
+
+
+def test_budget_exhausted_without_registered_continuation_blocks(tmp_path):
+    entry = {"run_id": "b", "regime": "G1", "family": "sparse_unet", "seed": 0}
+    _summary(tmp_path, "b", "completed", "reached_max_epochs", 1200)
+    _identity(tmp_path, "b")
+    _ledger(tmp_path, "b", extension=False)
+    out = nc.validate_and_freeze_run(tmp_path, entry, expect_git_sha="G", expect_spec_sha="S", load_checkpoints=False)
+    assert not out["valid"] and any("continuation" in p for p in out["problems"])
+
+
+def test_technical_states_block_validation(tmp_path):
+    entry = {"run_id": "x", "regime": "G1", "family": "sparse_unet", "seed": 0}
+    for status, stop, ep in (("completed", "reached_max_epochs", 1000), ("stopped_error", "non_finite_loss", 50),
+                              ("stopped_wall_time", "wall_time_cap", 700), ("completed", "reached_max_epochs", 1100)):
+        _summary(tmp_path, "x", status, stop, ep)
+        out = nc.validate_and_freeze_run(tmp_path, entry, expect_git_sha="G", expect_spec_sha="S", load_checkpoints=False)
+        assert not out["valid"], (status, ep)
+
+
 def test_weights_hash_matches_s7_definition():
     import torch
     s7 = _mod("scripts/38_s7_eval.py")
@@ -139,7 +187,10 @@ def test_aggregate_refuses_incomplete_and_accepts_complete(tmp_path, monkeypatch
                 (kdir / "COMPLETE.json").write_text("{}")
                 (eval_root / rid / "last").mkdir(parents=True, exist_ok=True)
                 (eval_root / rid / "last" / "SAME_AS_BEST.json").write_text("{}")
-                freeze_runs[rid] = {"valid": True, "family": fam, "regime": regime, "seed": seed, "problems": [], "state": "plateau",
+                bud = (i % 10 == 0)
+                freeze_runs[rid] = {"valid": True, "family": fam, "regime": regime, "seed": seed, "problems": [], "state": "budget_exhausted" if bud else "plateau",
+                                    "training_outcome": nc.OUTCOME_BUDGET if bud else nc.OUTCOME_PLATEAU, "budget_exhausted": bud,
+                                    "declared_converged": False if bud else None,
                                     "epochs_completed": 300, "best_val_epoch": 250, "best_val_metric": 40.0, "specialist_val_at_best": 41.0,
                                     "n_evals": 30, "clip_events": 1, "last_same_as_best": True, "best": {"epoch": 250, "weights_sha256": "w"}, "last": {"epoch": 300},
                                     "ledger": {"attempts": 1, "extension": False, "signals": 0}}
@@ -158,6 +209,11 @@ def test_aggregate_refuses_incomplete_and_accepts_complete(tmp_path, monkeypatch
     assert (dest.parent / "BLOCK_REPORT.md").exists() and not dest.exists()
     assert victim in (dest.parent / "BLOCK_REPORT.md").read_text()
     (eval_root / victim / "best" / "COMPLETE.json").write_text("{}")
+    bud_run = next(r for r, v in freeze_runs.items() if v["budget_exhausted"])
+    (eval_root / bud_run / "best" / "gate.json").write_text(json.dumps({"all_pass": False}))
+    assert agg.main() == 3 and "gate not passed" in (dest.parent / "BLOCK_REPORT.md").read_text()
+    assert bud_run in (dest.parent / "BLOCK_REPORT.md").read_text()
+    (eval_root / bud_run / "best" / "gate.json").write_text(json.dumps({"all_pass": True}))
     (dest.parent / "BLOCK_REPORT.md").unlink()
     assert agg.main() == 0
     t = pd.read_csv(dest / "tables" / "seed_summary.csv")
@@ -167,6 +223,18 @@ def test_aggregate_refuses_incomplete_and_accepts_complete(tmp_path, monkeypatch
     c = t[(t.family == "sparse_unet") & (t.checkpoint_kind == "best") & (t.role == "val_eval") & (t.train_regime == "G1") & (t.cell == "R0")].iloc[0]
     assert c["clean_cost_K__mean"] == pytest.approx(0.5, abs=0.3)
     assert (dest / "COMPLETE.json").exists() and (dest / "FINAL_SUMMARY.md").exists()
+    comp = json.loads((dest / "COMPLETE.json").read_text())
+    assert comp["n_budget_exhausted"] == 3 and comp["n_plateau"] == 27 and comp["all_declared_converged"] is False
+    assert len(comp["budget_exhausted_runs"]) == 3
+    idx = (dest / "INDEX.md").read_text()
+    assert "budget_exhausted" in idx and "NOT declared converged" in idx.replace("**not declared converged**", "NOT declared converged") or "not declared converged" in idx
+    assert "budget_exhausted" in (dest / "FINAL_SUMMARY.md").read_text()
+    tr = pd.read_csv(dest / "tables" / "training_diagnostics.csv")
+    assert int(tr["budget_exhausted"].sum()) == 3 and (tr["training_outcome"].str.startswith("budget_exhausted").sum() == 3)
+    pr = pd.read_csv(dest / "tables" / "per_run_scenario.csv")
+    assert set(pr.loc[pr.budget_exhausted, "run_id"]) == set(comp["budget_exhausted_runs"])
+    fi0 = json.loads((dest / "fields_index.json").read_text())
+    assert sum(r["budget_exhausted"] for r in fi0["runs"]) == 3
     assert len(list((dest / "figures").glob("*.png"))) == 4
     fi = json.loads((dest / "fields_index.json").read_text())
     assert fi["n_runs"] == 30 and all(Path(r["fields_npz"]).is_file() for r in fi["runs"])

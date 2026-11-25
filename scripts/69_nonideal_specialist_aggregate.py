@@ -101,7 +101,9 @@ def check_fields(freeze: dict, eval_root: Path) -> list[dict]:
             problems.append(f"{rid}: fields identity differs from the freeze")
             continue
         idx.append({"run_id": rid, "family": fr["family"], "regime": fr["regime"], "seed": fr["seed"], "fields_npz": str(npz),
-                    "fields_manifest": str(mp), "fields_sha256": m["file_sha256"], "n_entries": len(ents)})
+                    "fields_manifest": str(mp), "fields_sha256": m["file_sha256"], "n_entries": len(ents),
+                    "training_outcome": fr.get("training_outcome"), "budget_exhausted": bool(fr.get("budget_exhausted")),
+                    "epochs_completed": fr.get("epochs_completed"), "best_epoch": fr["best"]["epoch"], "last_epoch": fr["last"]["epoch"]})
     if problems:
         raise Refuse("\n".join(problems))
     return idx
@@ -151,7 +153,13 @@ def build(spec_frames: pd.DataFrame, base_frames: pd.DataFrame, freeze: dict) ->
     summ = pd.concat([getattr(g, f)().add_suffix(f"__{f}") for f in ("mean", "min", "max")], axis=1).reset_index()
     summ["n_seeds"] = pm.groupby(["family", "checkpoint_kind", "train_regime", "role", "cell"])["model_seed"].nunique().values
     own = pm[pm["cell"] == pm["train_regime"]]
-    train = pd.DataFrame([{k: v for k, v in fr.items() if k in ("run_id", "family", "regime", "seed", "state", "epochs_completed", "best_val_epoch",
+    outcome = {rid: fr.get("training_outcome", "unlabelled") for rid, fr in freeze["runs"].items()}
+    pm["training_outcome"] = pm["run_id"].map(outcome)
+    pm["budget_exhausted"] = pm["training_outcome"].str.startswith("budget_exhausted")
+    nb = pm[pm["budget_exhausted"]].groupby(["family", "checkpoint_kind", "train_regime", "role", "cell"])["run_id"].nunique()
+    summ = summ.merge(nb.rename("n_budget_exhausted_runs").reset_index(), on=["family", "checkpoint_kind", "train_regime", "role", "cell"], how="left")
+    summ["n_budget_exhausted_runs"] = summ["n_budget_exhausted_runs"].fillna(0).astype(int)
+    train = pd.DataFrame([{k: v for k, v in fr.items() if k in ("run_id", "family", "regime", "seed", "state", "training_outcome", "budget_exhausted", "declared_converged", "epochs_completed", "best_val_epoch",
                                                                 "best_val_metric", "specialist_val_at_best", "n_evals", "clip_events", "last_same_as_best")}
                           | {"attempts": fr["ledger"]["attempts"], "extension": fr["ledger"]["extension"], "signals": fr["ledger"]["signals"],
                              "best_epoch_file": fr["best"]["epoch"], "last_epoch_file": fr["last"]["epoch"]} for fr in freeze["runs"].values()])
@@ -175,7 +183,8 @@ def heatmaps(summ: pd.DataFrame, dest: Path, kind: str = "best") -> str:
             im = ax.imshow(M, cmap="RdBu", vmin=-lim, vmax=lim, aspect="auto")
             ax.set_xticks(range(len(CELLS))); ax.set_xticklabels(CELLS, fontsize=8)
             ax.set_yticks(range(len(REGIMES))); ax.set_yticklabels(REGIMES, fontsize=8)
-            ax.set_title(f"{FAM[fam]} {ROLE[role]} ({kind})", fontsize=9)
+            nb = int(s.groupby("train_regime")["n_budget_exhausted_runs"].max().sum()) if "n_budget_exhausted_runs" in s else 0
+            ax.set_title(f"{FAM[fam]} {ROLE[role]} ({kind})" + (f" - runs with budget_exhausted (1200 ep., not converged): {nb} regime-seed counts" if nb else ""), fontsize=8)
             for a in range(M.shape[0]):
                 for b in range(M.shape[1]):
                     if np.isfinite(M[a, b]):
@@ -198,7 +207,10 @@ def own_and_clean(pm: pd.DataFrame, dest: Path) -> list[str]:
             for k, r in enumerate(REGIMES):
                 s = pmb[(pmb.family == fam) & (pmb.role == role) & (pmb.train_regime == r) & (pmb.cell == r)]
                 ax.scatter([k - 0.12] * len(s), s["base_rmse_K"], color="#888", marker="o", s=22, label="original (clean)" if k == 0 else None)
-                ax.scatter([k + 0.12] * len(s), s["rmse_K"], color="#c0392b", marker="s", s=22, label="specialist" if k == 0 else None)
+                nbm = s["budget_exhausted"].to_numpy(bool)
+                ax.scatter([k + 0.12] * int((~nbm).sum()), s["rmse_K"][~nbm], color="#c0392b", marker="s", s=22, label="specialist (plateau)" if k == 0 else None)
+                ax.scatter([k + 0.12] * int(nbm.sum()), s["rmse_K"][nbm], facecolors="none", edgecolors="#c0392b", marker="s", s=30,
+                           label="specialist (budget_exhausted, not converged)" if (k == 0 and nbm.any()) else None)
                 for _, q in s.iterrows():
                     ax.plot([k - 0.12, k + 0.12], [q["base_rmse_K"], q["rmse_K"]], color="#bbb", lw=.6)
             ax.set_xticks(range(len(REGIMES))); ax.set_xticklabels(REGIMES)
@@ -210,7 +222,10 @@ def own_and_clean(pm: pd.DataFrame, dest: Path) -> list[str]:
         for fam, col in (("sparse_unet", "#1b6ca8"), ("adapted_glu", "#c0392b")):
             for k, r in enumerate(REGIMES):
                 s = pmb[(pmb.family == fam) & (pmb.role == role) & (pmb.train_regime == r) & (pmb.cell == "R0")]
-                ax.scatter([k + (0.1 if fam == "adapted_glu" else -0.1)] * len(s), s["clean_cost_K"], color=col, s=22, label=FAM[fam] if k == 0 else None)
+                nbm = s["budget_exhausted"].to_numpy(bool)
+                xx = k + (0.1 if fam == "adapted_glu" else -0.1)
+                ax.scatter([xx] * int((~nbm).sum()), s["clean_cost_K"][~nbm], color=col, s=22, label=FAM[fam] if k == 0 else None)
+                ax.scatter([xx] * int(nbm.sum()), s["clean_cost_K"][nbm], facecolors="none", edgecolors=col, s=30, label=f"{FAM[fam]} budget_exhausted" if (k == 0 and nbm.any()) else None)
         ax.axhline(0, color="gray", lw=.6); ax.set_xticks(range(len(REGIMES))); ax.set_xticklabels(REGIMES)
         ax.set_title(f"{ROLE[role]}: clean-input cost (specialist - original, K)", fontsize=9)
     axes[0].legend(fontsize=8)
@@ -269,12 +284,26 @@ def main() -> int:
                 q = s[(s.family == fam) & (s.checkpoint_kind == "best") & (s.role == role) & (s.train_regime == r) & (s.cell == "R0")].iloc[0]
                 row.append(f"{q['clean_cost_K__mean']:+.2f} [{q['clean_cost_K__min']:+.2f}, {q['clean_cost_K__max']:+.2f}]")
             lines.append(f"| {FAM[fam]} | {ROLE[role]} | " + " | ".join(row) + " |")
+    bud = [rid for rid, fr in freeze["runs"].items() if fr.get("budget_exhausted")]
+    n_b = len(bud)
+    lines += ["", "## Training outcomes (read before interpreting the tables)", "",
+              f"- {30 - n_b} runs stopped by the operational early-stop rule (plateau); {n_b} runs reached 1200 epochs without the plateau after the single authorised "
+              "continuation (`budget_exhausted`).",
+              "- `budget_exhausted` runs are valid artifacts (finite, checkpoints read back, gates passed, continuation registered) and are INCLUDED, labelled in "
+              "`tables/training_diagnostics.csv`, `per_run_scenario.csv`, `fields_index.json` and the figures (hollow markers). They are **not declared converged**: "
+              "their numbers are not an estimate of a converged model. The plateau rule itself is an operational convention, not a physical certification.",
+              "- Technical errors, missing continuation, non-finite values, invalid checkpoints or failed gates are NOT accepted: they block the package (BLOCK_REPORT.md)."]
+    if bud:
+        lines += ["- Runs with `budget_exhausted`: " + ", ".join(sorted(bud))]
     lines += ["", "## Figures", ""] + [f"- `{f}`" for f in figs] + ["", "## Tables", ""] + [f"- `tables/{k}.csv`" for k in t] + [""]
     (a.dest / "INDEX.md").write_text("\n".join(lines) + "\n")
     man = {p.relative_to(a.dest).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(a.dest.rglob("*")) if p.is_file()}
     (a.dest / "package_manifest.json").write_text(json.dumps({"freeze_sha256": file_sha256(a.freeze), "baselines": bman["block2_per_frame_csv_sha256"], "files": man}, indent=2) + "\n")
-    (a.dest / "COMPLETE.json").write_text(json.dumps({"ok": True, "n_files": len(man)}) + "\n")
-    (a.dest / "FINAL_SUMMARY.md").write_text("\n".join(lines[:4] + ["", f"Package: {a.dest}", "Status: COMPLETE (30/30 runs valid, gates passed, matrices complete)."]) + "\n")
+    (a.dest / "COMPLETE.json").write_text(json.dumps({"ok": True, "n_files": len(man), "n_runs": 30, "n_plateau": 30 - n_b,
+                                                        "n_budget_exhausted": n_b, "budget_exhausted_runs": sorted(bud),
+                                                        "all_declared_converged": False if n_b else None,
+                                                        "note": "budget_exhausted runs are included and labelled; none is declared converged"}, indent=1) + "\n")
+    (a.dest / "FINAL_SUMMARY.md").write_text("\n".join(lines[:4] + ["", f"Package: {a.dest}", f"Status: COMPLETE as a package (30/30 runs valid, gates passed, matrices complete); training outcomes: {30 - n_b} plateau, {n_b} budget_exhausted at 1200 epochs (included, labelled, NOT declared converged)."]) + "\n")
     print("AGGREGATE_OK")
     return 0
 
