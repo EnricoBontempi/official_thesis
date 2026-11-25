@@ -582,3 +582,21 @@ Roadmap A/B/C (`plan/abc-preparatory-studies` @ `9d2c3af`) **sospese, non cancel
 **Esito sintetico (descrittivo, scenari sintetici).** Rumore 0.5 m/s: ≤ 0.5 K (≤ 1.3 %); 1.5 m/s: 1.3–4.7 K (3–9 %); lacune a dischi: 4.1–8.1 K (10–15 %); combinazione ≈ lacune + 0.2–0.5 K (additiva). A pari numero di siti persi, la rimozione casuale spiega circa un terzo del danno delle lacune per i GLU e per la U-Net su seen (la contiguità i due terzi), circa metà per la U-Net su VAL. p_on attenua il peggioramento in media di 0.6–1.7 K, non in modo uniforme fra i seed.
 
 **Limiti.** Degradazioni di classe B/C, VAL123 già usata per selezione, tre seed, repliche non indipendenti. Nessun TEST, nessun training. Decisione sul Blocco III a Enrico.
+
+---
+
+## 2026-11-24 — Blocco II: lettura per la discussione, senza nuova valutazione
+
+**Già scritto sopra.** La campagna sui 12 modelli, i gate e i risultati principali stanno nella voce precedente e in [docs/nonideal/02_block2_robustness.md](nonideal/02_block2_robustness.md). Questa voce non li ripete e non modifica quello storico.
+
+**Consegna nuova.** Branch `nonideal/block2-reading`, dalla base `d4f2e3a`. Cartella distinta [results/nonideal/block2/reading/](../results/nonideal/block2/reading/INDEX.md); il pacchetto originale e le figure precedenti restano, con un collegamento nell'indice. Nota [docs/nonideal/03_block2_reading.md](nonideal/03_block2_reading.md). Script `scripts/63_nonideal_block2_reading.py`: legge solo le CSV aggregate.
+
+**Controlli.** Ricalcolate dalle tabelle aggregate le 48 RMSE medie del report, entro 0,02 K, e i 460 contrasti famiglia × φ/NH3 × condizione × cella × ruolo, di cui 9 migliorano. Soltanto letti: `VERIFY_OK.json` (12/12), `COMPLETE.json`, il conteggio 74 088 e il ricalcolo per-frame del report. Il CSV per frame e i campi delle mappe non sono nel repository: nessuna inferenza, nessuna mappa nuova. Le figure di campo già pubblicate mostrano temperatura vera e modulo dell'errore.
+
+**Cosa aggiunge la lettura.** Su seen il peggioramento è quasi tutto centered-RMSE: il bias si sposta di meno di 1 K. Su VAL la U-Net senza φ e NH3, con le lacune, sposta il bias di −8,6 K in media, e il GLU senza φ e NH3, col rumore a 1,5 m/s, di −10,7 K. Entrambi i salti sono tirati da `40NH3_0.9`, dove anche togliere i siti a caso sposta il livello della U-Net. I getti freddi portano l'aumento regionale (+8…+22 K sulle medie di gruppo); la zona calda resta entro +1,5…+4,6 K. Il rapporto N2/N1 delle medie di gruppo è 6,4–41. L'interazione rumore–lacune, media sui seed, resta fra −0,09 e +0,23 K in questi scenari; i singoli seed arrivano a −0,18 e +0,35 K. Non è una prova di additività generale, e il rapporto G1-eq/G1 non è una quota causale della contiguità.
+
+**Limiti.** Stress test sintetici, VAL123 già usata per selezione, seen220 non è un dominio nuovo, tre seed, repliche non indipendenti. Effetto piccolo del rumore a 0,5 m/s sulla RMSE: non è un margine per altre metriche o per una PIV reale. La U-Net resta più bassa in errore assoluto; «più robusto» sul deterioramento va guardato a parte e non è uniforme fra i ruoli.
+
+**Matrice dei 30 specialisti p_on.** Autorizzata e affidata a Sonnet per preparazione e sottomissione. Questa voce non ne dichiara submission, esecuzione o completamento.
+
+**Non fatto qui.** Nessun training, nessun job, nessun forward, nessun TEST, nessuna modifica di specifiche, dati o risultati del pacchetto, nessuna modifica di `documents_thesis`, nessuna riattivazione di A/B/C.
