@@ -57,3 +57,5 @@ Rows: 74088 nominal frame evaluations (expected 74088); 6174 technical GLU repla
 
 Figure e nota successive, senza nuova valutazione: [../reading/INDEX.md](../reading/INDEX.md) e [docs/nonideal/03_block2_reading.md](../../../../docs/nonideal/03_block2_reading.md). Il pacchetto sopra non è stato ricalcolato.
 
+Grafici dei 30 specialisti (codice e aggancio; le schede arrivano col job): [../graphics/INDEX.md](../graphics/INDEX.md).
+

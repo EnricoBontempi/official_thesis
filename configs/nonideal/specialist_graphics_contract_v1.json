@@ -1,0 +1,86 @@
+{
+  "format": "nonideal_specialist_graphics_contract_v1",
+  "reads": "frozen specialist evaluation and the Block II baseline CSV. Does not train or infer.",
+  "matrix": {
+    "families": ["sparse_unet", "adapted_glu"],
+    "conditioning": "p_on",
+    "seeds": [0, 1, 2],
+    "train_regimes": ["N1", "N2", "G1", "G1-eq", "N1G1"],
+    "eval_cells_label_order": ["R0", "N1", "N2", "G1-eq", "G1", "N1G1"],
+    "roles": ["seen_train_eval", "val_eval"],
+    "n_runs": 30,
+    "run_id": "NI-{glu|unet}-on-{N1|N2|G1|G1eq|N1G1}-s{0|1|2}",
+    "regime_token": {"G1eq": "G1-eq"}
+  },
+  "checkpoints": {
+    "graphics_use": "best",
+    "freeze": "<dest>/freeze.json keys runs.<run_id>.best.weights_sha256, family, regime, seed, valid",
+    "gate": "<eval_root>/<run_id>/best/gate.json all_pass true",
+    "complete": "<eval_root>/<run_id>/best/COMPLETE.json"
+  },
+  "metrics": {
+    "per_frame": "<eval_root>/<run_id>/best/per_frame/<cell>/<role>/rep<k>.csv",
+    "nominal_rows_best": 6174,
+    "columns_required": ["rmse_K", "mae_K", "bias_K", "abs_bias_K", "centered_rmse_K", "jet_rmse_K", "high_rmse_K", "peak_rmse_K", "surviving_sites_hash"],
+    "reduction": "mean over frames, then uniform mean over conditions, then mean over mask replicas 0/1/2",
+    "replicas": "mask replicas already averaged; not independent trainings",
+    "package_table": "<package>/tables/per_run_scenario.csv checkpoint_kind=best",
+    "package_crosscheck": "rmse_K agrees with the fresh reduction within 1e-4 K",
+    "gain_vs_baseline_K": "baseline RMSE minus specialist RMSE, same scenario. Positive: specialist lower.",
+    "delta_vs_baseline_K": "specialist RMSE minus baseline RMSE, same scenario",
+    "clean_cost_K": "specialist minus baseline on R0",
+    "regions": "jets T_true < 1800 K; hot zone T >= 2100 K; peak T >= 2200 K. Recomputed from per-frame columns; the numeric package drops them."
+  },
+  "fields": {
+    "format": "nonideal_specialist_fields_v1",
+    "index_format": "nonideal_specialist_fields_index_v1",
+    "index": "<package>/fields_index.json",
+    "npz": "<eval_root>/<run_id>/best/fields_val_frame1000_best.npz",
+    "manifest": "<eval_root>/<run_id>/best/fields_manifest.json",
+    "key": "<cell>|<condition>|<field>",
+    "field_names": ["pred_T_K", "true_T_K", "error_signed_K", "original_sites", "surviving_sites", "removed_sites", "g1_region_mask"],
+    "axes": ["x_m", "y_m"],
+    "frame_index": 1000,
+    "replica": 0,
+    "role": "val_eval",
+    "n_val_conditions": 3,
+    "shape": [128, 128],
+    "error_signed_K": "pred_T_K - true_T_K. Predicted T is never rebuilt from the absolute error.",
+    "sites": "flat index row*128+col",
+    "g1_region_mask": "bool 128x128 on G1 and N1G1; empty array on the other cells",
+    "rmse_check_K": 0.005,
+    "identity": "manifest identity.checkpoint_weights_sha256 equals freeze best weights sha256"
+  },
+  "baseline": {
+    "per_frame_csv": "/home/bontempi/official_thesis_nonideal_b2_pkg/package/tables/per_frame_all.csv.gz",
+    "per_frame_sha256": "cb96687cf3614c5393bc9658ec3469980313413f495f32930fd2e810ffc070b3",
+    "p_on_runs": {
+      "sparse_unet/0": "O-C149-on-s0",
+      "sparse_unet/1": "S7-C149-unet-on-s1",
+      "sparse_unet/2": "S7-C149-unet-on-s2",
+      "adapted_glu/0": "S7-C149-glu-on-s0",
+      "adapted_glu/1": "S7-C149-glu-on-s1",
+      "adapted_glu/2": "S7-C149-glu-on-s2"
+    },
+    "observation_check": "surviving_sites_hash equals that baseline run, same cell, role, replica, condition and frame",
+    "legacy_fields": "/home/bontempi/official_thesis_nonideal_b2_eval/<run_id>/fields_figure_frames.npz",
+    "legacy_note": "Block II panels fig5 cover four seed-0 runs and show |error|. They are not the frame-1000 collection. Missing v1 files are listed in BASELINE_FIELDS_NEEDED.md. No inference is started from this job."
+  },
+  "figures": {
+    "scenarios_are_categories": true,
+    "seed_span": "min and max across the three training seeds, with the three points drawn. Not a confidence interval.",
+    "error_clip_K": 400,
+    "spatial_variability": "mean of the three predicted fields; population std across those fields (ddof=0), labelled as dispersion across trainings; error of the mean field, whose RMSE is not the mean of the three RMSEs"
+  },
+  "refusal": {
+    "report": "<dest>/GRAPHICS_BLOCK_REPORT.md",
+    "no_partial_complete": true,
+    "exit_code": 3
+  },
+  "hook": {
+    "script": "scripts/engaging/nonideal_graphics.sbatch",
+    "when": "after the specialist aggregate job has finished, via $NI_DEST/post_hook.path. Not after training alone.",
+    "env": ["NI_DEST", "NI_EVAL_ROOT", "NI_PACKAGE", "NI_FIELDS_INDEX", "NI_FREEZE"],
+    "output": "$NI_DEST/graphics"
+  }
+}
