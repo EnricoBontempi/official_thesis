@@ -2,7 +2,7 @@
 
 **Data:** 25 novembre 2026  
 **Missione:** `mese3/01_observation_state_matrix/`  
-**Stato:** roadmap iniziale concordata nella chat di missione; ricognizioni e schede ancora da eseguire.  
+**Stato:** roadmap discussa nella chat di missione; template A/B/C approvati e pubblicati in [templates_abc.md](templates_abc.md). F0 ancora aperta per esempio e prompt; ricognizioni e schede scientifiche da eseguire.  
 **Base organizzativa:** branch `plan/month3-missions`, struttura iniziale `d30ec497`.
 
 ## 1. Obiettivo
@@ -195,7 +195,9 @@ Una proposta alternativa può emergere anche fuori dal regime o dataset attuale;
 
 - [x] Obiettivo A/B/C e apertura del perimetro discussi con Enrico.
 - [x] Roadmap iniziale definita per la pubblicazione.
-- [ ] F0: template e prompt del primo giro.
+- [x] F0 — Template A/B/C e regole comuni approvati e pubblicati: [templates_abc.md](templates_abc.md).
+- [ ] F0 — Provare il formato su un esempio A/B/C collegato nella chat.
+- [ ] F0 — Preparare i prompt del primo giro e assegnare etichette/responsabilità; nessun agent avviato.
 - [ ] F1: inventario iniziale, schede Jason, matrice v0.1.
 - [ ] F2: scouting tematici.
 - [ ] F3: verifica e integrazione.

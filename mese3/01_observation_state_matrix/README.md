@@ -14,4 +14,4 @@ In questa cartella mettiamo anche:
 
 ---
 
-Stato al 25 novembre 2026: testo descrittivo approvato, roadmap specifica ancora da costruire nella chat di brainstorming. Questo README non autorizza nuove esecuzioni. Per contesto e coordinamento: [indice delle missioni](../README.md).
+Stato al 25 novembre 2026: [roadmap01.md](roadmap01.md) pubblicata e discussa nella chat di brainstorming; [template A/B/C e regole comuni](templates_abc.md) approvati e pubblicati. F0 resta aperta per la prova su un esempio e i prompt degli incarichi. Nessuna ricognizione o esecuzione scientifica avviata con questa pubblicazione. Per contesto e coordinamento: [indice delle missioni](../README.md).
