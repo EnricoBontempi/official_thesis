@@ -1,6 +1,6 @@
 # Blocco II — runbook (12 modelli congelati)
 
-**Stato al 24 novembre 2026:** codice, configurazione e test CPU pronti e pubblicati. **Smoke GPU e campagna NON ancora eseguiti**: dal ambiente di sviluppo non c'è un socket SSH attivo verso Engaging (richiede password MIT + Duo interattivi) e la sessione non era interattiva.
+**Stato al 24 novembre 2026 (aggiornato):** smoke GPU (job 30388026) e campagna (array 30388340, verifica 30388341, aggregazione 30388342) eseguiti con SHA `12ceee6`; 12/12 COMPLETE, gate passati. Esiti: [02_block2_robustness.md](02_block2_robustness.md). Checkout cluster: `/home/bontempi/projects/official_thesis_nonideal_b2`; output `/home/bontempi/official_thesis_nonideal_b2_eval`; pacchetto `/home/bontempi/official_thesis_nonideal_b2_pkg`. Il testo seguente descrive il flusso usato.
 
 ## Che cosa è pronto
 | Cosa | Dove |

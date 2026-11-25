@@ -1,0 +1,29 @@
+{
+  "spec_sha256": "0946e6fb7a4572d043f9384bf97ed1a1d2cf7a390a40fe39ccecb7343eab45c4",
+  "files": {
+    "INDEX.md": "ab459d9a6118054a292c0b44a2285ff9b4ae56d5559560b0ccdd7028ed259ff2",
+    "figures/fig1_macro_rmse_by_cell.png": "77a117e26c96ee77e226195a6ad9cea2cf9b8e41e9dc962ceff40babf1dd7b0a",
+    "figures/fig2_deterioration_vs_R0.png": "73146044d3501b0759532c75161c4e88a52fb14a542f63692ded0afb66192ee6",
+    "figures/fig3_val_by_condition.png": "9061a8f8fe2fbfb617db7bf7feab26b4a60dbcab52a02a9dfa97e0af54014625",
+    "figures/fig4_level_vs_structure.png": "f35a5a6e5e58a713722f45920c58b42520314a2731664a1b8971eec2d45bcfa0",
+    "figures/fig5_fields_O-C149-off-s0.png": "6e77fdd60f95d4202450ce6e97af2ec2391d0be0e82103fac67d1f49a6d30cd1",
+    "figures/fig5_fields_O-C149-on-s0.png": "489b8d7c9626ceaeef2d351576755576a3e089d385f8852f33d2491244d328f4",
+    "figures/fig5_fields_S7-C149-glu-off-s0.png": "4c11e5f59b6efd35ec0414d4c01844c66b24e6f13d1dee29bf21c581a9d1eed3",
+    "figures/fig5_fields_S7-C149-glu-on-s0.png": "da160cb307b3eca5b1c47103f4d9827d11276597716561e30ec87e017bcc1d18",
+    "tables/absolute_per_model.csv": "086b72dc84badb2f7baf3ac46bf753a5a3b21ce26f9f68327b11f8ec287cce81",
+    "tables/absolute_seed_summary.csv": "c71ee413a0f84e7a2b4a62afefa8029e8d2fc536b30296b58ac0cebf19e0274c",
+    "tables/delta_seed_summary.csv": "e057db82a70877ffae47566341d8acc802ac59660169f9e6e16d88dd61149870",
+    "tables/delta_vs_R0_by_condition.csv": "6c73c31a402855644a314fe2d9613807cb50e163799b8f64cc0870e0a63e8e44",
+    "tables/delta_vs_R0_by_replica.csv": "0a0655c7dd6be9bcbee3a7d8b45436ac8c9a1db26018ea816543f1befadc767f",
+    "tables/delta_vs_R0_per_model.csv": "896660e14f7b08684ce55d80da423276202021a5957f63d54a0701d9bd554c7a",
+    "tables/family_contrast_by_seed_index.csv": "ed1a6cac994aa61c55c1b9285c35ea00b249b87b6a4db34d6d85729b247fcace",
+    "tables/glu_batching_diagnostic.csv": "c7cd312fcd8b6714b3e13149ef96220a42dfd0ce8de6b9131f7e52847f050881",
+    "tables/macro_by_replica.csv": "594463df3df010f9197e7143d837150716fb369fbddd7b51ec9644b4c6407a8a",
+    "tables/per_condition.csv": "5fe2d10e3857d78b9a1c64cee0d5b9ef03efbbbf1e62e819e34417f691652306",
+    "tables/per_frame_all.csv.gz": "cb96687cf3614c5393bc9658ec3469980313413f495f32930fd2e810ffc070b3",
+    "tables/pon_minus_poff.csv": "d2fefcb1dd59013cf6511900c5e6f889b9230b2107a60255d6a5ab3f8c2fe279",
+    "tables/regional_g1.csv": "e9dd41555045e2042d0c310f3746c1dc6bb0fbd0c88201a4bff2255ab19633d0",
+    "tables/sites_and_area.csv": "d66f25c35a1395b30510423913f55718da25e3908f7c54cd7d30a485b5255305",
+    "tables/structure_contrasts.csv": "ec285abe793ff1bac7b72f05f43afae3360838876e698dc5284c47724d59cb5e"
+  }
+}

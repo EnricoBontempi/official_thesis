@@ -42,7 +42,7 @@ Il Blocco II **misura** il problema; non modifica i modelli per farli funzionare
 |---|---|
 | Ricognizione, roadmap, nota di ricognizione, note di sospensione A/B/C | Eseguite con l'incarico del 24 novembre 2026 |
 | Blocco I (step I.1–I.5) | Eseguito il 24 novembre 2026 con incarico separato: ricognizione documentale completata nei limiti registrati, specifica scritta, operatori e test CPU, qualificazione G1 su TRAIN. Nessun calcolo GPU, nessun download EngineBench. STOP I: revisione di Enrico |
-| Blocco II | Da autorizzare dopo STOP I |
+| Blocco II | Eseguito il 24 novembre 2026 su 12 modelli (gate R0 12/12, 74 088 valutazioni): [docs/nonideal/02_block2_robustness.md](docs/nonideal/02_block2_robustness.md). STOP II: decisione di Enrico sul Blocco III |
 | Blocco III | Previsto, non autorizzato: decisione esplicita di Enrico dopo il Blocco II (§8, nessuna soglia automatica) |
 | TEST | Chiuso. La storia dei TEST esaminati nel Mese 1 va preservata e non va estesa |
 | Termocoppie all'uscita | Tema separato, fuori da questa roadmap |

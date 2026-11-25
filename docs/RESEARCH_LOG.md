@@ -572,3 +572,13 @@ Roadmap A/B/C (`plan/abc-preparatory-studies` @ `9d2c3af`) **sospese, non cancel
 **Cosa NON è stato fatto.** Nessuno smoke GPU, nessuna verifica di identità sul cluster, nessuna sottomissione: dall'ambiente di lavoro non esiste un socket SSH attivo verso Engaging (autenticazione interattiva password + Duo non eseguibile dalla sessione). Nessun risultato su checkpoint reali esiste. Nessun TEST, VAL non aperto, nessun training.
 
 **Prossimo passo.** Aprire la connessione SSH multiplexata (`ssh engaging`) e seguire `docs/nonideal/02_block2_runbook.md`: smoke sui quattro percorsi, poi campagna.
+
+---
+
+## 2026-11-24 — Blocco II: smoke GPU, campagna sui 12 modelli e analisi
+
+**Cosa è stato fatto.** Dopo la riapertura della connessione al cluster: checkout congelato (`12ceee6`), smoke GPU sui quattro percorsi famiglia × p (job 30388026), poi campagna (array 30388340, verifica 30388341, aggregazione 30388342). Esito verificato: 12/12 COMPLETE, gate R0 12/12 (scarto macro massimo 0 K per la U-Net, ≤ 0.003 K per il GLU), 74 088 righe scientifiche senza duplicati e 6 174 righe di replay tecnico; ricalcolo indipendente dei macro con scarto ≤ 1.4·10⁻¹⁴ K. Pacchetto e report in `results/nonideal/block2/` e `docs/nonideal/02_block2_robustness.md`; CSV per frame sul cluster.
+
+**Esito sintetico (descrittivo, scenari sintetici).** Rumore 0.5 m/s: ≤ 0.5 K (≤ 1.3 %); 1.5 m/s: 1.3–4.7 K (3–9 %); lacune a dischi: 4.1–8.1 K (10–15 %); combinazione ≈ lacune + 0.2–0.5 K (additiva). A pari numero di siti persi, la rimozione casuale spiega circa un terzo del danno delle lacune per i GLU e per la U-Net su seen (la contiguità i due terzi), circa metà per la U-Net su VAL. p_on attenua il peggioramento in media di 0.6–2.9 K, non in modo uniforme fra i seed.
+
+**Limiti.** Degradazioni di classe B/C, VAL123 già usata per selezione, tre seed, repliche non indipendenti. Nessun TEST, nessun training. Decisione sul Blocco III a Enrico.

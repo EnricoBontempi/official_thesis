@@ -39,3 +39,6 @@
 
 ## Aggiornamento Blocco II (24 novembre 2026)
 Ampliamento a 12 modelli (p_on e p_off, seed 0/1/2): revisione `degradation_spec_v1_12models.yaml`; batching uniforme per famiglia (GLU batch 1 anche per R0, replay tecnico a batching S7); gate R0 ≤ 0.05 K dal riferimento S7. Codice e test CPU pronti; smoke GPU e campagna da eseguire: vedi [02_block2_runbook.md](02_block2_runbook.md).
+
+### Esito (24 novembre 2026)
+Blocco II eseguito: 12/12 modelli COMPLETE, gate R0 12/12, 74 088 righe scientifiche (+6 174 di replay tecnico). Report: [02_block2_robustness.md](02_block2_robustness.md); pacchetto: `results/nonideal/block2/package/INDEX.md` (CSV per frame sul cluster, riferimento nel report). **STOP II:** la decisione sul Blocco III (famiglie, celle, distribuzione delle lacune, gestione dei token variabili nel GLU) spetta a Enrico; nessuna soglia automatica, nessun retraining autorizzato.
