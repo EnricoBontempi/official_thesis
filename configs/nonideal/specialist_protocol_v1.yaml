@@ -1,0 +1,105 @@
+format: nonideal_specialist_protocol_v1
+status: frozen_before_runs
+authorized_by: Enrico, 2026-11-24
+matrix:
+  families:
+  - sparse_unet
+  - adapted_glu
+  parameters:
+  - p_on
+  seeds:
+  - 0
+  - 1
+  - 2
+  regimes:
+  - N1
+  - N2
+  - G1
+  - G1-eq
+  - N1G1
+  n_trainings: 30
+  baseline: original clean models of the same family/seed (not retrained)
+  excluded:
+  - mixed training
+  - p_off
+  - assisted
+  - new families
+  - T input
+  - thermocouples
+  - post hoc correction
+regime_definitions: operators and levels frozen in configs/nonideal/degradation_spec_v1_12models.yaml (N1 0.5 m/s,
+  N2 1.5 m/s, G1 union of discs 25%, G1-eq same count uniform, N1G1)
+training:
+  from_scratch: true
+  pool: C149 (2980 frames)
+  normalizer: historical fit-only760, frozen
+  recipe: 'S7: batch 8, 760 presentations and 95 updates/epoch, AdamW lr 1e-3 wd 1e-4 clip 1, warmup 950 updates,
+    fp32, no AMP/TF32/compile'
+  init_seed_shuffle_seed: seed 0/1/2 as the originals
+  train_masks: historical TRAIN 5% recipe (epoch-dependent), degradation applied afterwards
+  regime_fixed_per_run: true
+  clean_fraction: 0
+realizations:
+  train_namespace_seed: 20261201
+  selection_namespace_seed: 20261202
+  evaluation_namespace_seed: 20261125
+  key: (sim_id, frame_index, mask epoch)
+  paired_across_families_and_seeds: true
+  pairing: N1/N2 same standardized noise (N2 = 3 x N1); G1/N1G1 same region; G1-eq removes the same count uniformly
+glu_variable_tokens:
+  policy: microbatch_size 1 + gradient accumulation to effective batch 8, for ALL five GLU specialists
+  loss: per-microbatch MSE scaled by 1/8 (equal weight per sample)
+  clip_and_step: once per effective batch
+  counters: update/warmup/scheduler counted per effective batch (95 per epoch)
+  not_done:
+  - truncation to the batch minimum
+  - padding
+  - filling tokens
+  - regrouping samples
+  difference_from_original_glu: original GLU training used one forward of batch 8 (microbatch null); numerics differ
+    only by summation order
+selection_and_stop:
+  primary: first absolute minimum of the clean VAL 5% macro RMSE, mean of 3 replicas (as S7)
+  scheduler_and_early_stop: driven by the same clean metric as S7
+  min_epochs: 200
+  patience_evals: 15
+  rel_improvement: 0.001
+  reset_on_lr_reduce: true
+  eval_every: 10
+  initial_tranche_epochs: 1000
+  single_continuation_to_epochs: 1200
+  after_1200_without_plateau: budget_exhausted, results kept, no further automatic extension
+  keep:
+  - best
+  - last
+  specialist_val_metric: recorded only on fixed SELECTION-namespace realizations; never used for scheduler, early
+    stop or best
+  statement: We compare specialist augmentations under the ORIGINAL selection, not the optimal checkpoint per scenario.
+evaluation:
+  checkpoints:
+  - best
+  - last
+  cells:
+  - R0
+  - N1
+  - N2
+  - G1
+  - G1-eq
+  - N1G1
+  roles:
+  - seen_train_eval
+  - val_eval
+  replicas:
+  - 0
+  - 1
+  - 2
+  spec: configs/nonideal/degradation_spec_v1_12models.yaml
+  batching: U-Net 8, GLU 1 (as Block II)
+  reference: original clean models, Block II package
+  replay_gate: R0 macro within 0.05 K of the training-loop metric at the evaluated epoch (val 3 replicas, seen replica
+    0)
+stops:
+- no automatic further training
+- no mixed or new configurations after the result
+- A/B/C suspended
+- TEST closed

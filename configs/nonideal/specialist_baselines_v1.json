@@ -1,0 +1,61 @@
+{
+ "baselines_not_retrained": true,
+ "block2_commit": "d4f2e3a58da9c95bb2259f2130cfbe41727df955",
+ "block2_eval_root": "/home/bontempi/official_thesis_nonideal_b2_eval",
+ "block2_package_index": "results/nonideal/block2/package/INDEX.md",
+ "block2_package_manifest_sha256": "5c1462cd44ea5ce98a3317d9d908219a52d89c97f937d0faf0c6abef6a88233f",
+ "block2_per_frame_csv": "/home/bontempi/official_thesis_nonideal_b2_pkg/package/tables/per_frame_all.csv.gz",
+ "block2_per_frame_csv_sha256": "cb96687cf3614c5393bc9658ec3469980313413f495f32930fd2e810ffc070b3",
+ "format": "nonideal_specialist_baselines_v1",
+ "runs": {
+  "O-C149-on-s0": {
+   "best_file_sha256": "bed10229342bb664adfbd247fb018670fa2b947df26092804841a7dfdc97bd7e",
+   "best_weights_sha256": "530258d7f65d901f17fa21b493d746a3b63409ad7d91ba91316780fd558386f1",
+   "epoch": 90,
+   "family": "sparse_unet",
+   "model_seed": 0,
+   "training_dir": "/home/bontempi/official_thesis_opus_c149_attempt2_runs/O-C149-on-s0"
+  },
+  "S7-C149-glu-on-s0": {
+   "best_file_sha256": "e1aad6019663d6137ff8abc5fc0acbc53f739d4037699b541e497a124b2802b3",
+   "best_weights_sha256": "0377fbb32e310026adc76af3c87221500898a9955717b25f9d199464300fcfcb",
+   "epoch": 290,
+   "family": "adapted_glu",
+   "model_seed": 0,
+   "training_dir": "/home/bontempi/official_thesis_s7_c149_runs/S7-C149-glu-on-s0"
+  },
+  "S7-C149-glu-on-s1": {
+   "best_file_sha256": "e33673b5b2e18be8b10347459b4f0d86f6aa114c233e79ccfa6be3021204ff6a",
+   "best_weights_sha256": "8e5f74937b7827eb1e7d5bc04a6fba6dda3b42fdcf16c7276c5a3bd21e0b0c56",
+   "epoch": 630,
+   "family": "adapted_glu",
+   "model_seed": 1,
+   "training_dir": "/home/bontempi/official_thesis_s7_c149_runs/S7-C149-glu-on-s1"
+  },
+  "S7-C149-glu-on-s2": {
+   "best_file_sha256": "d5034d497adf352302ae4f02e005ae09e9d3da2b5d61b88c519f930db2b61cb2",
+   "best_weights_sha256": "3615131abcdbe02bca1ea7e98a025a23a3b55e5efc41c7e50e2767a69407d309",
+   "epoch": 400,
+   "family": "adapted_glu",
+   "model_seed": 2,
+   "training_dir": "/home/bontempi/official_thesis_s7_c149_runs/S7-C149-glu-on-s2"
+  },
+  "S7-C149-unet-on-s1": {
+   "best_file_sha256": "008b1913cc5af2adbeb9bac403c41e38600da5d7313caef2e1d5b79e6cdac338",
+   "best_weights_sha256": "0eb2d31847b5dd934294bed85b7f6c6e7deec85c90aa8635b88eafd25f4bff46",
+   "epoch": 240,
+   "family": "sparse_unet",
+   "model_seed": 1,
+   "training_dir": "/home/bontempi/official_thesis_s7_c149_runs/S7-C149-unet-on-s1"
+  },
+  "S7-C149-unet-on-s2": {
+   "best_file_sha256": "f11be53fe70ef51b48c6a8b1ad548aba8fb9fe9d3852d86cc0c811ce516b91b2",
+   "best_weights_sha256": "c826830122e3818e1f2c2b7d4ddf6765b0a6941dc118e250c18582ead9e698cc",
+   "epoch": 180,
+   "family": "sparse_unet",
+   "model_seed": 2,
+   "training_dir": "/home/bontempi/official_thesis_s7_c149_runs/S7-C149-unet-on-s2"
+  }
+ },
+ "spec": "configs/nonideal/degradation_spec_v1_12models.yaml"
+}

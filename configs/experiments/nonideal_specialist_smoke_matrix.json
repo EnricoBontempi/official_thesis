@@ -1,0 +1,46 @@
+{
+ "new_runs": [
+  {
+   "array_index": 0,
+   "config": "configs/experiments/nonideal_specialist/smoke/NI-unet-on-R0smoke-s1.yaml",
+   "family": "sparse_unet",
+   "out_dir": "/home/bontempi/official_thesis_nonideal_spec_smoke_runs/NI-unet-on-R0smoke-s1",
+   "p_conditioning": true,
+   "regime": "R0",
+   "run_id": "NI-unet-on-R0smoke-s1",
+   "seed": 1,
+   "shuffle_seed": 1
+  },
+  {
+   "array_index": 1,
+   "config": "configs/experiments/nonideal_specialist/smoke/NI-glu-on-R0smoke-s0.yaml",
+   "family": "adapted_glu",
+   "out_dir": "/home/bontempi/official_thesis_nonideal_spec_smoke_runs/NI-glu-on-R0smoke-s0",
+   "p_conditioning": true,
+   "regime": "R0",
+   "run_id": "NI-glu-on-R0smoke-s0",
+   "seed": 0,
+   "shuffle_seed": 0
+  }
+ ],
+ "note": "smoke only: identity specialist path, never scientific",
+ "out_root": "/home/bontempi/official_thesis_nonideal_spec_smoke_runs",
+ "schema": "nonideal_specialist_smoke_matrix_v1",
+ "shared_inputs": {
+  "cache_counts": {
+   "seen_train_eval": 220,
+   "train_fit": 2980,
+   "val_eval": 123
+  },
+  "cache_hash_file": "/home/bontempi/official_thesis_data/month2_dense_unet_cache_c149/payload_hashes.json",
+  "cache_id": "month2_dense_unet_cache_opus_c149_v1",
+  "cache_root": "/home/bontempi/official_thesis_data/month2_dense_unet_cache_c149",
+  "cache_root_pool_original": "/orcd/pool/005/bontempi/official_thesis_data/month2_dense_unet_cache_c149",
+  "expect_cache_aggregate_sha256": "fa1c9358deb3bda0313cd74f9ab6855af87bc969c4069a463073d4c4120f03b4",
+  "mask_aggregate_payload_sha256": "7be78f35ffea2ebc598adce8cec39dc719339aac17ecadde3137f2064891ffeb",
+  "mask_manifest_file_sha256": "2e2d8ff6edabf62ad56702a155140d064c0b4014d06ee96debf52811efa5c75e",
+  "mask_root": "/home/bontempi/projects/official_thesis_s5/data/processed/month2_sparse_eval_masks",
+  "stats_relpath": "data/manifests/train_norm_stats_month2_fit.json",
+  "stats_sha256": "678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e"
+ }
+}

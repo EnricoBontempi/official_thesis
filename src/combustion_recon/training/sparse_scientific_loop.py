@@ -298,6 +298,7 @@ def assert_sparse_resume_compatible(
         "eval_mask_manifest_file_sha256",
         "eval_mask_aggregate_payload_sha256",
         "family",
+        "nonideal_specialist",
     ):
         if key not in ck_identity or key not in run_identity:
             continue
@@ -339,6 +340,8 @@ def assert_sparse_scientific_candidate_contract(cand: dict[str, Any]) -> dict[st
             "s5_submission_authorized",
             "opus_submission_authorized",
             "s7_submission_authorized",
+            "nonideal_submission_authorized",
+            "nonideal_specialist",
             "operational_s7",
             "operational_provisional_pending_s4_profiling",
             "operational_from_s4_profiling_candidate",
@@ -1277,6 +1280,8 @@ class SparseScientificTrainer:
                     )
                     eval_rec["val_mean_condition_rmse_K"] = val_out["mean_condition_rmse_K"]
                     eval_rec["val_per_replica"] = val_out["per_replica"]
+                    # Optional extra records (e.g. the specialist-scenario VAL metric). Never used for selection.
+                    eval_rec.update(val_out.get("extra_eval_fields") or {})
                     self._persist_eval_tables(
                         out_dir, epoch=self.state.epoch, role="val_eval", rows=val_out["rows"]
                     )

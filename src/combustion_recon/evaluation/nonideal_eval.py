@@ -77,18 +77,19 @@ def sites_hash(sites: np.ndarray) -> str:
     return hashlib.sha256(np.ascontiguousarray(np.asarray(sites, dtype=np.int64)).tobytes()).hexdigest()
 
 
-def degraded_item(ds, i: int, cell, spec: DegradationSpec, scale: VelocityScale) -> tuple[dict[str, Any], DegradedObservation]:
-    """Dataset item with the observation replaced by the degraded packet.
+def degrade_item(ds, item: dict[str, Any], cell, spec: DegradationSpec, scale: VelocityScale,
+                 replica_id: int) -> tuple[dict[str, Any], DegradedObservation]:
+    """Replace the observation of an already built dataset item by the degraded packet.
 
     R0 returns the historical item object untouched (bit-identical input). Everything else rebuilds
-    the U-Net grid and the GLU tokens from the surviving sites only.
+    the U-Net grid and the GLU tokens from the surviving sites only. ``replica_id`` selects the
+    realization (evaluation: mask replica; specialist training: mask epoch).
     """
-    item = ds[i]
     meta = item["metadata"]
     obs = item["observation"]
     deg = degrade_observation(
         obs, cell, spec, scale=scale, sim_id=str(meta["sim_id"]), frame_index=int(meta["frame_index"]),
-        replica_id=int(ds.replica_id), x_m=ds.x, y_m=ds.y,
+        replica_id=int(replica_id), x_m=ds.x, y_m=ds.y,
     )
     if deg.obs is obs:
         return item, deg
@@ -111,6 +112,11 @@ def degraded_item(ds, i: int, cell, spec: DegradationSpec, scale: VelocityScale)
     nm["mask_hash"] = deg.obs.mask_hash
     new["metadata"] = nm
     return new, deg
+
+
+def degraded_item(ds, i: int, cell, spec: DegradationSpec, scale: VelocityScale) -> tuple[dict[str, Any], DegradedObservation]:
+    """Evaluation path: realization = mask replica of the dataset."""
+    return degrade_item(ds, ds[i], cell, spec, scale, int(ds.replica_id))
 
 
 def _check_glu_homogeneous(batch: Mapping[str, Any]) -> None:

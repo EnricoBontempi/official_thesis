@@ -139,7 +139,7 @@ fi
 
 # ---- training command ----------------------------------------------------------------
 CMD=("$PY" scripts/16_train_sparse_scientific.py
-  --config "$CONFIG" --authorize-scientific-s7
+  --config "$CONFIG" "${S7_AUTH_FLAG:---authorize-scientific-s7}"
   --cache-root "$CACHE" --expect-cache-hashes "$CACHE_HASHES"
   --mask-root "$MASKS"
   --expect-mask-manifest-sha256 "$EXPECT_MASK_FILE" --expect-mask-aggregate-sha256 "$EXPECT_MASK_AGG"

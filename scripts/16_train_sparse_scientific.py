@@ -101,6 +101,11 @@ def main() -> int:
         action="store_true",
         help="Authorize an S7 candidate (YAML s7_submission_authorized must be true)",
     )
+    p.add_argument(
+        "--authorize-scientific-nonideal",
+        action="store_true",
+        help="Authorize a non-ideal specialist candidate (YAML nonideal_submission_authorized must be true)",
+    )
     p.add_argument("--expect-mask-manifest-sha256", type=str, default=None)
     p.add_argument("--expect-mask-aggregate-sha256", type=str, default=None)
     p.add_argument("--expect-stats-sha256", type=str, default=None)
@@ -155,6 +160,7 @@ def main() -> int:
         args.authorize_scientific_s5,
         args.authorize_scientific_opus,
         args.authorize_scientific_s7,
+        args.authorize_scientific_nonideal,
     ]
     if not any(auth_flags):
         raise SystemExit(
@@ -166,7 +172,7 @@ def main() -> int:
         raise SystemExit("pass exactly one --authorize-scientific-* flag")
     if args.smoke and "smoke" not in str(args.out_root):
         raise SystemExit(f"--smoke requires 'smoke' in --out-root, got {args.out_root}")
-    if args.authorize_scientific_s7 and not args.smoke:
+    if (args.authorize_scientific_s7 or args.authorize_scientific_nonideal) and not args.smoke:
         for need in ("expect_mask_manifest_sha256", "expect_mask_aggregate_sha256",
                      "expect_stats_sha256", "expect_cache_hashes",
                      "expect_cache_aggregate_sha256"):
@@ -191,6 +197,10 @@ def main() -> int:
         raise SystemExit(
             "S7 launch requires s7_submission_authorized: true in the candidate YAML"
         )
+    if args.authorize_scientific_nonideal and cand.get("nonideal_submission_authorized") is not True:
+        raise SystemExit("non-ideal launch requires nonideal_submission_authorized: true in the candidate YAML")
+    if bool(cand.get("nonideal_specialist")) != bool(args.authorize_scientific_nonideal):
+        raise SystemExit("a candidate with nonideal_specialist needs --authorize-scientific-nonideal (and only it)")
     if args.authorize_scientific_s5 and cand.get("s5_submission_authorized") is not True:
         raise SystemExit(
             "S5 launch requires s5_submission_authorized: true in the candidate YAML"
@@ -331,7 +341,27 @@ def main() -> int:
         import functools
 
         DS = functools.partial(AssistedDataset, anchors=anchors)
-    train_ds = DS(
+    spec_block = cand.get("nonideal_specialist")
+    spec_extra: dict = {}
+    spec_val_ds = None
+    if spec_block:
+        from combustion_recon.data.nonideal_observations import load_velocity_scale
+        from combustion_recon.training.nonideal_specialist import (
+            SpecialistSelectionDataset,
+            SpecialistTrainDataset,
+            validate_specialist_block,
+        )
+
+        if args.assisted:
+            raise SystemExit("specialist retraining is temperature-free: --assisted is refused")
+        resolved = validate_specialist_block(spec_block, family=cfg.family, tc=cand["training_candidate"], root=ROOT,
+                                              allow_identity=bool(args.smoke))
+        scale = load_velocity_scale(args.stats, expected_sha256=args.expect_stats_sha256 or None)
+        spec_extra = {"cell": resolved["cell"], "spec": resolved["spec"], "scale": scale}
+        DS_TRAIN = SpecialistTrainDataset
+    else:
+        DS_TRAIN = DS
+    train_ds = DS_TRAIN(
         "train_fit",
         cache_root=cache_root,
         indices=train_indices,
@@ -342,6 +372,7 @@ def main() -> int:
         normalizer=normalizer,
         eval_mask_payload_root=args.mask_root,
         require_eval_mask_payload=require_payload,
+        **spec_extra,
         **cache_kwargs,
     )
     # Historical 760-frame reference for TRAIN diagnostic (B19/C149 included).
@@ -388,9 +419,25 @@ def main() -> int:
         **cache_kwargs,
     )
 
+    if spec_block:
+        spec_val_ds = SpecialistSelectionDataset(
+            "val_eval",
+            cache_root=cache_root,
+            mask_mode="evaluation",
+            site_fraction=float(cfg.site_fraction),
+            eval_mask_seed=int(cfg.eval_mask_seed),
+            layout_id=str(cfg.layout_id),
+            p_conditioning=bool(cfg.p_conditioning),
+            normalizer=normalizer,
+            eval_mask_payload_root=args.mask_root,
+            require_eval_mask_payload=require_payload,
+            **spec_extra,
+            **cache_kwargs,
+        )
+
     if args.smoke:
         # Non-scientific: evaluate on a deterministic spread of real frames only.
-        for _ds in (train_eval_ds, val_ds, seen_ds):
+        for _ds in tuple(d for d in (train_eval_ds, val_ds, seen_ds, spec_val_ds) if d is not None):
             _ds.indices = [_ds.indices[i] for i in _smoke_subset(len(_ds.indices), args.smoke_eval_frames)]
         _log("smoke_eval_subsets", train_eval=len(train_eval_ds), val=len(val_ds), seen=len(seen_ds))
     _log("datasets_ready", train=len(train_ds), val=len(val_ds), seen=len(seen_ds), p_conditioning=cfg.p_conditioning)
@@ -433,7 +480,14 @@ def main() -> int:
     _log("model_ready", family=cfg.family, init_sha=init_sha[:16],
          n_params=sum(p_.numel() for p_ in model.parameters()))
 
-    if args.assisted:
+    if spec_block:
+        from combustion_recon.training.nonideal_specialist import SpecialistTrainer
+
+        trainer = SpecialistTrainer(
+            model, cfg=cfg, normalizer=normalizer, n_train_samples=len(train_ds),
+            query_coords_phys=queries, specialist_val_ds=spec_val_ds, regime=str(spec_block["regime"]),
+        )
+    elif args.assisted:
         trainer = AssistedTrainer(model, cfg=cfg, normalizer=normalizer, n_train_samples=len(train_ds),
                                   query_coords_phys=queries, anchors=anchors)
     else:
@@ -452,6 +506,8 @@ def main() -> int:
         "authorization_flag": (
             "authorize-scientific-s7"
             if args.authorize_scientific_s7
+            else "authorize-scientific-nonideal"
+            if args.authorize_scientific_nonideal
             else "authorize-scientific-opus"
             if args.authorize_scientific_opus
             else "authorize-scientific-s5"
@@ -509,6 +565,14 @@ def main() -> int:
         or cand.get("operational_provisional_pending_s4_profiling"),
         "contract_meta": meta,
     }
+    if spec_block:
+        identity["nonideal_specialist"] = {
+            **spec_block,
+            "resolved_cell": {"id": spec_extra["cell"].cell_id, "noise_sigma_ms": spec_extra["cell"].noise_sigma_ms,
+                              "gap": spec_extra["cell"].gap},
+            "selection": "original clean VAL 5% macro (3 replicas); specialist VAL recorded only",
+            "batching": {"microbatch_size": cfg.microbatch_size, "effective_batch": cfg.batch_size},
+        }
     if args.assisted:
         identity["assisted"] = {
             "study": "month2_temperature_study_v1",
