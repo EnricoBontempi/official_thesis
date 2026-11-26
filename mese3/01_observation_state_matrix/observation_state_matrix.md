@@ -1,6 +1,6 @@
 # Observation–State Matrix — prima versione consolidata (F3)
 
-**Stato:** prima versione consolidata, **proposta per revisione** del coordinatore e per la discussione con Enrico. Non è una versione accettata e non chiude la missione.
+**Stato:** prima versione consolidata, **revisionata dal coordinatore, in attesa delle correzioni finali e dell'accettazione con Enrico**. Non è una versione accettata e non chiude la missione.
 **Data:** 26 novembre 2026 · **Branch:** `matrix/f3-consolidation`, creato da `plan/month3-missions` @ `c79c470` e aggiornato con la base @ `5aec249`
 **Roadmap:** [roadmap01.md](roadmap01.md), fase F3 · **Formato:** [templates_abc.md](templates_abc.md)
 **Natura:** integrazione documentale delle consegne F1/F2 revisionate. Nessun esperimento, training, inferenza, download o lettura dei TEST; nessun contatto esterno.
@@ -292,7 +292,7 @@ Colonne comuni: **Grandezza e contesto** · **Tecnica → segnale** (con natura 
 - *Target e scala:* T istantanea sulla sezione, oppure livello termico o statistiche.
 - *Approcci documentati:* da definire nella missione 04 (baseline semplici prima di metodi appresi). Modello di sensore documentato solo in un contesto diverso (A-scout-001).
 - *Riferimento e validazione:* **VN** su LES.
-- *Mancante — requisito temporale:* un sensore lento richiede sequenze di frame. Per le 22 traiettorie non-TEST con coordinate regolari l'associazione indice↔tempo è **accettata dal loader, non verificata in modo indipendente**; `40NH3_1.2` è esclusa dagli usi multi-frame dalla policy attuale e dichiararne la lacuna non risolve l'associazione; `t` dei 7 TEST non letto; τ realistico per il nostro combustore M.
+- *Mancante — aspetti temporali:* un sensore lento richiede sequenze di frame. Per le 22 traiettorie non-TEST con coordinate regolari l'associazione indice↔tempo è **accettata dal loader**, senza anomalie dimostrate, ma **non verificata in modo indipendente**: servono ipotesi dichiarate e controlli proporzionati all'uso (INV §9; §6.2). `40NH3_1.2` è esclusa dagli usi multi-frame dalla policy attuale; dichiararne la lacuna non risolve l'associazione né autorizza eccezioni. `t` dei 7 TEST non letto; τ realistico per il nostro combustore M.
 - *Collegamenti:* B-data-audit-001/005; A-scout-001; C-scout-001; missione [04](../04_thermal_fusion/README.md).
 
 **C-consolidation-008 — HRR o statistiche termochimiche da OH\* sperimentale RealPDEBench**
@@ -398,7 +398,7 @@ Le missioni indicate sono quelle che *potrebbero* approfondire il punto. Non son
 | Lacuna | Perché | Possibile approfondimento |
 |---|---|---|
 | Orientamento fisico, definizione e segno di Velocity[i/j/k], piano della sezione RealPDEBench | Interpretazione fisica di un modello PIV virtuale e del confronto con apparati reali | 01 / 02 (domande agli autori, via Enrico) |
-| Associazione indice↔tempo verificata in modo indipendente; duplicati sulle altre 26 traiettorie; `40NH3_1.2` esclusa dal multi-frame dalla policy attuale | Ogni uso multi-frame (sensori lenti, forecasting) | 04, proporzionato all'uso (INV §9) |
+| Uso temporale delle traiettorie. Stato attuale: (a) 22 traiettorie non-TEST con coordinate regolari, associazione indice↔tempo **accettata dal loader** e nessuna anomalia dimostrata; (b) verifica indipendente dell'esportazione **non effettuata** per alcuna traiettoria: lacuna di verifica, non errore dimostrato; (c) `t` dei 7 TEST non letto; (d) duplicati di frame non controllati sulle altre 26 traiettorie; (e) `40NH3_1.2`: anomalia documentata, la policy attuale rifiuta il multi-frame; dichiararne la lacuna non risolve l'associazione né autorizza eccezioni | Un esperimento multi-frame (sensori lenti, forecasting) deve dichiarare l'ipotesi indice↔tempo e applicare controlli **proporzionati all'uso** (INV §9: regolarità di `t` sulla finestra impiegata, continuità dei soli frame usati, scala temporale del sensore rispetto a Δt = 0,25 ms). Il confronto con il raw HDF5 o con gli autori serve solo se l'esito dipende in modo decisivo dal tempo assoluto. Non è un prerequisito universale | 04, nel protocollo del proprio esperimento |
 | Bias della PIV in fiamma (seeding solo nell'aria, termoforesi, vettori rigettati) | Lacune e errori realistici per la PIV virtuale | 02. La missione ha pubblicato la [scheda integrata di Sciacchitano 2019](../02_virtual_piv/step1_sciacchitano.md) (step 1, approvato), arrivata sulla base dopo le consegne F1/F2 e **non integrata** in questa versione: candidata per le righe A.2 in F5 |
 | τ e correzioni di termocoppie nelle condizioni del combustore | Modello di sensore lento | 04 |
 | Regime di miscelazione della LES (INV §7 C9) | Qualsiasi uso del legame T–φ locale | 01 (fonte primaria) |

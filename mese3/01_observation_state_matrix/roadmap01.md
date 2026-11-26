@@ -2,7 +2,7 @@
 
 **Data:** 25 novembre 2026  
 **Missione:** `mese3/01_observation_state_matrix/`  
-**Stato:** roadmap discussa nella chat di missione; template A/B/C approvati e pubblicati in [templates_abc.md](templates_abc.md). Aggiornamento 26 novembre 2026: raccolta iniziale revisionata; integrazione F3 proposta, in attesa di revisione del coordinatore e discussione con Enrico ([observation_state_matrix.md](observation_state_matrix.md)).  
+**Stato:** roadmap discussa nella chat di missione; template A/B/C approvati e pubblicati in [templates_abc.md](templates_abc.md). Aggiornamento 26 novembre 2026: prompt del primo giro preparati, consegne degli agent ricevute e raccolta iniziale revisionata; integrazione F3 ([observation_state_matrix.md](observation_state_matrix.md)) revisionata dal coordinatore, in attesa delle correzioni finali e dell'accettazione con Enrico. Missione non conclusa.  
 **Base organizzativa:** branch `plan/month3-missions`, struttura iniziale `d30ec497`.
 
 ## 1. Obiettivo
@@ -196,11 +196,11 @@ Una proposta alternativa può emergere anche fuori dal regime o dataset attuale;
 - [x] Obiettivo A/B/C e apertura del perimetro discussi con Enrico.
 - [x] Roadmap iniziale definita per la pubblicazione.
 - [x] F0 — Template A/B/C e regole comuni approvati e pubblicati: [templates_abc.md](templates_abc.md).
-- [ ] F0 — Provare il formato su un esempio A/B/C collegato nella chat.
-- [ ] F0 — Preparare i prompt del primo giro e assegnare etichette/responsabilità; nessun agent avviato.
-- [ ] F1: inventario iniziale, schede Jason, matrice v0.1. *Raccolta iniziale revisionata dal coordinatore: [data_inventory.md](data_inventory.md), [papers/nie_2024.md](papers/nie_2024.md), [papers/liu_2025.md](papers/liu_2025.md); PR d'origine non mergiate.*
-- [ ] F2: scouting tematici. *Primo rapporto revisionato: [scouting/measurement_scouting.md](scouting/measurement_scouting.md); PR d'origine non mergiata.*
-- [ ] F3: verifica e integrazione. *Integrazione proposta in [observation_state_matrix.md](observation_state_matrix.md), in attesa di revisione del coordinatore e discussione con Enrico.*
+- [x] F0 — Prova del formato: superata dall'uso dei template sulle consegne reali di F1/F2; nessuna prova separata necessaria.
+- [x] F0 — Prompt del primo giro preparati ed etichette assegnate (`data-audit`, `jason`, `measurements-scout`); agent avviati da Enrico.
+- [x] F1: inventario iniziale e schede Jason consegnati e revisionati dal coordinatore: [data_inventory.md](data_inventory.md), [papers/nie_2024.md](papers/nie_2024.md), [papers/liu_2025.md](papers/liu_2025.md). La matrice v0.1 è confluita nell'integrazione F3.
+- [x] F2: primo giro di scouting consegnato e revisionato: [scouting/measurement_scouting.md](scouting/measurement_scouting.md). Copertura parziale e lacune dichiarate nel rapporto; approfondimenti ulteriori solo se cambiano una valutazione (F5).
+- [ ] F3: verifica e integrazione. *[observation_state_matrix.md](observation_state_matrix.md) revisionata dal coordinatore; in attesa delle correzioni finali e dell'accettazione con Enrico.*
 - [ ] F4: sintesi e discussione.
 - [ ] F5: aggiornamenti incrementali secondo necessità.
 
