@@ -2,7 +2,7 @@
 
 **Data:** 25 novembre 2026  
 **Missione:** `mese3/01_observation_state_matrix/`  
-**Stato:** roadmap discussa nella chat di missione; template A/B/C approvati e pubblicati in [templates_abc.md](templates_abc.md). F0 ancora aperta per esempio e prompt; ricognizioni e schede scientifiche da eseguire.  
+**Stato:** roadmap discussa nella chat di missione; template A/B/C approvati e pubblicati in [templates_abc.md](templates_abc.md). Aggiornamento 26 novembre 2026: raccolta iniziale revisionata; integrazione F3 proposta, in attesa di revisione del coordinatore e discussione con Enrico ([observation_state_matrix.md](observation_state_matrix.md)).  
 **Base organizzativa:** branch `plan/month3-missions`, struttura iniziale `d30ec497`.
 
 ## 1. Obiettivo
@@ -198,9 +198,9 @@ Una proposta alternativa può emergere anche fuori dal regime o dataset attuale;
 - [x] F0 — Template A/B/C e regole comuni approvati e pubblicati: [templates_abc.md](templates_abc.md).
 - [ ] F0 — Provare il formato su un esempio A/B/C collegato nella chat.
 - [ ] F0 — Preparare i prompt del primo giro e assegnare etichette/responsabilità; nessun agent avviato.
-- [ ] F1: inventario iniziale, schede Jason, matrice v0.1.
-- [ ] F2: scouting tematici.
-- [ ] F3: verifica e integrazione.
+- [ ] F1: inventario iniziale, schede Jason, matrice v0.1. *Raccolta iniziale revisionata dal coordinatore: [data_inventory.md](data_inventory.md), [papers/nie_2024.md](papers/nie_2024.md), [papers/liu_2025.md](papers/liu_2025.md); PR d'origine non mergiate.*
+- [ ] F2: scouting tematici. *Primo rapporto revisionato: [scouting/measurement_scouting.md](scouting/measurement_scouting.md); PR d'origine non mergiata.*
+- [ ] F3: verifica e integrazione. *Integrazione proposta in [observation_state_matrix.md](observation_state_matrix.md), in attesa di revisione del coordinatore e discussione con Enrico.*
 - [ ] F4: sintesi e discussione.
 - [ ] F5: aggiornamenti incrementali secondo necessità.
 

@@ -99,7 +99,7 @@ Conteggi: 30 condizioni in totale = 20 train + 3 val + 7 TEST (3 interp + 4 extr
 
 | Campo | Contenuto | Evidenza |
 |---|---|---|
-| Identità e accesso | Stessa release di 001, cartella `hf_dataset/real/`: 8 shard (6×≈500,3 MB, 2×≈375,2 MB, totale ≈3,67 GB), 30 traiettorie impacchettate 2–4 per shard; CC BY-NC 4.0 | D [A] (inventario remoto); **assenza locale D [L]** |
+| Identità e accesso | Stessa release di 001, cartella `hf_dataset/real/`: 8 shard (6×≈500,3 MB, 2×≈375,2 MB, totale ≈3,67 GB), 30 traiettorie impacchettate 2–4 per shard; CC BY-NC 4.0. *Nota F3: questi valori sono in unità binarie (MiB/GiB); in byte l'inventario remoto riporta 6×≈524,55 MB + 2×≈393,4–393,5 MB, totale ≈3,93 GB (= ≈3,66 GiB) per gli 8 shard `.arrow`* | D [A] (inventario remoto); **assenza locale D [L]** |
 | Contesto | Chemiluminescenza OH\* ad alta velocità; §3.2 del paper: solo OH\* (1 canale). Nessuna PIV né temperatura misurata per la combustione; la PIV è dichiarata solo per i sistemi fluidi | D [P] |
 | Variabili | Schema (`dataset_info`): `observed (T,H,W)`, `x`, `y`, `t`. Unità e scala dell'intensità: non dichiarate nelle fonti lette. Proprietà ottiche (esposizione, filtro, camera, lunghezza di visione) non lette | D schema [L sui metadati]; M resto |
 | Spazio | 128×128 dichiarata; campo di vista, proiezione (OH\* è integrato lungo la linea di vista), orientamento e rapporto con la sezione LES **non verificati** | M |
@@ -303,7 +303,7 @@ Le grandezze `T`, velocità e `observed` vanno tenute distinte come tre ruoli: *
   3. per finestre di forecasting, un controllo di continuità sui soli frame realmente usati (frame ripetuti, salti improvvisi), a costo contenuto e senza scansione completa;
   4. per sensori lenti, dichiarare la scala temporale: se è ≫ Δt=0,25 ms, un errore di pochi campioni ha effetto trascurabile [I, da verificare caso per caso];
   5. se l'esito dipendesse in modo decisivo dal tempo assoluto, confrontare con il raw HDF5 o chiedere agli autori;
-  6. `40NH3_1.2`: la policy attuale rifiuta il multi-frame (non modificata qui); per usi temporali la scelta è escluderla o dichiarare esplicitamente la lacuna 1098→1099.
+  6. `40NH3_1.2`: la policy attuale rifiuta il multi-frame (non modificata qui); per usi temporali va esclusa. Dichiarare la lacuna 1098→1099 non risolve l'associazione campo–tempo e non autorizza un'eccezione alla policy: un eventuale uso temporale richiederebbe una verifica indipendente dell'associazione e una decisione separata. *(Formulazione corretta in F3, vedi [observation_state_matrix.md](observation_state_matrix.md) §8; la versione originale indicava come alternativa «dichiarare esplicitamente la lacuna».)*
 - **Fiducia nell'orientamento** (bruciatore, segno di vj, vk come swirl): non dedurre fisica da C1.
 - **Regime di miscelazione e legame T–φ locale:** non determinati; da stabilire con fonte primaria prima di usarli (C9).
 - **OH\* e ricostruzione ottica:** scaricare e ispezionare almeno uno shard reale; caratterizzare `observed` (Q2, Q3). Senza dati simultanei di T non c'è validazione sperimentale della ricostruzione.
