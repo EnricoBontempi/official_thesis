@@ -2,7 +2,7 @@
 
 **Data:** 25 novembre 2026  
 **Missione:** `mese3/02_virtual_piv/`  
-**Stato:** piano in cinque step concordato con Enrico; esecuzione da avviare un passo alla volta nella chat di missione.  
+**Stato:** step 1 completato e approvato da Enrico il 25 novembre 2026 (America/New_York): [scheda integrata Sciacchitano](step1_sciacchitano.md). Step 2 da avviare con prompt concordati nella chat di missione.  
 **Base organizzativa:** branch `plan/month3-missions`, struttura iniziale `d30ec497`.
 
 ## Obiettivo e collegamento con la tesi
@@ -173,11 +173,11 @@ Riferimenti di contesto:
 
 Gli output degli step saranno creati nella cartella della missione quando prodotti, senza file vuoti preventivi; codice e risultati nei percorsi canonici della repository. La roadmap mantiene l'avanzamento operativo; gli aggiornamenti scientifici si registrano nel diario canonico quando si integrano risultati. `documents_thesis` resta una fonte consultabile, senza modifiche.
 
-## Stato iniziale
+## Stato di avanzamento
 
 - [x] Obiettivo e sequenza in cinque step concordati con Enrico.
 - [x] Roadmap preparata per la pubblicazione sul branch di pianificazione.
-- [ ] Step 1 — Lettura strutturata di Sciacchitano e discussione.
+- [x] Step 1 — Lettura di Sciacchitano, confronto delle tre schede e approvazione di Enrico: [consegna](step1_sciacchitano.md).
 - [ ] Step 2 — Preparazione dei prompt e avvio dei due scouting paralleli.
 - [ ] Step 3 — Verifica sui dataset e sintesi.
 - [ ] Step 4A — Scelta dello scenario e approvazione del contratto.
