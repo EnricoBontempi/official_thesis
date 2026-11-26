@@ -14,4 +14,4 @@ L’ordine è:
 
 ---
 
-Stato al 25 novembre 2026: testo descrittivo approvato, roadmap specifica ancora da costruire nella chat di brainstorming. Questo README non autorizza nuove esecuzioni. Per contesto e coordinamento: [indice delle missioni](../README.md).
+Stato al 25 novembre 2026: [roadmap 02](roadmap02.md) pubblicata; step 1 completato e approvato da Enrico dopo il confronto delle tre letture di Sciacchitano. Consegna: [scheda critica integrata](step1_sciacchitano.md). Prossimo passo: preparare i prompt dei due scout dello step 2 nella chat di missione. Nessuno scouting o esperimento avviato da questo aggiornamento. Per contesto e coordinamento: [indice delle missioni](../README.md).

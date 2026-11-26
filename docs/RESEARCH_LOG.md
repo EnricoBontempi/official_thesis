@@ -645,3 +645,13 @@ Paper identificati dagli screenshot condivisi: Nie et al., *Combustion and Flame
 - Le vecchie roadmap A/B/C restano sospese. TEST non viene aperto. Report dei supervisori, codice e checkout della campagna non vengono modificati.
 
 **Attività effettuata:** sola organizzazione documentale e aggiornamento del diario. Nessun job, training, inferenza, download di dataset o nuova esecuzione scientifica.
+
+---
+
+## 2026-11-25 — Missione 02: step 1 Sciacchitano completato e approvato
+
+**Decisione di Enrico (America/New_York).** Approvata la scheda integrata dello step 1 e autorizzata la pubblicazione su `plan/month3-missions`. Consegna: [mese3/02_virtual_piv/step1_sciacchitano.md](../mese3/02_virtual_piv/step1_sciacchitano.md); [roadmap 02](../mese3/02_virtual_piv/roadmap02.md) e README locale aggiornati.
+
+**Attività e contenuto.** Letto il PDF integrale di Sciacchitano (2019), DOI 10.1088/1361-6501/ab1db8. Confrontate la lettura del coordinatore e le schede indipendenti di Opus e Neon fornite da Enrico; controllati sul PDF i passaggi decisivi. Le tre letture condividono la stessa fonte e non costituiscono tre verifiche sperimentali. La scheda contiene evidenze con sezioni/pagine, implicazioni per la LES, limiti dello studio sintetico precedente, requisiti dei dataset e domande per i due scouting. Chiarite in particolare la distinzione fra risoluzione e passo, valori misurati/validati/sostituiti, incertezza per vettore e correlazione degli errori; il risultato su overlap riguarda rho(2h) nel caso citato, non indipendenza generale. Segnalate anomalie di notazione della review senza correggerle implicitamente. Specificità della combustione e parametri del modello virtuale restano da qualificare negli step successivi.
+
+**Prossimo passo e perimetro.** Preparare nella chat i prompt per scouting dataset e scouting letteratura, avviabili in parallelo dopo l'assegnazione. Nessun nuovo scout avviato, nessun download di dataset sperimentali, implementazione di operatori, training, inferenza, accesso a TEST o intervento sulla campagna dei 30 specialisti. L'audit RealPDEBench e l'Observation–State Matrix restano condivisi con la missione 01.
