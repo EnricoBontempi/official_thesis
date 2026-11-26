@@ -1,6 +1,7 @@
 # Inventario dei dati — Observation–State Matrix (incarico `data-audit`)
 
-**Data:** 25 novembre 2026 · **Base:** `plan/month3-missions` @ `30d11e0` · **Branch:** `matrix/f1-data-audit`
+**Audit locale iniziale:** 25 novembre 2026; integrazione documentale PIV del 26 novembre in §10, senza nuovo controllo del disco.
+**Base dell'audit iniziale:** `plan/month3-missions` @ `30d11e0` · **Branch:** `matrix/f1-data-audit`
 **Roadmap:** [roadmap01.md](roadmap01.md) §4 · **Template:** [templates_abc.md](templates_abc.md) (scheda B e regole comuni)
 **Natura:** ricognizione documentale con controlli locali leggeri. Nessun training, inferenza, download, apertura di TEST; nessun dato, raw o codice modificato.
 
@@ -163,7 +164,7 @@ Conteggi: 30 condizioni in totale = 20 train + 3 val + 7 TEST (3 interp + 4 extr
 | Identità e accesso | Oxford TPSRG; arXiv:2406.03325; `github.com/sambkr/EngineBench`. Pagina Oxford non raggiungibile il 24 novembre (HTTP 500); pagine Kaggle non leggibili. Licenza: testo CC BY 4.0, appendici [S] CC BY-NC-SA 4.0: **da chiarire** | D [A] (letto via API GitHub); M licenza |
 | Contesto | PIV in motore ottico TCC-III motorizzato (nessuna combustione), piano di swirl inferiore; subset `LSP_small` 5 205 snapshot, 1300 rpm, 40 kPa; fase in gradi di manovella | D [P][A] |
 | Variabili/spazio | u,v su 50×49 vettori con padding a 128×128; spaziatura ≈1,25–1,4 mm [S]; finestra, sovrapposizione, validazione: non verificate | D/[S]/M |
-| Vettori mancanti | Nel rilascio sono **zeri esatti**; maschera `u==0 | v==0`: non distingue mancante da zero vero. Le lacune del benchmark sono **artificiali** (poligoni di bordo fino al 25%, maschere fisse di test) | D [A] (codice letto) |
+| Vettori mancanti | Nel rilascio sono **zeri esatti**; maschera `u==0 \| v==0`: non distingue mancante da zero vero. Le lacune del benchmark sono **artificiali** (poligoni di bordo fino al 25%, maschere fisse di test) | D [A] (codice letto) |
 | Incertezza | "average velocity error 1,5–8%" (da Schiffmann et al. 2016); nessun indicatore per vettore | D [P] |
 | Riferimento | Nessun riferimento termico o scalare | D |
 | Uso | Ordini di grandezza e logica delle lacune; **non** maschera realistica del nostro combustore | I |
@@ -318,3 +319,25 @@ Le grandezze `T`, velocità e `observed` vanno tenute distinte come tre ruoli: *
 3. Confronto di frame adiacenti su TRAIN/VAL per i duplicati, proporzionato all'uso (C5).
 4. Domande agli autori su piano della sezione, ricampionamento e SGS.
 5. Domande minime a PoliMi sul contenuto dei dati motore.
+
+---
+
+## 10. Integrazione intermedia della missione 02 — 26 novembre 2026
+
+**Perimetro distinto dall'audit locale iniziale.** Le fonti sono lo scouting dataset v2 `ee9948e227f0d9272ae064cc8601c5e5399c28b4` e lo scouting letteratura v2 `2cbf5abd5fd44f8cb6f82c0be933f61e7340ddc5`, con [provenienza e limiti dettagliati](updates/piv_2026-11-26.md). Le righe B selezionate sono consultabili nella [vista B della matrice](observation_state_matrix.md#3-vista-b--dataset-e-configurazioni); le schede complete restano nel [rapporto dataset fissato al commit](https://github.com/EnricoBontempi/official_thesis/blob/ee9948e227f0d9272ae064cc8601c5e5399c28b4/mese3/02_virtual_piv/scouting/step2_datasets.md).
+
+Lo scout censisce 35 candidati e apre campioni di sette (S2D-01/02/03/04/09/10/11). Queste sono ispezioni documentate dal rapporto, **non nuovi dati attestati sul computer di Enrico**. Nessun nuovo controllo del disco, download o apertura di raw/TEST in questa integrazione. Le conclusioni sul possesso locale del §1 restano riferite al perimetro e alla data dell'audit iniziale.
+
+| ID stabile | Accesso documentato dalla consegna 02 | Che cosa aggiunge / che cosa non dimostra |
+|---|---|---|
+| B-PIV-S2D-01 | Cardiff: campioni di vettori ai tre stadi, XML, listing e maschera; CC BY 4.0 | PIV isoterma, non fiamma simultanea. Codici 0/1/16/17 e decoder non ufficiale da verificare; non frazioni certificate di rigetti/sostituzioni |
+| B-PIV-S2D-02 | Neal PIV-UQ: descrizione, immagini MS e campioni HDR; CC0 | Riferimento simultaneo più accurato di velocità, con correlazione su 5 coppie e interpolazione. Vettori MS da produrre; nessun riferimento T |
+| B-PIV-S2D-03 | MRB Darmstadt: 18 mappe medie MATLAB; CC BY-NC 4.0 | Campi medi sperimentali CH₄/H₂; RMS/OH medi dichiarati ma non aperti. Non qualifica lacune istantanee |
+| B-PIV-S2D-04 | RealPDEBench fluidi/cylinder: frammenti Arrow e metadati | Non è combustion. Δt 5 ms nei file contro 2,5 ms documentati; schema privo di flag/UQ. Nessuna modifica ai tempi della LES (§2 B-data-audit-001) |
+| B-PIV-S2D-05 | PIV Challenge: istruzioni e pagine; payload non ispezionati | Le convenzioni di flag nelle istruzioni non provano il contenuto dei rilasci; truth sintetica non ottenuta, licenza M |
+| B-PIV-S2D-11 | Yang: un file Tecplot 3C e vorticità; CC BY 4.0 | Piani traslati, simultaneità/unità/zeri M; non prova un volume istantaneo di riferimento |
+| B-PIV-S2D-35 | DaRUS RQL: soli metadati API; guestbook non compilato | Frammenti d'immagine PIV/soot e codice, non campi vettoriali o UQ; licenze distinte nei record |
+
+**Aggiornamenti delle voci iniziali:** B-data-audit-006 EngineBench motored e la risorsa TCC fired restano distinte, senza nuovi payload ispezionati. La voce B-data-audit-009 non va più interpretata come assenza generale di dati a campi medi: ora esistono i campioni di medie PIV MRB (B-PIV-S2D-03), mentre non è stato aggiunto un archivio laminare utilizzabile. Le piste Johe/Ye/Cambridge Oxycoal restano nel rapporto della 02 con i rispettivi limiti di contenuto/accesso.
+
+La nuova disponibilità di un riferimento sperimentale di **velocità** (Neal) non fornisce validazione sperimentale della ricostruzione di **temperatura**. Per la tesi resta disponibile il riferimento numerico LES; nessuna nuova T sperimentale simultanea alla velocità è stata individuata fra le risorse qui integrate. Verifiche estese e scelta del modello PIV restano nella 02.

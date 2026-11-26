@@ -2,7 +2,7 @@
 
 **Data:** 25 novembre 2026  
 **Missione:** `mese3/01_observation_state_matrix/`  
-**Stato:** roadmap discussa nella chat di missione; template A/B/C approvati e pubblicati in [templates_abc.md](templates_abc.md). Aggiornamento 26 novembre 2026: prompt del primo giro preparati, consegne degli agent ricevute e raccolta iniziale revisionata; integrazione F3 ([observation_state_matrix.md](observation_state_matrix.md)) revisionata dal coordinatore e accettata con Enrico il 26 novembre 2026; F3 conclusa. Missione non conclusa.  
+**Stato:** roadmap discussa nella chat di missione; template A/B/C approvati e pubblicati in [templates_abc.md](templates_abc.md). Aggiornamento 26 novembre 2026: prompt del primo giro preparati, consegne degli agent ricevute e raccolta iniziale revisionata; integrazione F3 ([observation_state_matrix.md](observation_state_matrix.md)) revisionata dal coordinatore e accettata con Enrico il 26 novembre 2026; F3 conclusa. Missione non conclusa. Aggiornamento intermedio 02 integrato il 26 novembre 2026 (F5); F4 rinviata al confronto delle evidenze pertinenti delle altre missioni, in particolare 02/04.  
 **Base organizzativa:** branch `plan/month3-missions`, struttura iniziale `d30ec497`.
 
 ## 1. Obiettivo
@@ -117,10 +117,12 @@ Distinguere validazione su simulazione, confronto con misure indipendenti, coere
 | F1 — Base e primi casi | Riordinare audit RealPDEBench; leggere criticamente i due paper di Jason; compilare prime righe | Inventario iniziale, due schede critiche e matrice v0.1 | Distinzioni misurato/simulato/inferito e principali lacune esplicite; niente attesa di completezza |
 | F2 — Scouting parallelo | Cercare diagnostiche, dati e problemi per famiglie; includere esempi oltre il contesto attuale | Rapporti tematici, registro delle ricerche e proposte di righe A/B/C | Copertura delle famiglie iniziali oppure motivazione delle lacune; fonti puntuali |
 | F3 — Verifica e integrazione | Deduplicare; controllare affermazioni decisive e numeri; risolvere o registrare contraddizioni | Matrice v0.2, inventario e catalogo coerenti | Ogni conclusione che orienta una scelta ha evidenza o un'incertezza dichiarata |
-| F4 — Sintesi e confronto | Confrontare opportunità e limiti; formulare domande mirate per esperti/supervisor | Sintesi leggibile, alternative motivate e prossime verifiche proposte | Discussione con Enrico; eventuali cambi di problema distinti dalla ricognizione |
-| F5 — Manutenzione | Integrare evidenze dagli altri filoni e nuove fonti quando cambiano una decisione | Versioni successive e stato delle domande aggiornato | Aggiornamenti mirati; nessuna revisione esaustiva obbligatoria |
+| F4 — Sintesi e confronto | Confrontare opportunità e limiti alla luce delle consegne pertinenti delle altre missioni; formulare domande mirate | Sintesi leggibile, alternative motivate e prossime verifiche proposte | Discussione complessiva con Enrico rinviata finché maturano le evidenze pertinenti; eventuali cambi di problema distinti dalla ricognizione |
+| F5 — Manutenzione | Integrare consegne intermedie prima dei training, poi nuovi risultati quando cambiano una valutazione | Versioni successive e stato delle domande aggiornato | Attiva già dopo F3, in parallelo alle altre missioni; non una fase terminale che chiude questa chat |
 
 F1 e F2 possono sovrapporsi appena il formato F0 è definito. Le altre missioni possono procedere con le informazioni disponibili e le ipotesi esplicite.
+
+**Coordinamento aggiornato con Enrico, 26 novembre 2026:** ricevere le consegne intermedie dopo lo scouting e prima dei training, con priorità alle missioni 02 (PIV) e 04 (sensori termici). F5 è già attiva: non occorre aspettare il termine di ogni missione. F4 è rinviata al confronto complessivo delle evidenze pertinenti; non costituisce un blocco agli aggiornamenti. Dopo gli esperimenti si integra nuovamente solo ciò che cambia evidenze, limiti o validazione. La missione resta il punto comune di manutenzione della matrice.
 
 **Punto di arresto della prima ricognizione:** abbiamo una mappa iniziale delle famiglie, le due schede di Jason, l'inventario RealPDEBench, problemi collegati alle evidenze e un elenco preciso delle informazioni mancanti. Dopo un primo giro di ricerca e di riferimenti citati/citanti, estendere lo scouting solo dove una lacuna può cambiare una valutazione. Nuovi paper che ripetono lo stesso punto si registrano senza moltiplicare schede equivalenti.
 
@@ -182,8 +184,9 @@ Output previsti, da creare nelle fasi corrispondenti nella cartella della missio
 - `data_inventory.md`: schede B, audit riutilizzati e verifiche mancanti;
 - `papers/`: due schede comuni di Jason ed eventuali altri approfondimenti necessari;
 - `scouting/`: rapporti degli agent e riferimenti delle ricerche, senza copiare interi articoli.
+- `updates/`: note circoscritte di integrazione dalle altre missioni, con fonti/versioni e limiti; il diario resta quello canonico.
 
-Questi sono output pianificati, non file già prodotti. Tabelle strutturate aggiuntive si introducono solo se aiutano l'uso effettivo. Niente file vuoti di facciata.
+L'elenco descrive i ruoli dei documenti; lo stato di consegna è nella checklist aggiornata sotto. Tabelle strutturate aggiuntive si introducono solo se aiutano l'uso effettivo. Niente file vuoti di facciata.
 
 La roadmap tiene checklist e decisioni operative; il diario canonico `docs/RESEARCH_LOG.md` conserva gli aggiornamenti scientifici quando si integrano risultati. Non creare un secondo diario. Codice e risultati storici restano nei percorsi canonici.
 
@@ -201,8 +204,10 @@ Una proposta alternativa può emergere anche fuori dal regime o dataset attuale;
 - [x] F1: inventario iniziale e schede Jason consegnati e revisionati dal coordinatore: [data_inventory.md](data_inventory.md), [papers/nie_2024.md](papers/nie_2024.md), [papers/liu_2025.md](papers/liu_2025.md). La matrice v0.1 è confluita nell'integrazione F3.
 - [x] F2: primo giro di scouting consegnato e revisionato: [scouting/measurement_scouting.md](scouting/measurement_scouting.md). Copertura parziale e lacune dichiarate nel rapporto; approfondimenti ulteriori solo se cambiano una valutazione (F5).
 - [x] F3: verifica e integrazione. *[observation_state_matrix.md](observation_state_matrix.md) revisionata dal coordinatore; correzioni finali verificate e prima versione accettata con Enrico il 26 novembre 2026; F3 conclusa.*
-- [ ] F4: sintesi e discussione.
-- [ ] F5: aggiornamenti incrementali secondo necessità.
+- [ ] F4: sintesi e discussione complessiva, rinviata alle evidenze pertinenti delle altre missioni; non blocca gli aggiornamenti intermedi.
+- [ ] F5: manutenzione incrementale attiva e continuativa, anche dopo i risultati degli esperimenti.
+- [x] F5 — 26 novembre 2026: integrata la consegna intermedia 02 (PIV1 e due scouting v2); [nota di integrazione](updates/piv_2026-11-26.md). Nessun esperimento o parametro PIV deciso.
+- [ ] F5 — Integrare la consegna intermedia 04 quando Enrico ne comunicherà la disponibilità.
 
 ## Fonti di contesto già identificate
 

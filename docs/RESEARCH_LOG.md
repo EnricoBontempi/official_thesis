@@ -655,3 +655,18 @@ Paper identificati dagli screenshot condivisi: Nie et al., *Combustion and Flame
 **Attività e contenuto.** Letto il PDF integrale di Sciacchitano (2019), DOI 10.1088/1361-6501/ab1db8. Confrontate la lettura del coordinatore e le schede indipendenti di Opus e Neon fornite da Enrico; controllati sul PDF i passaggi decisivi. Le tre letture condividono la stessa fonte e non costituiscono tre verifiche sperimentali. La scheda contiene evidenze con sezioni/pagine, implicazioni per la LES, limiti dello studio sintetico precedente, requisiti dei dataset e domande per i due scouting. Chiarite in particolare la distinzione fra risoluzione e passo, valori misurati/validati/sostituiti, incertezza per vettore e correlazione degli errori; il risultato su overlap riguarda rho(2h) nel caso citato, non indipendenza generale. Segnalate anomalie di notazione della review senza correggerle implicitamente. Specificità della combustione e parametri del modello virtuale restano da qualificare negli step successivi.
 
 **Prossimo passo e perimetro.** Preparare nella chat i prompt per scouting dataset e scouting letteratura, avviabili in parallelo dopo l'assegnazione. Nessun nuovo scout avviato, nessun download di dataset sperimentali, implementazione di operatori, training, inferenza, accesso a TEST o intervento sulla campagna dei 30 specialisti. L'audit RealPDEBench e l'Observation–State Matrix restano condivisi con la missione 01.
+
+
+---
+
+## 2026-11-26 — Missione 01: integrazione intermedia dello scouting PIV (02)
+
+**Decisione di Enrico.** Aggiornare ora l'Observation–State Matrix con la consegna intermedia della missione 02, prima di scegliere gli esperimenti; seguirà la consegna intermedia 04. F3 accettata e già integrata tramite PR #4. F5 attiva come manutenzione incrementale; F4 rinviata al confronto delle evidenze pertinenti delle altre missioni.
+
+**Fonti fissate.** Scheda Sciacchitano approvata sulla base `a894257497de1524566186c22b66e02bd7b7b8ee`; scouting dataset `piv/step2-dataset-scouting` @ `ee9948e227f0d9272ae064cc8601c5e5399c28b4`; scouting letteratura `piv/step2-literature-scouting` @ `2cbf5abd5fd44f8cb6f82c0be933f61e7340ddc5`. Fonti e limiti nella [nota di integrazione](../mese3/01_observation_state_matrix/updates/piv_2026-11-26.md); branch di scouting non mergiati da questa attività.
+
+**Risultato documentale.** Aggiornata la [matrice](../mese3/01_observation_state_matrix/observation_state_matrix.md): 29 righe A, 22 B, 20 C. Distinti passo/risposta spaziale, errore/correlazione, copertura/rigetto/sostituzione e misura/riferimento. Aggiunti casi PIV in combustione a 5 bar e con olio nel flashback, senza trasferirne i parametri alla LES. Sette righe dataset selezionate dai 35 candidati; due problemi di qualificazione Cardiff/Neal, non esperimenti approvati. Aggiornati inventario, README e roadmap01.
+
+**Qualificazione delle evidenze.** Le sette ispezioni di campioni riportate dallo scout non sono nuovi dati attestati sul computer di Enrico né la verifica estesa dello step 3 della 02. Cardiff: PIV isoterma, codici/decoder da verificare; Neal: riferimento simultaneo di velocità con correlazione su cinque coppie e interpolazione, non verità puntuale istantanea. Nessun nuovo riferimento sperimentale T simultaneo alla velocità. RealPDEBench fluidi è separato dalla LES combustion; tempi, geometria e policy di quest'ultima invariati.
+
+**Perimetro.** Sola integrazione documentale delle consegne; nessuna nuova lettura dei paper originali, ispezione di raw/TEST, download di dati, implementazione, esperimento o training. Nessuna modifica alle missioni 02/04 o agli altri filoni. Configurazione PIV e protocolli ancora da discutere con Enrico nella 02.
