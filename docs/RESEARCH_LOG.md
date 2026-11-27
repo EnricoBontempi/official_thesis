@@ -670,3 +670,15 @@ Paper identificati dagli screenshot condivisi: Nie et al., *Combustion and Flame
 **Qualificazione delle evidenze.** Le sette ispezioni di campioni riportate dallo scout non sono nuovi dati attestati sul computer di Enrico né la verifica estesa dello step 3 della 02. Cardiff: PIV isoterma, codici/decoder da verificare; Neal: riferimento simultaneo di velocità con correlazione su cinque coppie e interpolazione, non verità puntuale istantanea. Nessun nuovo riferimento sperimentale T simultaneo alla velocità. RealPDEBench fluidi è separato dalla LES combustion; tempi, geometria e policy di quest'ultima invariati.
 
 **Perimetro.** Sola integrazione documentale delle consegne; nessuna nuova lettura dei paper originali, ispezione di raw/TEST, download di dati, implementazione, esperimento o training. Nessuna modifica alle missioni 02/04 o agli altri filoni. Configurazione PIV e protocolli ancora da discutere con Enrico nella 02.
+
+---
+
+## 2026-11-27 — Missione 01: integrazione intermedia delle misure termiche (04)
+
+**Autorizzazione:** Enrico comunica completata la consegna intermedia 04 e richiede l'aggiornamento della Matrix. Fonti: pratica sperimentale ereditata dalla v2 dello step 1; modelli `mission04/step2-measurement-models` @ `c2980d3fdf66e1f43a54bbf7f12068d1a75214c6`; dataset `mission04/step2-thermal-datasets` @ `cf318f611d12cd4f151edd4f0e1578d1ea4f4114`. I rapporti restano proposte da discutere, non specifiche approvate.
+
+**Consegna:** [nota di integrazione](../mese3/01_observation_state_matrix/updates/thermal_2026-11-27.md); [matrice](../mese3/01_observation_state_matrix/observation_state_matrix.md) aggiornata a 33 A, 27 B, 20 C. Aggiunte configurazioni HYLON TC/LIP, Delft JHC ed EM2C; cinque dataset selezionati e aggiornati i problemi su sensori lenti e fusione.
+
+**Evidenze e limiti:** lettura della giunzione distinta dalla stima del gas; segno radiativo dipendente dall'ambiente; primo ordine costante come approssimazione; campionamento distinto dalla risposta termica. HYLON ha campagne separate, Waterloo statistiche congiunte LDA–TC simultanee; TG/TG_RMS NIST sono uscite di modello, non sua validazione indipendente. Nel materiale cercato e ispezionato manca un riferimento aperto T gas–PIV simultaneo nello swirl confinato. Nessun giudizio universale sulla sufficienza dei 0,5 s LES: dipende da risposta, inizializzazione e obiettivo.
+
+**Perimetro:** integrazione basata sui rapporti, controlli di campioni attribuiti agli scout; nessuna nuova lettura dei paper, verifica raw/TEST, download, esperimento o training. Nessuna modifica ai branch o ai file della 04/02. F5 attiva, consegne intermedie 02/04 integrate; specifica termica e decisioni sperimentali restano nella 04 secondo roadmap.

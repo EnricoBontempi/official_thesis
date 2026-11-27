@@ -1,9 +1,9 @@
 # Observation–State Matrix
 
-**Stato:** prima versione accettata con Enrico il 26 novembre 2026; **F3 conclusa**. Aggiornamento intermedio dalla missione 02 integrato il 26 novembre (F5). F4, confronto complessivo, rinviata alle evidenze pertinenti delle altre missioni; missione aperta.
-**Ultimo aggiornamento:** 26 novembre 2026 · **Branch di pubblicazione:** `plan/month3-missions`. Provenienza storica F3 in §1/§8; fonti dell'aggiornamento PIV in §9.
+**Stato:** prima versione accettata con Enrico il 26 novembre 2026; **F3 conclusa**. Aggiornamenti intermedi dalle missioni 02 (26 novembre) e 04 (27 novembre) integrati (F5). F4, confronto complessivo, rinviata alle evidenze pertinenti delle altre missioni; missione aperta.
+**Ultimo aggiornamento:** 27 novembre 2026 · **Branch di pubblicazione:** `plan/month3-missions`. Provenienza storica F3 in §1/§8; fonti degli aggiornamenti PIV/termico in §9/§10.
 **Roadmap:** [roadmap01.md](roadmap01.md), manutenzione F5 · **Formato:** [templates_abc.md](templates_abc.md)
-**Natura:** integrazione documentale delle consegne revisionate F1/F2 e dello scouting intermedio della 02. Nessun esperimento, training, inferenza, download di dati o lettura dei TEST in questa integrazione; nessun contatto esterno. Le ispezioni di campioni effettuate dagli scout sono attribuite ai loro rapporti.
+**Natura:** integrazione documentale delle consegne revisionate F1/F2 e degli scouting intermedi della 02 e della 04. Nessun esperimento, training, inferenza, download di dati o lettura dei TEST in questa integrazione; nessun contatto esterno. Le ispezioni di campioni effettuate dagli scout sono attribuite ai loro rapporti.
 
 ---
 
@@ -15,7 +15,7 @@ Questo documento è l'**indice ragionato** della missione. Collega tre viste:
 - **B — Inventario dei dati (§3):** che cosa esiste e che cosa abbiamo davvero.
 - **C — Catalogo dei problemi (§4):** osservazioni disponibili durante l'uso → stato desiderato → approcci → validazione → che cosa manca.
 
-Il centro è A; C la completa. **Input, target e riferimento sono ruoli del singolo problema C**, non proprietà di una variabile. I dettagli restano nei rapporti collegati (§1 e §9): qui si riportano solo le informazioni necessarie per confrontare le righe. Se un numero perde il suo contesto in sintesi, è omesso e si rimanda alla scheda.
+Il centro è A; C la completa. **Input, target e riferimento sono ruoli del singolo problema C**, non proprietà di una variabile. I dettagli restano nei rapporti collegati (§1, §9 e §10): qui si riportano solo le informazioni necessarie per confrontare le righe. Se un numero perde il suo contesto in sintesi, è omesso e si rimanda alla scheda.
 
 Ogni numero vale **per l'apparato, la simulazione o la condizione indicati**. Non è un parametro della tecnica in generale né del nostro combustore.
 
@@ -24,11 +24,11 @@ Ogni numero vale **per l'apparato, la simulazione o la condizione indicati**. No
 | Asse | Codici |
 |---|---|
 | Evidenza (per affermazione) | **D** documentato nella fonte indicata · **I** inferenza con premesse esplicite · **M** mancante/non verificato. Una conclusione non diventa D solo perché compare in una consegna revisionata: si conserva la marcatura del rapporto d'origine |
-| Profondità della fonte | **TI** testo integrale · **SZ** sezioni dichiarate · **AB** solo abstract · **SN** snippet, metadati o fonte secondaria · **RP** rapporto/audit preesistente della repository, non rieseguito · **LC** controllo locale diretto eseguito nella consegna F1 · **F3** controllato durante il consolidamento iniziale · **M02** riportato dalle consegne della missione 02, con profondità originale e autore dei controlli espliciti |
+| Profondità della fonte | **TI** testo integrale · **SZ** sezioni dichiarate · **AB** solo abstract · **SN** snippet, metadati o fonte secondaria · **RP** rapporto/audit preesistente della repository, non rieseguito · **LC** controllo locale diretto eseguito nella consegna F1 · **F3** controllato durante il consolidamento iniziale · **M02/M04** riportato dalle consegne delle missioni 02/04, con profondità originale e autore dei controlli espliciti |
 | Natura del dato | **MIS** misura sperimentale · **NUM** campo numerico · **SIN** osservazione sintetica o proxy derivato da una simulazione |
 | Supporto spaziale | **Pt** punto · **Ln** linea · **Pl** piano (sezione) · **Pr** proiezione (integrale lungo la vista) · **Vol** volume |
 | Imperfezioni (da SCO §2) | **E** errore sul valore (casuale, bias, correlato) · **F** filtraggio spaziale/risoluzione finita · **R** risposta e integrazione temporale · **L** lacune (assenza di osservazione, rigetto, campo di vista, durata) |
-| Accesso (B) | **LOC-I** presente localmente e ispezionato · **LOC** presente localmente, contenuto non caratterizzato · **SCOUT-I** campione ispezionato dallo scout della 02, possesso sul computer di Enrico non verificato · **DICH** dichiarato dalla fonte, non posseduto · **RICH** disponibile su richiesta, non richiesto · **CIT** solo citato o visto in snippet · **NESS** nessuna evidenza nel perimetro consultato |
+| Accesso (B) | **LOC-I** presente localmente e ispezionato · **LOC** presente localmente, contenuto non caratterizzato · **SCOUT-I** campione ispezionato dagli scout delle missioni 02/04, possesso sul computer di Enrico non verificato · **DICH** dichiarato dalla fonte, non posseduto · **RICH** disponibile su richiesta, non richiesto · **CIT** solo citato o visto in snippet · **NESS** nessuna evidenza nel perimetro consultato |
 | Validazione (C) | **VN** numerica, contro simulazione · **VS** sperimentale, contro misura indipendente · **VST** statistica o integrata (PDF, medie, spettri) · **VC** coerenza con gli input o con un residuo fisico. Si indica sempre se il riferimento è lo **stesso stato simultaneo** o solo lo **stesso scenario** |
 
 ### Citazioni e identificativi
@@ -43,6 +43,7 @@ Le fonti locali dei rapporti hanno numerazioni indipendenti: `S01` di un rapport
 | `SCO` | [scouting/measurement_scouting.md](scouting/measurement_scouting.md) | `SCO:S04 §3.7`, `SCO A-001` |
 | `PIV1` | [Scheda Sciacchitano della 02](../02_virtual_piv/step1_sciacchitano.md) | Evidenze della review mediate dalla scheda approvata |
 | `PIVL` / `PIVD` | [Scouting letteratura / dataset della 02, versioni fissate](updates/piv_2026-11-26.md#1-fonti-e-profondità) | `PIVL:L37`, `PIVD:S2D-01` |
+| `TH1` / `THM` / `THD` | [Consegne termiche della 04, versioni fissate](updates/thermal_2026-11-27.md) | Pratica, modelli e dataset; THD:D01 ecc. |
 
 Gli ID originali delle righe sono conservati. Righe nuove, suddivise o accorpate usano `A-consolidation-NNN`, `B-consolidation-NNN`, `C-consolidation-NNN`; le corrispondenze sono in §5.
 
@@ -64,7 +65,7 @@ I quattro file sono stati importati dai commit indicati, senza mergiare le PR e 
 
 ## 2. Matrice A — misure e osservazioni
 
-29 righe in sette famiglie. Le righe A.7 sono **osservazioni sintetiche o proxy**, non diagnostiche sperimentali disponibili. Ogni riga rimanda alla scheda dettagliata tramite la fonte.
+33 righe in sette famiglie. Le righe A.7 sono **osservazioni sintetiche o proxy**, non diagnostiche sperimentali disponibili. Ogni riga rimanda alla scheda dettagliata tramite la fonte.
 
 Colonne comuni: **Grandezza e contesto** · **Tecnica → segnale** (con natura e componenti) · **Spazio** (supporto, copertura, risoluzione) · **Tempo** · **Errori e limiti** (tipo E/F/R/L) · **Disponibilità · fonte · evidenza**.
 
@@ -77,6 +78,13 @@ Colonne comuni: **Grandezza e contesto** · **Tecnica → segnale** (con natura 
 | A-measurements-scout-003 | T planare | Rayleigh planare / filtered Rayleigh: intensità ∝ densità × σ_eff → T. MIS | Pl | M | **E-bias** da σ_eff dipendente dalla composizione (I); numeri rimossi perché non attribuibili | Sola pista · SCO:S25 SN · I/M |
 | A-measurements-scout-004 | T planare; combustore modello per turbine a gas, pulsante, 1 atm | Two-line OH-PLIF, rapporto di due PLIF di OH. MIS | Pl, **solo dove c'è OH**: lacuna correlata con lo stato (L, I dal principio) | Media in fase | Accuratezza M | Titolo e sede D · SCO:S16 SN (metadati) · I/M |
 | A-jason-nie-001 | T del gas [K]; getti turbolenti non premiscelati di toluene con soot, bruciatore JHC di Adelaide (Re 10 000–15 000) | nTLAF a indio seminato: due ICCD (410/451 nm), T dal rapporto delle fluorescenze con calibrazione. MIS, scalare | Pl centrale; foglio 16 mm × ~0,25 mm; finestra usata 70 × 10 mm a 0,089 mm/px, poi filtro gaussiano 0,5 × 0,5 mm². Copertura legata alla presenza di indio: M | Scatto singolo; 1 Hz, imposto dalla sincronizzazione del sistema combinato; gate M | **E:** ±120 K come std delle immagini istantanee; non è detto se per pixel o per immagine, né se prima o dopo il filtro (M). Accuratezza della media legata alla calibrazione. Limiti dichiarati: interferenze soot/PAH, difficoltà a kHz | Sistema di laboratorio; dati su richiesta · NIE:S01 TI pp. 1–3 · D (valori), M (definizione dei ±120 K) |
+| A-TH-001 | T media del gas, HYLON Phase 2, swirl H₂/aria confinato, 1 atm | Doppia giunzione → estrapolazione a superficie nulla; MIS **già corretta**, non letture grezze | Traversate a sei quote; supporto dichiarato ±4 mm; esclusione del nucleo in parte di Flame A.1 | Solo medie; frequenza, durata e τ M | **E/F/L:** ±10% dichiarato per il metodo; gradienti e perturbazione della CRZ; lega e diametri M. TC/Raman/PIV in campagne separate: differenze non isolano il solo errore TC | Campioni letti dallo scout; fonte primaria mediata da THD:D01 §3.1/§4.4 e THM §3.6bis · M04 D/I/M |
+| A-TH-002 | T del gas, Delft jet-in-hot-coflow chiuso (flameless) | TC S inguainata Pt-10%, diametro esterno 3 mm, piastra al posto di una finestra; correzione convettiva/radiativa. MIS | Traversata radiale, media su un diametro di sonda; accesso da porte | Acquisizione 10 Hz, traversata 0,62 mm/s; dato pubblicato mediato, τ M | **E/F/R:** correzione con h da PIV **non reagente in altra condizione**; T parete non definita nelle parti lette. 10 Hz non dimostra banda termica 10 Hz | Configurazione documentale, nessun dataset digitale individuato · THM §3.3 TS · M04 D/M |
+| A-TH-003 | T media del gas nella zona di ricircolo esterna relativamente fredda, EM2C swirl CH₄/H₂ | TC K 1,5 mm attraverso barra che sostiene il quarzo; MIS, non corretta | Punti nella ORZ; posizioni precise M | Equilibrio dell'apparato dopo circa 45 min; non è τ della sonda. Simultaneità PIV M | **E:** errore radiativo dichiarato ≤5% per T<1200 K nel caso; non trasferibile al nucleo caldo. τ in situ M | Documento Mercier et al.; originale della TC non letto · THM §3.4 TS · M04 D/M |
+| A-TH-004 | **T della parete interna**, HYLON Phase 2 | Fosfori termografici LIP, decadimento di Mg₃.₅FGeO₅:Mn, calibrazione contro TC K; MIS, scalare di superficie | Punti su backplane, quarzo e metallo; non T gas | 50 Hz, media di 100 colpi per punto | Incertezza dichiarata 2,50%; campagne separate dalle altre diagnostiche. Può vincolare condizioni al contorno, non sostituire una misura gas | Profili letti dallo scout · THD:D01 §3.1 · M04 D |
+
+
+**Catena termica (04).** Lettura della giunzione e stima corretta del gas sono prodotti diversi. Lo scambio radiativo netto può dare scarti di entrambi i segni; inerzia, conduzione e protocollo non si riducono a rumore. Un primo ordine con τ costante è un'approssimazione da qualificare; frequenza di acquisizione e banda del sensore sono distinte. Gas, pareti, ingresso e scarico restano grandezze separate. [Fonti, profondità e limiti](updates/thermal_2026-11-27.md).
 
 ### A.2 Velocità
 
@@ -141,7 +149,7 @@ Colonne comuni: **Grandezza e contesto** · **Tecnica → segnale** (con natura 
 
 ## 3. Vista B — dataset e configurazioni
 
-22 righe. Dettagli in [data_inventory.md](data_inventory.md) (B-data-audit-…), nelle schede dei paper (B-jason-…) e nello scouting §7 (B-consolidation-…, non schede ispezionate). Le sette nuove righe B-PIV-S2D-… rimandano a PIVD (fonti fissate in §9), senza copiare i payload. **Una risorsa citata o un campione ispezionato da uno scout non è un dataset posseduto sul computer di Enrico.**
+27 righe. Dettagli in [data_inventory.md](data_inventory.md) (B-data-audit-…), nelle schede dei paper (B-jason-…) e nello scouting §7 (B-consolidation-…, non schede ispezionate). Le sette nuove righe B-PIV-S2D-… rimandano a PIVD (fonti fissate in §9), senza copiare i payload. **Una risorsa citata o un campione ispezionato da uno scout non è un dataset posseduto sul computer di Enrico.**
 
 | ID | Dataset/configurazione | Provenienza: natura · regime · trattamento | Variabili | Spazio e tempo | Struttura/formato | Accesso | Riferimenti utilizzabili · lacune principali | A/C |
 |---|---|---|---|---|---|---|---|---|
@@ -167,8 +175,14 @@ Colonne comuni: **Grandezza e contesto** · **Tecnica → segnale** (con natura 
 | B-PIV-S2D-05 | PIV Challenge | MIS/SIN secondo il caso | Immagini e istruzioni di benchmark | Configurazione da scegliere | Vari; istruzioni consultate | **DICH**, payload non ispezionati; truth sintetica su richiesta non ottenuta; licenza M | 0/1/2 = convenzione di sottomissione, non flag verificati nei dati rilasciati · PIVD:S2D-05 | A.2 |
 | B-PIV-S2D-11 | Yang et al. 2020, fiamma swirl | MIS; piani stereo-PIV traslati | u,v,w e vorticità | File 26×61×81; simultaneità, istantaneo/media e unità M | Un file Tecplot letto integralmente | **SCOUT-I**, CC BY 4.0 | Zeri non qualificati; non è dimostrato un volume istantaneo di riferimento; paper non letto · PIVD:S2D-11 | A.2 |
 | B-PIV-S2D-35 | DaRUS RQL, Jose/Geigle/Hampp | MIS, frammenti d'immagine da combustore fuligginoso; codice di segmentazione | Immagini di traccianti/soot, **nessun campo vettoriale** | Parametri di misura M | ZIP/PNG e codice, solo metadati API letti | **DICH**, guestbook non compilato; CC BY 4.0/MIT secondo record | Pista per fenomeni d'immagine, non per percentuali di rigetto vettoriale/UQ · PIVD:S2D-35 | A.2 |
+| B-TH-D01 | HYLON TNF Phase 2-1, gennaio 2026 | MIS; swirl confinato H₂/aria, Flame A.1/L.1 | TC estrapolata, Raman media/RMS, LIP pareti, PIV media/RMS, CAD | Traversate/profili, campagne separate; **non serie simultanee** | CSV/TXT, PDF, CAD, immagini | **SCOUT-I**; licenza riuso non esplicita, restrizione NO-LIF nel PDF | Layout/statistiche, non validazione istantanea PIV–T; diametri, lega e raw TC M · THD:D01 | A-TH-001/004; C-cons-007 |
+| B-TH-D02 | NIST RSE 2007 | MIS; compartimento d'incendio | TC nude/aspirate, pareti, velocità da sonde bidirezionali | Δt 30 s; coppie TC a stesse coordinate nominali, velocità sfalsate 9–10 cm | CSV, documentazione/FDS | **SCOUT-I** | Confronto fra strumenti, aspirata non assunta esatta; non dinamica rapida/PIV. Anomalia osservata non equivale a guasto dimostrato · THD:D02 | A.1; C-scout-001 |
+| B-TH-D04 | NIST Pool Fires/MaCFP | MIS e stime da modello; più fiamme di pozza | TC/TC_RMS misurati; TG/TG_RMS compensati | Profili medi/RMS gas; nessuna serie raw gas depositata nel materiale letto | 13 CSV campionati | **SCOUT-I** | Correzioni non riferimento indipendente; confronto diametri confuso da condizioni/traverse · THD:D04 | A-scout-001; C-scout-001 |
+| B-TH-D09 | Waterloo Methanol/MaCFP | MIS; pool fire | TC S 50 µm + LDA 2C, momenti congiunti velocità–T | Acquisizione simultanea 125 Hz, 40 000 campioni; **solo statistiche rilasciate** | CSV per quota; compositi con righe fuse | **SCOUT-I** | Compensazione inerziale già applicata; può confrontare statistiche congiunte, non stati istantanei · THD:D09 | C-scout-001; C-cons-007 |
+| B-TH-D06 | Katurji in-fire | MIS; configurazione diversa dal combustore swirl | Serie TC e NaN osservati | 50 Hz nel dataset descritto | Campioni ispezionati dallo scout | **SCOUT-I** | Variabilità fisica, inerzia e rumore non separati; non identifica da sola τ o rumore elettronico · THD:D06 | C-scout-001 |
 
-**Riferimenti e simultaneità: sintesi.** Neal aggiunge un riferimento sperimentale simultaneo di **velocità**, con supporto e incertezza propri (C-PIV-update-002). Fra le risorse censite, solo B-jason-nie-001 contiene un riferimento termico **sperimentale** simultaneo e co-localizzato con altre modalità, ed è disponibile solo su richiesta. I riferimenti numerici (B-data-audit-001, B-jason-liu-…) sono simultanei per costruzione, ma input e target provengono dallo stesso modello. Per RealPDEBench, LES e OH\* sperimentale condividono la condizione operativa, non l'istante.
+
+**Riferimenti e simultaneità: sintesi.** Neal aggiunge un riferimento sperimentale simultaneo di **velocità**, con supporto e incertezza propri (C-PIV-update-002). Fra le risorse censite, B-jason-nie-001 contiene un riferimento termico **sperimentale** simultaneo e co-localizzato con altre modalità, ed è disponibile solo su richiesta. Waterloo aggiunge statistiche congiunte da LDA–TC simultanee; HYLON profili termici e PIV di campagne separate; NIST RSE serie lente con velocità da sonde sfalsate. Non forniscono una nuova serie T–PIV simultanea e co-localizzata per validare la ricostruzione istantanea nel combustore swirl. I riferimenti numerici (B-data-audit-001, B-jason-liu-…) sono simultanei per costruzione, ma input e target provengono dallo stesso modello. Per RealPDEBench, LES e OH\* sperimentale condividono la condizione operativa, non l'istante.
 
 ---
 
@@ -237,6 +251,8 @@ Colonne comuni: **Grandezza e contesto** · **Tecnica → segnale** (con natura 
 - *Riferimento e validazione:* nel caso letto, propagazione degli errori e verifica del codice su una sinusoide e su FDS; nessuna termometria ottica simultanea. Possibili: VS con Rayleigh/CARS co-localizzati (non trovata); VN con sensore sintetico su DNS/LES.
 - *Mancante:* coppie sperimentali termocoppia–ottica; τ e ruolo della conduzione nelle condizioni di interesse (τ dipende da diametro, velocità e T).
 - *Collegamenti:* A-measurements-scout-001; C-cons-007; missione [04](../04_thermal_fusion/README.md).
+
+- *Aggiornamento 04:* THM §2 distingue bilancio non lineare e primo ordine approssimato; THD:D04 rilascia TG/TG_RMS da modello, quindi non ne valida indipendentemente la risposta. Waterloo (D09) offre statistiche congiunte da misure simultanee, non serie raw; Katurji (D06) serie con mancanti, ma non separa fisica e rumore. Il confronto resta da progettare nella 04.
 
 **C-consolidation-001 — HRR da proiezione di chemiluminescenza OH\*** *(da C-measurements-scout-002, osservazione OH\*)*
 - *Osservazioni durante l'uso:* immagini OH\* da una vista, con canale CO₂\* per il fondo; per la correzione di Lauer anche velocità PIV (strain).
@@ -310,6 +326,8 @@ Colonne comuni: **Grandezza e contesto** · **Tecnica → segnale** (con natura 
 - *Riferimento e validazione:* **VN** su LES.
 - *Mancante — aspetti temporali:* un sensore lento richiede sequenze di frame. Per le 22 traiettorie non-TEST con coordinate regolari l'associazione indice↔tempo è **accettata dal loader**, senza anomalie dimostrate, ma **non verificata in modo indipendente**: servono ipotesi dichiarate e controlli proporzionati all'uso (INV §9; §6.2). `40NH3_1.2` è esclusa dagli usi multi-frame dalla policy attuale; dichiararne la lacuna non risolve l'associazione né autorizza eccezioni. `t` dei 7 TEST non letto; τ realistico per il nostro combustore M.
 - *Collegamenti:* B-data-audit-001/005; A-scout-001; C-scout-001; missione [04](../04_thermal_fusion/README.md).
+
+- *Aggiornamento 04:* distinguere input grezzo di giunzione, T gas corretta e statistica pubblicata; parete/ingresso/scarico non sono T locali del gas. THM/THD documentano layout e supporti (HYLON, Delft, EM2C), ma nessun parametro universale o sensore scelto. I 0,5 s disponibili richiedono valutazione con τ, inizializzazione, transitorio e obiettivo; ambiente radiativo e perturbazione intrusiva non sono qualificati dalla sola slice. Validazione numerica, statistica o fra diagnostiche ancora da concordare; nuove risorse B-TH non danno riferimento istantaneo T–PIV nel nostro apparato.
 
 **C-consolidation-008 — HRR o statistiche termochimiche da OH\* sperimentale RealPDEBench**
 - *Osservazioni durante l'uso:* immagini OH\* sperimentali (A-cons-001), una per istante, per condizione operativa.
@@ -437,7 +455,7 @@ Le missioni indicate sono quelle che *potrebbero* approfondire il punto. Non son
 | Orientamento fisico, definizione e segno di Velocity[i/j/k], piano della sezione RealPDEBench | Interpretazione fisica di un modello PIV virtuale e del confronto con apparati reali | 01 / 02 (domande agli autori, via Enrico) |
 | Uso temporale delle traiettorie. Stato attuale: (a) 22 traiettorie non-TEST con coordinate regolari, associazione indice↔tempo **accettata dal loader** e nessuna anomalia dimostrata; (b) verifica indipendente dell'esportazione **non effettuata** per alcuna traiettoria: lacuna di verifica, non errore dimostrato; (c) `t` dei 7 TEST non letto; (d) duplicati di frame non controllati sulle altre 26 traiettorie; (e) `40NH3_1.2`: anomalia documentata, la policy attuale rifiuta il multi-frame; dichiararne la lacuna non risolve l'associazione né autorizza eccezioni | Un esperimento multi-frame (sensori lenti, forecasting) deve dichiarare l'ipotesi indice↔tempo e applicare controlli **proporzionati all'uso** (INV §9: regolarità di `t` sulla finestra impiegata, continuità dei soli frame usati, scala temporale del sensore rispetto a Δt = 0,25 ms). Il confronto con il raw HDF5 o con gli autori serve solo se l'esito dipende in modo decisivo dal tempo assoluto. Non è un prerequisito universale | 04, nel protocollo del proprio esperimento |
 | PIV: configurazione, risposta spaziale, correlazione, validità/sostituzione e bias in fiamma | Meccanismi e apparati documentati da PIV1/PIVL/PIVD, ora integrati (§9); non stabiliti parametri trasferibili alla LES o una percentuale qualificata di rigetti nello swirl reagente stabilizzato | 02: scegliere la configurazione; verifiche proporzionate sui candidati selezionati. Cardiff: codici/decoder; Neal: processamento MS e supporto HDR. Nessun operatore deciso qui |
-| τ e correzioni di termocoppie nelle condizioni del combustore | Modello di sensore lento | 04 |
+| τ, ambiente radiativo, stato iniziale e livello del dato termico | THM documenta forme e configurazioni; risposta in situ e parametri trasferibili alla LES non identificati. Dati già compensati non validano il modello che li produce | 04: specifica da discutere con provenienza dei parametri; [consegna intermedia integrata](updates/thermal_2026-11-27.md) |
 | Regime di miscelazione della LES (INV §7 C9) | Qualsiasi uso del legame T–φ locale | 01 (fonte primaria) |
 | Qualificazione del riferimento: ±120 K Nie non definiti; UQ per vettore non disponibile nei dati EngineBench/GTMC consultati; in PIVL:L37 esistono stime a posteriori ma statistica e copertura M; HDR Neal filtrato/interpolato | Una stima UQ pubblicata non è una mappa disponibile né un riferimento esatto; residuo misura–riferimento e errore di ricostruzione restano distinti | 02 / 05, secondo il confronto scelto |
 
@@ -504,3 +522,13 @@ Integrate la scheda approvata Sciacchitano e le due consegne di scouting revisio
 **Verifica e limiti dell'integrazione:** lettura dei rapporti e confronto dei passaggi trasferiti con le rispettive schede/registri; nessuna nuova lettura dei paper originali, decodifica, ispezione di campioni o verifica del disco locale. Le sette ispezioni di campioni riportate da PIVD appartengono allo scout. Questo aggiornamento non costituisce la verifica estesa dello step 3 della 02.
 
 **Stato delle decisioni:** scouting 02 concluso secondo Enrico; protocolli, configurazioni PIV e training da discutere nella missione 02. F5 attiva anche prima dei training e aggiornabile dopo nuovi risultati. F4 rinviata al confronto delle evidenze pertinenti delle altre missioni; attesa la consegna intermedia 04. Nessuna decisione di cambio di problema della tesi.
+
+---
+
+## 10. Aggiornamento intermedio 04 — 27 novembre 2026 (F5)
+
+Integrati TH1, modelli v2 `c2980d3` e dataset v2 `cf318f6`: [fonti fissate e sintesi critica](updates/thermal_2026-11-27.md). Quattro righe A e cinque B aggiunte; aggiornati due problemi C esistenti. Gli ID B-TH-Dxx conservano il numero Dxx del rapporto termico; A-TH-001…004 identificano configurazioni, senza rinumerare gli ID preesistenti.
+
+La consegna intermedia è ricevuta secondo Enrico; i documenti originali mantengono lo stato di proposte da discutere nella 04. Nessun parametro o scenario approvato da questa integrazione. I controlli sui campioni appartengono allo scout: nessun nuovo audit locale, download di payload, lettura di TEST o esperimento. Il tipo finale di validazione resta aperto.
+
+F5 prosegue con nuove evidenze e risultati; le consegne intermedie 02/04 sono entrambe integrate. Il confronto complessivo F4 si prepara con Enrico; scelta e implementazione delle osservazioni termiche restano nella 04, secondo la sua roadmap.

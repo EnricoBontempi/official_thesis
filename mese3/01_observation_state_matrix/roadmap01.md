@@ -2,7 +2,7 @@
 
 **Data:** 25 novembre 2026  
 **Missione:** `mese3/01_observation_state_matrix/`  
-**Stato:** roadmap discussa nella chat di missione; template A/B/C approvati e pubblicati in [templates_abc.md](templates_abc.md). Aggiornamento 26 novembre 2026: prompt del primo giro preparati, consegne degli agent ricevute e raccolta iniziale revisionata; integrazione F3 ([observation_state_matrix.md](observation_state_matrix.md)) revisionata dal coordinatore e accettata con Enrico il 26 novembre 2026; F3 conclusa. Missione non conclusa. Aggiornamento intermedio 02 integrato il 26 novembre 2026 (F5); F4 rinviata al confronto delle evidenze pertinenti delle altre missioni, in particolare 02/04.  
+**Stato:** roadmap discussa nella chat di missione; template A/B/C approvati e pubblicati in [templates_abc.md](templates_abc.md). Aggiornamento 26 novembre 2026: prompt del primo giro preparati, consegne degli agent ricevute e raccolta iniziale revisionata; integrazione F3 ([observation_state_matrix.md](observation_state_matrix.md)) revisionata dal coordinatore e accettata con Enrico il 26 novembre 2026; F3 conclusa. Missione non conclusa. Aggiornamenti intermedi 02 (26 novembre) e 04 (27 novembre 2026) integrati (F5); F4 rinviata al confronto delle evidenze pertinenti delle altre missioni, in particolare 02/04.  
 **Base organizzativa:** branch `plan/month3-missions`, struttura iniziale `d30ec497`.
 
 ## 1. Obiettivo
@@ -207,7 +207,8 @@ Una proposta alternativa può emergere anche fuori dal regime o dataset attuale;
 - [ ] F4: sintesi e discussione complessiva, rinviata alle evidenze pertinenti delle altre missioni; non blocca gli aggiornamenti intermedi.
 - [ ] F5: manutenzione incrementale attiva e continuativa, anche dopo i risultati degli esperimenti.
 - [x] F5 — 26 novembre 2026: integrata la consegna intermedia 02 (PIV1 e due scouting v2); [nota di integrazione](updates/piv_2026-11-26.md). Nessun esperimento o parametro PIV deciso.
-- [ ] F5 — Integrare la consegna intermedia 04 quando Enrico ne comunicherà la disponibilità.
+- [x] F5 — 27 novembre 2026: integrata la consegna intermedia 04; [fonti, sintesi e limiti](updates/thermal_2026-11-27.md). Specifica e training da discutere nella 04.
+- [ ] F5 — Integrare risultati o nuove evidenze delle missioni quando cambiano misure, problemi o validazione.
 
 ## Fonti di contesto già identificate
 

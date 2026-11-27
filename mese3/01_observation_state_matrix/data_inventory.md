@@ -1,6 +1,6 @@
 # Inventario dei dati — Observation–State Matrix (incarico `data-audit`)
 
-**Audit locale iniziale:** 25 novembre 2026; integrazione documentale PIV del 26 novembre in §10, senza nuovo controllo del disco.
+**Audit locale iniziale:** 25 novembre 2026; integrazione documentale PIV del 26 novembre in §10, senza nuovo controllo del disco. Integrazione termica del 27 novembre in §11.
 **Base dell'audit iniziale:** `plan/month3-missions` @ `30d11e0` · **Branch:** `matrix/f1-data-audit`
 **Roadmap:** [roadmap01.md](roadmap01.md) §4 · **Template:** [templates_abc.md](templates_abc.md) (scheda B e regole comuni)
 **Natura:** ricognizione documentale con controlli locali leggeri. Nessun training, inferenza, download, apertura di TEST; nessun dato, raw o codice modificato.
@@ -341,3 +341,18 @@ Lo scout censisce 35 candidati e apre campioni di sette (S2D-01/02/03/04/09/10/1
 **Aggiornamenti delle voci iniziali:** B-data-audit-006 EngineBench motored e la risorsa TCC fired restano distinte, senza nuovi payload ispezionati. La voce B-data-audit-009 non va più interpretata come assenza generale di dati a campi medi: ora esistono i campioni di medie PIV MRB (B-PIV-S2D-03), mentre non è stato aggiunto un archivio laminare utilizzabile. Le piste Johe/Ye/Cambridge Oxycoal restano nel rapporto della 02 con i rispettivi limiti di contenuto/accesso.
 
 La nuova disponibilità di un riferimento sperimentale di **velocità** (Neal) non fornisce validazione sperimentale della ricostruzione di **temperatura**. Per la tesi resta disponibile il riferimento numerico LES; nessuna nuova T sperimentale simultanea alla velocità è stata individuata fra le risorse qui integrate. Verifiche estese e scelta del modello PIV restano nella 02.
+
+---
+
+## 11. Consegna intermedia 04 — 27 novembre 2026
+
+[Nota di integrazione e fonti fissate](updates/thermal_2026-11-27.md). THD (`cf318f6`) documenta campioni di 16 dataset (85 file verificati dallo scout) fra 40 candidati; THM (`c2980d3`) confronta modelli e configurazioni. Nessuna nuova ispezione del disco di Enrico o di raw/TEST: **SCOUT-I non equivale a possesso locale**.
+
+Cinque nuove schede sintetiche sono nella [vista B della matrice](observation_state_matrix.md#3-vista-b--dataset-e-configurazioni), con numeri Dxx conservati dalla fonte:
+- **B-TH-D01 HYLON:** TC estrapolata, Raman, pareti LIP e PIV in campagne separate. Profili/statistiche, non serie congiunte istantanee; licenza non esplicita e restrizione NO-LIF nel PDF da rispettare.
+- **B-TH-D02 NIST RSE 2007:** serie lente (30 s), coppie TC nude/aspirate a coordinate nominali uguali; velocità da sonde sfalsate. Il confronto non dà verità esatta né dinamica rapida.
+- **B-TH-D04 NIST Pool Fires:** TC/TC_RMS misurati contro TG/TG_RMS da modello; nessuna validazione indipendente della compensazione.
+- **B-TH-D09 Waterloo:** LDA–TC simultanee, rilasciate solo statistiche congiunte già compensate.
+- **B-TH-D06 Katurji:** serie TC 50 Hz con NaN nel campione; non identifica separatamente risposta e rumore.
+
+L'affermazione storica sull'assenza di validazione sperimentale va riferita alla ricostruzione istantanea di T dai dati attuali: le nuove risorse ampliano i confronti su statistiche e diagnostiche, senza fornire un riferimento T–PIV simultaneo nel combustore della tesi. Dataset termici di letteratura PoliMi non equivalgono ai dati motore RANS/URANS richiesti: disponibilità di questi ultimi invariata.
