@@ -1,0 +1,9 @@
+family,checkpoint,role,pct_variance_train_regime_rows,pct_variance_eval_scenario_columns,pct_variance_remainder,mean_own_scenario_premium_K,own_scenario_premium_K_N1,own_scenario_premium_K_N2,own_scenario_premium_K_G1,own_scenario_premium_K_G1-eq,own_scenario_premium_K_N1G1
+adapted_glu,best,seen_train_eval,88.805,5.667,5.528,1.283,-0.325,2.228,2.298,0.161,2.053
+adapted_glu,best,val_eval,66.588,17.301,16.111,0.899,-0.374,2.244,1.294,0.013,1.317
+adapted_glu,last,seen_train_eval,48.362,27.766,23.872,1.412,-0.346,2.066,2.802,0.235,2.304
+adapted_glu,last,val_eval,76.417,13.647,9.935,1.038,-0.602,2.006,1.982,0.163,1.641
+sparse_unet,best,seen_train_eval,52.013,24.924,23.063,1.266,0.188,1.008,2.506,-0.311,2.941
+sparse_unet,best,val_eval,81.635,8.730,9.634,0.662,0.169,0.821,1.339,-0.443,1.422
+sparse_unet,last,seen_train_eval,30.887,64.073,5.041,0.927,-1.083,0.401,2.830,-0.689,3.174
+sparse_unet,last,val_eval,81.500,17.729,0.771,0.486,-0.855,0.340,1.545,-0.256,1.655

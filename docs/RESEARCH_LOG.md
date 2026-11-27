@@ -711,3 +711,16 @@ Paper identificati dagli screenshot condivisi: Nie et al., *Combustion and Flame
 **Limiti e mancanze.** I campi spaziali delle baseline sono a frame 0 (VAL) e 1600 (seen), quelli degli specialisti a frame 1000: nessun pannello appaiato è stato disegnato; completarli richiederebbe una nuova inferenza non autorizzata. Dispersione fra seed non è incertezza fisica calibrata.
 
 **Non fatto.** Nessun training, nessuna nuova valutazione, nessun accesso al TEST, nessuna modifica di protocollo, soglie, selezione, baseline o metriche. Pacchetto numerico e figure restano nei percorsi canonici sul cluster; nel repository solo tabelle aggregate, figure di riepilogo e manifest ([results/nonideal/specialists/](../results/nonideal/specialists/)). Branch `nonideal/specialist-results`, senza merge.
+
+---
+
+## 2026-11-27 — Chiusura dello studio sulle degradazioni: rapporto a due livelli, dati completi e rendiconto computazionale
+
+**Cosa è stato fatto.** Il report [docs/nonideal/05_specialist_results.md](nonideal/05_specialist_results.md) è stato riscritto (non duplicato) in due livelli: Parte 1 per le persone (input e target, scenari, esperimenti dei Blocchi II e III e scopo di ogni confronto, figure A–E con didascalie e segno esplicito, limiti, implicazioni per la missione 02) e Parte 2, un'appendice tecnica per un altro agente (dati, split, operatori, seed, architetture, ricetta, selezione, budget, ledger e job, test e gate, metriche, risultati alle granularità disponibili, SHA e hash, ambiente, problemi e correzioni). Aggiunto il rendiconto computazionale ricostruito da `sacct -D` e dai ledger: 210,1 GPU-ore totali, di cui 200,7 per i training (23 640 epoche, 2 245 800 aggiornamenti, 34 preemption); distinti misura, stima e informazione non disponibile (nessuna latenza d'inferenza valida). Dati completi pubblicati: `per_condition` e `macro_by_replica` (gzip senza perdita), tabella delle diagnostiche (bias, centered-RMSE, regioni, picco, IoU), tabelle di lettura e accounting; archivi per frame e schede grafiche in una release tecnica non-latest (`nonideal-specialists-data-v1`) con checksum.
+
+**Livelli distinti.** Campagna numerica: verificata. Grafici: disponibili. Rapporto: consegnato. Lacune residue: pannelli appaiati baseline–specialista (frame 0/1600 contro 1000, nuova inferenza non autorizzata); latenza d'inferenza non misurata; batching GLU come confondente noto.
+
+**Osservazione quantitativa aggiunta.** Nelle matrici dei guadagni medi, su VAL (best), il regime di training (riga) spiega il 67–82 % della variabilità fra le 30 celle e lo scenario valutato (colonna) il 9–17 %; su seen la U-Net con last fa eccezione. È una scomposizione descrittiva, non un test.
+
+**Non fatto.** Nessun training, inferenza, benchmark o accesso a TEST; nessuna modifica di protocollo, selezione, soglie, baseline o metriche; nessun merge; `documents_thesis` e le altre missioni non toccati.
+

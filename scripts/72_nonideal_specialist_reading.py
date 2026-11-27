@@ -46,6 +46,19 @@ def main() -> None:
     # baseline deterioration per cell (original models, same observations): the size of the problem the specialists address
     b = d.drop_duplicates(["family", "model_seed", "cell", "role"]).groupby(["family", "role", "cell"])["baseline_deterioration_K"].mean().reset_index()
     b.to_csv(a.out / "baseline_deterioration.csv", index=False, float_format="%.4f")
+    # descriptive decomposition of the 5x6 matrix of mean gains (train regime x eval scenario): sums of squares of row means,
+    # column means and the remainder. It describes the 30 numbers; it is not a significance test.
+    import numpy as np
+    dec = []
+    for (fam, ck, ro), g in t.groupby(["family", "checkpoint_kind", "role"]):
+        M = np.array([[g[(g.train_regime == r) & (g.cell == c)]["mean"].iloc[0] for c in CELLS] for r in REG])
+        gm = M.mean(); row = M.mean(1) - gm; col = M.mean(0) - gm
+        ssr, ssc, sst = 6 * (row ** 2).sum(), 5 * (col ** 2).sum(), ((M - gm) ** 2).sum()
+        prem = [M[i, CELLS.index(r)] - np.mean([M[i, k] for k in range(6) if k != CELLS.index(r)]) for i, r in enumerate(REG)]
+        dec.append({"family": fam, "checkpoint": ck, "role": ro, "pct_variance_train_regime_rows": 100 * ssr / sst, "pct_variance_eval_scenario_columns": 100 * ssc / sst,
+                    "pct_variance_remainder": 100 * (sst - ssr - ssc) / sst, "mean_own_scenario_premium_K": float(np.mean(prem)),
+                    **{f"own_scenario_premium_K_{r}": float(v) for r, v in zip(REG, prem)}})
+    pd.DataFrame(dec).to_csv(a.out / "transfer_row_vs_column_decomposition.csv", index=False, float_format="%.3f")
     print("wrote", sorted(p.name for p in a.out.iterdir()))
 
 
