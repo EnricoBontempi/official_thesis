@@ -612,3 +612,93 @@ Roadmap A/B/C (`plan/abc-preparatory-studies` @ `9d2c3af`) **sospese, non cancel
 **Matrice dei 30 specialisti p_on.** Autorizzata e affidata a Sonnet per preparazione e sottomissione. Questa voce non ne dichiara submission, esecuzione o completamento.
 
 **Non fatto qui.** Nessun training, nessun job, nessun forward, nessun TEST, nessuna modifica di specifiche, dati o risultati del pacchetto, nessuna modifica di `documents_thesis`, nessuna riattivazione di A/B/C.
+
+---
+
+
+---
+
+## 2026-11-25 — Indicazioni dei supervisori e organizzazione delle missioni del Mese 3
+
+### Contesto e stato dello studio in corso
+
+Enrico ha condiviso i messaggi di Linzheng e Jason e ha approvato una struttura di missioni separate, ciascuna da discutere in una propria chat di brainstorming. La conversazione principale resta il quartier generale per priorità, decisioni scientifiche e coordinamento. È approvata la struttura descrittiva; **non sono ancora approvate le nuove roadmap operative né nuove campagne**.
+
+Secondo la ricognizione SSH riportata da Enrico alle circa 17:10 del 25 novembre: 14 dei 30 specialisti conclusi per plateau, 4 in esecuzione, 12 pending dopo preemption, nessun fallimento tecnico. Il presente aggiornamento documentale non è una nuova verifica del cluster e non dichiara conclusi training, valutazioni, grafici o pacchetto. Rimangono i limiti già documentati, inclusa la differenza di batching GLU tra specialisti e originali. La chiusura dello studio aggiuntivo sulle degradazioni sarà distinta dalla consegna precedente del Mese 2.
+
+### Indicazioni di Linzheng (messaggio riportato da Enrico)
+
+> Thanks for the update and for discussing the possible directions with your PoliMi advisor. I also find the two CNF papers from Jason very useful, as they demonstrate how meaningful ML research can emerge from actual measurement limitations and diagnostic needs, using either experimental or simulation-based data. You can read them carefully.
+>
+> I suggest that we continue with our current turbulent combustion reconstruction problem for now. We should still explore what engine data are available from PoliMi, including RANS/URANS, but there is no need to change the thesis direction before identifying a concrete and feasible engine problem.
+> Given your progress with sparse reconstruction, we are now ready to move beyond the initial learning and benchmarking stage and focus on application-driven methodological research. I see three connected stages:
+>
+> 1. Measurement-aware reconstruction and uncertainty quantification. Start by developing a simplified virtual PIV observation model inspired by EngineBench, accounting for measurement layouts, spatial resolution, missing regions and measurement uncertainty.Please read Sciacchitano’s 2019 review (https://iopscience.iop.org/article/10.1088/1361-6501/ab1db8) on PIV uncertainty quantification to understand how actual PIV measurements differ from ideal numerical point observations. Evaluate our existing U-Net and GLU models under these conditions.We can also explore DMF-Gen (https://doi.org/10.48550/arXiv.2610.34709, see code: https://github.com/cosmos2w/DMF-Gen) for generative reconstruction and uncertainty quantification, particularly when the available observations cannot uniquely determine the hidden state.
+>
+> 2. Multi-timescale measurement fusion. Investigate whether fast velocity measurements and slower, spatially limited thermal measurements can provide complementary information.
+> Your existing results on RealPDEBench suggest that velocity contains substantial information about instantaneous spatial structures, while sparse temperatures can help correct the overall thermal level.
+> We can build on the current U-Net/GLU models and investigate a simple thermal-state correction mechanism that accounts for realistic sensor locations, response times and measurement uncertainty.
+>
+> 3. Reconstruction from indirect optical observations. Explore how OH* chemiluminescence, PLIF and other optical diagnostics could constrain hidden thermochemical states.
+> RealPDEBench already provides an interesting starting point, although we need to understand the differences between the numerical fields, synthetic optical signals and actual measurements. The reconstruction targets do not necessarily need to be limited to the full instantaneous temperature field.
+>
+> Over the next month, I would like you to actively work on the first two stages, and do the literature investigation for the third. In parallel, please develop an Observation–State Matrix for turbulent combustion diagnostics, summarizing what can actually be measured, the characteristics and limitations of these measurements, what physical states we would like to recover, and how the reconstruction can be validated.
+> I also think a scientific discussion with Franzelli could be valuable, particularly for understanding realistic optical diagnostics and identifying meaningful reconstruction problems. We can discuss this with Prof. Deng before reaching out.
+
+### Indicazioni di Jason (messaggio riportato da Enrico)
+
+> Here are two papers in Combustion and Flame that are two different flavors of domain problems that people care about. The first one is a paper on experimental data/diagnostics similar to the other paper I sent. Realistically we can easily measure one modality spatially but it’s much harder to measure another so we try to infer the other one (in this case temperature). The second paper uses simulation and synthetic data that mimics the planar measurements that you would get experimentally and then tries to reconstruct the flame in 3-D (a tomography problem). These are both examples of domain problems that are feasible. So here if we want to do IC engines still, the goal here is to think about what we can do with the data available before we get too ahead of ourselves. With the RANS data, how much of it is available? What does it contain? In my opinion, it’s always nicer to have some experimental data like measurements but my ammonia DT paper was done completely with RANS/URANS data.
+
+Paper identificati dagli screenshot condivisi: Nie et al., *Combustion and Flame* 259 (2024) 113182, DOI 10.1016/j.combustflame.2023.113182; Liu et al., *Combustion and Flame* 281 (2025) 114454, DOI 10.1016/j.combustflame.2025.114454. La distinzione tra ricostruzione da piani e da proiezioni ottiche andrà mantenuta nella ricognizione.
+
+### Decisioni organizzative approvate da Enrico
+
+- Creare [mese3/README.md](../mese3/README.md) come indice descrittivo e sei sottocartelle: chiusura studio degradazioni; Observation–State Matrix; PIV virtuale; DMF-Gen; fusione termica; diagnostiche ottiche.
+- Ogni sottocartella contiene per ora soltanto il proprio README descrittivo. La roadmap specifica sarà costruita nella rispettiva chat, con discussione di obiettivi, dipendenze e verifiche prima dell’esecuzione.
+- Nessuna roadmap generale duplicata: l’indice coordina le missioni; le future roadmap saranno locali alle missioni.
+- La matrice nasce come versione iniziale e viene alimentata dalle ricognizioni. Non è un prerequisito da completare integralmente prima delle letture parallele.
+- Proseguire sulla combustione turbolenta; esplorare disponibilità e contenuto dei dati motore in parallelo, senza cambiare applicazione prima di un problema fattibile.
+- La campagna attuale resta uno studio sintetico preliminare: i suoi scenari non sono già una validazione PIV sperimentale qualificata.
+- Trattare DMF-Gen come candidato da studiare, non come sostituzione già decisa delle reti; distinguere accuratezza, incertezza della ricostruzione e dispersione tra seed.
+- Prima della fusione termica, verificare fattibilità temporale e vincoli delle misure. Nessun numero o posizionamento universale di termocoppie è stato fissato. Le idee di contrastive learning/fusione delle feature restano opzioni da valutare.
+- Per l’ottica, per ora ricognizione bibliografica. L’eventuale coinvolgimento di Franzelli va discusso con Deng prima del contatto; nessun contatto è stato effettuato in questa attività.
+- Le vecchie roadmap A/B/C restano sospese. TEST non viene aperto. Report dei supervisori, codice e checkout della campagna non vengono modificati.
+
+**Attività effettuata:** sola organizzazione documentale e aggiornamento del diario. Nessun job, training, inferenza, download di dataset o nuova esecuzione scientifica.
+
+---
+
+## 2026-11-25 — Missione 02: step 1 Sciacchitano completato e approvato
+
+**Decisione di Enrico (America/New_York).** Approvata la scheda integrata dello step 1 e autorizzata la pubblicazione su `plan/month3-missions`. Consegna: [mese3/02_virtual_piv/step1_sciacchitano.md](../mese3/02_virtual_piv/step1_sciacchitano.md); [roadmap 02](../mese3/02_virtual_piv/roadmap02.md) e README locale aggiornati.
+
+**Attività e contenuto.** Letto il PDF integrale di Sciacchitano (2019), DOI 10.1088/1361-6501/ab1db8. Confrontate la lettura del coordinatore e le schede indipendenti di Opus e Neon fornite da Enrico; controllati sul PDF i passaggi decisivi. Le tre letture condividono la stessa fonte e non costituiscono tre verifiche sperimentali. La scheda contiene evidenze con sezioni/pagine, implicazioni per la LES, limiti dello studio sintetico precedente, requisiti dei dataset e domande per i due scouting. Chiarite in particolare la distinzione fra risoluzione e passo, valori misurati/validati/sostituiti, incertezza per vettore e correlazione degli errori; il risultato su overlap riguarda rho(2h) nel caso citato, non indipendenza generale. Segnalate anomalie di notazione della review senza correggerle implicitamente. Specificità della combustione e parametri del modello virtuale restano da qualificare negli step successivi.
+
+**Prossimo passo e perimetro.** Preparare nella chat i prompt per scouting dataset e scouting letteratura, avviabili in parallelo dopo l'assegnazione. Nessun nuovo scout avviato, nessun download di dataset sperimentali, implementazione di operatori, training, inferenza, accesso a TEST o intervento sulla campagna dei 30 specialisti. L'audit RealPDEBench e l'Observation–State Matrix restano condivisi con la missione 01.
+
+
+---
+
+## 2026-11-26 — Missione 01: integrazione intermedia dello scouting PIV (02)
+
+**Decisione di Enrico.** Aggiornare ora l'Observation–State Matrix con la consegna intermedia della missione 02, prima di scegliere gli esperimenti; seguirà la consegna intermedia 04. F3 accettata e già integrata tramite PR #4. F5 attiva come manutenzione incrementale; F4 rinviata al confronto delle evidenze pertinenti delle altre missioni.
+
+**Fonti fissate.** Scheda Sciacchitano approvata sulla base `a894257497de1524566186c22b66e02bd7b7b8ee`; scouting dataset `piv/step2-dataset-scouting` @ `ee9948e227f0d9272ae064cc8601c5e5399c28b4`; scouting letteratura `piv/step2-literature-scouting` @ `2cbf5abd5fd44f8cb6f82c0be933f61e7340ddc5`. Fonti e limiti nella [nota di integrazione](../mese3/01_observation_state_matrix/updates/piv_2026-11-26.md); branch di scouting non mergiati da questa attività.
+
+**Risultato documentale.** Aggiornata la [matrice](../mese3/01_observation_state_matrix/observation_state_matrix.md): 29 righe A, 22 B, 20 C. Distinti passo/risposta spaziale, errore/correlazione, copertura/rigetto/sostituzione e misura/riferimento. Aggiunti casi PIV in combustione a 5 bar e con olio nel flashback, senza trasferirne i parametri alla LES. Sette righe dataset selezionate dai 35 candidati; due problemi di qualificazione Cardiff/Neal, non esperimenti approvati. Aggiornati inventario, README e roadmap01.
+
+**Qualificazione delle evidenze.** Le sette ispezioni di campioni riportate dallo scout non sono nuovi dati attestati sul computer di Enrico né la verifica estesa dello step 3 della 02. Cardiff: PIV isoterma, codici/decoder da verificare; Neal: riferimento simultaneo di velocità con correlazione su cinque coppie e interpolazione, non verità puntuale istantanea. Nessun nuovo riferimento sperimentale T simultaneo alla velocità. RealPDEBench fluidi è separato dalla LES combustion; tempi, geometria e policy di quest'ultima invariati.
+
+**Perimetro.** Sola integrazione documentale delle consegne; nessuna nuova lettura dei paper originali, ispezione di raw/TEST, download di dati, implementazione, esperimento o training. Nessuna modifica alle missioni 02/04 o agli altri filoni. Configurazione PIV e protocolli ancora da discutere con Enrico nella 02.
+
+---
+
+## 2026-11-27 — Missione 01: integrazione intermedia delle misure termiche (04)
+
+**Autorizzazione:** Enrico comunica completata la consegna intermedia 04 e richiede l'aggiornamento della Matrix. Fonti: pratica sperimentale ereditata dalla v2 dello step 1; modelli `mission04/step2-measurement-models` @ `c2980d3fdf66e1f43a54bbf7f12068d1a75214c6`; dataset `mission04/step2-thermal-datasets` @ `cf318f611d12cd4f151edd4f0e1578d1ea4f4114`. I rapporti restano proposte da discutere, non specifiche approvate.
+
+**Consegna:** [nota di integrazione](../mese3/01_observation_state_matrix/updates/thermal_2026-11-27.md); [matrice](../mese3/01_observation_state_matrix/observation_state_matrix.md) aggiornata a 33 A, 27 B, 20 C. Aggiunte configurazioni HYLON TC/LIP, Delft JHC ed EM2C; cinque dataset selezionati e aggiornati i problemi su sensori lenti e fusione.
+
+**Evidenze e limiti:** lettura della giunzione distinta dalla stima del gas; segno radiativo dipendente dall'ambiente; primo ordine costante come approssimazione; campionamento distinto dalla risposta termica. HYLON ha campagne separate, Waterloo statistiche congiunte LDA–TC simultanee; TG/TG_RMS NIST sono uscite di modello, non sua validazione indipendente. Nel materiale cercato e ispezionato manca un riferimento aperto T gas–PIV simultaneo nello swirl confinato. Nessun giudizio universale sulla sufficienza dei 0,5 s LES: dipende da risposta, inizializzazione e obiettivo.
+
+**Perimetro:** integrazione basata sui rapporti, controlli di campioni attribuiti agli scout; nessuna nuova lettura dei paper, verifica raw/TEST, download, esperimento o training. Nessuna modifica ai branch o ai file della 04/02. F5 attiva, consegne intermedie 02/04 integrate; specifica termica e decisioni sperimentali restano nella 04 secondo roadmap.
