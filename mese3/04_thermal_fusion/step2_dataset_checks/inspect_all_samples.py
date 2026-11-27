@@ -209,13 +209,41 @@ def inspect_nist_rse_2007(samples: Path) -> dict[str, Any]:
                 "min": r4(np.min(vf)) if vf.size else None,
                 "max": r4(np.max(vf)) if vf.size else None,
             }
-        res[fn] = {
+        entry: dict[str, Any] = {
             "n_cols": len(hdr),
             "time": check_time_vector(t),
             "nan_columns": nan_cols,
             "bare_vs_aspirated_pairs": pair_stats,
             "velocity_columns": vel_summary,
         }
+        if fn == "NIST_RSE_2007_12.csv":
+            ta_l = arr[:, idx["TD70LA"]]
+            tb_l = arr[:, idx["TD70LBB"]]
+            w_pre = (t > 0.0) & (t <= 1440.0)
+            w_anom = (t >= 1800.0) & (t <= 4080.0)
+            w_cool = t >= 4560.0
+            entry["td70lbb_observed_anomaly_summary"] = {
+                "status": "observed_unflagged_anomaly_not_confirmed_in_fds_guide",
+                "t_30_to_1440s_dT_min_max_K": [r4(np.min(tb_l[w_pre] - ta_l[w_pre])), r4(np.max(tb_l[w_pre] - ta_l[w_pre]))],
+                "t_1800_to_4080s_TD70LA_min_max_C": [r4(np.min(ta_l[w_anom])), r4(np.max(ta_l[w_anom]))],
+                "t_1800_to_4080s_TD70LBB_min_max_C": [r4(np.min(tb_l[w_anom])), r4(np.max(tb_l[w_anom]))],
+                "t_1800_to_4080s_dT_min_K": r4(np.min(tb_l[w_anom] - ta_l[w_anom])),
+                "t_ge_4560s_TD70LA_end_C": r4(ta_l[-1]),
+                "t_ge_4560s_TD70LBB_end_C": r4(tb_l[-1]),
+                "t_ge_4560s_dT_min_max_K": [r4(np.min(tb_l[w_cool] - ta_l[w_cool])), r4(np.max(tb_l[w_cool] - ta_l[w_cool]))],
+            }
+        res[fn] = entry
+    res["_comparability_metadata_from_fds_inputs"] = {
+        "source_files_verified": ["Validation/NIST_RSE_2007/FDS_Input_Files/RSE_01.fds", "RSE_12.fds"],
+        "doorway_tc_pairs_nominal_xyz_m": {
+            "TD70LA_TD70LBB": [-0.05, 0.32, 0.70],
+            "TD70CA_TD70CBB": [-0.05, 0.48, 0.70],
+            "TD50CA_TD50CBB": [-0.05, 0.48, 0.50],
+            "TD30LA_TD30LBB": [-0.05, 0.32, 0.30],
+            "TD30CA_TD30CBB": [-0.05, 0.48, 0.30],
+        },
+        "doorway_velocity_probes_note": "VD* probes lie on the same doorway plane X=-0.05 m at Z=0.05, 0.20, 0.40, 0.60, 0.79 m (vertically staggered by 9-10 cm relative to TC pairs at Z=0.30, 0.50, 0.70 m).",
+    }
     return res
 
 
@@ -324,6 +352,9 @@ def inspect_nist_pool_fires(samples: Path) -> dict[str, Any]:
     bead_map = {
         "Propane_37_cm_50_kW_TC_r=0_cm_Sung_2024.csv": "39 um",
         "Methanol_30_cm_TC_r=0_cm_Sung_2024.csv": "52 um",
+        "Methanol_30_cm_TC_z=41_cm_Sung_2024.csv": "150 um",
+        "Methanol_30_cm_TC_z=51_cm_Sung_2024.csv": "150 um",
+        "Methanol_30_cm_TC_z=61_cm_Sung_2024.csv": "150 um",
         "Methane_37_cm_TC_r=0_cm_Sung_2024.csv": "52 um & 119 um",
         "Ethanol_30_cm_TC_r=0_cm_Sung_2024.csv": "125 um & 199 um",
         "Methanol_100_cm_TC_r=0_cm_Sung_2021.csv": "153 um",
@@ -331,7 +362,15 @@ def inspect_nist_pool_fires(samples: Path) -> dict[str, Any]:
         "Methanol_100_cm_TC_z=61_cm_Sung_2021.csv": "153 um",
         "Methanol_100_cm_TC_z=101_cm_Sung_2021.csv": "153 um",
     }
-    res: dict[str, Any] = {"profiles": {}}
+    res: dict[str, Any] = {
+        "_epistemic_note": (
+            "TG and TG_RMS are model-corrected gas temperatures estimated by NIST from bare-bead Type-S TC readings "
+            "(not independent optical references). Comparisons across different fuels, burner diameters (30/37/100 cm), "
+            "and heights mix flow/flame conditions with bead diameter; only Methanol 30 cm at (r=0, z=41/51/61 cm) "
+            "provides overlapping nominal positions with two bead diameters (52 um vs 150 um) in separate traverses."
+        ),
+        "profiles": {},
+    }
     for fn, bead_desc in bead_map.items():
         p = d / fn
         with open(p, newline="", encoding="utf-8") as f:
@@ -423,6 +462,52 @@ def inspect_nist_pool_fires(samples: Path) -> dict[str, Any]:
             info["by_bead_diameter"] = by_bead
         res["profiles"][fn] = info
 
+    # Same-flame overlapping position check: Methanol 30 cm at r=0, z=41, 51, 61 cm (52 um centerline vs 150 um radial)
+    m30_cl_rows = {}
+    with open(d / "Methanol_30_cm_TC_r=0_cm_Sung_2024.csv", newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            m30_cl_rows[int(float(row["z_cm"]))] = {k: float(v) for k, v in row.items()}
+    same_flame_overlap = []
+    for z_cm in (41, 51, 61):
+        rad_p = d / f"Methanol_30_cm_TC_z={z_cm}_cm_Sung_2024.csv"
+        if rad_p.exists() and z_cm in m30_cl_rows:
+            r0_row = None
+            with open(rad_p, newline="", encoding="utf-8") as f:
+                for row in csv.DictReader(f):
+                    if abs(float(row["r_cm"])) < 1e-6:
+                        r0_row = {k: float(v) for k, v in row.items()}
+                        break
+            if r0_row is not None:
+                c52 = m30_cl_rows[z_cm]
+                same_flame_overlap.append({
+                    "flame": "Methanol 30 cm",
+                    "z_cm": z_cm,
+                    "r_cm": 0,
+                    "bead_52um": {
+                        "TC_K": c52["TC_K"],
+                        "TC_RMS_K": c52["TC_RMS_K"],
+                        "TG_K_model": c52["TG_K"],
+                        "TG_RMS_K_model": c52["TG_RMS_K"],
+                        "Uc_TG_K": c52["Uc_TG_K"],
+                        "TG_minus_TC_K": r4(c52["TG_K"] - c52["TC_K"]),
+                        "TG_RMS_over_TC_RMS": r4(c52["TG_RMS_K"] / c52["TC_RMS_K"]),
+                    },
+                    "bead_150um": {
+                        "TC_K": r0_row["TC_K"],
+                        "TC_RMS_K": r0_row["TC_RMS_K"],
+                        "TG_K_model": r0_row["TG_K"],
+                        "TG_RMS_K_model": r0_row["TG_RMS_K"],
+                        "Uc_TG_K": r0_row["Uc_TG_K"],
+                        "TG_minus_TC_K": r4(r0_row["TG_K"] - r0_row["TC_K"]),
+                        "TG_RMS_over_TC_RMS": r4(r0_row["TG_RMS_K"] / r0_row["TC_RMS_K"]),
+                    },
+                    "run_to_run_TC_150_minus_52_K": r4(r0_row["TC_K"] - c52["TC_K"]),
+                    "measured_TC_RMS_150_minus_52_K": r4(r0_row["TC_RMS_K"] - c52["TC_RMS_K"]),
+                    "measured_TC_RMS_ratio_150_over_52": r4(r0_row["TC_RMS_K"] / c52["TC_RMS_K"]),
+                    "model_TG_RMS_150_minus_52_K": r4(r0_row["TG_RMS_K"] - c52["TG_RMS_K"]),
+                })
+    res["same_flame_overlap_methanol_30cm_r0_52um_vs_150um"] = same_flame_overlap
+
     # Also check Acetone liquid-phase time series (1-row header!)
     with open(d / "Acetone_30_cm_TC_Sung_2024.csv", newline="", encoding="utf-8") as f:
         ac_rows = list(csv.reader(f))
@@ -456,9 +541,9 @@ def inspect_hylon_phase2(samples: Path) -> dict[str, Any]:
     zp = samples / "tnf_hylon_phase2" / "HYLON_TNF_2026_01_Phase2-1.zip"
     res: dict[str, Any] = {"flames": {}}
 
-    def parse_semicolon_csv(raw_bytes: bytes) -> tuple[list[str], np.ndarray]:
+    def parse_delim_csv(raw_bytes: bytes) -> tuple[list[str], list[str], np.ndarray]:
         lines = [l.strip() for l in raw_bytes.decode("utf-8", errors="replace").splitlines() if l.strip()]
-        # Skip leading # comments
+        comments = [l for l in lines if l.startswith("#")]
         data_lines = [l for l in lines if not l.startswith("#")]
         delim = ";" if ";" in data_lines[0] else ","
         hdr = [h.strip() for h in data_lines[0].split(delim) if h.strip() != ""]
@@ -468,11 +553,12 @@ def inspect_hylon_phase2(samples: Path) -> dict[str, Any]:
             vals = []
             for j in range(len(hdr)):
                 try:
-                    vals.append(float(parts[j].replace(",", ".")) if j < len(parts) and parts[j] != "" else float("nan"))
+                    token = parts[j].replace(",", ".") if delim == ";" else parts[j]
+                    vals.append(float(token) if j < len(parts) and parts[j] != "" else float("nan"))
                 except ValueError:
                     vals.append(float("nan"))
             rows.append(vals)
-        return hdr, np.asarray(rows, dtype=np.float64)
+        return comments, hdr, np.asarray(rows, dtype=np.float64)
 
     def parse_wall_txt(raw_bytes: bytes) -> dict[str, Any]:
         lines = [l.strip() for l in raw_bytes.decode("utf-8", errors="replace").splitlines() if l.strip() and not l.startswith("#")]
@@ -514,57 +600,93 @@ def inspect_hylon_phase2(samples: Path) -> dict[str, Any]:
                 m = re.search(r"z\+([0-9.]+)\.csv$", rf)
                 if m:
                     z_mm = round(float(m.group(1)) * 1000.0, 2)
-                    rh, rarr = parse_semicolon_csv(z.read(rf))
+                    rcmt, rh, rarr = parse_delim_csv(z.read(rf))
                     ridx = {h: i for i, h in enumerate(rh)}
-                    raman_by_z[z_mm] = (rh, rarr, ridx)
+                    raman_by_z[z_mm] = (rcmt, rh, rarr, ridx)
 
             tc_summary = {}
             overlap_comparisons = []
             replicate_diffs = []
+            tc_header_flow_lines = set()
             for tf in tc_files:
                 m = re.search(r"z\+([0-9.]+)\.csv$", tf)
                 z_mm = round(float(m.group(1)) * 1000.0, 2) if m else None
-                th, tarr = parse_semicolon_csv(z.read(tf))
+                tcmt, th, tarr = parse_delim_csv(z.read(tf))
+                for cl in tcmt:
+                    if "m_a" in cl:
+                        tc_header_flow_lines.add(cl.rstrip("; "))
                 # columns: x; T; error_T; error_x
                 x = tarr[:, 0]
                 T = tarr[:, 1]
                 err_T = tarr[:, 2]
                 err_x = tarr[:, 3]
                 # Check replicates (same x)
-                by_x: dict[float, list[float]] = {}
-                for xi, Ti in zip(x, T):
+                by_x: dict[float, list[tuple[float, float, float]]] = {}
+                for xi, Ti, eTi, exi in zip(x, T, err_T, err_x):
                     if np.isfinite(xi) and np.isfinite(Ti):
-                        by_x.setdefault(float(xi), []).append(float(Ti))
+                        by_x.setdefault(float(xi), []).append((float(Ti), float(eTi), float(exi)))
                 reps = []
                 for xi, vals in sorted(by_x.items()):
                     if len(vals) >= 2:
-                        diff_rep = abs(vals[0] - vals[1])
-                        reps.append({"x_mm": xi, "vals_K": [r4(v) for v in vals], "abs_diff_K": r4(diff_rep)})
+                        t_list = [v[0] for v in vals]
+                        diff_rep = abs(t_list[0] - t_list[1])
+                        reps.append({"x_mm": xi, "vals_K": [r4(v) for v in t_list], "abs_diff_K": r4(diff_rep)})
                         replicate_diffs.append(diff_rep)
-                # Check overlap with Raman at same z_mm
+                # Check ALL TC points inside [rx_min, rx_max] (explicitly reporting dx_nearest, linear interp, gradient, and x±err_x Raman range)
                 ov_pts = []
                 if z_mm in raman_by_z:
-                    rh, rarr, ridx = raman_by_z[z_mm]
+                    _rcmt, rh, rarr, ridx = raman_by_z[z_mm]
                     rx = rarr[:, ridx["x"]]
                     rT = rarr[:, ridx["Tpg"]]
                     rTrms = rarr[:, ridx["Tpg_rms"]]
                     rx_min, rx_max = float(np.nanmin(rx)), float(np.nanmax(rx))
+                    s_r = np.argsort(rx)
+                    rx_s, rT_s, rR_s = rx[s_r], rT[s_r], rTrms[s_r]
                     for xi, vals in sorted(by_x.items()):
                         if rx_min <= xi <= rx_max:
-                            j_near = int(np.argmin(np.abs(rx - xi)))
-                            if abs(rx[j_near] - xi) <= 0.5:
-                                t_tc = float(np.mean(vals))
-                                t_ram = float(rT[j_near])
-                                ov_pts.append({
-                                    "z_mm": z_mm,
-                                    "x_mm": xi,
-                                    "T_TC_K": r4(t_tc),
-                                    "T_Raman_K": r4(t_ram),
-                                    "T_Raman_rms_K": r4(rTrms[j_near]),
-                                    "dT_TC_minus_Raman_K": r4(t_tc - t_ram),
-                                    "rel_diff_pct": r4(100.0 * (t_tc - t_ram) / t_ram),
-                                })
-                                overlap_comparisons.append(ov_pts[-1])
+                            j_near = int(np.argmin(np.abs(rx_s - xi)))
+                            dx_near = float(rx_s[j_near] - xi)
+                            j0 = max(0, j_near - 1)
+                            j1 = min(len(rx_s) - 1, j_near + 1)
+                            grad_local = float((rT_s[j1] - rT_s[j0]) / (rx_s[j1] - rx_s[j0])) if rx_s[j1] != rx_s[j0] else 0.0
+                            t_ram_nn = float(rT_s[j_near])
+                            t_ram_lin = float(np.interp(xi, rx_s, rT_s))
+                            t_tc = float(np.mean([v[0] for v in vals]))
+                            e_t = float(np.mean([v[1] for v in vals]))
+                            e_x = float(np.mean([v[2] for v in vals]))
+                            in_win = (rx_s >= xi - e_x) & (rx_s <= xi + e_x)
+                            w_min = float(np.min(rT_s[in_win])) if in_win.any() else None
+                            w_max = float(np.max(rT_s[in_win])) if in_win.any() else None
+                            w_mean = float(np.mean(rT_s[in_win])) if in_win.any() else None
+                            overlaps_support = (
+                                (w_min is not None and w_max is not None)
+                                and ((t_tc + e_t) >= w_min)
+                                and ((t_tc - e_t) <= w_max)
+                            )
+                            ov_pts.append({
+                                "z_mm": z_mm,
+                                "x_TC_mm": xi,
+                                "x_Raman_nearest_mm": r4(rx_s[j_near]),
+                                "dx_nearest_mm": r4(dx_near),
+                                "within_0p5mm": bool(abs(dx_near) <= 0.5),
+                                "T_TC_K": r4(t_tc),
+                                "err_T_TC_K": r4(e_t),
+                                "err_x_TC_mm": r4(e_x),
+                                "T_Raman_nearest_K": r4(t_ram_nn),
+                                "T_Raman_linear_interp_K": r4(t_ram_lin),
+                                "raman_interp_minus_nn_K": r4(t_ram_lin - t_ram_nn),
+                                "local_dT_dx_K_per_mm": r4(grad_local),
+                                "T_Raman_rms_K": r4(rR_s[j_near]),
+                                "raman_window_pm_errx_n_pts": int(in_win.sum()),
+                                "raman_window_pm_errx_min_K": r4(w_min),
+                                "raman_window_pm_errx_max_K": r4(w_max),
+                                "raman_window_pm_errx_mean_K": r4(w_mean),
+                                "dT_TC_minus_Raman_nn_K": r4(t_tc - t_ram_nn),
+                                "dT_TC_minus_Raman_lin_K": r4(t_tc - t_ram_lin),
+                                "rel_diff_lin_pct": r4(100.0 * (t_tc - t_ram_lin) / t_ram_lin),
+                                "tc_errT_overlaps_raman_pm_errx_range": bool(overlaps_support),
+                            })
+                            overlap_comparisons.append(ov_pts[-1])
                 tc_summary[f"z={z_mm}mm"] = {
                     "n_rows": int(tarr.shape[0]),
                     "n_unique_x": len(by_x),
@@ -579,15 +701,17 @@ def inspect_hylon_phase2(samples: Path) -> dict[str, Any]:
                 }
             # 2) Raman summary
             raman_summary = {}
-            for z_mm, (rh, rarr, ridx) in sorted(raman_by_z.items()):
+            for z_mm, (_rcmt, rh, rarr, ridx) in sorted(raman_by_z.items()):
                 rx = rarr[:, ridx["x"]]
                 rT = rarr[:, ridx["Tpg"]]
                 rTrms = rarr[:, ridx["Tpg_rms"]]
+                dx_steps = np.abs(np.diff(rx))
                 raman_summary[f"z={z_mm}mm"] = {
                     "n_points": int(rarr.shape[0]),
                     "x_min_mm": r4(np.nanmin(rx)),
                     "x_max_mm": r4(np.nanmax(rx)),
-                    "dx_median_mm": r4(np.median(np.abs(np.diff(rx)))),
+                    "dx_median_mm": r4(np.median(dx_steps)),
+                    "dx_max_gap_mm": r4(np.max(dx_steps)),
                     "T_min_K": r4(np.nanmin(rT)),
                     "T_max_K": r4(np.nanmax(rT)),
                     "T_rms_max_K": r4(np.nanmax(rTrms)),
@@ -597,46 +721,65 @@ def inspect_hylon_phase2(samples: Path) -> dict[str, Any]:
             walls = {}
             for wf in sorted([n for n in all_names if n.startswith(fprefix + f"{short}_Wall_Temp/") and n.endswith(".txt")]):
                 walls[Path(wf).name] = parse_wall_txt(z.read(wf))
-            # 4) Hardware swap PIV comparison (2Steel2Quartz vs 4Quartz at z=12.7 and z=22.7 mm)
-            piv_swap = {}
-            for z_str in ["0.0127", "0.0227"]:
-                f_2s2q = fprefix + f"{short}_Flow_velocity/{short}_Flow_velocity_2Steel2Quartz/{short}_Reactive_z+{z_str}.csv"
-                f_4q = fprefix + f"{short}_Flow_velocity/{short}_Flow_velocity_4Quartz/{short}_Reactive_z+{z_str}.csv"
-                if f_2s2q in all_names and f_4q in all_names:
-                    h1, a1 = parse_semicolon_csv(z.read(f_2s2q))
-                    h2, a2 = parse_semicolon_csv(z.read(f_4q))
-                    # Interpolate U_z on overlapping x range
-                    uz1_col = h1.index("U_z") if "U_z" in h1 else 3
-                    uz2_col = h2.index("U_z") if "U_z" in h2 else 3
-                    s1 = np.argsort(a1[:, 0])
-                    s2 = np.argsort(a2[:, 0])
-                    x_lo = max(float(np.nanmin(a1[:, 0])), float(np.nanmin(a2[:, 0])))
-                    x_hi = min(float(np.nanmax(a1[:, 0])), float(np.nanmax(a2[:, 0])))
-                    x_grid = np.linspace(x_lo, x_hi, 101)
-                    u1_i = np.interp(x_grid, a1[s1, 0], a1[s1, uz1_col])
-                    u2_i = np.interp(x_grid, a2[s2, 0], a2[s2, uz2_col])
-                    piv_swap[f"z={float(z_str)*1000:.1f}mm"] = {
-                        "headers_2s2q": h1,
-                        "headers_4q": h2,
-                        "n_2s2q": int(a1.shape[0]),
-                        "n_4q": int(a2.shape[0]),
-                        "x_overlap_mm": [r4(x_lo), r4(x_hi)],
-                        "Uz_max_abs_diff_ms": r4(np.max(np.abs(u1_i - u2_i))),
-                        "Uz_rms_diff_ms": r4(np.sqrt(np.mean((u1_i - u2_i) ** 2))),
-                        "Uz_peak_2s2q_ms": r4(np.nanmax(a1[:, uz1_col])),
-                        "Uz_peak_4q_ms": r4(np.nanmax(a2[:, uz2_col])),
-                    }
+            # 4) PIV comparison (2Steel2Quartz vs 4Quartz) across ALL 5 heights and BOTH Reactive and Cold flows
+            piv_swap: dict[str, Any] = {"Reactive": {}, "Cold": {}}
+            for mode in ("Reactive", "Cold"):
+                for z_str in ("0.0027", "0.0077", "0.0127", "0.0227", "0.0327"):
+                    f_2s2q = fprefix + f"{short}_Flow_velocity/{short}_Flow_velocity_2Steel2Quartz/{short}_{mode}_z+{z_str}.csv"
+                    f_4q = fprefix + f"{short}_Flow_velocity/{short}_Flow_velocity_4Quartz/{short}_{mode}_z+{z_str}.csv"
+                    if f_2s2q in all_names and f_4q in all_names:
+                        _c1, h1, a1 = parse_delim_csv(z.read(f_2s2q))
+                        _c2, h2, a2 = parse_delim_csv(z.read(f_4q))
+                        i1 = {h: i for i, h in enumerate(h1)}
+                        i2 = {h: i for i, h in enumerate(h2)}
+                        x1, z1, uz1, uzr1 = a1[:, i1["x"]], a1[:, i1["z"]], a1[:, i1["U_z"]], a1[:, i1["U_z_rms"]]
+                        x2, z2, uz2, uzr2 = a2[:, i2["x"]], a2[:, i2["z"]], a2[:, i2["U_z"]], a2[:, i2["U_z_rms"]]
+                        s1 = np.argsort(x1)
+                        s2 = np.argsort(x2)
+                        x_lo = max(float(np.nanmin(x1)), float(np.nanmin(x2)))
+                        x_hi = min(float(np.nanmax(x1)), float(np.nanmax(x2)))
+                        x_grid = np.linspace(x_lo, x_hi, 201)
+                        u1_i = np.interp(x_grid, x1[s1], uz1[s1])
+                        u2_i = np.interp(x_grid, x2[s2], uz2[s2])
+                        r1_i = np.interp(x_grid, x1[s1], uzr1[s1])
+                        r2_i = np.interp(x_grid, x2[s2], uzr2[s2])
+                        diff_u = u1_i - u2_i
+                        jm = int(np.argmax(np.abs(diff_u)))
+                        z1_med = float(np.nanmedian(z1))
+                        z2_med = float(np.nanmedian(z2))
+                        xpk1 = float(x1[int(np.nanargmax(uz1))])
+                        xpk2 = float(x2[int(np.nanargmax(uz2))])
+                        piv_swap[mode][f"z={float(z_str)*1000:.1f}mm"] = {
+                            "n_2s2q": int(a1.shape[0]),
+                            "n_4q": int(a2.shape[0]),
+                            "z_col_median_2s2q_mm": r4(z1_med),
+                            "z_col_median_4q_mm": r4(z2_med),
+                            "dz_col_mm": r4(z1_med - z2_med),
+                            "x_overlap_mm": [r4(x_lo), r4(x_hi)],
+                            "Uz_rms_diff_ms": r4(np.sqrt(np.mean(diff_u ** 2))),
+                            "Uz_max_abs_diff_ms": r4(np.max(np.abs(diff_u))),
+                            "x_at_max_diff_mm": r4(x_grid[jm]),
+                            "Uz_rms_2s2q_at_max_ms": r4(r1_i[jm]),
+                            "Uz_rms_4q_at_max_ms": r4(r2_i[jm]),
+                            "Uz_peak_2s2q_ms": r4(np.nanmax(uz1)),
+                            "x_peak_2s2q_mm": r4(xpk1),
+                            "Uz_peak_4q_ms": r4(np.nanmax(uz2)),
+                            "x_peak_4q_mm": r4(xpk2),
+                            "dx_peak_4q_minus_2s2q_mm": r4(xpk2 - xpk1),
+                        }
 
             res["flames"][flame] = {
+                "tc_csv_comment_flow_conditions": sorted(tc_header_flow_lines),
                 "thermocouple_profiles": tc_summary,
                 "n_tc_replicates": len(replicate_diffs),
                 "tc_replicate_abs_diff_median_K": r4(np.median(replicate_diffs)) if replicate_diffs else None,
                 "tc_replicate_abs_diff_max_K": r4(np.max(replicate_diffs)) if replicate_diffs else None,
                 "raman_profiles": raman_summary,
-                "tc_vs_raman_overlap_count": len(overlap_comparisons),
+                "tc_vs_raman_overlap_count_in_rx_range": len(overlap_comparisons),
+                "tc_vs_raman_overlap_count_within_0p5mm": sum(1 for p in overlap_comparisons if p["within_0p5mm"]),
                 "tc_vs_raman_overlap_points": overlap_comparisons,
                 "lip_wall_temperatures": walls,
-                "piv_hardware_swap_2s2q_vs_4q": piv_swap,
+                "piv_comparison_2s2q_vs_4q": piv_swap,
             }
     return res
 
@@ -648,9 +791,22 @@ def inspect_cam_94523(samples: Path) -> dict[str, Any]:
     if not HAS_SCIPY:
         return {"error": "scipy not available"}
     d = samples / "cam_94523_ligs_tc"
+    all_mat_inventory: dict[str, dict[str, dict[str, Any]]] = {}
+    tc_keyword_matches: list[str] = []
+    for mat_p in sorted(d.glob("*.mat")):
+        mat_obj = sio.loadmat(mat_p, squeeze_me=False)
+        inv = {}
+        for k in sorted(mat_obj.keys()):
+            if k.startswith("__"):
+                continue
+            v = mat_obj[k]
+            inv[k] = {"shape": list(v.shape), "dtype": str(v.dtype)}
+            if any(w in k.lower() for w in ["tc", "thermo", "couple", "probe"]):
+                tc_keyword_matches.append(f"{mat_p.name}::{k}")
+        all_mat_inventory[mat_p.name] = inv
+
     fd = sio.loadmat(d / "FigureData.mat", squeeze_me=False)
     keys = sorted([k for k in fd.keys() if not k.startswith("__")])
-    tc_like_keys = [k for k in keys if any(w in k.lower() for w in ["tc", "thermo", "couple", "probe"])]
 
     def summarize_profile(arr: np.ndarray) -> dict[str, Any]:
         # cols: r_mm, T_K, norm_hist_weight
@@ -676,26 +832,53 @@ def inspect_cam_94523(samples: Path) -> dict[str, Any]:
     shot_dropouts = {}
     for fn in ["Signalss_thermal.mat", "Signalss_thermal2.mat", "Signalss_thermal3.mat", "Signalss_thermal4.mat"]:
         ms = sio.loadmat(d / fn, squeeze_me=False)["signalss"]
-        lens = [x.size for x in ms.flat]
-        n_total = len(lens)
-        n_dropped = sum(1 for l in lens if l <= 1)
-        valid_lens = sorted(set(l for l in lens if l > 1))
+        n_total = int(ms.size)
+        shape_dtype_counts: dict[str, int] = {}
+        n_exact_uint8_1x1_zero = 0
+        n_other_size_le_1 = 0
+        n_valid_float64 = 0
+        valid_shapes: set[tuple[int, ...]] = set()
+        val_min, val_max = float("inf"), float("-inf")
+        for elem in ms.flat:
+            sd_key = f"{list(elem.shape)}:{elem.dtype}"
+            shape_dtype_counts[sd_key] = shape_dtype_counts.get(sd_key, 0) + 1
+            if elem.shape == (1, 1) and elem.dtype == np.uint8 and int(elem[0, 0]) == 0:
+                n_exact_uint8_1x1_zero += 1
+            elif elem.size <= 1:
+                n_other_size_le_1 += 1
+            else:
+                n_valid_float64 += 1
+                valid_shapes.add(tuple(elem.shape))
+                val_min = min(val_min, float(np.min(elem)))
+                val_max = max(val_max, float(np.max(elem)))
         shot_dropouts[fn] = {
+            "container_shape": list(ms.shape),
             "n_shots": n_total,
-            "n_dropped_scalar_zero": n_dropped,
-            "dropout_pct": r4(100.0 * n_dropped / n_total),
-            "valid_trace_len": valid_lens,
+            "element_shape_dtype_counts": shape_dtype_counts,
+            "n_exact_uint8_1x1_zero": n_exact_uint8_1x1_zero,
+            "pct_exact_uint8_1x1_zero": r4(100.0 * n_exact_uint8_1x1_zero / n_total),
+            "n_other_size_le_1": n_other_size_le_1,
+            "n_valid_traces": n_valid_float64,
+            "valid_trace_shapes": [list(s) for s in sorted(valid_shapes)],
+            "valid_trace_value_min_max": [r4(val_min), r4(val_max)] if n_valid_float64 else None,
         }
 
     return {
+        "n_mat_files_inventoried": len(all_mat_inventory),
         "n_variables_in_FigureData": len(keys),
-        "thermocouple_named_variables_found": tc_like_keys,
-        "has_thermocouple_data_in_deposit": False,
+        "all_mat_files_variable_inventory": all_mat_inventory,
+        "automatic_tc_keyword_matched_vars": tc_keyword_matches,
+        "absence_of_tc_inference_note": (
+            "Automatic check confirms 0 variable names across all 7 .mat files match TC keywords; "
+            "manual inspection of all 61 FigureData.mat variable names/shapes/ranges confirms LIGS signals, "
+            "FFTs, histograms, and 4 scalars (mean_val_1..4, std_val_1..4), with no thermocouple array identified "
+            "(inference from variable inventory, not a hardcoded flag)."
+        ),
         "mean_vals_1_to_4": [r4(fd[f"mean_val_{i}"].flat[0]) for i in range(1, 5)],
         "std_vals_1_to_4": [r4(fd[f"std_val_{i}"].flat[0]) for i in range(1, 5)],
         "temperature30mm": summarize_profile(fd["temperature30mm"]),
         "temperature50mm": summarize_profile(fd["temperature50mm"]),
-        "raw_ligs_shot_dropouts": shot_dropouts,
+        "raw_ligs_shot_structure": shot_dropouts,
     }
 
 
@@ -845,9 +1028,10 @@ def inspect_ulb_furnace(samples: Path) -> dict[str, Any]:
     T_vals = []
     n_nonfinite = 0
     bad_examples = []
-    by_key: dict[tuple[float, float, float, float], list[float]] = {}
+    missing_row_indices: list[int] = []
+    by_key: dict[tuple[float, float, float, float], list[tuple[int, float]]] = {}
     combos: dict[tuple[float, float], int] = {}
-    for row in data[1:]:
+    for row_idx, row in enumerate(data[1:], start=2):
         try:
             a, b, c, d_y, e = float(row["A"]), float(row["B"]), float(row["C"]), float(row["D"]), float(row["E"])
             if not all(math.isfinite(v) for v in (a, b, c, d_y, e)):
@@ -857,17 +1041,44 @@ def inspect_ulb_furnace(samples: Path) -> dict[str, Any]:
             x_set.add(c)
             y_set.add(d_y)
             T_vals.append(e)
-            by_key.setdefault((a, b, c, d_y), []).append(e)
+            by_key.setdefault((a, b, c, d_y), []).append((row_idx, e))
             combos[(a, b)] = combos.get((a, b), 0) + 1
         except (KeyError, TypeError, ValueError):
             n_nonfinite += 1
+            missing_row_indices.append(row_idx)
             if len(bad_examples) < 5:
                 bad_examples.append(row)
     T_arr = np.asarray(T_vals, dtype=np.float64)
     counts = list(combos.values())
-    # Replicate repeatability across identical (C6H6, phi, x, y) keys
-    rep_spans = [max(v) - min(v) for v in by_key.values() if len(v) >= 2]
-    rep_stds = [float(np.std(v, ddof=1)) for v in by_key.values() if len(v) >= 2]
+    # Audit duplicate (C6H6, phi, x, y) keys WITHOUT assuming they are pure identical-condition replicates!
+    mult_counts: dict[str, int] = {}
+    for v in by_key.values():
+        mk = str(len(v))
+        mult_counts[mk] = mult_counts.get(mk, 0) + 1
+    pairs = [(k, v[0][1], v[1][1]) for k, v in by_key.items() if len(v) == 2]
+    signed_diffs = np.asarray([t2 - t1 for _, t1, t2 in pairs], dtype=np.float64)
+    abs_spans = np.abs(signed_diffs)
+    by_cond_shift: dict[tuple[float, float], list[float]] = {}
+    for k, t1, t2 in pairs:
+        by_cond_shift.setdefault((k[0], k[1]), []).append(t2 - t1)
+    top_cond_shifts = sorted(
+        [
+            {
+                "C6H6_pct": c[0],
+                "phi": c[1],
+                "n_pairs": len(vals),
+                "mean_2nd_minus_1st_K": r4(np.mean(vals)),
+                "std_2nd_minus_1st_K": r4(np.std(vals)),
+            }
+            for c, vals in by_cond_shift.items()
+        ],
+        key=lambda d_item: abs(d_item["mean_2nd_minus_1st_K"]),
+        reverse=True,
+    )[:8]
+    n_missing_blocks = (
+        1 + sum(1 for i in range(1, len(missing_row_indices)) if missing_row_indices[i] != missing_row_indices[i - 1] + 1)
+        if missing_row_indices else 0
+    )
     return {
         "sheet_names": list(sheets.keys()),
         "data_header_row": hdr,
@@ -876,6 +1087,8 @@ def inspect_ulb_furnace(samples: Path) -> dict[str, Any]:
         "n_data_rows": len(data) - 1,
         "n_valid_5col_rows": int(T_arr.size),
         "n_missing_coord_or_meta_rows": n_nonfinite,
+        "missing_A_row_index_range": [missing_row_indices[0], missing_row_indices[-1]] if missing_row_indices else None,
+        "missing_A_n_contiguous_blocks": n_missing_blocks,
         "bad_row_examples": bad_examples,
         "unique_C6H6_pct": sorted(c6h6_set),
         "unique_phi": sorted(phi_set),
@@ -885,18 +1098,35 @@ def inspect_ulb_furnace(samples: Path) -> dict[str, Any]:
         "rows_per_condition_min": min(counts) if counts else None,
         "rows_per_condition_max": max(counts) if counts else None,
         "n_unique_condition_coord_keys": len(by_key),
-        "n_keys_with_replicates": len(rep_spans),
-        "replicate_span_median_K": r4(np.median(rep_spans)) if rep_spans else None,
-        "replicate_span_p95_K": r4(np.percentile(rep_spans, 95)) if rep_spans else None,
-        "replicate_span_max_K": r4(np.max(rep_spans)) if rep_spans else None,
-        "replicate_std_median_K": r4(np.median(rep_stds)) if rep_stds else None,
+        "duplicate_key_audit": {
+            "key_multiplicity_counts": mult_counts,
+            "n_duplicate_pairs": len(pairs),
+            "signed_diff_2nd_minus_1st_mean_K": r4(np.mean(signed_diffs)) if pairs else None,
+            "signed_diff_2nd_minus_1st_median_K": r4(np.median(signed_diffs)) if pairs else None,
+            "signed_diff_2nd_minus_1st_std_K": r4(np.std(signed_diffs)) if pairs else None,
+            "abs_diff_span_median_K": r4(np.median(abs_spans)) if pairs else None,
+            "abs_diff_span_p90_K": r4(np.percentile(abs_spans, 90)) if pairs else None,
+            "abs_diff_span_p95_K": r4(np.percentile(abs_spans, 95)) if pairs else None,
+            "abs_diff_span_max_K": r4(np.max(abs_spans)) if pairs else None,
+            "half_span_median_K": r4(np.median(abs_spans / 2.0)) if pairs else None,
+            "half_span_p95_K": r4(np.percentile(abs_spans / 2.0, 95)) if pairs else None,
+            "pct_pairs_abs_diff_gt_20K": r4(100.0 * np.mean(abs_spans > 20.0)) if pairs else None,
+            "pct_pairs_abs_diff_gt_40K": r4(100.0 * np.mean(abs_spans > 40.0)) if pairs else None,
+            "top_conditions_by_abs_mean_shift": top_cond_shifts,
+            "interpretation_limit_note": (
+                "Because columns 'data (yyyy-mm-dd)', 'cog', and 'air_excess' listed in sheet 'units' are absent from sheet 'data', "
+                "duplicate (C6H6, phi, x, y) pairs cannot be proven to be pure replicates of identical operating/thermal states "
+                "(systematic mean shifts of -16 to -25 K occur across entire phi=1.0 and phi=1.2 maps). Moreover, a two-point span "
+                "|T2 - T1| is not directly equivalent to a ±20 K expanded uncertainty band (2*20 K = 40 K full width)."
+            ),
+        },
         "T_min_K": r4(np.min(T_arr)),
         "T_median_K": r4(np.median(T_arr)),
         "T_max_K": r4(np.max(T_arr)),
         "declared_vs_actual_discrepancies": [
             "README_V4.txt states 'expressed in degrees Celsius', whereas sheet 'data' header is 'T_mean [K]' and values span 1145-1927 (Kelvin), matching sheet 'units'.",
             "README_V4.txt states 'standard deviations... are also reported for all the measured temperatures' and sheet 'units' lists T_std/T_median/T_iqr, whereas sheet 'data' contains ONLY 5 columns (A-E: C6H6, phi, x, y, T_mean [K]) and NO T_std column.",
-            f"Data contains {len(data)-1} rows including {n_nonfinite} rows with missing/non-numeric metadata cells and {len(rep_spans)} duplicated (C6H6, phi, x, y) entries (likely repeated runs/dates collapsed without the 'data (yyyy-mm-dd)' column listed in sheet 'units').",
+            f"Data contains {len(data)-1} rows including {n_nonfinite} rows missing column A (C6H6 %) and {len(pairs)} duplicated (C6H6, phi, x, y) pairs without identifying run/date/cog metadata.",
         ],
     }
 
@@ -936,6 +1166,8 @@ def inspect_cardiff(samples: Path) -> dict[str, Any]:
                 tmp.write_bytes(z.read(fn))
                 mash_sheets = list(read_xlsx_sheet_rows(tmp).keys())
                 tmp.unlink()
+    rad_hdr_texts = [str(v).lower() for row in rad[:4] for v in row.values() if v is not None]
+    rad_has_rms_or_unc = any(k in t for t in rad_hdr_texts for k in ("rms", "std", "unc", "err", "±", "sd"))
     return {
         "cardiff_31141438_radiation": {
             "n_conditions": len(phis),
@@ -949,7 +1181,7 @@ def inspect_cardiff(samples: Path) -> dict[str, Any]:
                 r4(max(a - b for a, b in zip(tin_nh3, tout_nh3))),
             ],
             "n_blank_NH3_emission_cells_out_of_9": n_blank_nh3_em,
-            "has_rms_or_uncertainty_cols": False,
+            "automatic_rms_or_unc_header_match": rad_has_rms_or_unc,
         },
         "cardiff_30234904_cognh3_negative_check": {
             "row2_group_headers": cog_headers_r2,
@@ -1031,6 +1263,7 @@ def inspect_wang_mwir_tc(samples: Path) -> dict[str, Any]:
     with zipfile.ZipFile(zp) as z:
         c2 = list(csv.DictReader(z.read("campaign2_station_data.csv").decode("utf-8").splitlines()))
         rad = list(csv.DictReader(z.read("analysis_tc_radiation_error.csv").decode("utf-8").splitlines()))
+        eb = list(csv.DictReader(z.read("analysis_error_budget.csv").decode("utf-8").splitlines()))
     direct_0deg = [r for r in c2 if r["viewing_angle_deg"] == "0"]
     diffs = []
     for r in direct_0deg:
@@ -1040,6 +1273,8 @@ def inspect_wang_mwir_tc(samples: Path) -> dict[str, Any]:
             "nozzle": r["nozzle"],
             "state": r["engine_state"],
             "MWIR_mean_K": mwir,
+            "MWIR_sd_K": float(r["sd_K"]),
+            "MWIR_ci95_halfwidth_K": float(r["ci95_halfwidth_K"]),
             "TC_ref_K": tc,
             "dT_MWIR_minus_TC_K": r4(mwir - tc),
             "declared_dev_pct": float(r["mean_deviation_pct"]),
@@ -1047,9 +1282,15 @@ def inspect_wang_mwir_tc(samples: Path) -> dict[str, Any]:
     return {
         "n_campaign2_rows": len(c2),
         "campaign2_0deg_vs_TC": diffs,
+        "declared_error_budget_rows": eb,
         "radiation_model_table_rows": len(rad),
         "radiation_model_h_range_W_m2_K": [float(rad[0]["h_W_m-2_K-1"]), float(rad[-1]["h_W_m-2_K-1"])],
-        "note": "analysis_tc_radiation_error.csv is an analytical parametric radiation-bias sensitivity table, not raw TC measurements.",
+        "note": (
+            "analysis_tc_radiation_error.csv is an analytical parametric radiation-bias sensitivity table, not raw TC measurements. "
+            "Observed MWIR - TC differences (-3.80% to -4.84%) overlap with or slightly exceed the authors' own combined comparison "
+            "expanded uncertainty (U=4.1% at k=2, combining MWIR U=2.6% and TC reference u~1.6% including TC radiation bias); "
+            "thus MWIR - TC alone does not independently isolate plume emissivity bias."
+        ),
     }
 
 
@@ -1164,10 +1405,11 @@ def inspect_pelzmann_metfortc_brzosko(samples: Path) -> dict[str, Any]:
             hh, mm, ss = [int(x) for x in parts[1].split(":")]
             secs.append(hh * 3600 + mm * 60 + ss)
     dt_tph = np.diff(secs)
+    c1_hdr = [x for x in c1_rows[0] if x != ""]
     out["pelzmann_mckenna"] = {
-        "condition01_header": [x for x in c1_rows[0] if x != ""],
+        "condition01_header": c1_hdr,
         "condition01_rows": len(c1_rows) - 1,
-        "condition01_is_heatflux_SBG_not_TC": True,
+        "automatic_heatflux_header_check": ("Q [W]" in c1_hdr and "U [mV]" in c1_hdr and not any("T [" in h or "Temp" in h for h in c1_hdr)),
         "tph_log_rows": len(secs),
         "tph_log_n_negative_dt_jumps": int((dt_tph < 0).sum()),
         "tph_log_n_zero_dt": int((dt_tph == 0).sum()),
@@ -1264,7 +1506,12 @@ def inspect_sydney_and_sandia(samples: Path) -> dict[str, Any]:
     ascii_blocks = [m.group(0).decode("latin1") for m in re.finditer(rb"[\x20-\x7e\r\n\t\x07]{15,}", raw)]
     bb_text = "\n".join(b.replace("\x07", " | ").replace("\r", "\n") for b in ascii_blocks if any(w in b for w in ["Ceramic", "HM1", "HM2", "HM3", "Mikron", "Bluff-Body"]))
     out["sydney_surface_temp_bb_doc"] = {
-        "instrument_confirmed": "Mikron M90-D infrared pyrometer camera (500-1500 C, filters flame radiation) — NOT a thermocouple!",
+        "automatic_text_matches": {
+            "mentions_mikron_m90d": "Mikron M90-D" in bb_text,
+            "mentions_infrared_pyrometer": "infrared pyrometer" in bb_text.lower(),
+            "mentions_thermocouple": "thermocouple" in bb_text.lower(),
+            "mentions_swirl_burner_no_swirl": "swirl burner operated with no swirl" in bb_text.lower(),
+        },
         "extracted_text_excerpt": bb_text[:1800],
     }
 

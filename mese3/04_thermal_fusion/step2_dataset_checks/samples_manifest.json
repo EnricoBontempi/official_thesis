@@ -1,6 +1,6 @@
 {
-  "n_files": 82,
-  "total_bytes": 49626582,
+  "n_files": 85,
+  "total_bytes": 49627572,
   "files": [
     {
       "dataset_id": "nist_rse_2007",
@@ -1067,6 +1067,45 @@
       "bytes": 9273876,
       "sha256": "4dc63f18651f6145f5f49a71048523e84ed8d28871ce2bdd5c5a599c3770cf2e",
       "relative_path": "tnf_hylon_phase2/HYLON_TNF_2026_01_Phase2-1.zip"
+    },
+    {
+      "dataset_id": "nist_pool_fires",
+      "filename": "Methanol_30_cm_TC_z=41_cm_Sung_2024.csv",
+      "url": "https://raw.githubusercontent.com/MaCFP/macfp-db/master/Liquid_Pool_Fires/NIST_Pool_Fires/Experimental_Data/Methanol_30_cm_TC_z=41_cm_Sung_2024.csv",
+      "downloaded_utc": "2026-11-27T03:32:44.883529+00:00",
+      "http_status": 200,
+      "content_type": "text/plain; charset=utf-8",
+      "last_modified": null,
+      "etag": "\"12fc1233bd98bac8bce7cd3771e0b76ee77ec1b9dc3365a876c42953257ec44a\"",
+      "bytes": 331,
+      "sha256": "b8f5f46e18c024006835b5e84672e29e031655a44be4115e002a3ff52329b2f3",
+      "relative_path": "nist_pool_fires/Methanol_30_cm_TC_z=41_cm_Sung_2024.csv"
+    },
+    {
+      "dataset_id": "nist_pool_fires",
+      "filename": "Methanol_30_cm_TC_z=51_cm_Sung_2024.csv",
+      "url": "https://raw.githubusercontent.com/MaCFP/macfp-db/master/Liquid_Pool_Fires/NIST_Pool_Fires/Experimental_Data/Methanol_30_cm_TC_z=51_cm_Sung_2024.csv",
+      "downloaded_utc": "2026-11-27T03:32:44.959737+00:00",
+      "http_status": 200,
+      "content_type": "text/plain; charset=utf-8",
+      "last_modified": null,
+      "etag": "\"42afa46be0e7ade7d1c8d7bb866bfad9a93ef8e8077ab3c1696787527f29a46c\"",
+      "bytes": 331,
+      "sha256": "90c7eb7c466c5cfe07baf50a4c5017b8fa6bf94a9e3ae45d393017f98c896216",
+      "relative_path": "nist_pool_fires/Methanol_30_cm_TC_z=51_cm_Sung_2024.csv"
+    },
+    {
+      "dataset_id": "nist_pool_fires",
+      "filename": "Methanol_30_cm_TC_z=61_cm_Sung_2024.csv",
+      "url": "https://raw.githubusercontent.com/MaCFP/macfp-db/master/Liquid_Pool_Fires/NIST_Pool_Fires/Experimental_Data/Methanol_30_cm_TC_z=61_cm_Sung_2024.csv",
+      "downloaded_utc": "2026-11-27T03:32:45.008381+00:00",
+      "http_status": 200,
+      "content_type": "text/plain; charset=utf-8",
+      "last_modified": null,
+      "etag": "\"30e36b0f6ab085f8f8cb755b1c00efe5b7c5e246d1486fa47fa407878cdbf742\"",
+      "bytes": 328,
+      "sha256": "dfc238c0041ca7dc4a70c089ce24916ad534f7bf90b2746c85deccfdd0fabcf3",
+      "relative_path": "nist_pool_fires/Methanol_30_cm_TC_z=61_cm_Sung_2024.csv"
     }
   ]
 }

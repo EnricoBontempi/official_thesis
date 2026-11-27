@@ -95,7 +95,7 @@ def make_fig1_nist_rse2007(samples: Path, out_dir: Path) -> None:
     ax.axhline(0, color="k", ls="--", lw=0.8)
     ax.set_xlabel(r"Double-shielded aspirated reference $T_{\mathrm{aspirated}}$ (°C)")
     ax.set_ylabel(r"$\Delta T = T_{\mathrm{bare}} - T_{\mathrm{aspirated}}$ (K)")
-    ax.set_title("(b) Radiation bias vs. reference T (cooling hot / heating cool)")
+    ax.set_title("(b) Bare vs. aspirated difference at identical nominal (X,Y,Z)")
     ax.legend(fontsize=7.5, loc="best")
     ax.grid(alpha=0.3)
 
@@ -123,17 +123,17 @@ def make_fig2_faults(samples: Path, out_dir: Path) -> None:
     idx = {c: j for j, c in enumerate(h)}
     t = a[:, idx["Time"]]
     ax = axes[0]
-    ax.plot(t, a[:, idx["TC South U-3-1"]], color="#c0392b", lw=1.5, label="TC South U-3-1 (stuck 3320–3330 °C, open-circuit)")
-    ax.plot(t, a[:, idx["TC South U-3-2"]], color="#27ae60", lw=1.4, label="TC South U-3-2 (adjacent valid wall TC)")
+    ax.plot(t, a[:, idx["TC South U-3-1"]], color="#c0392b", lw=1.5, label="TC South U-3-1 (stuck 3320–3330 °C; unflagged anomaly)")
+    ax.plot(t, a[:, idx["TC South U-3-2"]], color="#27ae60", lw=1.4, label="TC South U-3-2 (adjacent wall TC)")
     ax.plot(t, a[:, idx["Tree 4-9"]], color="#8e44ad", lw=1.5, ls="--",
-            label="Tree 4-9 (999.0 at t=-60 s -> 0.0 for t>=-50 s; faulty)")
-    ax.plot(t, a[:, idx["Tree 4-8"]], color="#2980b9", lw=1.3, ls=":", label="Tree 4-8 (adjacent valid gas TC)")
+            label="Tree 4-9 (999.0 at t=-60 s -> 0.0; documented fault)")
+    ax.plot(t, a[:, idx["Tree 4-8"]], color="#2980b9", lw=1.3, ls=":", label="Tree 4-8 (adjacent gas TC)")
     ax.scatter([t[0]], [a[0, idx["Tree 4-9"]]], color="#8e44ad", s=45, zorder=5)
-    ax.annotate("999.0 sentinel\nat t = -60 s", xy=(t[0], 999.0), xytext=(320, 1250),
+    ax.annotate("999.0 at t = -60 s\n(observed sentinel)", xy=(t[0], 999.0), xytext=(320, 1250),
                 arrowprops=dict(arrowstyle="->", color="#8e44ad", lw=1.1), fontsize=8, color="#8e44ad")
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Recorded temperature (°C)")
-    ax.set_title("(a) NIST/NRC Test 01: open-circuit (3320 °C) & 999->0 sentinel")
+    ax.set_title("(a) NIST/NRC Test 01: unflagged anomaly (3320 °C) & 999->0 pattern")
     ax.legend(fontsize=7.4, loc="center right")
     ax.grid(alpha=0.3)
 
@@ -216,17 +216,34 @@ def make_fig3_nist_pool(samples: Path, out_dir: Path) -> None:
                 db = np.full(ratios.shape, float(fixed_d))
             ax1.scatter(db, ratios, color=col, marker=mk, s=36, alpha=0.85, label=lbl)
 
+    # Also highlight the 3 same-flame overlapping points in Methanol 30 cm (r=0, z=41/51/61 cm, 150 um)
+    m30_150_tc, m30_150_dt, m30_150_r = [], [], []
+    for z_cm in (41, 51, 61):
+        p_rad = d / f"Methanol_30_cm_TC_z={z_cm}_cm_Sung_2024.csv"
+        if p_rad.exists():
+            with open(p_rad, newline="", encoding="utf-8") as f:
+                for r in csv.DictReader(f):
+                    if abs(float(r["r_cm"])) < 1e-6:
+                        m30_150_tc.append(float(r["TC_K"]))
+                        m30_150_dt.append(float(r["TG_K"]) - float(r["TC_K"]))
+                        m30_150_r.append(float(r["TG_RMS_K"]) / float(r["TC_RMS_K"]))
+    if m30_150_tc:
+        ax0.scatter(m30_150_tc, m30_150_dt, color="#2ca02c", marker="*", s=95, edgecolors="k", lw=0.7, zorder=5,
+                    label="Methanol 30 cm r=0, z=41–61 (150 µm)")
+        ax1.scatter([150.0] * len(m30_150_r), m30_150_r, color="#2ca02c", marker="*", s=95, edgecolors="k", lw=0.7, zorder=5,
+                    label="Methanol 30 cm r=0, z=41–61 (150 µm)")
+
     ax0.set_xlabel(r"Uncorrected bead temperature $T_{\mathrm{C}}$ (K)")
-    ax0.set_ylabel(r"Correction $T_{\mathrm{G}} - T_{\mathrm{C}}$ (K)")
-    ax0.set_title("(a) NIST Pool Fires: mean radiation+inertia shift (TG - TC)")
-    ax0.legend(fontsize=8, loc="upper left")
+    ax0.set_ylabel(r"Model correction $T_{\mathrm{G}} - T_{\mathrm{C}}$ (K)")
+    ax0.set_title("(a) NIST Pool Fires: model-derived shift (TG - TC) across cases")
+    ax0.legend(fontsize=7.3, loc="upper left")
     ax0.grid(alpha=0.3)
 
     ax1.axhline(1.0, color="k", ls="--", lw=0.8)
-    ax1.set_xlabel(r"Type-S thermocouple bead diameter $D_{\mathrm{bead}}$ (µm)")
-    ax1.set_ylabel(r"RMS recovery factor $T_{\mathrm{G,RMS}} / T_{\mathrm{C,RMS}}$ (-)")
-    ax1.set_title("(b) Thermal-inertia RMS attenuation vs. bead diameter")
-    ax1.legend(fontsize=8, loc="upper left")
+    ax1.set_xlabel(r"Type-S bead diameter $D_{\mathrm{bead}}$ (µm) — fuels/pans/heights vary")
+    ax1.set_ylabel(r"Model-derived ratio $T_{\mathrm{G,RMS}} / T_{\mathrm{C,RMS}}$ (-)")
+    ax1.set_title("(b) Cross-case model RMS ratio (not single-var. diameter scaling)")
+    ax1.legend(fontsize=7.3, loc="upper right")
     ax1.grid(alpha=0.3)
 
     fig.tight_layout()
@@ -273,13 +290,13 @@ def make_fig4_hylon2(samples: Path, out_dir: Path) -> None:
                 ri = {h: j for j, h in enumerate(rh)}
                 rx, rT, rR = ra[:, ri["x"]], ra[:, ri["Tpg"]], ra[:, ri["Tpg_rms"]]
                 z_mm = float(z_str) * 1000.0
-                ax.plot(rx, rT, color=col, lw=1.6, label=f"1D Raman z={z_mm:.1f} mm")
+                ax.plot(rx, rT, color=col, lw=1.6, label=f"1D Raman Tpg ± Tpg_rms (z={z_mm:.1f} mm)")
                 ax.fill_between(rx, rT - rR, rT + rR, color=col, alpha=0.14)
 
                 _, ta = read_semi(z, f"HYLON_TNF_2026_01_Phase2-1/{flame}/{tc_dir}/HYLON-KAUST_Isolated_Fla_{fl_ch}_EXP_z+{z_str}.csv")
                 ax.errorbar(ta[:, 0], ta[:, 1], yerr=ta[:, 2], xerr=ta[:, 3], fmt="o",
                             color=col, ms=5, capsize=2.5, elinewidth=1.0,
-                            label=f"Double-bead TC z={z_mm:.1f} mm (±10%, ±4 mm)")
+                            label=f"Double-bead TC (z={z_mm:.1f} mm; ±10% T, ±4 mm x)")
             ax.set_xlabel("Radial position x (mm)")
             ax.set_ylabel("Gas temperature (K)")
             ax.set_title(title, fontsize=10)

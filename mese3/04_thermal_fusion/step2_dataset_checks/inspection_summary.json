@@ -483,7 +483,63 @@
           "min": 0.08,
           "max": 1.3
         }
+      },
+      "td70lbb_observed_anomaly_summary": {
+        "status": "observed_unflagged_anomaly_not_confirmed_in_fds_guide",
+        "t_30_to_1440s_dT_min_max_K": [
+          -104.4,
+          23.8
+        ],
+        "t_1800_to_4080s_TD70LA_min_max_C": [
+          587.2,
+          1159.8
+        ],
+        "t_1800_to_4080s_TD70LBB_min_max_C": [
+          414.7,
+          520.6
+        ],
+        "t_1800_to_4080s_dT_min_K": -681.9,
+        "t_ge_4560s_TD70LA_end_C": 86.2,
+        "t_ge_4560s_TD70LBB_end_C": 79.6,
+        "t_ge_4560s_dT_min_max_K": [
+          -85.1,
+          -6.6
+        ]
       }
+    },
+    "_comparability_metadata_from_fds_inputs": {
+      "source_files_verified": [
+        "Validation/NIST_RSE_2007/FDS_Input_Files/RSE_01.fds",
+        "RSE_12.fds"
+      ],
+      "doorway_tc_pairs_nominal_xyz_m": {
+        "TD70LA_TD70LBB": [
+          -0.05,
+          0.32,
+          0.7
+        ],
+        "TD70CA_TD70CBB": [
+          -0.05,
+          0.48,
+          0.7
+        ],
+        "TD50CA_TD50CBB": [
+          -0.05,
+          0.48,
+          0.5
+        ],
+        "TD30LA_TD30LBB": [
+          -0.05,
+          0.32,
+          0.3
+        ],
+        "TD30CA_TD30CBB": [
+          -0.05,
+          0.48,
+          0.3
+        ]
+      },
+      "doorway_velocity_probes_note": "VD* probes lie on the same doorway plane X=-0.05 m at Z=0.05, 0.20, 0.40, 0.60, 0.79 m (vertically staggered by 9-10 cm relative to TC pairs at Z=0.30, 0.50, 0.70 m)."
     }
   },
   "nist_nrc": {
@@ -848,6 +904,7 @@
     }
   },
   "nist_pool_fires": {
+    "_epistemic_note": "TG and TG_RMS are model-corrected gas temperatures estimated by NIST from bare-bead Type-S TC readings (not independent optical references). Comparisons across different fuels, burner diameters (30/37/100 cm), and heights mix flow/flame conditions with bead diameter; only Methanol 30 cm at (r=0, z=41/51/61 cm) provides overlapping nominal positions with two bead diameters (52 um vs 150 um) in separate traverses.",
     "profiles": {
       "Propane_37_cm_50_kW_TC_r=0_cm_Sung_2024.csv": {
         "n_points": 17,
@@ -922,6 +979,117 @@
             "dT_max_K": 50.0,
             "RMS_ratio_median": 1.3403,
             "RMS_ratio_max": 4.0
+          }
+        }
+      },
+      "Methanol_30_cm_TC_z=41_cm_Sung_2024.csv": {
+        "n_points": 11,
+        "headers": [
+          "r_cm",
+          "TC_K",
+          "TC_RMS_K",
+          "TG_K",
+          "TG_RMS_K",
+          "Uc_TG_K",
+          "D_bead_um"
+        ],
+        "has_separate_units_row": false,
+        "bead_readme": "150 um",
+        "TC_unit": "K",
+        "TC_min": 404.0,
+        "TC_max": 781.0,
+        "TG_max": 785.0,
+        "dT_TG_minus_TC_min_K": 0.0,
+        "dT_TG_minus_TC_max_K": 4.0,
+        "dT_TG_minus_TC_mean_K": 1.5455,
+        "TC_RMS_max_K": 258.0,
+        "TG_RMS_max_K": 444.0,
+        "RMS_ratio_TG_over_TC_min": 1.5414,
+        "RMS_ratio_TG_over_TC_median": 1.7209,
+        "RMS_ratio_TG_over_TC_max": 1.7783,
+        "UC_TG_min": 21.0,
+        "UC_TG_max": 41.0,
+        "by_bead_diameter": {
+          "150um": {
+            "n": 11,
+            "dT_mean_K": 1.5455,
+            "dT_max_K": 4.0,
+            "RMS_ratio_median": 1.7209,
+            "RMS_ratio_max": 1.7783
+          }
+        }
+      },
+      "Methanol_30_cm_TC_z=51_cm_Sung_2024.csv": {
+        "n_points": 11,
+        "headers": [
+          "r_cm",
+          "TC_K",
+          "TC_RMS_K",
+          "TG_K",
+          "TG_RMS_K",
+          "Uc_TG_K",
+          "D_bead_um"
+        ],
+        "has_separate_units_row": false,
+        "bead_readme": "150 um",
+        "TC_unit": "K",
+        "TC_min": 406.0,
+        "TC_max": 630.0,
+        "TG_max": 632.0,
+        "dT_TG_minus_TC_min_K": 0.0,
+        "dT_TG_minus_TC_max_K": 2.0,
+        "dT_TG_minus_TC_mean_K": 0.5455,
+        "TC_RMS_max_K": 150.0,
+        "TG_RMS_max_K": 340.0,
+        "RMS_ratio_TG_over_TC_min": 1.2333,
+        "RMS_ratio_TG_over_TC_median": 1.88,
+        "RMS_ratio_TG_over_TC_max": 2.2667,
+        "UC_TG_min": 21.0,
+        "UC_TG_max": 33.0,
+        "by_bead_diameter": {
+          "150um": {
+            "n": 11,
+            "dT_mean_K": 0.5455,
+            "dT_max_K": 2.0,
+            "RMS_ratio_median": 1.88,
+            "RMS_ratio_max": 2.2667
+          }
+        }
+      },
+      "Methanol_30_cm_TC_z=61_cm_Sung_2024.csv": {
+        "n_points": 11,
+        "headers": [
+          "r_cm",
+          "TC_K",
+          "TC_RMS_K",
+          "TG_K",
+          "TG_RMS_K",
+          "Uc_TG_K",
+          "D_bead_um"
+        ],
+        "has_separate_units_row": false,
+        "bead_readme": "150 um",
+        "TC_unit": "K",
+        "TC_min": 377.0,
+        "TC_max": 545.0,
+        "TG_max": 545.0,
+        "dT_TG_minus_TC_min_K": 0.0,
+        "dT_TG_minus_TC_max_K": 1.0,
+        "dT_TG_minus_TC_mean_K": 0.3636,
+        "TC_RMS_max_K": 146.0,
+        "TG_RMS_max_K": 263.0,
+        "RMS_ratio_TG_over_TC_min": 1.6351,
+        "RMS_ratio_TG_over_TC_median": 1.7348,
+        "RMS_ratio_TG_over_TC_max": 1.8074,
+        "UC_TG_min": 20.0,
+        "UC_TG_max": 28.0,
+        "by_bead_diameter": {
+          "150um": {
+            "n": 11,
+            "dT_mean_K": 0.3636,
+            "dT_max_K": 1.0,
+            "RMS_ratio_median": 1.7348,
+            "RMS_ratio_max": 1.8074
           }
         }
       },
@@ -1164,6 +1332,89 @@
         }
       }
     },
+    "same_flame_overlap_methanol_30cm_r0_52um_vs_150um": [
+      {
+        "flame": "Methanol 30 cm",
+        "z_cm": 41,
+        "r_cm": 0,
+        "bead_52um": {
+          "TC_K": 719.0,
+          "TC_RMS_K": 265.0,
+          "TG_K_model": 720.0,
+          "TG_RMS_K_model": 369.0,
+          "Uc_TG_K": 37.0,
+          "TG_minus_TC_K": 1.0,
+          "TG_RMS_over_TC_RMS": 1.3925
+        },
+        "bead_150um": {
+          "TC_K": 781.0,
+          "TC_RMS_K": 239.0,
+          "TG_K_model": 785.0,
+          "TG_RMS_K_model": 422.0,
+          "Uc_TG_K": 41.0,
+          "TG_minus_TC_K": 4.0,
+          "TG_RMS_over_TC_RMS": 1.7657
+        },
+        "run_to_run_TC_150_minus_52_K": 62.0,
+        "measured_TC_RMS_150_minus_52_K": -26.0,
+        "measured_TC_RMS_ratio_150_over_52": 0.9019,
+        "model_TG_RMS_150_minus_52_K": 53.0
+      },
+      {
+        "flame": "Methanol 30 cm",
+        "z_cm": 51,
+        "r_cm": 0,
+        "bead_52um": {
+          "TC_K": 594.0,
+          "TC_RMS_K": 208.0,
+          "TG_K_model": 595.0,
+          "TG_RMS_K_model": 285.0,
+          "Uc_TG_K": 31.0,
+          "TG_minus_TC_K": 1.0,
+          "TG_RMS_over_TC_RMS": 1.3702
+        },
+        "bead_150um": {
+          "TC_K": 630.0,
+          "TC_RMS_K": 150.0,
+          "TG_K_model": 632.0,
+          "TG_RMS_K_model": 327.0,
+          "Uc_TG_K": 33.0,
+          "TG_minus_TC_K": 2.0,
+          "TG_RMS_over_TC_RMS": 2.18
+        },
+        "run_to_run_TC_150_minus_52_K": 36.0,
+        "measured_TC_RMS_150_minus_52_K": -58.0,
+        "measured_TC_RMS_ratio_150_over_52": 0.7212,
+        "model_TG_RMS_150_minus_52_K": 42.0
+      },
+      {
+        "flame": "Methanol 30 cm",
+        "z_cm": 61,
+        "r_cm": 0,
+        "bead_52um": {
+          "TC_K": 503.0,
+          "TC_RMS_K": 153.0,
+          "TG_K_model": 503.0,
+          "TG_RMS_K_model": 216.0,
+          "Uc_TG_K": 26.0,
+          "TG_minus_TC_K": 0.0,
+          "TG_RMS_over_TC_RMS": 1.4118
+        },
+        "bead_150um": {
+          "TC_K": 545.0,
+          "TC_RMS_K": 146.0,
+          "TG_K_model": 545.0,
+          "TG_RMS_K_model": 263.0,
+          "Uc_TG_K": 28.0,
+          "TG_minus_TC_K": 0.0,
+          "TG_RMS_over_TC_RMS": 1.8014
+        },
+        "run_to_run_TC_150_minus_52_K": 42.0,
+        "measured_TC_RMS_150_minus_52_K": -7.0,
+        "measured_TC_RMS_ratio_150_over_52": 0.9542,
+        "model_TG_RMS_150_minus_52_K": 47.0
+      }
+    ],
     "acetone_liquid_timeseries": {
       "n_rows": 299,
       "n_cols": 11,
@@ -1219,6 +1470,9 @@
   "hylon_phase2": {
     "flames": {
       "FLAME_A1": {
+        "tc_csv_comment_flow_conditions": [
+          "#Flame A; reactive flow conditions; m_a = 1.7054 g/s; m_h = 0.02094 g/s; T_i^a = 298 K; T_i^h = 298K; p_outlet = atmospheric"
+        ],
         "thermocouple_profiles": {
           "z=2.7mm": {
             "n_rows": 8,
@@ -1250,12 +1504,26 @@
             "overlap_with_raman": [
               {
                 "z_mm": 2.7,
-                "x_mm": 13.0,
+                "x_TC_mm": 13.0,
+                "x_Raman_nearest_mm": 12.9474,
+                "dx_nearest_mm": -0.0526,
+                "within_0p5mm": true,
                 "T_TC_K": 837.0625,
-                "T_Raman_K": 941.5061,
+                "err_T_TC_K": 83.7062,
+                "err_x_TC_mm": 4.0,
+                "T_Raman_nearest_K": 941.5061,
+                "T_Raman_linear_interp_K": 941.5756,
+                "raman_interp_minus_nn_K": 0.0696,
+                "local_dT_dx_K_per_mm": -5.6607,
                 "T_Raman_rms_K": 80.4817,
-                "dT_TC_minus_Raman_K": -104.4436,
-                "rel_diff_pct": -11.0932
+                "raman_window_pm_errx_n_pts": 57,
+                "raman_window_pm_errx_min_K": 350.0612,
+                "raman_window_pm_errx_max_K": 950.0458,
+                "raman_window_pm_errx_mean_K": 870.986,
+                "dT_TC_minus_Raman_nn_K": -104.4436,
+                "dT_TC_minus_Raman_lin_K": -104.5131,
+                "rel_diff_lin_pct": -11.0998,
+                "tc_errT_overlaps_raman_pm_errx_range": true
               }
             ]
           },
@@ -1289,12 +1557,49 @@
             "overlap_with_raman": [
               {
                 "z_mm": 12.7,
-                "x_mm": 13.0,
+                "x_TC_mm": 13.0,
+                "x_Raman_nearest_mm": 12.9474,
+                "dx_nearest_mm": -0.0526,
+                "within_0p5mm": true,
                 "T_TC_K": 767.25,
-                "T_Raman_K": 1122.7747,
+                "err_T_TC_K": 76.725,
+                "err_x_TC_mm": 4.0,
+                "T_Raman_nearest_K": 1122.7747,
+                "T_Raman_linear_interp_K": 1097.9009,
+                "raman_interp_minus_nn_K": -24.8738,
+                "local_dT_dx_K_per_mm": -460.1477,
                 "T_Raman_rms_K": 546.2523,
-                "dT_TC_minus_Raman_K": -355.5247,
-                "rel_diff_pct": -31.6648
+                "raman_window_pm_errx_n_pts": 76,
+                "raman_window_pm_errx_min_K": 759.4216,
+                "raman_window_pm_errx_max_K": 1688.0061,
+                "raman_window_pm_errx_mean_K": 1135.9899,
+                "dT_TC_minus_Raman_nn_K": -355.5247,
+                "dT_TC_minus_Raman_lin_K": -330.6509,
+                "rel_diff_lin_pct": -30.1166,
+                "tc_errT_overlaps_raman_pm_errx_range": true
+              },
+              {
+                "z_mm": 12.7,
+                "x_TC_mm": 18.0,
+                "x_Raman_nearest_mm": 17.0511,
+                "dx_nearest_mm": -0.9489,
+                "within_0p5mm": false,
+                "T_TC_K": 871.0625,
+                "err_T_TC_K": 87.1063,
+                "err_x_TC_mm": 4.0,
+                "T_Raman_nearest_K": 847.3969,
+                "T_Raman_linear_interp_K": 879.1175,
+                "raman_interp_minus_nn_K": 31.7206,
+                "local_dT_dx_K_per_mm": 33.2569,
+                "T_Raman_rms_K": 125.919,
+                "raman_window_pm_errx_n_pts": 50,
+                "raman_window_pm_errx_min_K": 759.4216,
+                "raman_window_pm_errx_max_K": 910.8381,
+                "raman_window_pm_errx_mean_K": 833.7991,
+                "dT_TC_minus_Raman_nn_K": 23.6656,
+                "dT_TC_minus_Raman_lin_K": -8.055,
+                "rel_diff_lin_pct": -0.9163,
+                "tc_errT_overlaps_raman_pm_errx_range": true
               }
             ]
           },
@@ -1320,21 +1625,49 @@
             "overlap_with_raman": [
               {
                 "z_mm": 22.7,
-                "x_mm": 3.0,
+                "x_TC_mm": 3.0,
+                "x_Raman_nearest_mm": 2.9474,
+                "dx_nearest_mm": -0.0526,
+                "within_0p5mm": true,
                 "T_TC_K": 1180.6875,
-                "T_Raman_K": 998.8851,
+                "err_T_TC_K": 118.0687,
+                "err_x_TC_mm": 4.0,
+                "T_Raman_nearest_K": 998.8851,
+                "T_Raman_linear_interp_K": 999.7145,
+                "raman_interp_minus_nn_K": 0.8294,
+                "local_dT_dx_K_per_mm": 63.7376,
                 "T_Raman_rms_K": 58.1922,
-                "dT_TC_minus_Raman_K": 181.8024,
-                "rel_diff_pct": 18.2005
+                "raman_window_pm_errx_n_pts": 76,
+                "raman_window_pm_errx_min_K": 983.0834,
+                "raman_window_pm_errx_max_K": 1008.8918,
+                "raman_window_pm_errx_mean_K": 994.7262,
+                "dT_TC_minus_Raman_nn_K": 181.8024,
+                "dT_TC_minus_Raman_lin_K": 180.973,
+                "rel_diff_lin_pct": 18.1025,
+                "tc_errT_overlaps_raman_pm_errx_range": false
               },
               {
                 "z_mm": 22.7,
-                "x_mm": 8.0,
+                "x_TC_mm": 8.0,
+                "x_Raman_nearest_mm": 8.0,
+                "dx_nearest_mm": 0.0,
+                "within_0p5mm": true,
                 "T_TC_K": 1318.4375,
-                "T_Raman_K": 1000.4826,
+                "err_T_TC_K": 131.8438,
+                "err_x_TC_mm": 4.0,
+                "T_Raman_nearest_K": 1000.4826,
+                "T_Raman_linear_interp_K": 1000.4826,
+                "raman_interp_minus_nn_K": 0.0,
+                "local_dT_dx_K_per_mm": 30.3582,
                 "T_Raman_rms_K": 81.5119,
-                "dT_TC_minus_Raman_K": 317.9549,
-                "rel_diff_pct": 31.7801
+                "raman_window_pm_errx_n_pts": 77,
+                "raman_window_pm_errx_min_K": 986.6293,
+                "raman_window_pm_errx_max_K": 1111.9807,
+                "raman_window_pm_errx_mean_K": 1020.0979,
+                "dT_TC_minus_Raman_nn_K": 317.9549,
+                "dT_TC_minus_Raman_lin_K": 317.9549,
+                "rel_diff_lin_pct": 31.7801,
+                "tc_errT_overlaps_raman_pm_errx_range": false
               }
             ]
           },
@@ -1384,6 +1717,7 @@
             "x_min_mm": -3.0511,
             "x_max_mm": 14.946,
             "dx_median_mm": 0.1051,
+            "dx_max_gap_mm": 0.1066,
             "T_min_K": 348.8408,
             "T_max_K": 1754.5693,
             "T_rms_max_K": 562.1269,
@@ -1394,6 +1728,7 @@
             "x_min_mm": -3.0511,
             "x_max_mm": 12.946,
             "dx_median_mm": 0.1051,
+            "dx_max_gap_mm": 1.8979,
             "T_min_K": 472.8216,
             "T_max_K": 1823.7225,
             "T_rms_max_K": 526.372,
@@ -1404,6 +1739,7 @@
             "x_min_mm": -3.0511,
             "x_max_mm": 20.946,
             "dx_median_mm": 0.1051,
+            "dx_max_gap_mm": 1.8979,
             "T_min_K": 759.4216,
             "T_max_K": 2043.1244,
             "T_rms_max_K": 546.3671,
@@ -1414,49 +1750,130 @@
             "x_min_mm": -3.0511,
             "x_max_mm": 20.946,
             "dx_median_mm": 0.1051,
+            "dx_max_gap_mm": 0.1066,
             "T_min_K": 983.0834,
             "T_max_K": 1594.9027,
             "T_rms_max_K": 431.0181,
             "n_nan_T": 0
           }
         },
-        "tc_vs_raman_overlap_count": 4,
+        "tc_vs_raman_overlap_count_in_rx_range": 5,
+        "tc_vs_raman_overlap_count_within_0p5mm": 4,
         "tc_vs_raman_overlap_points": [
           {
             "z_mm": 2.7,
-            "x_mm": 13.0,
+            "x_TC_mm": 13.0,
+            "x_Raman_nearest_mm": 12.9474,
+            "dx_nearest_mm": -0.0526,
+            "within_0p5mm": true,
             "T_TC_K": 837.0625,
-            "T_Raman_K": 941.5061,
+            "err_T_TC_K": 83.7062,
+            "err_x_TC_mm": 4.0,
+            "T_Raman_nearest_K": 941.5061,
+            "T_Raman_linear_interp_K": 941.5756,
+            "raman_interp_minus_nn_K": 0.0696,
+            "local_dT_dx_K_per_mm": -5.6607,
             "T_Raman_rms_K": 80.4817,
-            "dT_TC_minus_Raman_K": -104.4436,
-            "rel_diff_pct": -11.0932
+            "raman_window_pm_errx_n_pts": 57,
+            "raman_window_pm_errx_min_K": 350.0612,
+            "raman_window_pm_errx_max_K": 950.0458,
+            "raman_window_pm_errx_mean_K": 870.986,
+            "dT_TC_minus_Raman_nn_K": -104.4436,
+            "dT_TC_minus_Raman_lin_K": -104.5131,
+            "rel_diff_lin_pct": -11.0998,
+            "tc_errT_overlaps_raman_pm_errx_range": true
           },
           {
             "z_mm": 12.7,
-            "x_mm": 13.0,
+            "x_TC_mm": 13.0,
+            "x_Raman_nearest_mm": 12.9474,
+            "dx_nearest_mm": -0.0526,
+            "within_0p5mm": true,
             "T_TC_K": 767.25,
-            "T_Raman_K": 1122.7747,
+            "err_T_TC_K": 76.725,
+            "err_x_TC_mm": 4.0,
+            "T_Raman_nearest_K": 1122.7747,
+            "T_Raman_linear_interp_K": 1097.9009,
+            "raman_interp_minus_nn_K": -24.8738,
+            "local_dT_dx_K_per_mm": -460.1477,
             "T_Raman_rms_K": 546.2523,
-            "dT_TC_minus_Raman_K": -355.5247,
-            "rel_diff_pct": -31.6648
+            "raman_window_pm_errx_n_pts": 76,
+            "raman_window_pm_errx_min_K": 759.4216,
+            "raman_window_pm_errx_max_K": 1688.0061,
+            "raman_window_pm_errx_mean_K": 1135.9899,
+            "dT_TC_minus_Raman_nn_K": -355.5247,
+            "dT_TC_minus_Raman_lin_K": -330.6509,
+            "rel_diff_lin_pct": -30.1166,
+            "tc_errT_overlaps_raman_pm_errx_range": true
+          },
+          {
+            "z_mm": 12.7,
+            "x_TC_mm": 18.0,
+            "x_Raman_nearest_mm": 17.0511,
+            "dx_nearest_mm": -0.9489,
+            "within_0p5mm": false,
+            "T_TC_K": 871.0625,
+            "err_T_TC_K": 87.1063,
+            "err_x_TC_mm": 4.0,
+            "T_Raman_nearest_K": 847.3969,
+            "T_Raman_linear_interp_K": 879.1175,
+            "raman_interp_minus_nn_K": 31.7206,
+            "local_dT_dx_K_per_mm": 33.2569,
+            "T_Raman_rms_K": 125.919,
+            "raman_window_pm_errx_n_pts": 50,
+            "raman_window_pm_errx_min_K": 759.4216,
+            "raman_window_pm_errx_max_K": 910.8381,
+            "raman_window_pm_errx_mean_K": 833.7991,
+            "dT_TC_minus_Raman_nn_K": 23.6656,
+            "dT_TC_minus_Raman_lin_K": -8.055,
+            "rel_diff_lin_pct": -0.9163,
+            "tc_errT_overlaps_raman_pm_errx_range": true
           },
           {
             "z_mm": 22.7,
-            "x_mm": 3.0,
+            "x_TC_mm": 3.0,
+            "x_Raman_nearest_mm": 2.9474,
+            "dx_nearest_mm": -0.0526,
+            "within_0p5mm": true,
             "T_TC_K": 1180.6875,
-            "T_Raman_K": 998.8851,
+            "err_T_TC_K": 118.0687,
+            "err_x_TC_mm": 4.0,
+            "T_Raman_nearest_K": 998.8851,
+            "T_Raman_linear_interp_K": 999.7145,
+            "raman_interp_minus_nn_K": 0.8294,
+            "local_dT_dx_K_per_mm": 63.7376,
             "T_Raman_rms_K": 58.1922,
-            "dT_TC_minus_Raman_K": 181.8024,
-            "rel_diff_pct": 18.2005
+            "raman_window_pm_errx_n_pts": 76,
+            "raman_window_pm_errx_min_K": 983.0834,
+            "raman_window_pm_errx_max_K": 1008.8918,
+            "raman_window_pm_errx_mean_K": 994.7262,
+            "dT_TC_minus_Raman_nn_K": 181.8024,
+            "dT_TC_minus_Raman_lin_K": 180.973,
+            "rel_diff_lin_pct": 18.1025,
+            "tc_errT_overlaps_raman_pm_errx_range": false
           },
           {
             "z_mm": 22.7,
-            "x_mm": 8.0,
+            "x_TC_mm": 8.0,
+            "x_Raman_nearest_mm": 8.0,
+            "dx_nearest_mm": 0.0,
+            "within_0p5mm": true,
             "T_TC_K": 1318.4375,
-            "T_Raman_K": 1000.4826,
+            "err_T_TC_K": 131.8438,
+            "err_x_TC_mm": 4.0,
+            "T_Raman_nearest_K": 1000.4826,
+            "T_Raman_linear_interp_K": 1000.4826,
+            "raman_interp_minus_nn_K": 0.0,
+            "local_dT_dx_K_per_mm": 30.3582,
             "T_Raman_rms_K": 81.5119,
-            "dT_TC_minus_Raman_K": 317.9549,
-            "rel_diff_pct": 31.7801
+            "raman_window_pm_errx_n_pts": 77,
+            "raman_window_pm_errx_min_K": 986.6293,
+            "raman_window_pm_errx_max_K": 1111.9807,
+            "raman_window_pm_errx_mean_K": 1020.0979,
+            "dT_TC_minus_Raman_nn_K": 317.9549,
+            "dT_TC_minus_Raman_lin_K": 317.9549,
+            "rel_diff_lin_pct": 31.7801,
+            "tc_errT_overlaps_raman_pm_errx_range": false
           }
         ],
         "lip_wall_temperatures": {
@@ -1491,66 +1908,227 @@
             "rel_unc_pct_median": 2.4989
           }
         },
-        "piv_hardware_swap_2s2q_vs_4q": {
-          "z=12.7mm": {
-            "headers_2s2q": [
-              "x",
-              "z",
-              "U_x",
-              "U_z",
-              "U_x_rms",
-              "U_z_rms"
-            ],
-            "headers_4q": [
-              "x",
-              "z",
-              "U_x",
-              "U_z",
-              "U_x_rms",
-              "U_z_rms"
-            ],
-            "n_2s2q": 128,
-            "n_4q": 1251,
-            "x_overlap_mm": [
-              0.0379,
-              30.7417
-            ],
-            "Uz_max_abs_diff_ms": 2.2322,
-            "Uz_rms_diff_ms": 0.8748,
-            "Uz_peak_2s2q_ms": 13.8039,
-            "Uz_peak_4q_ms": 14.4175
+        "piv_comparison_2s2q_vs_4q": {
+          "Reactive": {
+            "z=2.7mm": {
+              "n_2s2q": 128,
+              "n_4q": 1251,
+              "z_col_median_2s2q_mm": 2.7773,
+              "z_col_median_4q_mm": 2.6962,
+              "dz_col_mm": 0.0811,
+              "x_overlap_mm": [
+                0.0379,
+                30.7417
+              ],
+              "Uz_rms_diff_ms": 0.5958,
+              "Uz_max_abs_diff_ms": 2.6189,
+              "x_at_max_diff_mm": 9.7096,
+              "Uz_rms_2s2q_at_max_ms": 1.9649,
+              "Uz_rms_4q_at_max_ms": 1.4955,
+              "Uz_peak_2s2q_ms": 15.6197,
+              "x_peak_2s2q_mm": 8.7413,
+              "Uz_peak_4q_ms": 16.5717,
+              "x_peak_4q_mm": 8.8611,
+              "dx_peak_4q_minus_2s2q_mm": 0.1198
+            },
+            "z=7.7mm": {
+              "n_2s2q": 127,
+              "n_4q": 1251,
+              "z_col_median_2s2q_mm": 7.6126,
+              "z_col_median_4q_mm": 7.6962,
+              "dz_col_mm": -0.0836,
+              "x_overlap_mm": [
+                0.2796,
+                30.7417
+              ],
+              "Uz_rms_diff_ms": 0.4781,
+              "Uz_max_abs_diff_ms": 1.0289,
+              "x_at_max_diff_mm": 6.9813,
+              "Uz_rms_2s2q_at_max_ms": 1.8613,
+              "Uz_rms_4q_at_max_ms": 2.1237,
+              "Uz_peak_2s2q_ms": 14.7805,
+              "x_peak_2s2q_mm": 10.4337,
+              "Uz_peak_4q_ms": 15.403,
+              "x_peak_4q_mm": 10.6944,
+              "dx_peak_4q_minus_2s2q_mm": 0.2607
+            },
+            "z=12.7mm": {
+              "n_2s2q": 128,
+              "n_4q": 1251,
+              "z_col_median_2s2q_mm": 12.6896,
+              "z_col_median_4q_mm": 12.6962,
+              "dz_col_mm": -0.0066,
+              "x_overlap_mm": [
+                0.0379,
+                30.7417
+              ],
+              "Uz_rms_diff_ms": 0.8764,
+              "Uz_max_abs_diff_ms": 2.2322,
+              "x_at_max_diff_mm": 10.1701,
+              "Uz_rms_2s2q_at_max_ms": 4.1971,
+              "Uz_rms_4q_at_max_ms": 3.5255,
+              "Uz_peak_2s2q_ms": 13.8039,
+              "x_peak_2s2q_mm": 13.093,
+              "Uz_peak_4q_ms": 14.4175,
+              "x_peak_4q_mm": 13.2222,
+              "dx_peak_4q_minus_2s2q_mm": 0.1292
+            },
+            "z=22.7mm": {
+              "n_2s2q": 128,
+              "n_4q": 1251,
+              "z_col_median_2s2q_mm": 22.6018,
+              "z_col_median_4q_mm": 22.6962,
+              "dz_col_mm": -0.0944,
+              "x_overlap_mm": [
+                0.0379,
+                30.7417
+              ],
+              "Uz_rms_diff_ms": 0.7668,
+              "Uz_max_abs_diff_ms": 1.4289,
+              "x_at_max_diff_mm": 29.9741,
+              "Uz_rms_2s2q_at_max_ms": 1.6599,
+              "Uz_rms_4q_at_max_ms": 1.6882,
+              "Uz_peak_2s2q_ms": 9.2263,
+              "x_peak_2s2q_mm": 21.0712,
+              "Uz_peak_4q_ms": 10.3436,
+              "x_peak_4q_mm": 20.5278,
+              "dx_peak_4q_minus_2s2q_mm": -0.5434
+            },
+            "z=32.7mm": {
+              "n_2s2q": 127,
+              "n_4q": 1251,
+              "z_col_median_2s2q_mm": 32.7558,
+              "z_col_median_4q_mm": 32.6962,
+              "dz_col_mm": 0.0596,
+              "x_overlap_mm": [
+                0.0379,
+                30.4999
+              ],
+              "Uz_rms_diff_ms": 0.7038,
+              "Uz_max_abs_diff_ms": 1.507,
+              "x_at_max_diff_mm": 7.0441,
+              "Uz_rms_2s2q_at_max_ms": 5.1297,
+              "Uz_rms_4q_at_max_ms": 1.0702,
+              "Uz_peak_2s2q_ms": 4.3623,
+              "x_peak_2s2q_mm": 30.4999,
+              "Uz_peak_4q_ms": 4.3408,
+              "x_peak_4q_mm": 33.0,
+              "dx_peak_4q_minus_2s2q_mm": 2.5001
+            }
           },
-          "z=22.7mm": {
-            "headers_2s2q": [
-              "x",
-              "z",
-              "U_x",
-              "U_z",
-              "U_x_rms",
-              "U_z_rms"
-            ],
-            "headers_4q": [
-              "x",
-              "z",
-              "U_x",
-              "U_z",
-              "U_x_rms",
-              "U_z_rms"
-            ],
-            "n_2s2q": 128,
-            "n_4q": 1251,
-            "x_overlap_mm": [
-              0.0379,
-              30.7417
-            ],
-            "Uz_max_abs_diff_ms": 1.4161,
-            "Uz_rms_diff_ms": 0.7675,
-            "Uz_peak_2s2q_ms": 9.2263,
-            "Uz_peak_4q_ms": 10.3436
+          "Cold": {
+            "z=2.7mm": {
+              "n_2s2q": 268,
+              "n_4q": 2422,
+              "z_col_median_2s2q_mm": 2.7996,
+              "z_col_median_4q_mm": 2.6962,
+              "dz_col_mm": 0.1035,
+              "x_overlap_mm": [
+                -33.3748,
+                30.9863
+              ],
+              "Uz_rms_diff_ms": 1.3706,
+              "Uz_max_abs_diff_ms": 7.7802,
+              "x_at_max_diff_mm": -9.5612,
+              "Uz_rms_2s2q_at_max_ms": 2.9477,
+              "Uz_rms_4q_at_max_ms": 3.3332,
+              "Uz_peak_2s2q_ms": 15.918,
+              "x_peak_2s2q_mm": -8.5464,
+              "Uz_peak_4q_ms": 16.4867,
+              "x_peak_4q_mm": -9.0667,
+              "dx_peak_4q_minus_2s2q_mm": -0.5203
+            },
+            "z=7.7mm": {
+              "n_2s2q": 268,
+              "n_4q": 2422,
+              "z_col_median_2s2q_mm": 7.6207,
+              "z_col_median_4q_mm": 7.6962,
+              "dz_col_mm": -0.0755,
+              "x_overlap_mm": [
+                -33.3748,
+                30.9863
+              ],
+              "Uz_rms_diff_ms": 1.259,
+              "Uz_max_abs_diff_ms": 3.5864,
+              "x_at_max_diff_mm": 7.4945,
+              "Uz_rms_2s2q_at_max_ms": 3.3616,
+              "Uz_rms_4q_at_max_ms": 3.8884,
+              "Uz_peak_2s2q_ms": 12.8868,
+              "x_peak_2s2q_mm": -9.0285,
+              "Uz_peak_4q_ms": 13.248,
+              "x_peak_4q_mm": -9.4556,
+              "dx_peak_4q_minus_2s2q_mm": -0.4271
+            },
+            "z=12.7mm": {
+              "n_2s2q": 268,
+              "n_4q": 2422,
+              "z_col_median_2s2q_mm": 12.6828,
+              "z_col_median_4q_mm": 12.6962,
+              "dz_col_mm": -0.0134,
+              "x_overlap_mm": [
+                -33.3748,
+                30.9863
+              ],
+              "Uz_rms_diff_ms": 1.204,
+              "Uz_max_abs_diff_ms": 2.8429,
+              "x_at_max_diff_mm": 6.8509,
+              "Uz_rms_2s2q_at_max_ms": 3.474,
+              "Uz_rms_4q_at_max_ms": 3.8258,
+              "Uz_peak_2s2q_ms": 10.1123,
+              "x_peak_2s2q_mm": -9.5106,
+              "Uz_peak_4q_ms": 10.6357,
+              "x_peak_4q_mm": -10.1222,
+              "dx_peak_4q_minus_2s2q_mm": -0.6116
+            },
+            "z=22.7mm": {
+              "n_2s2q": 268,
+              "n_4q": 2422,
+              "z_col_median_2s2q_mm": 22.807,
+              "z_col_median_4q_mm": 22.6962,
+              "dz_col_mm": 0.1108,
+              "x_overlap_mm": [
+                -33.3748,
+                30.9863
+              ],
+              "Uz_rms_diff_ms": 0.8667,
+              "Uz_max_abs_diff_ms": 1.6928,
+              "x_at_max_diff_mm": 13.9306,
+              "Uz_rms_2s2q_at_max_ms": 2.2452,
+              "Uz_rms_4q_at_max_ms": 2.7255,
+              "Uz_peak_2s2q_ms": 6.8275,
+              "x_peak_2s2q_mm": -11.198,
+              "Uz_peak_4q_ms": 7.3104,
+              "x_peak_4q_mm": -11.65,
+              "dx_peak_4q_minus_2s2q_mm": -0.452
+            },
+            "z=32.7mm": {
+              "n_2s2q": 268,
+              "n_4q": 2422,
+              "z_col_median_2s2q_mm": 32.6902,
+              "z_col_median_4q_mm": 32.6962,
+              "dz_col_mm": -0.006,
+              "x_overlap_mm": [
+                -33.3748,
+                30.9863
+              ],
+              "Uz_rms_diff_ms": 0.5751,
+              "Uz_max_abs_diff_ms": 1.0636,
+              "x_at_max_diff_mm": 19.0795,
+              "Uz_rms_2s2q_at_max_ms": 1.7671,
+              "Uz_rms_4q_at_max_ms": 2.136,
+              "Uz_peak_2s2q_ms": 4.6424,
+              "x_peak_2s2q_mm": -15.0548,
+              "Uz_peak_4q_ms": 4.8853,
+              "x_peak_4q_mm": -15.65,
+              "dx_peak_4q_minus_2s2q_mm": -0.5952
+            }
           }
         }
       },
       "FLAME_L1": {
+        "tc_csv_comment_flow_conditions": [
+          "#Flame L; reactive flow conditions; m_a = 1.7054 g/s; m_h = 0.02094 g/s; T_i^a = 298 K; T_i^h = 298K; p_outlet = atmospheric"
+        ],
         "thermocouple_profiles": {
           "z=2.7mm": {
             "n_rows": 7,
@@ -1565,21 +2143,49 @@
             "overlap_with_raman": [
               {
                 "z_mm": 2.7,
-                "x_mm": 5.0,
+                "x_TC_mm": 5.0,
+                "x_Raman_nearest_mm": 4.9474,
+                "dx_nearest_mm": -0.0526,
+                "within_0p5mm": true,
                 "T_TC_K": 1459.25,
-                "T_Raman_K": 1392.7657,
+                "err_T_TC_K": 145.925,
+                "err_x_TC_mm": 4.0,
+                "T_Raman_nearest_K": 1392.7657,
+                "T_Raman_linear_interp_K": 1367.6366,
+                "raman_interp_minus_nn_K": -25.1291,
+                "local_dT_dx_K_per_mm": 0.7944,
                 "T_Raman_rms_K": 479.318,
-                "dT_TC_minus_Raman_K": 66.4843,
-                "rel_diff_pct": 4.7735
+                "raman_window_pm_errx_n_pts": 76,
+                "raman_window_pm_errx_min_K": 333.393,
+                "raman_window_pm_errx_max_K": 2244.0088,
+                "raman_window_pm_errx_mean_K": 1338.4876,
+                "dT_TC_minus_Raman_nn_K": 66.4843,
+                "dT_TC_minus_Raman_lin_K": 91.6134,
+                "rel_diff_lin_pct": 6.6987,
+                "tc_errT_overlaps_raman_pm_errx_range": true
               },
               {
                 "z_mm": 2.7,
-                "x_mm": 10.0,
+                "x_TC_mm": 10.0,
+                "x_Raman_nearest_mm": 10.0,
+                "dx_nearest_mm": 0.0,
+                "within_0p5mm": true,
                 "T_TC_K": 947.6875,
-                "T_Raman_K": 937.0026,
+                "err_T_TC_K": 94.7687,
+                "err_x_TC_mm": 4.0,
+                "T_Raman_nearest_K": 937.0026,
+                "T_Raman_linear_interp_K": 937.0026,
+                "raman_interp_minus_nn_K": 0.0,
+                "local_dT_dx_K_per_mm": 657.1374,
                 "T_Raman_rms_K": 180.9987,
-                "dT_TC_minus_Raman_K": 10.6849,
-                "rel_diff_pct": 1.1403
+                "raman_window_pm_errx_n_pts": 77,
+                "raman_window_pm_errx_min_K": 333.393,
+                "raman_window_pm_errx_max_K": 1125.4417,
+                "raman_window_pm_errx_mean_K": 827.3175,
+                "dT_TC_minus_Raman_nn_K": 10.6849,
+                "dT_TC_minus_Raman_lin_K": 10.6849,
+                "rel_diff_lin_pct": 1.1403,
+                "tc_errT_overlaps_raman_pm_errx_range": true
               }
             ]
           },
@@ -1596,39 +2202,95 @@
             "overlap_with_raman": [
               {
                 "z_mm": 12.7,
-                "x_mm": 0.0,
+                "x_TC_mm": 0.0,
+                "x_Raman_nearest_mm": 0.0,
+                "dx_nearest_mm": 0.0,
+                "within_0p5mm": true,
                 "T_TC_K": 1728.4375,
-                "T_Raman_K": 1215.6178,
+                "err_T_TC_K": 172.8438,
+                "err_x_TC_mm": 4.0,
+                "T_Raman_nearest_K": 1215.6178,
+                "T_Raman_linear_interp_K": 1215.6178,
+                "raman_interp_minus_nn_K": 0.0,
+                "local_dT_dx_K_per_mm": -9.6124,
                 "T_Raman_rms_K": 77.0348,
-                "dT_TC_minus_Raman_K": 512.8197,
-                "rel_diff_pct": 42.1859
+                "raman_window_pm_errx_n_pts": 68,
+                "raman_window_pm_errx_min_K": 1200.8643,
+                "raman_window_pm_errx_max_K": 1284.8253,
+                "raman_window_pm_errx_mean_K": 1235.5854,
+                "dT_TC_minus_Raman_nn_K": 512.8197,
+                "dT_TC_minus_Raman_lin_K": 512.8197,
+                "rel_diff_lin_pct": 42.1859,
+                "tc_errT_overlaps_raman_pm_errx_range": false
               },
               {
                 "z_mm": 12.7,
-                "x_mm": 10.0,
+                "x_TC_mm": 10.0,
+                "x_Raman_nearest_mm": 10.0,
+                "dx_nearest_mm": 0.0,
+                "within_0p5mm": true,
                 "T_TC_K": 1891.125,
-                "T_Raman_K": 2125.3349,
+                "err_T_TC_K": 189.1125,
+                "err_x_TC_mm": 4.0,
+                "T_Raman_nearest_K": 2125.3349,
+                "T_Raman_linear_interp_K": 2125.3349,
+                "raman_interp_minus_nn_K": 0.0,
+                "local_dT_dx_K_per_mm": -117.0936,
                 "T_Raman_rms_K": 199.4544,
-                "dT_TC_minus_Raman_K": -234.2099,
-                "rel_diff_pct": -11.0199
+                "raman_window_pm_errx_n_pts": 77,
+                "raman_window_pm_errx_min_K": 1048.718,
+                "raman_window_pm_errx_max_K": 2197.2067,
+                "raman_window_pm_errx_mean_K": 1788.2071,
+                "dT_TC_minus_Raman_nn_K": -234.2099,
+                "dT_TC_minus_Raman_lin_K": -234.2099,
+                "rel_diff_lin_pct": -11.0199,
+                "tc_errT_overlaps_raman_pm_errx_range": true
               },
               {
                 "z_mm": 12.7,
-                "x_mm": 15.0,
+                "x_TC_mm": 15.0,
+                "x_Raman_nearest_mm": 14.9474,
+                "dx_nearest_mm": -0.0526,
+                "within_0p5mm": true,
                 "T_TC_K": 956.8125,
-                "T_Raman_K": 934.7337,
+                "err_T_TC_K": 95.6813,
+                "err_x_TC_mm": 4.0,
+                "T_Raman_nearest_K": 934.7337,
+                "T_Raman_linear_interp_K": 929.9301,
+                "raman_interp_minus_nn_K": -4.8036,
+                "local_dT_dx_K_per_mm": 89.8671,
                 "T_Raman_rms_K": 371.3791,
-                "dT_TC_minus_Raman_K": 22.0788,
-                "rel_diff_pct": 2.362
+                "raman_window_pm_errx_n_pts": 76,
+                "raman_window_pm_errx_min_K": 863.0778,
+                "raman_window_pm_errx_max_K": 2136.0649,
+                "raman_window_pm_errx_mean_K": 1186.4306,
+                "dT_TC_minus_Raman_nn_K": 22.0788,
+                "dT_TC_minus_Raman_lin_K": 26.8824,
+                "rel_diff_lin_pct": 2.8908,
+                "tc_errT_overlaps_raman_pm_errx_range": true
               },
               {
                 "z_mm": 12.7,
-                "x_mm": 20.0,
+                "x_TC_mm": 20.0,
+                "x_Raman_nearest_mm": 20.0,
+                "dx_nearest_mm": 0.0,
+                "within_0p5mm": true,
                 "T_TC_K": 988.5,
-                "T_Raman_K": 891.8121,
+                "err_T_TC_K": 98.85,
+                "err_x_TC_mm": 4.0,
+                "T_Raman_nearest_K": 891.8121,
+                "T_Raman_linear_interp_K": 891.8121,
+                "raman_interp_minus_nn_K": 0.0,
+                "local_dT_dx_K_per_mm": -25.0146,
                 "T_Raman_rms_K": 156.7379,
-                "dT_TC_minus_Raman_K": 96.6879,
-                "rel_diff_pct": 10.8417
+                "raman_window_pm_errx_n_pts": 67,
+                "raman_window_pm_errx_min_K": 863.0778,
+                "raman_window_pm_errx_max_K": 922.4626,
+                "raman_window_pm_errx_mean_K": 886.8655,
+                "dT_TC_minus_Raman_nn_K": 96.6879,
+                "dT_TC_minus_Raman_lin_K": 96.6879,
+                "rel_diff_lin_pct": 10.8417,
+                "tc_errT_overlaps_raman_pm_errx_range": true
               }
             ]
           },
@@ -1645,48 +2307,118 @@
             "overlap_with_raman": [
               {
                 "z_mm": 22.7,
-                "x_mm": 0.0,
+                "x_TC_mm": 0.0,
+                "x_Raman_nearest_mm": 0.0,
+                "dx_nearest_mm": 0.0,
+                "within_0p5mm": true,
                 "T_TC_K": 1149.25,
-                "T_Raman_K": 1196.124,
+                "err_T_TC_K": 114.925,
+                "err_x_TC_mm": 4.0,
+                "T_Raman_nearest_K": 1196.124,
+                "T_Raman_linear_interp_K": 1196.124,
+                "raman_interp_minus_nn_K": 0.0,
+                "local_dT_dx_K_per_mm": -7.3337,
                 "T_Raman_rms_K": 58.232,
-                "dT_TC_minus_Raman_K": -46.874,
-                "rel_diff_pct": -3.9188
+                "raman_window_pm_errx_n_pts": 68,
+                "raman_window_pm_errx_min_K": 1193.1945,
+                "raman_window_pm_errx_max_K": 1288.1182,
+                "raman_window_pm_errx_mean_K": 1248.7698,
+                "dT_TC_minus_Raman_nn_K": -46.874,
+                "dT_TC_minus_Raman_lin_K": -46.874,
+                "rel_diff_lin_pct": -3.9188,
+                "tc_errT_overlaps_raman_pm_errx_range": true
               },
               {
                 "z_mm": 22.7,
-                "x_mm": 5.0,
+                "x_TC_mm": 5.0,
+                "x_Raman_nearest_mm": 4.9474,
+                "dx_nearest_mm": -0.0526,
+                "within_0p5mm": true,
                 "T_TC_K": 1211.25,
-                "T_Raman_K": 1279.2342,
+                "err_T_TC_K": 121.125,
+                "err_x_TC_mm": 4.0,
+                "T_Raman_nearest_K": 1279.2342,
+                "T_Raman_linear_interp_K": 1280.6127,
+                "raman_interp_minus_nn_K": 1.3785,
+                "local_dT_dx_K_per_mm": 75.7576,
                 "T_Raman_rms_K": 57.9227,
-                "dT_TC_minus_Raman_K": -67.9842,
-                "rel_diff_pct": -5.3144
+                "raman_window_pm_errx_n_pts": 76,
+                "raman_window_pm_errx_min_K": 1236.335,
+                "raman_window_pm_errx_max_K": 1310.2378,
+                "raman_window_pm_errx_mean_K": 1281.3786,
+                "dT_TC_minus_Raman_nn_K": -67.9842,
+                "dT_TC_minus_Raman_lin_K": -69.3627,
+                "rel_diff_lin_pct": -5.4164,
+                "tc_errT_overlaps_raman_pm_errx_range": true
               },
               {
                 "z_mm": 22.7,
-                "x_mm": 10.0,
+                "x_TC_mm": 10.0,
+                "x_Raman_nearest_mm": 10.0,
+                "dx_nearest_mm": 0.0,
+                "within_0p5mm": true,
                 "T_TC_K": 1294.25,
-                "T_Raman_K": 1293.2337,
+                "err_T_TC_K": 129.425,
+                "err_x_TC_mm": 4.0,
+                "T_Raman_nearest_K": 1293.2337,
+                "T_Raman_linear_interp_K": 1293.2337,
+                "raman_interp_minus_nn_K": 0.0,
+                "local_dT_dx_K_per_mm": -18.5649,
                 "T_Raman_rms_K": 63.4694,
-                "dT_TC_minus_Raman_K": 1.0163,
-                "rel_diff_pct": 0.0786
+                "raman_window_pm_errx_n_pts": 77,
+                "raman_window_pm_errx_min_K": 1269.2449,
+                "raman_window_pm_errx_max_K": 1428.8308,
+                "raman_window_pm_errx_mean_K": 1323.3205,
+                "dT_TC_minus_Raman_nn_K": 1.0163,
+                "dT_TC_minus_Raman_lin_K": 1.0163,
+                "rel_diff_lin_pct": 0.0786,
+                "tc_errT_overlaps_raman_pm_errx_range": true
               },
               {
                 "z_mm": 22.7,
-                "x_mm": 15.0,
+                "x_TC_mm": 15.0,
+                "x_Raman_nearest_mm": 14.9474,
+                "dx_nearest_mm": -0.0526,
+                "within_0p5mm": true,
                 "T_TC_K": 1563.3125,
-                "T_Raman_K": 1528.7223,
+                "err_T_TC_K": 156.3313,
+                "err_x_TC_mm": 4.0,
+                "T_Raman_nearest_K": 1528.7223,
+                "T_Raman_linear_interp_K": 1533.2467,
+                "raman_interp_minus_nn_K": 4.5244,
+                "local_dT_dx_K_per_mm": 182.7136,
                 "T_Raman_rms_K": 290.0628,
-                "dT_TC_minus_Raman_K": 34.5902,
-                "rel_diff_pct": 2.2627
+                "raman_window_pm_errx_n_pts": 76,
+                "raman_window_pm_errx_min_K": 1320.9835,
+                "raman_window_pm_errx_max_K": 1832.563,
+                "raman_window_pm_errx_mean_K": 1554.3989,
+                "dT_TC_minus_Raman_nn_K": 34.5902,
+                "dT_TC_minus_Raman_lin_K": 30.0658,
+                "rel_diff_lin_pct": 1.9609,
+                "tc_errT_overlaps_raman_pm_errx_range": true
               },
               {
                 "z_mm": 22.7,
-                "x_mm": 20.0,
+                "x_TC_mm": 20.0,
+                "x_Raman_nearest_mm": 20.0,
+                "dx_nearest_mm": 0.0,
+                "within_0p5mm": true,
                 "T_TC_K": 1345.8125,
-                "T_Raman_K": 1600.9926,
+                "err_T_TC_K": 134.5813,
+                "err_x_TC_mm": 4.0,
+                "T_Raman_nearest_K": 1600.9926,
+                "T_Raman_linear_interp_K": 1600.9926,
+                "raman_interp_minus_nn_K": 0.0,
+                "local_dT_dx_K_per_mm": -163.4932,
                 "T_Raman_rms_K": 454.7727,
-                "dT_TC_minus_Raman_K": -255.1801,
-                "rel_diff_pct": -15.9389
+                "raman_window_pm_errx_n_pts": 67,
+                "raman_window_pm_errx_min_K": 1240.3723,
+                "raman_window_pm_errx_max_K": 1832.563,
+                "raman_window_pm_errx_mean_K": 1587.324,
+                "dT_TC_minus_Raman_nn_K": -255.1801,
+                "dT_TC_minus_Raman_lin_K": -255.1801,
+                "rel_diff_lin_pct": -15.9389,
+                "tc_errT_overlaps_raman_pm_errx_range": true
               }
             ]
           },
@@ -1736,6 +2468,7 @@
             "x_min_mm": -3.0511,
             "x_max_mm": 14.946,
             "dx_median_mm": 0.1051,
+            "dx_max_gap_mm": 0.1066,
             "T_min_K": 333.393,
             "T_max_K": 2244.0088,
             "T_rms_max_K": 490.0968,
@@ -1746,6 +2479,7 @@
             "x_min_mm": -3.0511,
             "x_max_mm": 18.946,
             "dx_median_mm": 0.1051,
+            "dx_max_gap_mm": 1.8979,
             "T_min_K": 596.0144,
             "T_max_K": 2194.6425,
             "T_rms_max_K": 558.7859,
@@ -1756,6 +2490,7 @@
             "x_min_mm": -3.0511,
             "x_max_mm": 22.946,
             "dx_median_mm": 0.1051,
+            "dx_max_gap_mm": 0.1066,
             "T_min_K": 863.0778,
             "T_max_K": 2197.2067,
             "T_rms_max_K": 593.4464,
@@ -1766,112 +2501,268 @@
             "x_min_mm": -3.0511,
             "x_max_mm": 22.946,
             "dx_median_mm": 0.1051,
+            "dx_max_gap_mm": 0.1066,
             "T_min_K": 1193.1945,
             "T_max_K": 1832.563,
             "T_rms_max_K": 464.4901,
             "n_nan_T": 0
           }
         },
-        "tc_vs_raman_overlap_count": 11,
+        "tc_vs_raman_overlap_count_in_rx_range": 11,
+        "tc_vs_raman_overlap_count_within_0p5mm": 11,
         "tc_vs_raman_overlap_points": [
           {
             "z_mm": 2.7,
-            "x_mm": 5.0,
+            "x_TC_mm": 5.0,
+            "x_Raman_nearest_mm": 4.9474,
+            "dx_nearest_mm": -0.0526,
+            "within_0p5mm": true,
             "T_TC_K": 1459.25,
-            "T_Raman_K": 1392.7657,
+            "err_T_TC_K": 145.925,
+            "err_x_TC_mm": 4.0,
+            "T_Raman_nearest_K": 1392.7657,
+            "T_Raman_linear_interp_K": 1367.6366,
+            "raman_interp_minus_nn_K": -25.1291,
+            "local_dT_dx_K_per_mm": 0.7944,
             "T_Raman_rms_K": 479.318,
-            "dT_TC_minus_Raman_K": 66.4843,
-            "rel_diff_pct": 4.7735
+            "raman_window_pm_errx_n_pts": 76,
+            "raman_window_pm_errx_min_K": 333.393,
+            "raman_window_pm_errx_max_K": 2244.0088,
+            "raman_window_pm_errx_mean_K": 1338.4876,
+            "dT_TC_minus_Raman_nn_K": 66.4843,
+            "dT_TC_minus_Raman_lin_K": 91.6134,
+            "rel_diff_lin_pct": 6.6987,
+            "tc_errT_overlaps_raman_pm_errx_range": true
           },
           {
             "z_mm": 2.7,
-            "x_mm": 10.0,
+            "x_TC_mm": 10.0,
+            "x_Raman_nearest_mm": 10.0,
+            "dx_nearest_mm": 0.0,
+            "within_0p5mm": true,
             "T_TC_K": 947.6875,
-            "T_Raman_K": 937.0026,
+            "err_T_TC_K": 94.7687,
+            "err_x_TC_mm": 4.0,
+            "T_Raman_nearest_K": 937.0026,
+            "T_Raman_linear_interp_K": 937.0026,
+            "raman_interp_minus_nn_K": 0.0,
+            "local_dT_dx_K_per_mm": 657.1374,
             "T_Raman_rms_K": 180.9987,
-            "dT_TC_minus_Raman_K": 10.6849,
-            "rel_diff_pct": 1.1403
+            "raman_window_pm_errx_n_pts": 77,
+            "raman_window_pm_errx_min_K": 333.393,
+            "raman_window_pm_errx_max_K": 1125.4417,
+            "raman_window_pm_errx_mean_K": 827.3175,
+            "dT_TC_minus_Raman_nn_K": 10.6849,
+            "dT_TC_minus_Raman_lin_K": 10.6849,
+            "rel_diff_lin_pct": 1.1403,
+            "tc_errT_overlaps_raman_pm_errx_range": true
           },
           {
             "z_mm": 12.7,
-            "x_mm": 0.0,
+            "x_TC_mm": 0.0,
+            "x_Raman_nearest_mm": 0.0,
+            "dx_nearest_mm": 0.0,
+            "within_0p5mm": true,
             "T_TC_K": 1728.4375,
-            "T_Raman_K": 1215.6178,
+            "err_T_TC_K": 172.8438,
+            "err_x_TC_mm": 4.0,
+            "T_Raman_nearest_K": 1215.6178,
+            "T_Raman_linear_interp_K": 1215.6178,
+            "raman_interp_minus_nn_K": 0.0,
+            "local_dT_dx_K_per_mm": -9.6124,
             "T_Raman_rms_K": 77.0348,
-            "dT_TC_minus_Raman_K": 512.8197,
-            "rel_diff_pct": 42.1859
+            "raman_window_pm_errx_n_pts": 68,
+            "raman_window_pm_errx_min_K": 1200.8643,
+            "raman_window_pm_errx_max_K": 1284.8253,
+            "raman_window_pm_errx_mean_K": 1235.5854,
+            "dT_TC_minus_Raman_nn_K": 512.8197,
+            "dT_TC_minus_Raman_lin_K": 512.8197,
+            "rel_diff_lin_pct": 42.1859,
+            "tc_errT_overlaps_raman_pm_errx_range": false
           },
           {
             "z_mm": 12.7,
-            "x_mm": 10.0,
+            "x_TC_mm": 10.0,
+            "x_Raman_nearest_mm": 10.0,
+            "dx_nearest_mm": 0.0,
+            "within_0p5mm": true,
             "T_TC_K": 1891.125,
-            "T_Raman_K": 2125.3349,
+            "err_T_TC_K": 189.1125,
+            "err_x_TC_mm": 4.0,
+            "T_Raman_nearest_K": 2125.3349,
+            "T_Raman_linear_interp_K": 2125.3349,
+            "raman_interp_minus_nn_K": 0.0,
+            "local_dT_dx_K_per_mm": -117.0936,
             "T_Raman_rms_K": 199.4544,
-            "dT_TC_minus_Raman_K": -234.2099,
-            "rel_diff_pct": -11.0199
+            "raman_window_pm_errx_n_pts": 77,
+            "raman_window_pm_errx_min_K": 1048.718,
+            "raman_window_pm_errx_max_K": 2197.2067,
+            "raman_window_pm_errx_mean_K": 1788.2071,
+            "dT_TC_minus_Raman_nn_K": -234.2099,
+            "dT_TC_minus_Raman_lin_K": -234.2099,
+            "rel_diff_lin_pct": -11.0199,
+            "tc_errT_overlaps_raman_pm_errx_range": true
           },
           {
             "z_mm": 12.7,
-            "x_mm": 15.0,
+            "x_TC_mm": 15.0,
+            "x_Raman_nearest_mm": 14.9474,
+            "dx_nearest_mm": -0.0526,
+            "within_0p5mm": true,
             "T_TC_K": 956.8125,
-            "T_Raman_K": 934.7337,
+            "err_T_TC_K": 95.6813,
+            "err_x_TC_mm": 4.0,
+            "T_Raman_nearest_K": 934.7337,
+            "T_Raman_linear_interp_K": 929.9301,
+            "raman_interp_minus_nn_K": -4.8036,
+            "local_dT_dx_K_per_mm": 89.8671,
             "T_Raman_rms_K": 371.3791,
-            "dT_TC_minus_Raman_K": 22.0788,
-            "rel_diff_pct": 2.362
+            "raman_window_pm_errx_n_pts": 76,
+            "raman_window_pm_errx_min_K": 863.0778,
+            "raman_window_pm_errx_max_K": 2136.0649,
+            "raman_window_pm_errx_mean_K": 1186.4306,
+            "dT_TC_minus_Raman_nn_K": 22.0788,
+            "dT_TC_minus_Raman_lin_K": 26.8824,
+            "rel_diff_lin_pct": 2.8908,
+            "tc_errT_overlaps_raman_pm_errx_range": true
           },
           {
             "z_mm": 12.7,
-            "x_mm": 20.0,
+            "x_TC_mm": 20.0,
+            "x_Raman_nearest_mm": 20.0,
+            "dx_nearest_mm": 0.0,
+            "within_0p5mm": true,
             "T_TC_K": 988.5,
-            "T_Raman_K": 891.8121,
+            "err_T_TC_K": 98.85,
+            "err_x_TC_mm": 4.0,
+            "T_Raman_nearest_K": 891.8121,
+            "T_Raman_linear_interp_K": 891.8121,
+            "raman_interp_minus_nn_K": 0.0,
+            "local_dT_dx_K_per_mm": -25.0146,
             "T_Raman_rms_K": 156.7379,
-            "dT_TC_minus_Raman_K": 96.6879,
-            "rel_diff_pct": 10.8417
+            "raman_window_pm_errx_n_pts": 67,
+            "raman_window_pm_errx_min_K": 863.0778,
+            "raman_window_pm_errx_max_K": 922.4626,
+            "raman_window_pm_errx_mean_K": 886.8655,
+            "dT_TC_minus_Raman_nn_K": 96.6879,
+            "dT_TC_minus_Raman_lin_K": 96.6879,
+            "rel_diff_lin_pct": 10.8417,
+            "tc_errT_overlaps_raman_pm_errx_range": true
           },
           {
             "z_mm": 22.7,
-            "x_mm": 0.0,
+            "x_TC_mm": 0.0,
+            "x_Raman_nearest_mm": 0.0,
+            "dx_nearest_mm": 0.0,
+            "within_0p5mm": true,
             "T_TC_K": 1149.25,
-            "T_Raman_K": 1196.124,
+            "err_T_TC_K": 114.925,
+            "err_x_TC_mm": 4.0,
+            "T_Raman_nearest_K": 1196.124,
+            "T_Raman_linear_interp_K": 1196.124,
+            "raman_interp_minus_nn_K": 0.0,
+            "local_dT_dx_K_per_mm": -7.3337,
             "T_Raman_rms_K": 58.232,
-            "dT_TC_minus_Raman_K": -46.874,
-            "rel_diff_pct": -3.9188
+            "raman_window_pm_errx_n_pts": 68,
+            "raman_window_pm_errx_min_K": 1193.1945,
+            "raman_window_pm_errx_max_K": 1288.1182,
+            "raman_window_pm_errx_mean_K": 1248.7698,
+            "dT_TC_minus_Raman_nn_K": -46.874,
+            "dT_TC_minus_Raman_lin_K": -46.874,
+            "rel_diff_lin_pct": -3.9188,
+            "tc_errT_overlaps_raman_pm_errx_range": true
           },
           {
             "z_mm": 22.7,
-            "x_mm": 5.0,
+            "x_TC_mm": 5.0,
+            "x_Raman_nearest_mm": 4.9474,
+            "dx_nearest_mm": -0.0526,
+            "within_0p5mm": true,
             "T_TC_K": 1211.25,
-            "T_Raman_K": 1279.2342,
+            "err_T_TC_K": 121.125,
+            "err_x_TC_mm": 4.0,
+            "T_Raman_nearest_K": 1279.2342,
+            "T_Raman_linear_interp_K": 1280.6127,
+            "raman_interp_minus_nn_K": 1.3785,
+            "local_dT_dx_K_per_mm": 75.7576,
             "T_Raman_rms_K": 57.9227,
-            "dT_TC_minus_Raman_K": -67.9842,
-            "rel_diff_pct": -5.3144
+            "raman_window_pm_errx_n_pts": 76,
+            "raman_window_pm_errx_min_K": 1236.335,
+            "raman_window_pm_errx_max_K": 1310.2378,
+            "raman_window_pm_errx_mean_K": 1281.3786,
+            "dT_TC_minus_Raman_nn_K": -67.9842,
+            "dT_TC_minus_Raman_lin_K": -69.3627,
+            "rel_diff_lin_pct": -5.4164,
+            "tc_errT_overlaps_raman_pm_errx_range": true
           },
           {
             "z_mm": 22.7,
-            "x_mm": 10.0,
+            "x_TC_mm": 10.0,
+            "x_Raman_nearest_mm": 10.0,
+            "dx_nearest_mm": 0.0,
+            "within_0p5mm": true,
             "T_TC_K": 1294.25,
-            "T_Raman_K": 1293.2337,
+            "err_T_TC_K": 129.425,
+            "err_x_TC_mm": 4.0,
+            "T_Raman_nearest_K": 1293.2337,
+            "T_Raman_linear_interp_K": 1293.2337,
+            "raman_interp_minus_nn_K": 0.0,
+            "local_dT_dx_K_per_mm": -18.5649,
             "T_Raman_rms_K": 63.4694,
-            "dT_TC_minus_Raman_K": 1.0163,
-            "rel_diff_pct": 0.0786
+            "raman_window_pm_errx_n_pts": 77,
+            "raman_window_pm_errx_min_K": 1269.2449,
+            "raman_window_pm_errx_max_K": 1428.8308,
+            "raman_window_pm_errx_mean_K": 1323.3205,
+            "dT_TC_minus_Raman_nn_K": 1.0163,
+            "dT_TC_minus_Raman_lin_K": 1.0163,
+            "rel_diff_lin_pct": 0.0786,
+            "tc_errT_overlaps_raman_pm_errx_range": true
           },
           {
             "z_mm": 22.7,
-            "x_mm": 15.0,
+            "x_TC_mm": 15.0,
+            "x_Raman_nearest_mm": 14.9474,
+            "dx_nearest_mm": -0.0526,
+            "within_0p5mm": true,
             "T_TC_K": 1563.3125,
-            "T_Raman_K": 1528.7223,
+            "err_T_TC_K": 156.3313,
+            "err_x_TC_mm": 4.0,
+            "T_Raman_nearest_K": 1528.7223,
+            "T_Raman_linear_interp_K": 1533.2467,
+            "raman_interp_minus_nn_K": 4.5244,
+            "local_dT_dx_K_per_mm": 182.7136,
             "T_Raman_rms_K": 290.0628,
-            "dT_TC_minus_Raman_K": 34.5902,
-            "rel_diff_pct": 2.2627
+            "raman_window_pm_errx_n_pts": 76,
+            "raman_window_pm_errx_min_K": 1320.9835,
+            "raman_window_pm_errx_max_K": 1832.563,
+            "raman_window_pm_errx_mean_K": 1554.3989,
+            "dT_TC_minus_Raman_nn_K": 34.5902,
+            "dT_TC_minus_Raman_lin_K": 30.0658,
+            "rel_diff_lin_pct": 1.9609,
+            "tc_errT_overlaps_raman_pm_errx_range": true
           },
           {
             "z_mm": 22.7,
-            "x_mm": 20.0,
+            "x_TC_mm": 20.0,
+            "x_Raman_nearest_mm": 20.0,
+            "dx_nearest_mm": 0.0,
+            "within_0p5mm": true,
             "T_TC_K": 1345.8125,
-            "T_Raman_K": 1600.9926,
+            "err_T_TC_K": 134.5813,
+            "err_x_TC_mm": 4.0,
+            "T_Raman_nearest_K": 1600.9926,
+            "T_Raman_linear_interp_K": 1600.9926,
+            "raman_interp_minus_nn_K": 0.0,
+            "local_dT_dx_K_per_mm": -163.4932,
             "T_Raman_rms_K": 454.7727,
-            "dT_TC_minus_Raman_K": -255.1801,
-            "rel_diff_pct": -15.9389
+            "raman_window_pm_errx_n_pts": 67,
+            "raman_window_pm_errx_min_K": 1240.3723,
+            "raman_window_pm_errx_max_K": 1832.563,
+            "raman_window_pm_errx_mean_K": 1587.324,
+            "dT_TC_minus_Raman_nn_K": -255.1801,
+            "dT_TC_minus_Raman_lin_K": -255.1801,
+            "rel_diff_lin_pct": -15.9389,
+            "tc_errT_overlaps_raman_pm_errx_range": true
           }
         ],
         "lip_wall_temperatures": {
@@ -1906,62 +2797,220 @@
             "rel_unc_pct_median": 2.4989
           }
         },
-        "piv_hardware_swap_2s2q_vs_4q": {
-          "z=12.7mm": {
-            "headers_2s2q": [
-              "x",
-              "z",
-              "U_x",
-              "U_z",
-              "U_x_rms",
-              "U_z_rms"
-            ],
-            "headers_4q": [
-              "x",
-              "z",
-              "U_x",
-              "U_z",
-              "U_x_rms",
-              "U_z_rms"
-            ],
-            "n_2s2q": 85,
-            "n_4q": 68,
-            "x_overlap_mm": [
-              0.2424,
-              30.4835
-            ],
-            "Uz_max_abs_diff_ms": 3.8669,
-            "Uz_rms_diff_ms": 2.2907,
-            "Uz_peak_2s2q_ms": 28.5541,
-            "Uz_peak_4q_ms": 28.7563
+        "piv_comparison_2s2q_vs_4q": {
+          "Reactive": {
+            "z=2.7mm": {
+              "n_2s2q": 85,
+              "n_4q": 68,
+              "z_col_median_2s2q_mm": 2.7502,
+              "z_col_median_4q_mm": 2.5152,
+              "dz_col_mm": 0.2351,
+              "x_overlap_mm": [
+                0.2424,
+                30.4835
+              ],
+              "Uz_rms_diff_ms": 1.2541,
+              "Uz_max_abs_diff_ms": 6.213,
+              "x_at_max_diff_mm": 9.466,
+              "Uz_rms_2s2q_at_max_ms": 3.4662,
+              "Uz_rms_4q_at_max_ms": 5.4943,
+              "Uz_peak_2s2q_ms": 32.8379,
+              "x_peak_2s2q_mm": 8.7817,
+              "Uz_peak_4q_ms": 32.5808,
+              "x_peak_4q_mm": 8.4848,
+              "dx_peak_4q_minus_2s2q_mm": -0.2969
+            },
+            "z=7.7mm": {
+              "n_2s2q": 85,
+              "n_4q": 68,
+              "z_col_median_2s2q_mm": 7.814,
+              "z_col_median_4q_mm": 7.8485,
+              "dz_col_mm": -0.0345,
+              "x_overlap_mm": [
+                0.2424,
+                30.4835
+              ],
+              "Uz_rms_diff_ms": 1.3473,
+              "Uz_max_abs_diff_ms": 3.8257,
+              "x_at_max_diff_mm": 13.0949,
+              "Uz_rms_2s2q_at_max_ms": 4.5864,
+              "Uz_rms_4q_at_max_ms": 5.2832,
+              "Uz_peak_2s2q_ms": 30.2832,
+              "x_peak_2s2q_mm": 10.9519,
+              "Uz_peak_4q_ms": 30.147,
+              "x_peak_4q_mm": 10.9091,
+              "dx_peak_4q_minus_2s2q_mm": -0.0428
+            },
+            "z=12.7mm": {
+              "n_2s2q": 85,
+              "n_4q": 68,
+              "z_col_median_2s2q_mm": 12.8777,
+              "z_col_median_4q_mm": 12.697,
+              "dz_col_mm": 0.1807,
+              "x_overlap_mm": [
+                0.2424,
+                30.4835
+              ],
+              "Uz_rms_diff_ms": 2.2922,
+              "Uz_max_abs_diff_ms": 3.8669,
+              "x_at_max_diff_mm": 28.3666,
+              "Uz_rms_2s2q_at_max_ms": 1.7509,
+              "Uz_rms_4q_at_max_ms": 2.7635,
+              "Uz_peak_2s2q_ms": 28.5541,
+              "x_peak_2s2q_mm": 13.8455,
+              "Uz_peak_4q_ms": 28.7563,
+              "x_peak_4q_mm": 13.8182,
+              "dx_peak_4q_minus_2s2q_mm": -0.0273
+            },
+            "z=22.7mm": {
+              "n_2s2q": 85,
+              "n_4q": 68,
+              "z_col_median_2s2q_mm": 22.6435,
+              "z_col_median_4q_mm": 22.8788,
+              "dz_col_mm": -0.2353,
+              "x_overlap_mm": [
+                0.2424,
+                30.4835
+              ],
+              "Uz_rms_diff_ms": 3.0589,
+              "Uz_max_abs_diff_ms": 6.916,
+              "x_at_max_diff_mm": 20.3527,
+              "Uz_rms_2s2q_at_max_ms": 9.7336,
+              "Uz_rms_4q_at_max_ms": 10.7924,
+              "Uz_peak_2s2q_ms": 19.0363,
+              "x_peak_2s2q_mm": 21.8028,
+              "Uz_peak_4q_ms": 16.0336,
+              "x_peak_4q_mm": 24.0,
+              "dx_peak_4q_minus_2s2q_mm": 2.1972
+            },
+            "z=32.7mm": {
+              "n_2s2q": 85,
+              "n_4q": 68,
+              "z_col_median_2s2q_mm": 32.771,
+              "z_col_median_4q_mm": 32.5758,
+              "dz_col_mm": 0.1952,
+              "x_overlap_mm": [
+                0.2424,
+                30.4835
+              ],
+              "Uz_rms_diff_ms": 1.7308,
+              "Uz_max_abs_diff_ms": 3.0101,
+              "x_at_max_diff_mm": 28.9714,
+              "Uz_rms_2s2q_at_max_ms": 8.096,
+              "Uz_rms_4q_at_max_ms": 7.4084,
+              "Uz_peak_2s2q_ms": 7.8997,
+              "x_peak_2s2q_mm": 30.4835,
+              "Uz_peak_4q_ms": 7.9496,
+              "x_peak_4q_mm": 32.7273,
+              "dx_peak_4q_minus_2s2q_mm": 2.2438
+            }
           },
-          "z=22.7mm": {
-            "headers_2s2q": [
-              "x",
-              "z",
-              "U_x",
-              "U_z",
-              "U_x_rms",
-              "U_z_rms"
-            ],
-            "headers_4q": [
-              "x",
-              "z",
-              "U_x",
-              "U_z",
-              "U_x_rms",
-              "U_z_rms"
-            ],
-            "n_2s2q": 85,
-            "n_4q": 68,
-            "x_overlap_mm": [
-              0.2424,
-              30.4835
-            ],
-            "Uz_max_abs_diff_ms": 6.9074,
-            "Uz_rms_diff_ms": 3.0579,
-            "Uz_peak_2s2q_ms": 19.0363,
-            "Uz_peak_4q_ms": 16.0336
+          "Cold": {
+            "z=2.7mm": {
+              "n_2s2q": 268,
+              "n_4q": 2422,
+              "z_col_median_2s2q_mm": 2.7996,
+              "z_col_median_4q_mm": 2.6962,
+              "dz_col_mm": 0.1035,
+              "x_overlap_mm": [
+                -33.3748,
+                30.9863
+              ],
+              "Uz_rms_diff_ms": 2.055,
+              "Uz_max_abs_diff_ms": 10.0307,
+              "x_at_max_diff_mm": 9.4253,
+              "Uz_rms_2s2q_at_max_ms": 5.7008,
+              "Uz_rms_4q_at_max_ms": 7.7503,
+              "Uz_peak_2s2q_ms": 33.3595,
+              "x_peak_2s2q_mm": -8.7874,
+              "Uz_peak_4q_ms": 29.0506,
+              "x_peak_4q_mm": 8.9278,
+              "dx_peak_4q_minus_2s2q_mm": 17.7152
+            },
+            "z=7.7mm": {
+              "n_2s2q": 268,
+              "n_4q": 2422,
+              "z_col_median_2s2q_mm": 7.6207,
+              "z_col_median_4q_mm": 7.6962,
+              "dz_col_mm": -0.0755,
+              "x_overlap_mm": [
+                -33.3748,
+                30.9863
+              ],
+              "Uz_rms_diff_ms": 1.9051,
+              "Uz_max_abs_diff_ms": 6.6304,
+              "x_at_max_diff_mm": 8.4599,
+              "Uz_rms_2s2q_at_max_ms": 7.6591,
+              "Uz_rms_4q_at_max_ms": 8.7104,
+              "Uz_peak_2s2q_ms": 26.7847,
+              "x_peak_2s2q_mm": -9.5106,
+              "Uz_peak_4q_ms": 27.8933,
+              "x_peak_4q_mm": -9.85,
+              "dx_peak_4q_minus_2s2q_mm": -0.3394
+            },
+            "z=12.7mm": {
+              "n_2s2q": 268,
+              "n_4q": 2422,
+              "z_col_median_2s2q_mm": 12.6828,
+              "z_col_median_4q_mm": 12.6962,
+              "dz_col_mm": -0.0134,
+              "x_overlap_mm": [
+                -33.3748,
+                30.9863
+              ],
+              "Uz_rms_diff_ms": 2.0156,
+              "Uz_max_abs_diff_ms": 5.3484,
+              "x_at_max_diff_mm": 7.8163,
+              "Uz_rms_2s2q_at_max_ms": 8.1133,
+              "Uz_rms_4q_at_max_ms": 8.352,
+              "Uz_peak_2s2q_ms": 20.7619,
+              "x_peak_2s2q_mm": -10.2338,
+              "Uz_peak_4q_ms": 22.2726,
+              "x_peak_4q_mm": -10.9056,
+              "dx_peak_4q_minus_2s2q_mm": -0.6718
+            },
+            "z=22.7mm": {
+              "n_2s2q": 268,
+              "n_4q": 2422,
+              "z_col_median_2s2q_mm": 22.807,
+              "z_col_median_4q_mm": 22.6962,
+              "dz_col_mm": 0.1108,
+              "x_overlap_mm": [
+                -33.3748,
+                30.9863
+              ],
+              "Uz_rms_diff_ms": 1.5111,
+              "Uz_max_abs_diff_ms": 3.1815,
+              "x_at_max_diff_mm": 14.2524,
+              "Uz_rms_2s2q_at_max_ms": 4.8034,
+              "Uz_rms_4q_at_max_ms": 5.6926,
+              "Uz_peak_2s2q_ms": 13.7494,
+              "x_peak_2s2q_mm": -11.6801,
+              "Uz_peak_4q_ms": 13.62,
+              "x_peak_4q_mm": 12.65,
+              "dx_peak_4q_minus_2s2q_mm": 24.3301
+            },
+            "z=32.7mm": {
+              "n_2s2q": 268,
+              "n_4q": 2422,
+              "z_col_median_2s2q_mm": 32.6902,
+              "z_col_median_4q_mm": 32.6962,
+              "dz_col_mm": -0.006,
+              "x_overlap_mm": [
+                -33.3748,
+                30.9863
+              ],
+              "Uz_rms_diff_ms": 0.8191,
+              "Uz_max_abs_diff_ms": 1.6185,
+              "x_at_max_diff_mm": 10.7126,
+              "Uz_rms_2s2q_at_max_ms": 5.5802,
+              "Uz_rms_4q_at_max_ms": 6.2643,
+              "Uz_peak_2s2q_ms": 9.353,
+              "x_peak_2s2q_mm": 15.3178,
+              "Uz_peak_4q_ms": 9.5391,
+              "x_peak_4q_mm": -14.9333,
+              "dx_peak_4q_minus_2s2q_mm": -30.2511
+            }
           }
         }
       }
@@ -1969,9 +3018,493 @@
     "total_real_files": 73
   },
   "cam_94523_ligs_tc": {
+    "n_mat_files_inventoried": 7,
     "n_variables_in_FigureData": 61,
-    "thermocouple_named_variables_found": [],
-    "has_thermocouple_data_in_deposit": false,
+    "all_mat_files_variable_inventory": {
+      "FigureData.mat": {
+        "bin1": {
+          "shape": [
+            200,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "bin2": {
+          "shape": [
+            200,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "bin3": {
+          "shape": [
+            200,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "bin4": {
+          "shape": [
+            200,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "colors": {
+          "shape": [
+            14,
+            3
+          ],
+          "dtype": "float64"
+        },
+        "directory": {
+          "shape": [
+            1
+          ],
+          "dtype": "<U124"
+        },
+        "fftsignal_1": {
+          "shape": [
+            262145,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "fftsignal_2": {
+          "shape": [
+            262145,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "fftsignal_3": {
+          "shape": [
+            262145,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "fftsignal_4": {
+          "shape": [
+            262145,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "fftsignal_5": {
+          "shape": [
+            262145,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "fftsignal_6": {
+          "shape": [
+            262145,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "fftsignals": {
+          "shape": [
+            262145,
+            6
+          ],
+          "dtype": "float64"
+        },
+        "freq_1": {
+          "shape": [
+            262145,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "freq_2": {
+          "shape": [
+            262145,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "frequency": {
+          "shape": [
+            262145,
+            2
+          ],
+          "dtype": "float64"
+        },
+        "hist_1": {
+          "shape": [
+            200,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "hist_2": {
+          "shape": [
+            200,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "hist_3": {
+          "shape": [
+            200,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "hist_4": {
+          "shape": [
+            200,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "intervals": {
+          "shape": [
+            200,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "intervalss": {
+          "shape": [
+            200,
+            4
+          ],
+          "dtype": "float64"
+        },
+        "intervalss_1": {
+          "shape": [
+            200,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "intervalss_2": {
+          "shape": [
+            200,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "intervalss_3": {
+          "shape": [
+            200,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "intervalss_4": {
+          "shape": [
+            200,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "ligssignal_1": {
+          "shape": [
+            2385,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "ligssignal_2": {
+          "shape": [
+            2385,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "ligssignal_3": {
+          "shape": [
+            2385,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "ligssignal_4": {
+          "shape": [
+            2385,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "ligssignal_5": {
+          "shape": [
+            2385,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "ligssignal_6": {
+          "shape": [
+            2385,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "mean_val_1": {
+          "shape": [
+            1,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "mean_val_2": {
+          "shape": [
+            1,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "mean_val_3": {
+          "shape": [
+            1,
+            1
+          ],
+          "dtype": "uint16"
+        },
+        "mean_val_4": {
+          "shape": [
+            1,
+            1
+          ],
+          "dtype": "uint16"
+        },
+        "normweightedhist": {
+          "shape": [
+            200,
+            4
+          ],
+          "dtype": "float64"
+        },
+        "normweightedtemphist": {
+          "shape": [
+            200,
+            4
+          ],
+          "dtype": "float64"
+        },
+        "pdffile": {
+          "shape": [
+            1
+          ],
+          "dtype": "<U154"
+        },
+        "ratio1": {
+          "shape": [
+            200,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "ratio2": {
+          "shape": [
+            200,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "ratio3": {
+          "shape": [
+            200,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "ratio30mm": {
+          "shape": [
+            2800,
+            3
+          ],
+          "dtype": "float64"
+        },
+        "ratio4": {
+          "shape": [
+            200,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "ratio50mm": {
+          "shape": [
+            3000,
+            3
+          ],
+          "dtype": "float64"
+        },
+        "ratiobins": {
+          "shape": [
+            200,
+            4
+          ],
+          "dtype": "float64"
+        },
+        "ratiobinsvalues": {
+          "shape": [
+            200,
+            4
+          ],
+          "dtype": "float64"
+        },
+        "rawsignal": {
+          "shape": [
+            2385,
+            6
+          ],
+          "dtype": "float64"
+        },
+        "std_val_1": {
+          "shape": [
+            1,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "std_val_2": {
+          "shape": [
+            1,
+            1
+          ],
+          "dtype": "uint8"
+        },
+        "std_val_3": {
+          "shape": [
+            1,
+            1
+          ],
+          "dtype": "uint8"
+        },
+        "std_val_4": {
+          "shape": [
+            1,
+            1
+          ],
+          "dtype": "uint8"
+        },
+        "tdata_1": {
+          "shape": [
+            2385,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "tdata_2": {
+          "shape": [
+            2385,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "temp_hist_1": {
+          "shape": [
+            200,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "temp_hist_2": {
+          "shape": [
+            200,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "temp_hist_3": {
+          "shape": [
+            200,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "temp_hist_4": {
+          "shape": [
+            200,
+            1
+          ],
+          "dtype": "float64"
+        },
+        "temperature30mm": {
+          "shape": [
+            2800,
+            3
+          ],
+          "dtype": "float64"
+        },
+        "temperature50mm": {
+          "shape": [
+            3000,
+            3
+          ],
+          "dtype": "float64"
+        },
+        "time_offset": {
+          "shape": [
+            2385,
+            2
+          ],
+          "dtype": "float64"
+        }
+      },
+      "Signalss_thermal.mat": {
+        "signalss": {
+          "shape": [
+            1000,
+            1
+          ],
+          "dtype": "object"
+        }
+      },
+      "Signalss_thermal2.mat": {
+        "signalss": {
+          "shape": [
+            1000,
+            1
+          ],
+          "dtype": "object"
+        }
+      },
+      "Signalss_thermal3.mat": {
+        "signalss": {
+          "shape": [
+            1000,
+            1
+          ],
+          "dtype": "object"
+        }
+      },
+      "Signalss_thermal4.mat": {
+        "signalss": {
+          "shape": [
+            1000,
+            1
+          ],
+          "dtype": "object"
+        }
+      },
+      "Signalss_time_offset.mat": {
+        "time_offset": {
+          "shape": [
+            1,
+            1260
+          ],
+          "dtype": "float64"
+        }
+      },
+      "Signalss_time_offset2.mat": {
+        "time_offset": {
+          "shape": [
+            1,
+            2500
+          ],
+          "dtype": "float64"
+        }
+      }
+    },
+    "automatic_tc_keyword_matched_vars": [],
+    "absence_of_tc_inference_note": "Automatic check confirms 0 variable names across all 7 .mat files match TC keywords; manual inspection of all 61 FigureData.mat variable names/shapes/ranges confirms LIGS signals, FFTs, histograms, and 4 scalars (mean_val_1..4, std_val_1..4), with no thermocouple array identified (inference from variable inventory, not a hardcoded flag).",
     "mean_vals_1_to_4": [
       1609.29,
       680.95,
@@ -2171,37 +3704,105 @@
         }
       ]
     },
-    "raw_ligs_shot_dropouts": {
+    "raw_ligs_shot_structure": {
       "Signalss_thermal.mat": {
+        "container_shape": [
+          1000,
+          1
+        ],
         "n_shots": 1000,
-        "n_dropped_scalar_zero": 395,
-        "dropout_pct": 39.5,
-        "valid_trace_len": [
-          1260
+        "element_shape_dtype_counts": {
+          "[1260, 1]:float64": 605,
+          "[1, 1]:uint8": 395
+        },
+        "n_exact_uint8_1x1_zero": 395,
+        "pct_exact_uint8_1x1_zero": 39.5,
+        "n_other_size_le_1": 0,
+        "n_valid_traces": 605,
+        "valid_trace_shapes": [
+          [
+            1260,
+            1
+          ]
+        ],
+        "valid_trace_value_min_max": [
+          -0.0089,
+          0.2156
         ]
       },
       "Signalss_thermal2.mat": {
+        "container_shape": [
+          1000,
+          1
+        ],
         "n_shots": 1000,
-        "n_dropped_scalar_zero": 469,
-        "dropout_pct": 46.9,
-        "valid_trace_len": [
-          1260
+        "element_shape_dtype_counts": {
+          "[1, 1]:uint8": 469,
+          "[1260, 1]:float64": 531
+        },
+        "n_exact_uint8_1x1_zero": 469,
+        "pct_exact_uint8_1x1_zero": 46.9,
+        "n_other_size_le_1": 0,
+        "n_valid_traces": 531,
+        "valid_trace_shapes": [
+          [
+            1260,
+            1
+          ]
+        ],
+        "valid_trace_value_min_max": [
+          -0.0073,
+          0.4491
         ]
       },
       "Signalss_thermal3.mat": {
+        "container_shape": [
+          1000,
+          1
+        ],
         "n_shots": 1000,
-        "n_dropped_scalar_zero": 82,
-        "dropout_pct": 8.2,
-        "valid_trace_len": [
-          1260
+        "element_shape_dtype_counts": {
+          "[1260, 1]:float64": 918,
+          "[1, 1]:uint8": 82
+        },
+        "n_exact_uint8_1x1_zero": 82,
+        "pct_exact_uint8_1x1_zero": 8.2,
+        "n_other_size_le_1": 0,
+        "n_valid_traces": 918,
+        "valid_trace_shapes": [
+          [
+            1260,
+            1
+          ]
+        ],
+        "valid_trace_value_min_max": [
+          -0.0076,
+          0.4181
         ]
       },
       "Signalss_thermal4.mat": {
+        "container_shape": [
+          1000,
+          1
+        ],
         "n_shots": 1000,
-        "n_dropped_scalar_zero": 2,
-        "dropout_pct": 0.2,
-        "valid_trace_len": [
-          2500
+        "element_shape_dtype_counts": {
+          "[2500, 1]:float64": 998,
+          "[1, 1]:uint8": 2
+        },
+        "n_exact_uint8_1x1_zero": 2,
+        "pct_exact_uint8_1x1_zero": 0.2,
+        "n_other_size_le_1": 0,
+        "n_valid_traces": 998,
+        "valid_trace_shapes": [
+          [
+            2500,
+            1
+          ]
+        ],
+        "valid_trace_value_min_max": [
+          -0.007,
+          0.4469
         ]
       }
     }
@@ -2356,6 +3957,11 @@
     "n_data_rows": 5060,
     "n_valid_5col_rows": 4515,
     "n_missing_coord_or_meta_rows": 545,
+    "missing_A_row_index_range": [
+      4445,
+      5061
+    ],
+    "missing_A_n_contiguous_blocks": 5,
     "bad_row_examples": [
       {
         "B": "1",
@@ -2430,18 +4036,90 @@
     "rows_per_condition_min": 92,
     "rows_per_condition_max": 144,
     "n_unique_condition_coord_keys": 2304,
-    "n_keys_with_replicates": 2211,
-    "replicate_span_median_K": 11.2578,
-    "replicate_span_p95_K": 40.5432,
-    "replicate_span_max_K": 89.196,
-    "replicate_std_median_K": 7.9605,
+    "duplicate_key_audit": {
+      "key_multiplicity_counts": {
+        "2": 2211,
+        "1": 93
+      },
+      "n_duplicate_pairs": 2211,
+      "signed_diff_2nd_minus_1st_mean_K": -4.4701,
+      "signed_diff_2nd_minus_1st_median_K": -5.4974,
+      "signed_diff_2nd_minus_1st_std_K": 19.3688,
+      "abs_diff_span_median_K": 11.2578,
+      "abs_diff_span_p90_K": 32.1688,
+      "abs_diff_span_p95_K": 40.5432,
+      "abs_diff_span_max_K": 89.196,
+      "half_span_median_K": 5.6289,
+      "half_span_p95_K": 20.2716,
+      "pct_pairs_abs_diff_gt_20K": 24.4233,
+      "pct_pairs_abs_diff_gt_40K": 5.2917,
+      "top_conditions_by_abs_mean_shift": [
+        {
+          "C6H6_pct": 2.0,
+          "phi": 1.2,
+          "n_pairs": 48,
+          "mean_2nd_minus_1st_K": -25.3837,
+          "std_2nd_minus_1st_K": 26.5488
+        },
+        {
+          "C6H6_pct": 1.12,
+          "phi": 1.2,
+          "n_pairs": 72,
+          "mean_2nd_minus_1st_K": -21.8498,
+          "std_2nd_minus_1st_K": 24.3354
+        },
+        {
+          "C6H6_pct": 0.5,
+          "phi": 1.0,
+          "n_pairs": 72,
+          "mean_2nd_minus_1st_K": -19.6509,
+          "std_2nd_minus_1st_K": 12.9426
+        },
+        {
+          "C6H6_pct": 5.0,
+          "phi": 1.0,
+          "n_pairs": 48,
+          "mean_2nd_minus_1st_K": -18.7863,
+          "std_2nd_minus_1st_K": 16.0442
+        },
+        {
+          "C6H6_pct": 1.12,
+          "phi": 1.0,
+          "n_pairs": 72,
+          "mean_2nd_minus_1st_K": -17.5374,
+          "std_2nd_minus_1st_K": 12.7101
+        },
+        {
+          "C6H6_pct": 2.0,
+          "phi": 1.0,
+          "n_pairs": 48,
+          "mean_2nd_minus_1st_K": -16.1635,
+          "std_2nd_minus_1st_K": 17.635
+        },
+        {
+          "C6H6_pct": 0.0,
+          "phi": 1.0,
+          "n_pairs": 72,
+          "mean_2nd_minus_1st_K": -16.1006,
+          "std_2nd_minus_1st_K": 11.9103
+        },
+        {
+          "C6H6_pct": 3.0,
+          "phi": 1.1,
+          "n_pairs": 48,
+          "mean_2nd_minus_1st_K": -15.7594,
+          "std_2nd_minus_1st_K": 15.4994
+        }
+      ],
+      "interpretation_limit_note": "Because columns 'data (yyyy-mm-dd)', 'cog', and 'air_excess' listed in sheet 'units' are absent from sheet 'data', duplicate (C6H6, phi, x, y) pairs cannot be proven to be pure replicates of identical operating/thermal states (systematic mean shifts of -16 to -25 K occur across entire phi=1.0 and phi=1.2 maps). Moreover, a two-point span |T2 - T1| is not directly equivalent to a \u00b120 K expanded uncertainty band (2*20 K = 40 K full width)."
+    },
     "T_min_K": 1144.9327,
     "T_median_K": 1394.9239,
     "T_max_K": 1926.7447,
     "declared_vs_actual_discrepancies": [
       "README_V4.txt states 'expressed in degrees Celsius', whereas sheet 'data' header is 'T_mean [K]' and values span 1145-1927 (Kelvin), matching sheet 'units'.",
       "README_V4.txt states 'standard deviations... are also reported for all the measured temperatures' and sheet 'units' lists T_std/T_median/T_iqr, whereas sheet 'data' contains ONLY 5 columns (A-E: C6H6, phi, x, y, T_mean [K]) and NO T_std column.",
-      "Data contains 5060 rows including 545 rows with missing/non-numeric metadata cells and 2211 duplicated (C6H6, phi, x, y) entries (likely repeated runs/dates collapsed without the 'data (yyyy-mm-dd)' column listed in sheet 'units')."
+      "Data contains 5060 rows including 545 rows missing column A (C6H6 %) and 2211 duplicated (C6H6, phi, x, y) pairs without identifying run/date/cog metadata."
     ]
   },
   "cardiff_nh3_swirl": {
@@ -2472,7 +4150,7 @@
         36.032
       ],
       "n_blank_NH3_emission_cells_out_of_9": 3,
-      "has_rms_or_uncertainty_cols": false
+      "automatic_rms_or_unc_header_match": false
     },
     "cardiff_30234904_cognh3_negative_check": {
       "row2_group_headers": {
@@ -2619,6 +4297,8 @@
         "nozzle": "Nozzle 1",
         "state": "steady",
         "MWIR_mean_K": 812.0,
+        "MWIR_sd_K": 7.5,
+        "MWIR_ci95_halfwidth_K": 9.3,
         "TC_ref_K": 847.0,
         "dT_MWIR_minus_TC_K": -35.0,
         "declared_dev_pct": 4.13
@@ -2627,6 +4307,8 @@
         "nozzle": "Nozzle 1",
         "state": "acceleration",
         "MWIR_mean_K": 912.0,
+        "MWIR_sd_K": 11.5,
+        "MWIR_ci95_halfwidth_K": 14.2,
         "TC_ref_K": 948.0,
         "dT_MWIR_minus_TC_K": -36.0,
         "declared_dev_pct": 3.8
@@ -2635,6 +4317,8 @@
         "nozzle": "Nozzle 2",
         "state": "steady",
         "MWIR_mean_K": 876.0,
+        "MWIR_sd_K": 6.6,
+        "MWIR_ci95_halfwidth_K": 8.2,
         "TC_ref_K": 915.0,
         "dT_MWIR_minus_TC_K": -39.0,
         "declared_dev_pct": 4.26
@@ -2643,9 +4327,69 @@
         "nozzle": "Nozzle 2",
         "state": "acceleration",
         "MWIR_mean_K": 982.0,
+        "MWIR_sd_K": 6.4,
+        "MWIR_ci95_halfwidth_K": 7.9,
         "TC_ref_K": 1032.0,
         "dT_MWIR_minus_TC_K": -50.0,
         "declared_dev_pct": 4.84
+      }
+    ],
+    "declared_error_budget_rows": [
+      {
+        "source": "calibration chain",
+        "type": "B",
+        "bound_pct": "<=1.8",
+        "distribution": "rectangular",
+        "standard_u_pct": "1.04",
+        "basis": "lab verification; <=1.3% statutory (JJG 856-2015)"
+      },
+      {
+        "source": "atmospheric transmission",
+        "type": "B",
+        "bound_pct": "<=0.7",
+        "distribution": "rectangular",
+        "standard_u_pct": "0.40",
+        "basis": "Section 5 computation"
+      },
+      {
+        "source": "per-station repeatability",
+        "type": "A",
+        "bound_pct": "SE of 5-sample mean, 0.2-0.7",
+        "distribution": "normal",
+        "standard_u_pct": "<=0.70",
+        "basis": "Type A"
+      },
+      {
+        "source": "COMBINED radiance temperature",
+        "type": "-",
+        "bound_pct": "-",
+        "distribution": "-",
+        "standard_u_pct": "1.3 (U=2.6 at k=2)",
+        "basis": "RSS"
+      },
+      {
+        "source": "thermocouple reference",
+        "type": "B",
+        "bound_pct": "spec +/-2.5 C + radiation bias",
+        "distribution": "rectangular",
+        "standard_u_pct": "~1.6",
+        "basis": "Section 7.1"
+      },
+      {
+        "source": "comparison quantity delta",
+        "type": "-",
+        "bound_pct": "-",
+        "distribution": "-",
+        "standard_u_pct": "2.1 (U=4.1 at k=2)",
+        "basis": "RSS"
+      },
+      {
+        "source": "emissivity deficit (systematic)",
+        "type": "-",
+        "bound_pct": "3.7-4.8",
+        "distribution": "bounded",
+        "standard_u_pct": "-",
+        "basis": "implied eps_eff=0.82-0.86"
       }
     ],
     "radiation_model_table_rows": 181,
@@ -2653,7 +4397,7 @@
       50.0,
       500.0
     ],
-    "note": "analysis_tc_radiation_error.csv is an analytical parametric radiation-bias sensitivity table, not raw TC measurements."
+    "note": "analysis_tc_radiation_error.csv is an analytical parametric radiation-bias sensitivity table, not raw TC measurements. Observed MWIR - TC differences (-3.80% to -4.84%) overlap with or slightly exceed the authors' own combined comparison expanded uncertainty (U=4.1% at k=2, combining MWIR U=2.6% and TC reference u~1.6% including TC radiation bias); thus MWIR - TC alone does not independently isolate plume emissivity bias."
   },
   "waterloo_fm_umd": {
     "waterloo_methanol": {
@@ -2784,7 +4528,7 @@
         "Q [kW]"
       ],
       "condition01_rows": 363,
-      "condition01_is_heatflux_SBG_not_TC": true,
+      "automatic_heatflux_header_check": true,
       "tph_log_rows": 244,
       "tph_log_n_negative_dt_jumps": 1,
       "tph_log_n_zero_dt": 0,
@@ -2911,7 +4655,12 @@
   },
   "sydney_and_sandia": {
     "sydney_surface_temp_bb_doc": {
-      "instrument_confirmed": "Mikron M90-D infrared pyrometer camera (500-1500 C, filters flame radiation) \u2014 NOT a thermocouple!",
+      "automatic_text_matches": {
+        "mentions_mikron_m90d": true,
+        "mentions_infrared_pyrometer": true,
+        "mentions_thermocouple": false,
+        "mentions_swirl_burner_no_swirl": true
+      },
       "extracted_text_excerpt": "Ceramic Face Temperatures\nThe average temperature across the ceramic face of the burner was measured using an infrared pyrometer camera (model: Mikron M90-D). This instrument is capable of measuring across a temperature range of 500-1500(C and filters out flame radiation.\n \nFor each flame, temperatures were measured at approximately r=12.5mm which is half way between the geometrical centreline of the burner and the edge of the bluff body. These measurements were performed at four quadrants around the face of the burner. Each value reported is based on three individual readings.\n\nIn the bluff-body flames, temperatures were measured using the swirl burner operated with no swirl component and an annulus bulk velocity (based on flowrate) of 40m/s. All other flow settings were identical to those in flames HM1, HM2 and HM3. Such a configuration will shroud these non-swirling flames with a high streamwise flow that mimics the actual co-flow velocity of Ue=40m/s (to a reasonable extent) which was applied during acquisition of the compositional and velocity data. Even so, the coflow around the swirl burner was still operated at Ue=25.3m/s which is the maximum available through the present experimental configuration at the time this page was authored. \n\n\nBluff-Body stabilized flames |  | Flame | HM1 | HM2 | HM3 |  | Ave. temp, (C | 680 | 734 | 777 |  | Range,\n\nCeramic Face Temperatures\nCeramic Face Temperatures"
     },
     "sydney_sm1_zip": {
