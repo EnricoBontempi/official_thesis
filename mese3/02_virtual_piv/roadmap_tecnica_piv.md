@@ -1,7 +1,7 @@
 # Missione 02 — Roadmap tecnica: osservazioni PIV sulla LES e campagna U-Net/GLU
 
 **Data:** 27 novembre 2026 · **Branch:** `piv/experiment-proposal` · **Destinatario dell'esecuzione:** Sonnet IDE, dopo l'approvazione di Enrico
-**Stato:** roadmap e matrice da approvare. Questo documento non implementa nulla e non autorizza download di dataset, job, training, inferenze o accesso a TEST. Ogni fase parte solo dopo il punto di revisione che la precede (§6).
+**Stato:** impostazione approvata da Enrico il 27/11/2026; revisione v2 con le correzioni richieste per il passaggio a Sonnet (supporto e discretizzazione del filtro, confronti sugli stessi nodi, significato dei campi completi, download autorizzati: §10). Questo documento non implementa nulla e non autorizza download di dataset, job, training, inferenze o accesso a TEST. Ogni fase parte solo dopo il punto di revisione che la precede (§6).
 
 **Problema invariato.** Dataset RealPDEBench combustion, parte LES numerica. Compito: ricostruzione istantanea della T dalle velocità osservate, con le stesse condizioni, gli stessi split e la stessa T come riferimento. Cambiano soltanto le osservazioni di velocità. Non ci sono nuove architetture, né varianti con tracciante a olio, né dataset sperimentali usati come dati di training: Neal, Cardiff e gli articoli servono solo a qualificare il modello di misura.
 
@@ -37,7 +37,7 @@ Le configurazioni principali sono due, entrambe tratte dallo stesso articolo sul
 - **A — pieno campo, basso rateo:** tutta la slice;
 - **B — campo ridotto, alto rateo:** una finestra di 30×30 mm.
 
-I rigetti dei vettori interni non hanno una base quantitativa in fiamma swirl atmosferica. Entrano solo come **sensibilità dichiarate**, con e senza la sostituzione che la pratica sperimentale applica prima del rilascio.
+I rigetti dei vettori interni non hanno una base quantitativa in fiamma swirl atmosferica. Il modello principale rappresenta il dato **rilasciato e completo**, ma un campo sperimentale completo dopo interpolazione non dimostra che rigetti e sostituzioni siano senza effetto. Il modello principale li approssima ignorandoli. Le **sensibilità dichiarate**, con e senza sostituzione, ne esplorano alcune conseguenze, non la loro entità reale.
 
 **Perché è più rappresentativo della missione 00.** La 00 aggiungeva rumore indipendente e dischi senza dati a un layout che nessuna PIV produce. Qui ogni elemento segue una proprietà documentata della misura:
 
@@ -52,14 +52,14 @@ Le intensità non sono scelte in base al danno sulle reti. Se filtro ed errore r
 **Quale campagna propongo.**
 1. **Verifiche e implementazione:** orientamento delle componenti dalla provenienza del dataset, supporto della griglia alle scale PIV, generatore delle osservazioni. Poi una **revisione delle osservazioni generate**, con figure e statistiche, prima di qualunque rete.
 2. **Test dei checkpoint esistenti** (12 originali e 2 U-Net dense del Mese 2), costruiti per separare il cambio di layout dagli effetti di filtro, errore e copertura, con un ponte diretto ai numeri della 00.
-3. **Training da zero su A e su B**, ciascuno con il suo controllo ideale e la stessa ricetta:
+3. **Training da zero su A e su B**, ciascuno con il suo controllo ideale **sugli stessi nodi** e con la stessa ricetta:
    - U-Net: 4 celle × 5 seed;
    - GLU: 4 celle × 3 seed;
    - un ponte GLU di 3 run che chiude il confondente di batching della 00.
 
    In tutto 35 run necessari, contro 30 nella 00. Gruppi aggiuntivi (rigetti, training su più configurazioni, separazione filtro/errore) solo se i risultati li motivano.
 
-Costo indicativo del necessario: circa 200–850 GPU-h, contro 210 nella 00. L'incertezza viene quasi tutta dal GLU con migliaia di token, da misurare con una profilazione prima di decidere.
+Costo indicativo del necessario: circa 180–850 GPU-h, contro 210 nella 00. L'incertezza viene quasi tutta dal GLU con migliaia di token, da misurare con una profilazione prima di decidere.
 
 ---
 
@@ -83,8 +83,9 @@ La cache densa C149 contiene vi e vj normalizzati su tutti i nodi: è la sorgent
 |---|---|---|---|
 | **PIV-A** | Principale | Stereo-PIV a basso rateo, pieno campo, particelle solide; finestra W = 1,3 mm; overlap 50 % | STO12 §2.3.2; OBE15 §2.2 |
 | **PIV-B** | Principale | Stereo-PIV ad alto rateo, campo 30×30 mm, particelle solide; W = 1,5 mm; overlap 50 % | STO12 §2.3.3 (stesso articolo e combustore di A) |
-| **IDEAL-full** | Controllo | Valore puntuale LES su tutti i nodi | Mese 2, U4/U6 |
-| **IDEAL-B** | Controllo | Valore puntuale LES nei nodi del campo di B | — |
+| **IDEAL-full** | Riferimento di layout (solo valutazione) | Valore puntuale LES su tutti i 16 384 nodi | Mese 2, U4/U6 |
+| **IDEAL-A** | Controllo | Valore puntuale LES sugli **stessi nodi validi** di PIV-A | — |
+| **IDEAL-B** | Controllo | Valore puntuale LES sugli **stessi nodi validi** di PIV-B, nella stessa posizione | — |
 | **SENS-…** | Sensibilità | Varianti non calibrate o alternative documentate (§2.6) | — |
 
 A e B **non** mescolano apparati: sono i due sistemi descritti in STO12. Le altre fonti mostrano che le proprietà ricorrono (SINT §2.2), ma non forniscono parametri da sommare.
@@ -109,14 +110,33 @@ Formato di ogni elemento: fonte → motivazione → parametri → assunzioni e i
 - *Assunzioni:* la posizione in B non ha corrispondenza fisica, quindi i risultati vanno riportati per posizione. Nessuna esclusione da riflessi o pareti nel modello di base, perché non sappiamo se la slice contenga pareti (SINT G10).
 
 **(3) Risposta spaziale**
-- *Fonte:* il vettore è una media pesata dello spostamento. Per il multi-pass DaVis su immagini sintetiche la risposta alle lunghezze d'onda è un MHG (gaussiana con 30–40 % di cappello messicano) con L_sr(R_A) = 29,8 px su una finestra di 32 px al 50 %, cioè ≈0,93 W (WIE17 §2.6, Tab. 2.4, PDF 39). Per il single-pass a finestra quadrata la risposta è un top-hat di lato W.
-- *Rappresentazione principale:* convoluzione 2D in millimetri con kernel separabile MHG, L_sr = 0,93 W e b = 0,35. Integrazione sotto-cella, per esempio con sovracampionamento ≥8× per asse e media sulle celle, per rispettare l'anisotropia.
+- *Fonte:* il vettore è una media pesata dello spostamento. Per il multi-pass DaVis su immagini sintetiche la risposta alle lunghezze d'onda è un MHG (gaussiana con 30–40 % di cappello messicano) con L_sr(R_A) = 29,8 px su una finestra di 32 px al 50 %, cioè ≈0,93 W (WIE17 §2.6, Tab. 2.4, PDF 39–40). Per il single-pass a finestra quadrata la risposta è un top-hat di lato W.
+- *Kernel continuo:* separabile, F(x, y) = F(x) F(y), con per ciascun asse la forma MHG di WIE17 (Tab. 2.1, p. 15 stampata, PDF 26):
+  F(s) = (1 − b s²/σ_r²) · exp(−s²/(2σ_r²)) / ((1 − b) σ_r √(2π)), con ∫F ds = 1.
+  - Lunghezza di filtro: L_sr = 1/∫F² ds = σ_r √(4π) (1 − b)² / (1 − b + 3b²/4).
+  - Con b = 0,35 e target L_sr = 0,93 W si ottiene σ_r = 0,4607 W: **0,599 mm in A** e **0,691 mm in B**. Il lobo negativo inizia a |s| = σ_r/√b ≈ 0,78 W. Calcolo verificato numericamente in questa revisione.
+- *Supporto e troncamento:* il supporto numerico è |s| ≤ R_r = 4 σ_r ≈ 1,84 W, cioè **2,40 mm in A e 2,76 mm in B**. **Non coincide con ±W/2**: la risposta equivalente del multi-pass si estende oltre la finestra. La massa |F| oltre 4 σ_r è circa 5·10⁻⁴. Il kernel è troncato a R_r e i pesi sono rinormalizzati a somma 1.
+- *Discretizzazione sulla griglia LES:* il campo LES è trattato come costante a tratti nella cella (assunzione dichiarata; nessun sovracampionamento, che introdurrebbe un'interpolazione in più).
+  - Peso per asse: w_x(i) = ∫ F(s) ds sulla cella i, cioè sull'intervallo [s_i − Δx/2, s_i + Δx/2] ∩ [−R_r, R_r], con s_i offset del nodo. Analogo in y con Δy.
+  - Pesi 2D = prodotto; normalizzazione Σ w = 1.
+  - In A il kernel copre ±4 nodi in x (R_r/Δx = 4,1) e ±3 nodi in y (R_r/Δy = 3,2).
+- *Verifica e taratura della risposta discretizzata:* per ciascun asse si calcolano la lunghezza discreta L_sr,disc = Δ / Σ_i w(i)² e la risposta discreta H(k) = Σ_i w(i) cos(k s_i).
+  - Se L_sr,disc differisce di più del 5 % dal target 0,93 W, si ritocca σ_r **di quell'asse** finché rientra.
+  - Nella specifica si registrano σ_r nominale e tarato, L_sr,disc e H(k) alle lunghezze d'onda 2–10 mm.
+  - La risposta dichiarata è quella **discreta realizzata**, non quella continua.
 - *Parametri:* A: W = 1,3 mm. B: W = 1,5 mm.
-- *Sensibilità SENS-TH:* top-hat di lato W.
-- *Bordi:* un vettore esiste solo se il supporto [−W/2, +W/2] in x e in y sta dentro il campo (A: dominio; B: finestra). Niente estrapolazione né riflessione.
+- *Campo e bordi:* il campo è un rettangolo in mm.
+  - **A:** rettangolo dei nodi estremi della slice, sotto l'assunzione dichiarata "slice = sezione osservata".
+  - **B:** [x_c ± 15 mm] × [y_c ± 15 mm].
+  - **Esistenza del vettore (regola PIV):** il vettore esiste se la sua **finestra di interrogazione** [±W/2]² è interamente nel campo. Margine atteso: 2 nodi in x e 1 nodo in y sia per W = 1,3 sia per W = 1,5. Vettori validi attesi: A ≈ 124×126 ≈ 15 600; B ≈ 1 800–1 900 per posizione. I conteggi esatti si fissano nella specifica.
+  - **Vettori vicini al bordo** (finestra dentro, supporto R_r fuori): kernel troncato ai soli nodi del campo e rinormalizzato a somma 1. È un'approssimazione [ipotesi] della risposta modificata di una PIV reale vicino al bordo dell'immagine, dove contribuiscono solo le particelle visibili. Questi vettori sono marcati nei metadati e la loro risposta realizzata si misura a parte (F2.6).
+  - In B la LES esiste anche fuori dalla finestra ma **non si usa**: la camera non la vede.
+  - Niente estrapolazione né riflessione.
+  - **SENS-EDGE** (solo valutazione): esistono solo i vettori il cui supporto R_r è interamente nel campo, con margine di circa 5 nodi in x e 4 in y in A.
+- *Top-hat (SENS-TH):* F = 1/W su |s| ≤ W/2 (supporto = ±W/2), stessa integrazione per cella con peso proporzionale alla sovrapposizione, stessa rinormalizzazione e stesse regole di bordo.
 - *Assunzioni e incertezze:*
   - pesatura e numero di passate GTMC non dichiarati (DaVis 7.2 e 8.0, "multi-scale");
-  - il kernel copre circa 2 celle, quindi l'effetto dipende dal contenuto della LES a quelle scale (verifica F1.2);
+  - la finestra copre circa 2 celle e il supporto del kernel ±4 nodi in x e ±3 in y: l'effetto dipende dal contenuto della LES a quelle scale (verifica F1.2) e dalla discretizzazione, verificata come sopra;
   - **la media attraverso lo spessore del foglio (~1 mm) non è rappresentabile** su una slice.
 
 **(4) Ampiezza dell'errore casuale**
@@ -141,7 +161,12 @@ Formato di ogni elemento: fonte → motivazione → parametri → assunzioni e i
 
 **(5) Correlazione spaziale dell'errore**
 - *Fonte:* in DaVis multi-pass la risposta e l'autocorrelazione del rumore sono **due funzioni diverse** (WIE17 §2.5, PDF 39). Con W = 32 px al 50 %, la lunghezza integrale dell'autocorrelazione del rumore è L_sr(rumore) = 38,4 px ≈ 1,2 W, contro 0,93 W della risposta. Monte Carlo: ρ(2d) = 0,11 "rappresentativo" al 50 % (WIE17 §4.3, PDF 90). La review riporta ρ(2h) = 0 per overlap ≤50 % in quel caso (P16).
-- *Rappresentazione principale:* rumore bianco sul reticolo sovracampionato, filtrato con un **kernel MHG distinto da quello della risposta**, tarato perché l'autocorrelazione risultante abbia L_sr = 1,2 W, poi campionato ai nodi e rinormalizzato a σ_u. Le componenti u e v sono indipendenti fra loro (ipotesi; WIE17 §4.3 la adotta).
+- *Rappresentazione principale:* **kernel di rumore g distinto dal kernel di risposta**, con la stessa forma MHG (b = 0,35) e L_sr,n = 1,2 W, quindi σ_n = 0,5944 W: **0,773 mm in A** e **0,892 mm in B**.
+  - g è troncato a 4 σ_n e discretizzato per cella come nel punto (3).
+  - Per ogni componente: rumore bianco N(0, 1) indipendente per nodo, su una griglia estesa di R_n = 4 σ_n oltre il campo, così il rumore è stazionario fino ai bordi e non serve troncarlo; convoluzione con g; divisione per √(Σ g²) per avere varianza unitaria; moltiplicazione per σ_u,c; campionamento sui nodi validi.
+  - Nel modello lineare di Wieneke l'integrale dell'autocorrelazione del rumore vale 1/∫g², quindi ≈1,2 W per costruzione. La stessa taratura discreta del punto (3) vale per σ_n, con tolleranza del 5 %.
+  - Valori attesi (continuo, per asse): ρ(0,5 W) ≈ 0,68, ρ(W) ≈ 0,15, ρ(1,5 W) ≈ −0,07. Con passo d = W/2 (overlap 50 %) si ha ρ(2d) ≈ 0,15, dello stesso ordine del valore "rappresentativo" 0,11. È una coerenza, non una verifica. Sulla griglia anisotropa si riportano ρ ai ritardi effettivi dei nodi (0,581 e 0,758 mm e multipli).
+  - Le componenti u e v sono indipendenti fra loro (ipotesi; WIE17 §4.3 la adotta).
 - *Sensibilità SENS-ρ0:* rumore indipendente per nodo. **È un caso limite di modellazione, non l'equivalente del risultato della review**: ρ = 0 a una distanza (2h) non implica indipendenza a tutte le distanze.
 - *Incertezze:* la divergenza fra 0 e 0,11 al 50 % non è risolta. La procedura per chiuderla è al §5, D-ρ.
 
@@ -149,7 +174,12 @@ Formato di ogni elemento: fonte → motivazione → parametri → assunzioni e i
 Non incluso. Slip ≤2 % stimato a priori (STO12) o trascurabile (OBE15); nessun bias trasferibile documentato in fiamma atmosferica (SINT §2.2). L'esclusione è dichiarata come scelta.
 
 **(7) Regioni mancanti, rigetti e sostituzioni**
-- *Modello principale:* in A e B le uniche regioni senza vettori sono **fuori dal campo e nella fascia di bordo**. È coerente con ciò che il GTMC rilascia: campi completi, con buchi di un solo vettore interpolati (BOX10 p. 31).
+- *Modello principale:* in A e B le uniche regioni senza vettori sono **fuori dal campo e nella fascia di bordo**. Il modello **approssima** il dato GTMC come rilasciato: campi completi, con buchi di un solo vettore interpolati (BOX10 p. 31).
+- *Che cosa questa approssimazione non dimostra:* un campo sperimentale completo dopo interpolazione **non dimostra** che rigetti e sostituzioni siano senza effetto.
+  - I valori sostituiti sono stime locali, non misure, e lo diventano in modo invisibile se manca un flag (SINT §2.1).
+  - Possono concentrarsi dove la misura è più difficile: più vettori interpolati nella zona di reazione (BAU15 p. 127 stampata).
+  - Il modello principale **trascura** questi effetti perché frequenza e distribuzione in fiamma swirl atmosferica non sono documentate.
+  - Le sensibilità qui sotto ne esplorano **alcune conseguenze** (assenza esplicita contro sostituzione non segnalata; rigetti isolati contro a cluster), **non** la loro entità reale.
 - *Rigetti interni:* esistono certamente prima della validazione, ma **non sono quantificati** in fiamma swirl atmosferica (SINT §3.2). Per questo non entrano nel modello principale.
 - *Sensibilità non calibrate SENS-REJ*, applicate a PIV-A con le stesse posizioni nei due livelli di dato:
   - **REJ-iso:** rigetti isolati, uniformi sui vettori validi;
@@ -163,8 +193,8 @@ Non incluso. Slip ≤2 % stimato a priori (STO12) o trascurabile (OBE15); nessun
 
 **Ordine delle operazioni:**
 1. velocità LES in m/s, ricostruita dalla cache con le statistiche congelate;
-2. convoluzione di risposta;
-3. selezione dei nodi validi (campo e bordi);
+2. convoluzione di risposta con il kernel discreto tarato, limitata ai nodi del campo e rinormalizzata vicino ai bordi;
+3. selezione dei nodi validi (regola della finestra);
 4. errore correlato;
 5. rigetti (solo SENS-REJ);
 6. sostituzione (solo `sub`);
@@ -186,10 +216,10 @@ Nuovo namespace, distinto da quelli storici (20261114/16/18) e della 00 (2026112
 
 | Aspetto | Missione 00 | Questa roadmap |
 |---|---|---|
-| Layout | 819 siti casuali (5 %) | Tutti i nodi nel campo (A ≈ 15–16 mila; B ≈ 2 mila) |
+| Layout | 819 siti casuali (5 %) | Nodi validi nel campo (A ≈ 15 600; B ≈ 1 800–1 900 per posizione) |
 | Valore | Puntuale esatto | Media pesata su W (1,3 / 1,5 mm) |
 | Errore | i.i.d. 0,5 / 1,5 m/s, livelli di scenario | Correlato, con lunghezza ≈1,2 W; σ dal progetto di Δt, per condizione |
-| Lacune | Dischi al 25 % dell'area | Fuori dal campo e bordo; rigetti solo come sensibilità |
+| Lacune | Dischi al 25 % dell'area | Fuori dal campo e bordo; rigetti solo come sensibilità, perché un dato rilasciato completo non ne dimostra l'assenza |
 | Sostituzione | Mai | Sensibilità `sub` |
 | Selezione | VAL pulita | VAL della stessa osservazione |
 | Ricette | GLU originali batch 8 contro specialisti microbatch 1 | Stessa ricetta per tutte le celle; ponte con gli originali |
@@ -199,6 +229,7 @@ Nuovo namespace, distinto da quelli storici (20261114/16/18) e della 00 (2026112
 | ID | Che cosa varia | Uso |
 |---|---|---|
 | SENS-TH | Top-hat invece di MHG | Valutazione; training solo se D-kern lo richiede |
+| SENS-EDGE | Esclusione stretta: solo vettori con supporto R_r interamente nel campo | Valutazione |
 | SENS-σlo / SENS-σhi | σ_px 0,06 / 0,15 | Valutazione |
 | SENS-ρ0 | Rumore indipendente | Valutazione |
 | SENS-REJ-{iso,clu}-{flag,sub} | Rigetti non calibrati al 10 % | Valutazione; training condizionato (gruppo T8) |
@@ -213,6 +244,8 @@ Nuovo namespace, distinto da quelli storici (20261114/16/18) e della 00 (2026112
 3. Risposta e autocorrelazione dell'errore sono **due kernel separati**, con lunghezze diverse: 0,93 W e 1,2 W.
 4. Un'eventuale verifica su Neal (F2.4) qualifica la forma dell'errore **in un getto non reagente** con il processamento scelto. Non certifica una PIV reagente.
 5. Nessuna percentuale di rigetto isoterma è trasferita alla combustione. Il 10 % di SENS-REJ è uno scenario dichiarato, non una frequenza.
+6. Il supporto del kernel non è ±W/2: è 4 σ_r ≈ 1,84 W. L'esistenza del vettore segue invece la finestra ±W/2 (§2.3, punto 3).
+7. Un campo rilasciato completo non dimostra l'assenza di effetti da rigetto e sostituzione (§2.3, punto 7).
 
 ---
 
@@ -261,34 +294,39 @@ Ogni attività riporta ID, dipendenze e criterio di completamento. Tutto si eseg
 *Completamento:* test CPU che passano (F2.3).
 
 **F2.3 Test unitari.**
-- Identità: IDEAL-full riproduce bit a bit la cache densa.
-- Trasferimento del filtro su campi sinusoidali in mm, contro l'analitico.
+- Identità: IDEAL-full riproduce bit a bit la cache densa; IDEAL-A e IDEAL-B riproducono la cache sui nodi validi di PIV-A e PIV-B.
+- Nodi validi: PIV-A e IDEAL-A hanno lo stesso insieme di nodi (hash uguale); lo stesso per PIV-B e IDEAL-B in ogni posizione.
+- Pesi del kernel: somma 1 dopo troncamento e dopo la rinormalizzazione di bordo; L_sr,disc entro il 5 % del target per asse.
+- Trasferimento del filtro su campi sinusoidali in mm, contro H(k) discreta attesa, separatamente per vettori interni e di bordo.
 - σ e autocorrelazione empiriche del rumore contro i target (L_sr, ρ(d), ρ(2d), ρ(3d) in x e y), su molte realizzazioni.
-- Esclusione dei bordi; geometria delle tre posizioni di B.
+- Regola della finestra e margini; SENS-EDGE; geometria delle tre posizioni di B.
+- Stazionarietà del rumore fino ai bordi (griglia estesa).
 - Frazione e connettività dei rigetti in SENS-REJ.
 - Regola di sostituzione.
 - Determinismo e separazione dei namespace.
 - Equivalenza U-Net/GLU.
 - Assenza di accesso a T: test di firma più test di regressione con T perturbata.
 
-**F2.4 (condizionata, richiede autorizzazione al download di 271,8 MB) Verifica metrologica su Neal.**
+**F2.4 (opzionale, download autorizzato: §10) Verifica metrologica su Neal.**
 - Elaborare le immagini MS con un software aperto documentato (finestre 16 e 32 px; overlap 50 % e 75 %).
 - Allineare all'HDR (kernel di 5 coppie).
-- Stimare distribuzione e ρ(d), ρ(2d) dei residui.
+- Stimare distribuzione e ρ(d), ρ(2d) dei residui, per componente e direzione.
+- Confrontare la lunghezza integrale dei residui con la relazione rumore–finestra usata in §2.3, punto 5.
 
-*Esito:* qualifica la forma dell'errore e la relazione con l'overlap **in un getto freddo**; non certifica la fiamma. Serve solo a chiudere D-ρ.
+*Esito:* qualifica la forma dell'errore e la relazione con l'overlap **in un getto freddo, con il processamento scelto e con i limiti del riferimento HDR** (kernel di 5 coppie, outlier interpolati non marcati, ricampionamento a 1 px). Non certifica una PIV reagente. Serve solo a chiudere D-ρ. I dati non diventano dati di training.
 
-**F2.5 (condizionata, richiede autorizzazione ≈0,8 GB) Cardiff, regola di sostituzione.**
-- Validare il decoder con la statistica `V.*` del database.
-- Confrontare la regola di F2.2 con il comportamento dei vettori sostituiti di Cardiff (distanza dalla media dei vicini).
+**F2.5 (opzionale, download autorizzato: §10) Cardiff, processamento e sostituzione.**
+- Validare il decoder non ufficiale: media dei 514 campi decodificati contro la statistica `V.*` salvata da DynamicStudio; regione NaN del primo stadio contro la maschera `D.4xd8dily`; riproduzione degli sha256 dei 12 file già estratti dallo scout.
+- Descrivere sui 514 frame come la catena reale trasforma i vettori fra i tre stadi (transizioni dei codici, cambiamenti dei valori, distanza dei sostituiti dalla media dei vicini).
+- Confrontare la regola di sostituzione di F2.2 (media iterativa 3×3) con quel comportamento.
 
-*Esito:* qualifica della regola. **Nessuna frequenza trasferita.**
+*Esito:* qualifica del processamento e della regola di sostituzione **in una PIV isoterma**. Frazioni e morfologia dei codici si riportano come descrizione di quel dataset. **Nessuna frequenza è trasferita** alla combustione né a SENS-REJ. I dati non diventano dati di training.
 
 **F2.6 Qualifica delle osservazioni generate** (su `train_fit`, 760 frame, e su 3 condizioni TRAIN rappresentative).
 
 *Statistiche:*
 - conteggi e copertura;
-- trasferimento realizzato sulla griglia discreta;
+- risposta realizzata sulla griglia discreta (L_sr,disc e H(k)), **separata per vettori interni e di bordo**, confrontata con il target;
 - σ_u per condizione;
 - autocorrelazione dell'errore realizzata;
 - differenza RMS fra campo ideale e osservato, per componente e per regione di velocità;
@@ -301,8 +339,8 @@ Ogni attività riporta ID, dipendenze e criterio di completamento. Tutto si eseg
 *Completamento:* rapporto `piv_observation_qualification.md` con figure. Revisione **R2** superata.
 
 **F2.7 Profilazione GPU** (smoke non scientifico, ≈2–4 GPU-h, dopo R2).
-- U-Net e GLU su A, B e IDEAL-full: tempo per epoca, VRAM, tempo di valutazione.
-- GLU con **tutti** i nodi di A (≈16 000 token) a microbatch 1 con accumulo.
+- U-Net e GLU su A, B e IDEAL-A: tempo per epoca, VRAM, tempo di valutazione.
+- GLU con **tutti** i nodi validi di A (≈15 600 token) a microbatch 1 con accumulo.
 
 *Completamento:* tabella dei costi e proposta per D-GLU (§5).
 
@@ -318,32 +356,38 @@ Ogni attività riporta ID, dipendenze e criterio di completamento. Tutto si eseg
 
 ### 4.2 Osservazioni di test e contrasti
 
-| ID | Layout | Valori | Errore | Copertura | Modelli |
-|---|---|---|---|---|---|
-| E0 | 5 % storico | Ideali | — | Tutta la slice | 12 originali (replay R0: gate ≤0,05 K macro contro la 00) |
-| E1 | 5 % storico | Filtrati (A, W = 1,3) | — | Tutta la slice | 12 originali |
-| E2 | 5 % storico | Filtrati | Errore A | Tutta la slice | 12 originali |
-| E3 | Tutti i nodi | Ideali | — | Tutta la slice | 12 originali, U4, U6 |
-| E4 | Nodi validi di A | Filtrati | — | A | 12 originali; U4, U6 solo nella variante diagnostica E4* |
-| E5 | Nodi validi di A | Filtrati | Errore A | **PIV-A** | 12 originali; U4, U6 su E5* |
-| E6 | Nodi di B (centro) | Ideali | — | B | 12 originali |
-| E7 | Nodi di B (3 posizioni) | Filtrati (W = 1,5) | Errore B | **PIV-B** | 12 originali |
+**Regola:** un contrasto che dichiara di isolare filtro o errore usa **gli stessi nodi validi** e le stesse realizzazioni su entrambi i lati. Solo i contrasti di layout e di copertura cambiano i nodi, e lo fanno per definizione.
 
-E4* ed E5* sono varianti diagnostiche per le U-Net dense: il kernel è troncato e rinormalizzato ai bordi invece di escludere i vettori, ed è dichiarato come diagnostica.
+| ID | Nodi | Valori | Errore | Modelli |
+|---|---|---|---|---|
+| E0 | 819 siti storici | Ideali | — | 12 originali. Replay R0: gate ≤0,05 K macro contro la 00 |
+| E0v | Siti storici ∩ nodi validi di A | Ideali | — | 12 originali |
+| E1 | Come E0v | Filtrati (A, W = 1,3) | — | 12 originali |
+| E2 | Come E0v | Filtrati | Errore A | 12 originali |
+| E3 | Tutti i 16 384 nodi | Ideali | — | 12 originali, U4, U6 |
+| E3a | Nodi validi di A | Ideali | — | 12 originali |
+| E4 | Nodi validi di A | Filtrati | — | 12 originali |
+| E5 | Nodi validi di A | Filtrati | Errore A | 12 originali (**PIV-A**) |
+| E6 | Nodi validi di B, 3 posizioni | Ideali | — | 12 originali |
+| E7 | Come E6, stessa posizione | Filtrati (W = 1,5) | Errore B | 12 originali (**PIV-B**) |
+| E4*, E5* | Tutti i 16 384 nodi | Filtrati con kernel troncato e rinormalizzato anche entro W/2 dal bordo; E5* con errore | Come E4, E5 | Solo U4, U6 (diagnostica: non hanno canale di maschera) |
 
-**Contrasti** (sempre sugli stessi frame e sulle stesse realizzazioni):
+**Contrasti** (stessi frame e stesse realizzazioni):
 
-| Contrasto | Che cosa isola |
-|---|---|
-| E1 − E0 | Effetto del filtro **a layout fisso**: ponte diretto con la 00 |
-| E2 − E1 | Effetto dell'errore PIV correlato a layout fisso; confrontabile con N1/N2 della 00 |
-| E3 − E0 | **Cambio di layout** (densità), con valori ideali |
-| E4 − E3 | Filtro su layout denso |
-| E5 − E4 | Errore su layout denso |
-| E6 − E3 | **Copertura** con valori ideali |
-| E7 − E6 | Misura dentro il campo ridotto |
+| Contrasto | Nodi | Che cosa isola |
+|---|---|---|
+| E0v − E0 | Diversi (siti di bordo rimossi) | Effetto della sola rimozione dei siti di bordo; atteso piccolo, riportato |
+| E1 − E0v | Uguali | Filtro **a layout storico fisso**: ponte diretto con la 00 |
+| E2 − E1 | Uguali | Errore PIV correlato a layout storico fisso; confrontabile con N1/N2 della 00 |
+| E3 − E0 | Diversi per definizione | **Cambio di layout** (densità), valori ideali |
+| E3a − E3 | Diversi (fascia di bordo) | Effetto della fascia di bordo esclusa |
+| E4 − E3a | Uguali | Filtro su layout denso |
+| E5 − E4 | Uguali | Errore su layout denso |
+| E6 − E3a | Diversi per definizione | **Copertura** con valori ideali |
+| E7 − E6 | Uguali (per posizione) | Misura dentro il campo ridotto |
+| E4* − E3, E5* − E4* | Uguali | Filtro ed errore per le U-Net dense (diagnostica) |
 
-Sensibilità in sola valutazione, dopo E0–E7: SENS-TH, SENS-σlo/hi, SENS-ρ0, SENS-REJ (4 combinazioni), SENS-B-pos, SENS-W.
+Sensibilità in sola valutazione, dopo E0–E7: SENS-TH, SENS-EDGE, SENS-σlo/hi, SENS-ρ0, SENS-REJ (4 combinazioni), SENS-B-pos, SENS-W. Ognuna è confrontata con la configurazione principale **sugli stessi nodi**. Per SENS-EDGE il confronto si fa sull'intersezione dei nodi validi.
 
 **Interpretazione.** I modelli al 5 % su E3–E7 sono **fuori distribuzione**: U-Net con maschera quasi piena, GLU con migliaia di token. Questi test misurano la robustezza di modelli costruiti per un'altra osservazione, non l'informazione contenuta nella PIV. Il GLU originale a 819 token potrebbe richiedere molta memoria con input densi: la profilazione F2.7 decide se valutarlo a microbatch 1. Nessuna riduzione silenziosa dei token.
 
@@ -397,14 +441,21 @@ Sensibilità in sola valutazione, dopo E0–E7: SENS-TH, SENS-σlo/hi, SENS-ρ0,
 
 | Gruppo | Cella | Osservazione di training | Famiglia × seed | Run | Perché |
 |---|---|---|---|---|---|
-| T1 | IDEAL-full | Tutti i nodi, valori ideali | U-Net × 5 | 5 | Controllo con la stessa ricetta; ancoraggio a U4 (Mese 2, 26,9 K, un seed) |
+| T1 | IDEAL-A | **Stessi nodi validi di PIV-A**, valori ideali | U-Net × 5 | 5 | Controllo di T2 con la stessa ricetta e gli stessi nodi. Ancoraggio a U4 tramite la valutazione su E3 |
 | T2 | PIV-A | §2.3, configurazione A | U-Net × 5 | 5 | **Cuore della missione**: ricostruzione da PIV a pieno campo |
-| T3 | IDEAL-B | Nodi di B (centro), ideali | U-Net × 5 | 5 | Separa la copertura dalla qualità dei vettori |
+| T3 | IDEAL-B | **Stessi nodi validi di PIV-B** (centro), ideali | U-Net × 5 | 5 | Controllo di T4; con T1 separa la copertura dalla qualità dei vettori |
 | T4 | PIV-B | Configurazione B (centro) | U-Net × 5 | 5 | PIV ad alto rateo, campo ridotto |
-| T5 | IDEAL-full, PIV-A | Come T1 e T2 | GLU × 3 + 3 | 6 | Le conclusioni valgono anche per la seconda architettura? Stesse osservazioni fisiche della U-Net (D-GLU) |
-| T6 | IDEAL-B, PIV-B | Come T3 e T4 | GLU × 3 + 3 | 6 | Come T5; ≈2 000 token |
+| T5 | IDEAL-A, PIV-A | Come T1 e T2 | GLU × 3 + 3 | 6 | Le conclusioni valgono anche per la seconda architettura? Stesse osservazioni fisiche della U-Net (D-GLU) |
+| T6 | IDEAL-B, PIV-B | Come T3 e T4 | GLU × 3 + 3 | 6 | Come T5; ≈1 800–1 900 token |
 | T7 | Ponte 5 % ideale | Siti casuali al 5 %, come gli originali | GLU × 3 | 3 | Separa la ricetta (batching) dall'osservazione; collega la campagna alla 00 |
 | | | | **Totale** | **35** | |
+
+**Conseguenze della correzione sui nodi.** Il controllo ideale di A passa da IDEAL-full (tutti i nodi) a **IDEAL-A** (stessi nodi validi di PIV-A); quello di B usa gli stessi nodi validi di PIV-B. Il numero di run **non cambia**: 35 necessari, come nella versione approvata. IDEAL-full non si allena:
+- differisce da IDEAL-A solo per la fascia di bordo (2 nodi in x e 1 in y per lato);
+- il suo effetto si misura in valutazione (E3a − E3);
+- l'ancoraggio al Mese 2 resta affidato a U4 e U6 e alla valutazione dei modelli T1 su E3.
+
+Nessun training è stato aggiunto.
 
 **Condizionati**
 
@@ -412,7 +463,7 @@ Sensibilità in sola valutazione, dopo E0–E7: SENS-TH, SENS-σlo/hi, SENS-ρ0,
 |---|---|---|---|
 | T8 | PIV-A + REJ-clu, nei livelli `flag` e `sub` | D-REJ | U-Net 5 + 5 |
 | T9 | Più configurazioni: A e B con posizioni campionate | D-mix | U-Net 5 (+ GLU 3 solo se la U-Net mostra un beneficio) |
-| T10 | PIV-A con top-hat, oppure PIV-A senza errore (solo filtro) | D-kern, o se la Fase 3 mostra filtro ed errore entrambi rilevanti e non separabili | U-Net 5 |
+| T10 | PIV-A con top-hat, oppure PIV-A senza errore (solo filtro), sugli stessi nodi validi | D-kern, o se la Fase 3 mostra filtro ed errore entrambi rilevanti e non separabili | U-Net 5 |
 | T11 | A2 (layout ridotto) | Solo se D-GLU lo richiede | U-Net 5 + GLU 3 |
 
 ### 7.3 Valutazione
@@ -422,7 +473,8 @@ Ogni modello T1–T11 viene valutato con `best` e `last` su seen220 e VAL123, co
 Ne risulta una **matrice incrociata**, in cui righe e colonne hanno i ruoli seguenti:
 - *diagonale* (training = test): l'informazione utilizzabile con quell'osservazione;
 - *fuori diagonale*: il costo di un operatore sbagliato e il trasferimento fra configurazioni;
-- *T1 testato su E5, contro T2 su E5*: il valore del training coerente con la misura.
+- *T1 testato su E5, contro T2 su E5* (stessi nodi): il valore del training coerente con la misura;
+- *T1 su E3a contro T2 su E5*: la perdita d'informazione attribuibile a filtro ed errore con modelli allenati per ciascuna osservazione.
 
 **Metriche** (in K, sul campo 128×128, con l'aggregazione della 00: frame → condizione → media uniforme → repliche):
 - RMSE, bias, RMSE centrata, MAE;
@@ -446,7 +498,7 @@ Tutto è riportato per condizione e per seed.
 
 Ipotesi:
 - U-Net: 1–5 GPU-h per run. Estremo basso dalla profilazione densa del Mese 2 (28,5 min per 730 epoche); estremo alto dagli specialisti della 00 (4,5 GPU-h, con valutazioni ogni 10 epoche e preemption). Gli input densi non cambiano il costo della U-Net.
-- GLU: 8,9 GPU-h per run a 819 token (00). A ≈16 000 token da ×1 a ×10, da misurare in F2.7; per B, ≈2 000 token, da ×1 a ×2.
+- GLU: 8,9 GPU-h per run a 819 token (00). A ≈15 600 token da ×1 a ×10, da misurare in F2.7; per B, ≈1 800–1 900 token, da ×1 a ×2.
 - I tempi di valutazione includono generazione delle osservazioni, I/O e metriche: non sono latenze d'inferenza.
 
 | Voce | Run | GPU-h |
@@ -470,7 +522,7 @@ Riferimento: la 00 è costata 210,1 GPU-h per 30 run (95 % training), in circa 5
 1. **Branch:** lavorare su un branch dedicato da `piv/experiment-proposal` (nome da concordare); niente merge in `main`. Nessuna modifica a `nonideal_observations.py`, alle specifiche della 00, ai risultati storici o ai documenti delle missioni 00 e 01: si propongono gli aggiornamenti alla 01.
 2. **Ordine vincolante:** Fase 1 → R1 → Fase 2 → R2 → F2.7 e Fase 3 → R3 → Fase 4 (T1–T7) → R4 → condizionati. Non anticipare training o valutazioni neurali prima di R2.
 3. **Divieti:** TEST mai letto (rifiutare i ruoli `test*` come nella 00); nessun uso di T nel generatore; nessun parametro scelto guardando metriche delle reti; nessuna riduzione di token o di nodi non dichiarata nella specifica.
-4. **Download:** F2.4 e F2.5 solo dopo l'autorizzazione esplicita di Enrico, tramite HTTP Range dove possibile, fuori dalla repository, con manifest e sha256.
+4. **Download:** F2.4 e F2.5 sono **già autorizzati** (§10): non chiedere di nuovo l'autorizzazione. Le verifiche restano opzionali e motivate. Seguire esattamente §10: file, destinazione fuori dalla repository, checksum e manifest. Nessun altro download di dataset.
 5. **Provenienza:** ogni artefatto registra SHA del codice, sha256 della specifica, della cache e delle statistiche, namespace e seed, configurazione, posizione di B, livello `flag` o `sub`.
 6. **Riuso:** pipeline di valutazione, gate di replay, aggregazione, metriche e accounting della 00. L'accounting Slurm va prodotto con lo stesso metodo (`sacct -D`).
 7. **Consegne per ogni fase:** un documento leggibile nella cartella della missione, più tabelle e figure in `results/piv/…`, con un indice.
@@ -483,4 +535,62 @@ Riferimento: la 00 è costata 210,1 GPU-h per 30 run (95 % training), in circa 5
 - Le osservazioni rappresentano una classe di PIV documentata (GTMC), con trasferimenti dichiarati. Non sono una riproduzione del nostro combustore, la cui geometria è ignota.
 - Fenomeni **non rappresentabili** con una slice: spessore del foglio, errori propri della stereo, rifrazione, luminosità di fiamma, traiettorie delle particelle.
 - Fenomeni **documentati ma non quantificati**, quindi solo sensibilità o esclusi: rigetti in fiamma, densità di particelle nel gas combusto.
-- Una qualifica su Neal o Cardiff riguarda flussi non reagenti o isotermi.
+- Una qualifica su Neal o Cardiff riguarda flussi non reagenti o isotermi e non certifica una misura reagente.
+- Il modello principale rappresenta il dato rilasciato completo: **non** dimostra che rigetti e sostituzioni in fiamma siano senza effetto. Le sensibilità ne esplorano alcune conseguenze, non l'entità reale.
+
+---
+
+## 10. Download autorizzati per le verifiche F2.4 e F2.5
+
+**Autorizzazione.** Enrico, 27 novembre 2026, autorizza Sonnet a scaricare durante l'esecuzione locale o sul cluster i due insiemi di dati sotto, **solo** per le verifiche F2.4 e F2.5. Sonnet **non deve chiedere di nuovo** l'autorizzazione.
+- Le verifiche restano **opzionali** e motivate dalle decisioni D-ρ (Neal) e dalla qualifica della regola di sostituzione (Cardiff).
+- I dati **non** diventano dataset di training o di valutazione delle reti.
+- I dati **non** certificano una misura reagente.
+- Nessun altro download di dataset è autorizzato da questa voce.
+
+Identificativi verificati il 27/11/2026 tramite le API pubbliche dei repository (solo metadati; nessun dato scaricato in questa revisione).
+
+### 10.1 Neal et al., "unsteady inviscid core" (F2.4)
+
+| Campo | Valore |
+|---|---|
+| Titolo | *PIV uncertainty - Database of the unsteady inviscid core of a transitional jet* |
+| DOI e versione | 10.4121/13663376.v1 (4TU.ResearchData), UUID del record `309145fd-dcd3-47c4-8b88-8349d9e70cdb` |
+| Licenza | CC0 |
+| File | `Unsteady Inviscid core.zip`, **271 827 177 byte**, MD5 dichiarato dal repository `eb6d86228f534d6285859ccc0f16c369` |
+| URL | `https://data.4tu.nl/file/309145fd-dcd3-47c4-8b88-8349d9e70cdb/426acdf9-5762-4fad-8d99-f8604bc69c86` |
+| Che cosa serve | L'intero zip: immagini MS, campi HDR, `Database description.pdf`, `data description.txt` |
+| Metodo | Download intero. Verificare dimensione e MD5 contro il repository; calcolare sha256 dello zip e dei membri estratti |
+
+### 10.2 Cardiff, Runyon et al. (F2.5)
+
+| Campo | Valore |
+|---|---|
+| Titolo | *Lean methane flame stability in a premixed generic swirl burner: isothermal flow and atmospheric combustion characterization* |
+| DOI e versione | 10.17035/d.2017.0011500240; figshare article 27051964, versione 1 |
+| Licenza | CC BY 4.0 (citare il dataset) |
+| File sorgente | `d.2017.0011500240.zip`, file figshare **49264399**, 7 301 821 358 byte, MD5 dichiarato `a0dc9d9574a1ffdf14cc9634b97ddd52` |
+| URL | `https://ndownloader.figshare.com/files/49264399` |
+| Che cosa serve | **Non** l'intero archivio da 7,3 GB, ma i membri seguenti, estratti via HTTP Range (≈0,8 GB) |
+| Membri | Sotto `d.2017.0011500240/PIVImages/20170303_143734/HiSense Mk II #1.4wewffbs/I.4xd8gr7l/`: `0h6c/data/AdaptivePIV#k.vectors`, `0h6c/bled/data/ValRange#k.vectors`, `0h6c/bled/h4h3/data/ValMovAvg#k.vectors` per k = 0…513 (514 × 3 file da 512 422 byte ≈ 790 MB); gli `AnalysisEnsemble.xml` dei tre stadi. Inoltre: `PIVImages/20170303_143734/Run.xml`; `HiSense Mk II #1.4wewffbs/AcquiredImageEnsemble.xml`; `README.txt` alla radice |
+| Membri da individuare dal listing | Definizione della maschera (`D.4xd8dily`) e statistica DynamicStudio (`V.*`) del ramo principale. Il percorso esatto va letto dalla directory centrale dello zip e registrato nel manifest |
+| Strumenti | `step2_datasets_remote_zip.py` (`list`, `extract`) e `step2_datasets_dynamicstudio_vectors.py` (decoder **non ufficiale**) da `piv/step2-dataset-scouting` @ `ee9948e227f0d9272ae064cc8601c5e5399c28b4`, cartella `mese3/02_virtual_piv/scouting/`. Copiarli con `git show` in una cartella di strumenti separata dai dati |
+| Controllo di riproduzione | I 12 file già estratti dallo scout (frame 0, 1, 257, 513 ai tre stadi) devono riprodurre gli sha256 di `step2_datasets_samples_manifest.tsv` sullo stesso commit |
+| Metodo | Per ogni membro: CRC-32 dalla directory centrale dello zip verificato dopo l'estrazione; sha256 calcolato |
+
+### 10.3 Destinazione, sicurezza e provenienza
+
+- **Destinazione fuori dalla repository**, per esempio `$HOME/piv_qualification_data/neal_unsteady_core/` e `$HOME/piv_qualification_data/cardiff_d2017/` (sul cluster o in locale). Mai committare dati.
+- **Dati non fidati:** script in una cartella diversa dai dati; Python con `-I`; nessun eseguibile o script degli archivi viene eseguito.
+- **Manifest di provenienza committato**, per esempio `results/piv/qualification/download_manifest.tsv`, con una riga per file o membro:
+  - dataset, DOI e versione, URL;
+  - data e ora UTC del download;
+  - metodo (intero / HTTP Range);
+  - percorso interno all'archivio;
+  - byte;
+  - MD5 dichiarato contro calcolato (dove esiste);
+  - CRC-32 del membro;
+  - sha256;
+  - commit degli strumenti usati;
+  - esito delle verifiche.
+- Una discrepanza di dimensione o checksum blocca l'uso del file e va riportata, senza nuovi tentativi indiscriminati.
