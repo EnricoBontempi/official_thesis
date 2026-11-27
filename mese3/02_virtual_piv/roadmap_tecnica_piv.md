@@ -3,6 +3,15 @@
 **Data:** 27 novembre 2026 · **Branch:** `piv/experiment-proposal` · **Destinatario dell'esecuzione:** Sonnet IDE, dopo l'approvazione di Enrico
 **Stato:** impostazione approvata da Enrico il 27/11/2026; revisione v2 con le correzioni richieste per il passaggio a Sonnet (supporto e discretizzazione del filtro, confronti sugli stessi nodi, significato dei campi completi, download autorizzati: §10). Questo documento non implementa nulla e non autorizza download di dataset, job, training, inferenze o accesso a TEST. Ogni fase parte solo dopo il punto di revisione che la precede (§6).
 
+**§0 — Decisioni R1 (27/11/2026).** La revisione R1 è chiusa con [decisione_R1.md](decisione_R1.md), che prevale su questa roadmap dove le due divergono. Le sezioni interessate sono state aggiornate:
+- componenti (vi, vj), con vi trasversale e vj assiale (esito *probabile*); SENS-OOP disattivata;
+- righe ↔ `x` (passo 0,581 mm), colonne ↔ `y` (passo 0,758 mm) per generatore e metriche in mm; la convenzione storica diventa SENS-SWAP;
+- kernel tarati sempre all'1 %; top-hat solo come sensibilità, tarato a L_sr = W; il criterio D-kern è sostituito;
+- v_ref sull'intero record di ogni condizione;
+- B allenato nella posizione adiacente al bordo d'ingresso, centrata sull'asse (B-in);
+- definizioni diagnostiche fissate;
+- attività autorizzate: F2.0–F2.6.
+
 **Problema invariato.** Dataset RealPDEBench combustion, parte LES numerica. Compito: ricostruzione istantanea della T dalle velocità osservate, con le stesse condizioni, gli stessi split e la stessa T come riferimento. Cambiano soltanto le osservazioni di velocità. Non ci sono nuove architetture, né varianti con tracciante a olio, né dataset sperimentali usati come dati di training: Neal, Cardiff e gli articoli servono solo a qualificare il modello di misura.
 
 **Base documentale.**
@@ -29,13 +38,13 @@
 
 - un vettore per ogni nodo dentro il campo di vista;
 - ogni vettore è una media pesata su circa 1,3 mm, come la finestra di interrogazione;
-- un errore casuale di qualche decimo di m/s, correlato fra vettori vicini, con ampiezza fissata dal modo in cui si progetta la misura per quella condizione;
+- un errore casuale di circa 0,45–0,87 m/s secondo la condizione (media ≈0,6 m/s, dalla Fase 1), correlato fra vettori vicini, con ampiezza fissata dal modo in cui si progetta la misura per quella condizione;
 - nessun vettore dove la finestra esce dal campo.
 
 Le configurazioni principali sono due, entrambe tratte dallo stesso articolo sul combustore modello GTMC del DLR (Stöhr et al. 2012):
 
 - **A — pieno campo, basso rateo:** tutta la slice;
-- **B — campo ridotto, alto rateo:** una finestra di 30×30 mm.
+- **B — campo ridotto, alto rateo:** una finestra di 30×30 mm adiacente al bordo d'ingresso e centrata sull'asse, come il campo GTMC "above the nozzle" (decisione R1).
 
 I rigetti dei vettori interni non hanno una base quantitativa in fiamma swirl atmosferica. Il modello principale rappresenta il dato **rilasciato e completo**, ma un campo sperimentale completo dopo interpolazione non dimostra che rigetti e sostituzioni siano senza effetto. Il modello principale li approssima ignorandoli. Le **sensibilità dichiarate**, con e senza sostituzione, ne esplorano alcune conseguenze, non la loro entità reale.
 
@@ -68,10 +77,10 @@ Costo indicativo del necessario: circa 180–850 GPU-h, contro 210 nella 00. L'i
 ### 2.1 Vincoli dal dataset
 
 Dalla missione 01 (INV B-data-audit-001, §7):
-- griglia 128×128, x ∈ [−36,9; 36,9] mm (colonne), y ∈ [62,9; 159,1] mm (righe);
-- celle 0,581×0,758 mm;
+- griglia 128×128; coordinate x ∈ [−36,9; 36,9] mm e y ∈ [62,9; 159,1] mm. Assegnazione agli assi **decisa a R1**: righe ↔ x (passo 0,581 mm, laterale), colonne ↔ y (passo 0,758 mm, assiale), esito *probabile*. La convenzione storica della missione 01 (colonne ↔ x) è SENS-SWAP;
+- celle 0,581 mm (lungo le righe) × 0,758 mm (lungo le colonne);
 - velocità in m/s e T in K, per inferenza dagli intervalli;
-- **definizione di i/j/k, segno e piano della slice non dichiarati**;
+- **definizione di i/j/k, segno e piano della slice non dichiarati**. Fase 1: slice per l'asse del bruciatore, con l'asse sulla riga 63,5; vj assiale, vi trasversale, vk fuori piano (*probabile*; [orientation_note.md](orientation_note.md), [decisione_R1.md](decisione_R1.md) §2);
 - vk presente nei raw ma non nelle cache;
 - filtro e ricampionamento della LES ignoti.
 
@@ -90,7 +99,7 @@ La cache densa C149 contiene vi e vj normalizzati su tutti i nodi: è la sorgent
 
 A e B **non** mescolano apparati: sono i due sistemi descritti in STO12. Le altre fonti mostrano che le proprietà ricorrono (SINT §2.2), ma non forniscono parametri da sommare.
 
-Entrambi i sistemi GTMC sono stereo e misurano tre componenti. Ne usiamo due (vi, vj) **per ipotesi di piano** finché la fase 1 non qualifica l'orientamento. Se il risultato fosse "k non è la componente fuori piano", la configurazione si ridefinisce alla revisione R1.
+Entrambi i sistemi GTMC sono stereo e misurano tre componenti. Ne usiamo due (vi, vj). R1 ha chiuso questo punto con esito *probabile*: vi trasversale e vj assiale nel piano, vk fuori piano. Il limite residuo (vi potrebbe essere fuori piano) è dichiarato in decisione_R1 §2.
 
 ### 2.3 Elemento per elemento
 
@@ -99,44 +108,46 @@ Formato di ogni elemento: fonte → motivazione → parametri → assunzioni e i
 **(1) Layout regolare e passo**
 - *Fonte:* nelle configurazioni DLR il passo è metà della finestra con overlap 50 %: 1,0/0,5 mm (BOX10 p. 15), 1,0/0,5 mm (SAI16 p. 7), 1,9/0,95 mm (KAR20 p. 5). Per W = 1,3 mm il passo è ≈0,65 mm [inferenza].
 - *Rappresentazione:* **un vettore per ogni nodo LES valido**, passo 0,581×0,758 mm. Nessuna interpolazione fuori nodo. U-Net e GLU ricevono così gli stessi valori nelle stesse posizioni.
-- *Assunzioni:* il passo è anisotropo invece di quadrato; per B il passo dedotto (0,75 mm) coincide quasi con la cella in y. Il numero di vettori supera l'informazione indipendente (P10). Si dichiara, non si corregge.
+- *Assunzioni:* il passo è anisotropo invece di quadrato; per B il passo dedotto (0,75 mm) coincide quasi con la cella lungo le colonne (0,758 mm). Il numero di vettori supera l'informazione indipendente (P10). Si dichiara, non si corregge.
 
 **(2) Campo di vista e copertura**
 - *A:* tutta la slice ("entire vertical section", STO12 §2.3.2), meno la fascia di bordo del punto (3).
-- *B:* finestra di 30×30 mm (STO12 §2.3.3), cioè circa 52 colonne × 40 righe e il 13 % dell'area.
-  - **Posizioni:** tre, fissate prima di ogni valutazione con una regola geometrica che non dipende dai risultati: x centrato; centro in y a y_mid − 30 mm, y_mid e y_mid + 30 mm. Si arrotonda al nodo; la finestra resta interna al dominio.
-  - Il training di B usa **la posizione centrale**; le altre due servono in valutazione.
+- *B:* finestra di 30×30 mm (STO12 §2.3.3: "region above the nozzle"), cioè 52 righe × 40 colonne (30,2 × 30,3 mm) e il 13 % dell'area.
+  - **Posizioni (decisione R1, regola geometrica e di velocità, indipendente dai risultati):**
+    - **B-in**, training e valutazione: righe 38–89, colonne 88–127; adiacente al bordo d'ingresso, centrata sull'asse;
+    - **B-down**, solo valutazione: righe 38–89, colonne 48–87; 30 mm a valle sulla stessa linea d'asse;
+    - **B-off**, solo valutazione: righe 64–115, colonne 88–127; adiacente all'ingresso, con l'asse al bordo della finestra.
 - *Motivazione:* il campo ridotto ad alto rateo è documentato in più apparati (Toronto/DLR, DLR 5 bar, UT Austin; SINT §2.2). Il decentramento dipende dalla geometria del combustore, che non conosciamo (INV C1).
-- *Assunzioni:* la posizione in B non ha corrispondenza fisica, quindi i risultati vanno riportati per posizione. Nessuna esclusione da riflessi o pareti nel modello di base, perché non sappiamo se la slice contenga pareti (SINT G10).
+- *Assunzioni:* l'ugello potrebbe essere fuori dalla slice (y parte da 62,9 mm): B-in è l'approssimazione più vicina a "above the nozzle". Risultati riportati per posizione. Nessuna esclusione da riflessi o pareti nel modello di base, perché non sappiamo se la slice contenga pareti (SINT G10).
 
 **(3) Risposta spaziale**
 - *Fonte:* il vettore è una media pesata dello spostamento. Per il multi-pass DaVis su immagini sintetiche la risposta alle lunghezze d'onda è un MHG (gaussiana con 30–40 % di cappello messicano) con L_sr(R_A) = 29,8 px su una finestra di 32 px al 50 %, cioè ≈0,93 W (WIE17 §2.6, Tab. 2.4, PDF 39–40). Per il single-pass a finestra quadrata la risposta è un top-hat di lato W.
 - *Kernel continuo:* separabile, F(x, y) = F(x) F(y), con per ciascun asse la forma MHG di WIE17 (Tab. 2.1, p. 15 stampata, PDF 26):
   F(s) = (1 − b s²/σ_r²) · exp(−s²/(2σ_r²)) / ((1 − b) σ_r √(2π)), con ∫F ds = 1.
   - Lunghezza di filtro: L_sr = 1/∫F² ds = σ_r √(4π) (1 − b)² / (1 − b + 3b²/4).
-  - Con b = 0,35 e target L_sr = 0,93 W si ottiene σ_r = 0,4607 W: **0,599 mm in A** e **0,691 mm in B**. Il lobo negativo inizia a |s| = σ_r/√b ≈ 0,78 W. Calcolo verificato numericamente in questa revisione.
+  - Con b = 0,35 e target L_sr = 0,93 W si ottiene il valore **nominale** σ_r = 0,4607 W (0,599 mm in A, 0,691 mm in B). I valori usati sono quelli **tarati** per asse (sotto e decisione_R1 §4), per esempio 0,545 mm lungo le righe e 0,531 mm lungo le colonne con W = 1,3. Il lobo negativo inizia a |s| = σ_r/√b ≈ 0,78 W. Calcolo verificato numericamente in questa revisione.
 - *Supporto e troncamento:* il supporto numerico è |s| ≤ R_r = 4 σ_r ≈ 1,84 W, cioè **2,40 mm in A e 2,76 mm in B**. **Non coincide con ±W/2**: la risposta equivalente del multi-pass si estende oltre la finestra. La massa |F| oltre 4 σ_r è circa 5·10⁻⁴. Il kernel è troncato a R_r e i pesi sono rinormalizzati a somma 1.
 - *Discretizzazione sulla griglia LES:* il campo LES è trattato come costante a tratti nella cella (assunzione dichiarata; nessun sovracampionamento, che introdurrebbe un'interpolazione in più).
-  - Peso per asse: w_x(i) = ∫ F(s) ds sulla cella i, cioè sull'intervallo [s_i − Δx/2, s_i + Δx/2] ∩ [−R_r, R_r], con s_i offset del nodo. Analogo in y con Δy.
+  - Peso per asse: w_x(i) = ∫ F(s) ds sulla cella i, cioè sull'intervallo [s_i − Δ/2, s_i + Δ/2] ∩ [−R_r, R_r], con s_i offset del nodo e Δ il passo dell'asse (0,581 mm lungo le righe, 0,758 mm lungo le colonne).
   - Pesi 2D = prodotto; normalizzazione Σ w = 1.
-  - In A il kernel copre ±4 nodi in x (R_r/Δx = 4,1) e ±3 nodi in y (R_r/Δy = 3,2).
+  - Con W = 1,3 mm il kernel tarato copre ±4 nodi lungo le righe (passo 0,581 mm) e ±3 lungo le colonne (passo 0,758 mm).
 - *Verifica e taratura della risposta discretizzata:* per ciascun asse si calcolano la lunghezza discreta L_sr,disc = Δ / Σ_i w(i)² e la risposta discreta H(k) = Σ_i w(i) cos(k s_i).
-  - Se L_sr,disc differisce di più del 5 % dal target 0,93 W, si ritocca σ_r **di quell'asse** finché rientra.
+  - **Decisione R1:** σ_r si tara **sempre** per asse al target 0,93 W, con tolleranza dell'1 % (non più "solo oltre il 5 %").
   - Nella specifica si registrano σ_r nominale e tarato, L_sr,disc e H(k) alle lunghezze d'onda 2–10 mm.
   - La risposta dichiarata è quella **discreta realizzata**, non quella continua.
 - *Parametri:* A: W = 1,3 mm. B: W = 1,5 mm.
 - *Campo e bordi:* il campo è un rettangolo in mm.
-  - **A:** rettangolo dei nodi estremi della slice, sotto l'assunzione dichiarata "slice = sezione osservata".
+  - **A:** rettangolo dei nodi estremi della slice, sotto l'assunzione dichiarata "slice = sezione osservata". Margine: 2 nodi lungo le righe e 1 lungo le colonne (W = 1,3 e 1,5).
   - **B:** [x_c ± 15 mm] × [y_c ± 15 mm].
-  - **Esistenza del vettore (regola PIV):** il vettore esiste se la sua **finestra di interrogazione** [±W/2]² è interamente nel campo. Margine atteso: 2 nodi in x e 1 nodo in y sia per W = 1,3 sia per W = 1,5. Vettori validi attesi: A ≈ 124×126 ≈ 15 600; B ≈ 1 800–1 900 per posizione. I conteggi esatti si fissano nella specifica.
+  - **Esistenza del vettore (regola PIV):** il vettore esiste se la sua **finestra di interrogazione** [±W/2]² è interamente nel campo. Margine atteso: 2 nodi in x e 1 nodo in y sia per W = 1,3 sia per W = 1,5. Vettori validi: A = 124 × 126 = 15 624 (righe × colonne); B = 48 × 38 = 1 824 per posizione. I conteggi esatti si fissano nella specifica.
   - **Vettori vicini al bordo** (finestra dentro, supporto R_r fuori): kernel troncato ai soli nodi del campo e rinormalizzato a somma 1. È un'approssimazione [ipotesi] della risposta modificata di una PIV reale vicino al bordo dell'immagine, dove contribuiscono solo le particelle visibili. Questi vettori sono marcati nei metadati e la loro risposta realizzata si misura a parte (F2.6).
   - In B la LES esiste anche fuori dalla finestra ma **non si usa**: la camera non la vede.
   - Niente estrapolazione né riflessione.
-  - **SENS-EDGE** (solo valutazione): esistono solo i vettori il cui supporto R_r è interamente nel campo, con margine di circa 5 nodi in x e 4 in y in A.
-- *Top-hat (SENS-TH):* F = 1/W su |s| ≤ W/2 (supporto = ±W/2), stessa integrazione per cella con peso proporzionale alla sovrapposizione, stessa rinormalizzazione e stesse regole di bordo.
+  - **SENS-EDGE** (solo valutazione): esistono solo i vettori il cui supporto R_r è interamente nel campo, con margine di circa 4–5 nodi lungo le righe e 3–4 lungo le colonne in A.
+- *Top-hat (SENS-TH):* F = 1/W_eff su |s| ≤ W_eff/2, stessa integrazione per cella con peso proporzionale alla sovrapposizione, stessa rinormalizzazione e stesse regole di bordo. **Decisione R1:** W_eff si tara per asse perché L_sr,disc = W, cioè la lunghezza del single-pass; senza taratura la discretizzazione lo allarga di 1,2–1,5 volte. Solo sensibilità di valutazione: l'apparato di riferimento usa una correlazione multi-pass.
 - *Assunzioni e incertezze:*
   - pesatura e numero di passate GTMC non dichiarati (DaVis 7.2 e 8.0, "multi-scale");
-  - la finestra copre circa 2 celle e il supporto del kernel ±4 nodi in x e ±3 in y: l'effetto dipende dal contenuto della LES a quelle scale (verifica F1.2) e dalla discretizzazione, verificata come sopra;
+  - la finestra copre circa 2 celle e il supporto del kernel ±4 nodi lungo le righe e ±3 lungo le colonne: l'effetto dipende dal contenuto della LES a quelle scale (verifica F1.2) e dalla discretizzazione, verificata come sopra;
   - **la media attraverso lo spessore del foglio (~1 mm) non è rappresentabile** su una slice.
 
 **(4) Ampiezza dell'errore casuale**
@@ -146,14 +157,14 @@ Formato di ogni elemento: fonte → motivazione → parametri → assunzioni e i
   - deviazione standard dell'errore **misurata** contro un riferimento in un getto non reagente, 16×16 px al 75 %: 0,060 px (WIE17 §4.4.2, PIVL:L16);
   - **sintetico** DaVis 16×16 px al 75 %: 0,146 px (WIE17 Tab. 2.4).
 - *Regola di rappresentazione:* σ_u = σ_px · v_ref,c / d_max per ciascuna componente in piano, uniforme nel frame. È proporzionale alla velocità di riferimento della condizione c, perché lo sperimentatore sceglie Δt condizione per condizione.
-  - v_ref,c = p99,9 di |u_planare| sui frame del ruolo usato, **calcolato solo dalla velocità**;
+  - **Decisione R1:** v_ref,c = p99,9 di |u_planare| su tutti i nodi dei frame **0:2001:10 dell'intero record** della condizione (201 frame, dal raw), **solo velocità**; IC95 con bootstrap a blocchi. Motivo: STO12 ricava la scala da campi istantanei della condizione, e Δt vale per l'intera prova (decisione_R1 §6);
   - per TEST si calcola soltanto al momento dell'apertura, autorizzata separatamente.
 - *Parametri:*
   - σ_px = **0,10 px** come valore principale, scelto perché sta all'interno dell'intervallo coperto da due evidenze indipendenti (0,06 px misurato; 0,15 px sintetico) e coincide con l'ordine dichiarato dalla fonte;
   - sensibilità **SENS-σlo** a 0,06 px e **SENS-σhi** a 0,15 px;
   - d_max = 6 px [inferenza da STO12].
 
-  Ordine di grandezza atteso: con v_ref ≈ 47 m/s (p99,9 pooled TRAIN, ricognizione §1.3), σ ≈ 0,8 m/s; varierà per condizione.
+  Ordine di grandezza dalla Fase 1 (pool C149): σ_u fra 0,45 e 0,87 m/s secondo la condizione, media ≈0,59 m/s. Il valore 0,8 m/s della versione precedente veniva dal p99,9 raggruppato su tutte le condizioni ed era una sovrastima.
 - *Distribuzione:* gaussiana, **come ipotesi di modello**.
 - *Assunzioni e incertezze:*
   - **il "±0,1 px" pubblicato non è trattato come σ**: la fonte non dichiara se sia standard o espansa, né la copertura;
@@ -162,7 +173,7 @@ Formato di ogni elemento: fonte → motivazione → parametri → assunzioni e i
 **(5) Correlazione spaziale dell'errore**
 - *Fonte:* in DaVis multi-pass la risposta e l'autocorrelazione del rumore sono **due funzioni diverse** (WIE17 §2.5, PDF 39). Con W = 32 px al 50 %, la lunghezza integrale dell'autocorrelazione del rumore è L_sr(rumore) = 38,4 px ≈ 1,2 W, contro 0,93 W della risposta. Monte Carlo: ρ(2d) = 0,11 "rappresentativo" al 50 % (WIE17 §4.3, PDF 90). La review riporta ρ(2h) = 0 per overlap ≤50 % in quel caso (P16).
 - *Rappresentazione principale:* **kernel di rumore g distinto dal kernel di risposta**, con la stessa forma MHG (b = 0,35) e L_sr,n = 1,2 W, quindi σ_n = 0,5944 W: **0,773 mm in A** e **0,892 mm in B**.
-  - g è troncato a 4 σ_n e discretizzato per cella come nel punto (3).
+  - g è troncato a 4 σ_n, discretizzato per cella e **tarato sempre** per asse a L_sr,disc = 1,2 W (tolleranza 1 %), come nel punto (3). Valori indicativi con W = 1,3: 0,731 mm lungo le righe e 0,702 mm lungo le colonne.
   - Per ogni componente: rumore bianco N(0, 1) indipendente per nodo, su una griglia estesa di R_n = 4 σ_n oltre il campo, così il rumore è stazionario fino ai bordi e non serve troncarlo; convoluzione con g; divisione per √(Σ g²) per avere varianza unitaria; moltiplicazione per σ_u,c; campionamento sui nodi validi.
   - Nel modello lineare di Wieneke l'integrale dell'autocorrelazione del rumore vale 1/∫g², quindi ≈1,2 W per costruzione. La stessa taratura discreta del punto (3) vale per σ_n, con tolleranza del 5 %.
   - Valori attesi (continuo, per asse): ρ(0,5 W) ≈ 0,68, ρ(W) ≈ 0,15, ρ(1,5 W) ≈ −0,07. Con passo d = W/2 (overlap 50 %) si ha ρ(2d) ≈ 0,15, dello stesso ordine del valore "rappresentativo" 0,11. È una coerenza, non una verifica. Sulla griglia anisotropa si riportano ρ ai ritardi effettivi dei nodi (0,581 e 0,758 mm e multipli).
@@ -216,7 +227,7 @@ Nuovo namespace, distinto da quelli storici (20261114/16/18) e della 00 (2026112
 
 | Aspetto | Missione 00 | Questa roadmap |
 |---|---|---|
-| Layout | 819 siti casuali (5 %) | Nodi validi nel campo (A ≈ 15 600; B ≈ 1 800–1 900 per posizione) |
+| Layout | 819 siti casuali (5 %) | Nodi validi nel campo (A = 15 624; B = 1 824 per posizione) |
 | Valore | Puntuale esatto | Media pesata su W (1,3 / 1,5 mm) |
 | Errore | i.i.d. 0,5 / 1,5 m/s, livelli di scenario | Correlato, con lunghezza ≈1,2 W; σ dal progetto di Δt, per condizione |
 | Lacune | Dischi al 25 % dell'area | Fuori dal campo e bordo; rigetti solo come sensibilità, perché un dato rilasciato completo non ne dimostra l'assenza |
@@ -228,12 +239,13 @@ Nuovo namespace, distinto da quelli storici (20261114/16/18) e della 00 (2026112
 
 | ID | Che cosa varia | Uso |
 |---|---|---|
-| SENS-TH | Top-hat invece di MHG | Valutazione; training solo se D-kern lo richiede |
+| SENS-TH | Top-hat tarato a L_sr,disc = W invece di MHG | Valutazione; training T10 solo con la regola R4 (decisione_R1 §5) |
+| SENS-SWAP | Passi di cella scambiati (convenzione storica colonne ↔ x) | Qualifica F2.6 e valutazione in Fase 3 |
 | SENS-EDGE | Esclusione stretta: solo vettori con supporto R_r interamente nel campo | Valutazione |
 | SENS-σlo / SENS-σhi | σ_px 0,06 / 0,15 | Valutazione |
 | SENS-ρ0 | Rumore indipendente | Valutazione |
 | SENS-REJ-{iso,clu}-{flag,sub} | Rigetti non calibrati al 10 % | Valutazione; training condizionato (gruppo T8) |
-| SENS-B-pos | Posizioni laterali di B | Valutazione |
+| SENS-B-pos | Posizioni B-down e B-off | Valutazione |
 | SENS-W | W = 1,0 mm (OBE15 10 kHz; BOX10) e W = 1,9 mm (KAR20, configurazione non GTMC) | Solo valutazione: test di configurazioni non viste |
 | SENS-OOP | Perdita di coppie da vk | Condizionata a F1.1 |
 
@@ -253,7 +265,7 @@ Nuovo namespace, distinto da quelli storici (20261114/16/18) e della 00 (2026112
 
 Ogni attività riporta ID, dipendenze e criterio di completamento. Tutto si esegue **solo** su TRAIN e sui metadati, salvo dove indicato; VAL non è necessaria in queste fasi.
 
-### Fase 1 — Verifiche sui dati
+### Fase 1 — Verifiche sui dati (**completata**: [fase1_report_R1.md](fase1_report_R1.md); R1 chiusa con [decisione_R1.md](decisione_R1.md))
 
 **F1.1 Orientamento e componenti dalla provenienza** (coordinamento con la missione 01).
 1. Raccogliere dalla provenienza:
@@ -279,11 +291,19 @@ Ogni attività riporta ID, dipendenze e criterio di completamento. Tutto si eseg
 
 ### Fase 2 — Implementazione e qualifica
 
+**F2.0 Aggiornamento dei preliminari dopo R1** (CPU; solo TRAIN e sola velocità di VAL; nessun TEST).
+- v_ref,c sull'intero record (frame 0:2001:10), TRAIN e VAL, con IC95 a blocchi, e σ_u per σ_px 0,06/0,10/0,15.
+- Registro dei kernel (MHG di risposta, rumore, top-hat) con passi righe 0,581 / colonne 0,758 mm, taratura all'1 %, per W ∈ {1,0; 1,3; 1,5; 1,9}; più il registro SENS-SWAP.
+- Contenuto delle finestre B-in, B-down e B-off (decisione_R1 §8).
+- Indice che renda le tabelle `f12_swapcells` il riferimento F1.2.
+
+*Completamento:* tabelle versionate in `results/piv/phase2/f20/` con provenienza.
+
 **F2.1 Specifica versionata** `piv_observation_spec_v1` (YAML con sha256).
 - Contenuto: configurazioni A, B, IDEAL-*, SENS-*; parametri e fonti per ogni parametro; ordine delle operazioni; namespace e seed; regola delle posizioni di B.
 - Le categorie per ogni parametro: *documentato*, *trasferimento*, *sensibilità*.
 
-*Dipende da:* F1.1–F1.3 e dalla revisione R1.
+*Dipende da:* F2.0 e decisione_R1. Contiene esplicitamente: assegnazione righe/colonne e passi; componenti; σ tarati; v_ref,c; posizioni B; definizioni diagnostiche.
 
 **F2.2 Generatore** (modulo nuovo, per esempio `src/combustion_recon/data/piv_observations.py`).
 - Riusare `CanonicalSparseObservation`, il pacchetto U-Net a 7 canali e i token GLU senza modificare il comportamento di `nonideal_observations.py`.
@@ -298,7 +318,7 @@ Ogni attività riporta ID, dipendenze e criterio di completamento. Tutto si eseg
 - Nodi validi: PIV-A e IDEAL-A hanno lo stesso insieme di nodi (hash uguale); lo stesso per PIV-B e IDEAL-B in ogni posizione.
 - Pesi del kernel: somma 1 dopo troncamento e dopo la rinormalizzazione di bordo; L_sr,disc entro il 5 % del target per asse.
 - Trasferimento del filtro su campi sinusoidali in mm, contro H(k) discreta attesa, separatamente per vettori interni e di bordo.
-- σ e autocorrelazione empiriche del rumore contro i target (L_sr, ρ(d), ρ(2d), ρ(3d) in x e y), su molte realizzazioni.
+- σ e autocorrelazione empiriche del rumore contro i target (L_sr, ρ(d), ρ(2d), ρ(3d) lungo righe e colonne), su molte realizzazioni.
 - Regola della finestra e margini; SENS-EDGE; geometria delle tre posizioni di B.
 - Stazionarietà del rumore fino ai bordi (griglia estesa).
 - Frazione e connettività dei rigetti in SENS-REJ.
@@ -330,9 +350,12 @@ Ogni attività riporta ID, dipendenze e criterio di completamento. Tutto si eseg
 - σ_u per condizione;
 - autocorrelazione dell'errore realizzata;
 - differenza RMS fra campo ideale e osservato, per componente e per regione di velocità;
-- per SENS-REJ: frazioni e distribuzione delle dimensioni dei cluster.
+- per SENS-REJ: frazioni e distribuzione delle dimensioni dei cluster;
+- SENS-TH (tarato): differenza dei campi rispetto al MHG, per regione (descrittiva; il criterio D-kern non si applica più);
+- SENS-SWAP: stesse statistiche con i passi scambiati;
+- contenuto delle tre posizioni B.
 
-*Figure:* per 3 condizioni × 2 frame, pannelli vi e vj ideale | filtrato | osservato A | osservato B (3 posizioni) | errore | maschere; istogrammi; autocorrelazioni.
+*Figure:* per 3 condizioni × 2 frame, pannelli vi e vj ideale | filtrato | osservato A | osservato B (B-in, B-down, B-off) | errore | maschere; istogrammi; autocorrelazioni.
 
 *Tabella di confronto:* proprietà sostenuta dalle fonti (SINT §2.2) → valore prodotto → esito.
 
@@ -368,7 +391,7 @@ Ogni attività riporta ID, dipendenze e criterio di completamento. Tutto si eseg
 | E3a | Nodi validi di A | Ideali | — | 12 originali |
 | E4 | Nodi validi di A | Filtrati | — | 12 originali |
 | E5 | Nodi validi di A | Filtrati | Errore A | 12 originali (**PIV-A**) |
-| E6 | Nodi validi di B, 3 posizioni | Ideali | — | 12 originali |
+| E6 | Nodi validi di B (B-in, B-down, B-off) | Ideali | — | 12 originali |
 | E7 | Come E6, stessa posizione | Filtrati (W = 1,5) | Errore B | 12 originali (**PIV-B**) |
 | E4*, E5* | Tutti i 16 384 nodi | Filtrati con kernel troncato e rinormalizzato anche entro W/2 dal bordo; E5* con errore | Come E4, E5 | Solo U4, U6 (diagnostica: non hanno canale di maschera) |
 
@@ -387,7 +410,7 @@ Ogni attività riporta ID, dipendenze e criterio di completamento. Tutto si eseg
 | E7 − E6 | Uguali (per posizione) | Misura dentro il campo ridotto |
 | E4* − E3, E5* − E4* | Uguali | Filtro ed errore per le U-Net dense (diagnostica) |
 
-Sensibilità in sola valutazione, dopo E0–E7: SENS-TH, SENS-EDGE, SENS-σlo/hi, SENS-ρ0, SENS-REJ (4 combinazioni), SENS-B-pos, SENS-W. Ognuna è confrontata con la configurazione principale **sugli stessi nodi**. Per SENS-EDGE il confronto si fa sull'intersezione dei nodi validi.
+Sensibilità in sola valutazione, dopo E0–E7: SENS-TH, SENS-SWAP, SENS-EDGE, SENS-σlo/hi, SENS-ρ0, SENS-REJ (4 combinazioni), SENS-B-pos, SENS-W. Ognuna è confrontata con la configurazione principale **sugli stessi nodi**. Per SENS-EDGE il confronto si fa sull'intersezione dei nodi validi.
 
 **Interpretazione.** I modelli al 5 % su E3–E7 sono **fuori distribuzione**: U-Net con maschera quasi piena, GLU con migliaia di token. Questi test misurano la robustezza di modelli costruiti per un'altra osservazione, non l'informazione contenuta nella PIV. Il GLU originale a 819 token potrebbe richiedere molta memoria con input densi: la profilazione F2.7 decide se valutarlo a microbatch 1. Nessuna riduzione silenziosa dei token.
 
@@ -401,8 +424,8 @@ Sensibilità in sola valutazione, dopo E0–E7: SENS-TH, SENS-EDGE, SENS-σlo/hi
 
 | ID | Decisione | Procedura | Chiusura |
 |---|---|---|---|
-| D-ori | 2C in piano? SENS-OOP sì o no? | F1.1 | R1: con esito **confermato** o **probabile** si procede con 2C. Con esito **ignoto** si procede con 2C come ipotesi dichiarata e SENS-OOP viene escluso |
-| D-kern | Kernel principale MHG o top-hat | F1.2 | R1: se la differenza fra i due filtrati è piccola rispetto a σ_u (RMS < 0,25 σ_u nelle regioni ad alto gradiente), MHG resta principale e il top-hat si valuta solo nella Fase 3. Altrimenti il top-hat entra anche in training (gruppo T10) |
+| D-ori | 2C in piano? SENS-OOP sì o no? | F1.1 | **Chiusa a R1:** esito *probabile*, 2C = (vi, vj), SENS-OOP disattivata (decisione_R1 §2). Regola originale: con esito **confermato** o **probabile** si procede con 2C. Con esito **ignoto** si procede con 2C come ipotesi dichiarata e SENS-OOP viene escluso |
+| D-kern | Kernel principale MHG o top-hat | F1.2 | **Chiusa a R1:** MHG principale; top-hat tarato solo come sensibilità di valutazione; T10 deciso a R4 se i modelli T2 su SENS-TH perdono più della deviazione standard fra seed di T2 (decisione_R1 §5). Regola originale, sostituita: se la differenza fra i due filtrati è piccola rispetto a σ_u (RMS < 0,25 σ_u nelle regioni ad alto gradiente), MHG resta principale e il top-hat si valuta solo nella Fase 3. Altrimenti il top-hat entra anche in training (gruppo T10) |
 | D-ρ | Correlazione principale | F2.4 se autorizzata | R2: se i residui Neal al 50 % mostrano una correlazione incompatibile con il kernel di rumore, si rivede il kernel e lo si registra (resta qualifica non reagente). Senza F2.4: principale invariato, SENS-ρ0 riportato sempre |
 | D-σ | σ_px | Nessuna nuova misura possibile sulla nostra fiamma | Congelato a 0,10 px con sensibilità 0,06 e 0,15 |
 | D-REJ | Training con rigetti | Fase 3 e risultati di T1/T2 | R4: si allena (T8) solo se la valutazione dei modelli T2 su SENS-REJ mostra una perdita superiore alla dispersione fra seed della cella T2 |
@@ -416,7 +439,7 @@ Sensibilità in sola valutazione, dopo E0–E7: SENS-TH, SENS-EDGE, SENS-σlo/hi
 | ID | Quando | Che cosa si guarda | Chi decide |
 |---|---|---|---|
 | **R0** | Ora | Questa roadmap | Enrico |
-| **R1** | Dopo F1.1–F1.3 | Orientamento, supporto della griglia, v_ref; chiusura di D-ori e D-kern; congelamento della specifica v1 | Enrico |
+| **R1** | Dopo F1.1–F1.3 | Orientamento, supporto della griglia, v_ref; chiusura di D-ori e D-kern; congelamento della specifica v1 | **Chiusa** il 27/11/2026: [decisione_R1.md](decisione_R1.md) (mandato tecnico delegato da Enrico) |
 | **R2** | Dopo F2.6 (ed eventualmente F2.4–F2.5) | **Osservazioni generate**: figure, statistiche, confronto con le proprietà delle fonti. Nessuna rete prima di R2 | Enrico |
 | **R3** | Dopo la Fase 3 e F2.7 | Risultati dei checkpoint esistenti; D-GLU; conferma della matrice di training | Enrico |
 | **R4** | Dopo T1–T7 e le valutazioni | Risultati; D-REJ, D-mix, D-kern-train; preregistrazione per TEST | Enrico |
@@ -443,15 +466,15 @@ Sensibilità in sola valutazione, dopo E0–E7: SENS-TH, SENS-EDGE, SENS-σlo/hi
 |---|---|---|---|---|---|
 | T1 | IDEAL-A | **Stessi nodi validi di PIV-A**, valori ideali | U-Net × 5 | 5 | Controllo di T2 con la stessa ricetta e gli stessi nodi. Ancoraggio a U4 tramite la valutazione su E3 |
 | T2 | PIV-A | §2.3, configurazione A | U-Net × 5 | 5 | **Cuore della missione**: ricostruzione da PIV a pieno campo |
-| T3 | IDEAL-B | **Stessi nodi validi di PIV-B** (centro), ideali | U-Net × 5 | 5 | Controllo di T4; con T1 separa la copertura dalla qualità dei vettori |
-| T4 | PIV-B | Configurazione B (centro) | U-Net × 5 | 5 | PIV ad alto rateo, campo ridotto |
+| T3 | IDEAL-B | **Stessi nodi validi di PIV-B** (posizione B-in), ideali | U-Net × 5 | 5 | Controllo di T4; con T1 separa la copertura dalla qualità dei vettori |
+| T4 | PIV-B | Configurazione B, posizione B-in | U-Net × 5 | 5 | PIV ad alto rateo, campo ridotto |
 | T5 | IDEAL-A, PIV-A | Come T1 e T2 | GLU × 3 + 3 | 6 | Le conclusioni valgono anche per la seconda architettura? Stesse osservazioni fisiche della U-Net (D-GLU) |
 | T6 | IDEAL-B, PIV-B | Come T3 e T4 | GLU × 3 + 3 | 6 | Come T5; ≈1 800–1 900 token |
 | T7 | Ponte 5 % ideale | Siti casuali al 5 %, come gli originali | GLU × 3 | 3 | Separa la ricetta (batching) dall'osservazione; collega la campagna alla 00 |
 | | | | **Totale** | **35** | |
 
 **Conseguenze della correzione sui nodi.** Il controllo ideale di A passa da IDEAL-full (tutti i nodi) a **IDEAL-A** (stessi nodi validi di PIV-A); quello di B usa gli stessi nodi validi di PIV-B. Il numero di run **non cambia**: 35 necessari, come nella versione approvata. IDEAL-full non si allena:
-- differisce da IDEAL-A solo per la fascia di bordo (2 nodi in x e 1 in y per lato);
+- differisce da IDEAL-A solo per la fascia di bordo (2 nodi lungo le righe e 1 lungo le colonne, per lato);
 - il suo effetto si misura in valutazione (E3a − E3);
 - l'ancoraggio al Mese 2 resta affidato a U4 e U6 e alla valutazione dei modelli T1 su E3.
 
@@ -463,7 +486,7 @@ Nessun training è stato aggiunto.
 |---|---|---|---|
 | T8 | PIV-A + REJ-clu, nei livelli `flag` e `sub` | D-REJ | U-Net 5 + 5 |
 | T9 | Più configurazioni: A e B con posizioni campionate | D-mix | U-Net 5 (+ GLU 3 solo se la U-Net mostra un beneficio) |
-| T10 | PIV-A con top-hat, oppure PIV-A senza errore (solo filtro), sugli stessi nodi validi | D-kern, o se la Fase 3 mostra filtro ed errore entrambi rilevanti e non separabili | U-Net 5 |
+| T10 | PIV-A con top-hat tarato, oppure PIV-A senza errore (solo filtro), sugli stessi nodi validi | Regola R4 su SENS-TH (decisione_R1 §5), o se la Fase 3 mostra filtro ed errore entrambi rilevanti e non separabili | U-Net 5 |
 | T11 | A2 (layout ridotto) | Solo se D-GLU lo richiede | U-Net 5 + GLU 3 |
 
 ### 7.3 Valutazione
@@ -520,7 +543,7 @@ Riferimento: la 00 è costata 210,1 GPU-h per 30 run (95 % training), in circa 5
 ## 8. Istruzioni operative per Sonnet IDE
 
 1. **Branch:** lavorare su un branch dedicato da `piv/experiment-proposal` (nome da concordare); niente merge in `main`. Nessuna modifica a `nonideal_observations.py`, alle specifiche della 00, ai risultati storici o ai documenti delle missioni 00 e 01: si propongono gli aggiornamenti alla 01.
-2. **Ordine vincolante:** Fase 1 → R1 → Fase 2 → R2 → F2.7 e Fase 3 → R3 → Fase 4 (T1–T7) → R4 → condizionati. Non anticipare training o valutazioni neurali prima di R2.
+2. **Ordine vincolante:** Fase 1 → R1 (chiusa) → Fase 2 (F2.0 → F2.1 → F2.2–F2.3 → F2.4–F2.5 opzionali → F2.6) → R2 → F2.7 e Fase 3 → R3 → Fase 4 (T1–T7) → R4 → condizionati. Non anticipare training o valutazioni neurali prima di R2.
 3. **Divieti:** TEST mai letto (rifiutare i ruoli `test*` come nella 00); nessun uso di T nel generatore; nessun parametro scelto guardando metriche delle reti; nessuna riduzione di token o di nodi non dichiarata nella specifica.
 4. **Download:** F2.4 e F2.5 sono **già autorizzati** (§10): non chiedere di nuovo l'autorizzazione. Le verifiche restano opzionali e motivate. Seguire esattamente §10: file, destinazione fuori dalla repository, checksum e manifest. Nessun altro download di dataset.
 5. **Provenienza:** ogni artefatto registra SHA del codice, sha256 della specifica, della cache e delle statistiche, namespace e seed, configurazione, posizione di B, livello `flag` o `sub`.

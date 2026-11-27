@@ -19,3 +19,5 @@ Stato al 25 novembre 2026: [roadmap 02](roadmap02.md) pubblicata; step 1 complet
 ---
 
 **Aggiornamento del 27 novembre 2026 (esecuzione, branch `mission02/piv-execution`):** Fase 1 della [roadmap tecnica](roadmap_tecnica_piv.md) completata fino alla revisione R1 (F1.1–F1.3): [report R1](fase1_report_R1.md), [nota di orientamento](orientation_note.md), artefatti in [results/piv/phase1/](../../results/piv/phase1/INDEX.md). Nessun training né inferenza; Fase 2 in attesa delle decisioni di R1.
+
+**Revisione R1 chiusa (27 novembre 2026):** [decisione_R1.md](decisione_R1.md). Roadmap tecnica aggiornata (§0). Sonnet può eseguire la Fase 2 da F2.0 a F2.6; F2.7 e Fase 3 solo dopo R2.
