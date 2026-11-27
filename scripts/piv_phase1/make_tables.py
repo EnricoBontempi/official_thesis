@@ -91,14 +91,14 @@ t = pd.read_csv(R / "f13/vref_sigma_u_table.csv")
 a = t[t.role == "train_fit_C149"].sort_values(["nh3", "phi"])
 a38 = t[t.role == "train_fit_A38"].set_index("condition")["v_ref_p99.9"]; se = t[t.role == "seen_train_eval"].set_index("condition")["v_ref_p99.9"]
 v = pd.DataFrame({"condizione": a.condition.str.replace(".h5", "", regex=False), "NH3": a.nh3, "φ": a.phi, "n frame": a.n_frames,
-                  "p50 |u|": a.p50.round(1), "p99": a.p99.round(1), "v_ref (p99,9)": a["v_ref_p99.9"].round(2),
+                  "p50 modulo u": a.p50.round(1), "p99": a.p99.round(1), "v_ref (p99,9)": a["v_ref_p99.9"].round(2),
                   "IC95 bootstrap": [f"{lo:.1f}–{hi:.1f}" for lo, hi in zip(a.boot95_lo, a.boot95_hi)],
                   "v_ref pool 38 fr.": a.condizione.map(a38).round(1) if False else [round(a38[c], 1) for c in a.condition],
                   "v_ref seen (11 fr.)": [round(se[c], 1) for c in a.condition],
                   "σ_u 0,06 px": a["sigma_u_lo_0.06_m_s"].round(2), "σ_u 0,10 px (princ.)": a["sigma_u_main_0.10_m_s"].round(2), "σ_u 0,15 px": a["sigma_u_hi_0.15_m_s"].round(2)})
 open(T / "t5_vref_sigma_train.md", "w").write(md(v))
 b = t[t.role == "val_eval"].sort_values(["nh3", "phi"])
-vv = pd.DataFrame({"condizione": b.condition.str.replace(".h5", "", regex=False), "NH3": b.nh3, "φ": b.phi, "n frame": b.n_frames, "p50 |u|": b.p50.round(1),
+vv = pd.DataFrame({"condizione": b.condition.str.replace(".h5", "", regex=False), "NH3": b.nh3, "φ": b.phi, "n frame": b.n_frames, "p50 modulo u": b.p50.round(1),
                    "p99": b.p99.round(1), "v_ref (p99,9)": b["v_ref_p99.9"].round(2), "IC95 bootstrap": [f"{lo:.1f}–{hi:.1f}" for lo, hi in zip(b.boot95_lo, b.boot95_hi)],
                    "σ_u 0,06 px": b["sigma_u_lo_0.06_m_s"].round(2), "σ_u 0,10 px (princ.)": b["sigma_u_main_0.10_m_s"].round(2), "σ_u 0,15 px": b["sigma_u_hi_0.15_m_s"].round(2)})
 open(T / "t5b_vref_sigma_val.md", "w").write(md(vv))
@@ -110,8 +110,8 @@ x["r [IC95]"] = [f"{r:+.2f} [{lo:+.2f}, {hi:+.2f}]" for r, lo, hi in zip(x.r, x.
 x["pendenza [IC95]"] = [f"{r:+.2f} [{lo:+.2f}, {hi:+.2f}]" for r, lo, hi in zip(x.slope, x.slope_lo, x.slope_hi)]
 open(T / "t6_displacement_regressions_T.md", "w").write(md(x[["subset", "n", "target", "predictor", "r [IC95]", "pendenza [IC95]"]]))
 dc = pd.read_csv(R / "f11/decorrelation_drivers.csv")
-dd = pd.DataFrame([{"tracciante": r.tracer, "lag (frame)": r.lag, "n": r.n, "|vi|": f"{r['coef_|vi|_per_sd']:+.4f} [{r.lo_vi:+.4f}, {r.hi_vi:+.4f}]",
-                    "|vj|": f"{r['coef_|vj|_per_sd']:+.4f} [{r.lo_vj:+.4f}, {r.hi_vj:+.4f}]", "|vk|": f"{r['coef_|vk|_per_sd']:+.4f} [{r.lo_vk:+.4f}, {r.hi_vk:+.4f}]"} for _, r in dc.iterrows()])
+dd = pd.DataFrame([{"tracciante": r.tracer, "lag (frame)": r.lag, "n": r.n, "abs(vi)": f"{r['coef_|vi|_per_sd']:+.4f} [{r.lo_vi:+.4f}, {r.hi_vi:+.4f}]",
+                    "abs(vj)": f"{r['coef_|vj|_per_sd']:+.4f} [{r.lo_vj:+.4f}, {r.hi_vj:+.4f}]", "abs(vk)": f"{r['coef_|vk|_per_sd']:+.4f} [{r.lo_vk:+.4f}, {r.hi_vk:+.4f}]"} for _, r in dc.iterrows()])
 open(T / "t6b_decorrelation.md", "w").write(md(dd))
 sy = pd.read_csv(R / "f11/mean_field_symmetry_centre_lines.csv")
 ss = sy.groupby(["component", "mirror"]).sym_energy_frac.agg(["min", "median", "max"]).round(3).reset_index()

@@ -40,6 +40,15 @@ t = pd.DataFrame(rows)
 t.to_csv(out / "displacement_regressions.csv", index=False)
 pd.set_option("display.width", 220); pd.set_option("display.max_rows", 200)
 print(t.round(3).to_string())
+means = []
+for tracer in ("T",):
+    for label, sel in (("all_structured", lambda q: q), ("cold_Tmean<1800K", lambda q: q[q.Tmean < 1800])):
+        q = sel(quality(d[d.tracer == tracer]))
+        means.append({"tracer": tracer, "subset": label, "n": len(q), "mean_dx_mm": q.dx_mm.mean(), "mean_dy_mm": q.dy_mm.mean(),
+                      "mean_vi_ms": q.vi.mean(), "mean_vj_ms": q.vj.mean(), "mean_vk_ms": q.vk.mean(),
+                      "mean_Dt_vj_mm": q.vj_ms.mean(), "corr_vi_vk": float(np.corrcoef(q.vi, q.vk)[0, 1])})
+pd.DataFrame(means).to_csv(out / "displacement_subset_means.csv", index=False)
+print(pd.DataFrame(means).round(3).to_string())
 # partial effect of |vk| on peak (out-of-plane decorrelation)
 q = quality(d[d.tracer == "T"], pmin=0.0)
 X = np.column_stack([np.ones(len(q)), np.hypot(q.vi, q.vj), np.abs(q.vk)])

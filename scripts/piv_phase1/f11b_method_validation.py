@@ -62,6 +62,7 @@ for sim, trs in tracer_ch.items():
 df = pd.DataFrame(rows); df.to_csv(out / "displacement_lags_passive_tracers.csv", index=False)
 q = df[(df.edge == 0) & (df.peak >= 0.9)]
 print(len(df), len(q))
+reg_rows = []
 for (tn, lag), s in q.groupby(["tracer", "lag"]):
     X = np.column_stack([np.ones(len(s)), s.vi_ms, s.vj_ms, s.vk_ms])
     line = f"{tn} lag{lag} n={len(s)} "
@@ -69,5 +70,8 @@ for (tn, lag), s in q.groupby(["tracer", "lag"]):
         b = np.linalg.lstsq(X, s[t].values, rcond=None)[0]
         r2 = 1 - ((s[t] - X @ b)**2).sum() / ((s[t] - s[t].mean())**2).sum()
         line += f"| {t}: coef(vi,vj,vk)={b[1:].round(2)} R2={r2:.2f} "
+        reg_rows.append({"tracer": tn, "lag": lag, "n": len(s), "target": t, "intercept_mm": b[0], "coef_dt_vi": b[1], "coef_dt_vj": b[2],
+                         "coef_dt_vk": b[3], "R2": r2, "mean_abs_target_mm": float(np.abs(s[t]).mean())})
     print(line)
+pd.DataFrame(reg_rows).to_csv(out / "lag_joint_regressions.csv", index=False)
 C.dump_provenance(out / "f11b_provenance.json", {"script": "f11b_method_validation.py"})
