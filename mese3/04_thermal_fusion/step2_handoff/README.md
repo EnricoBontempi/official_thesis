@@ -1,4 +1,6 @@
-# Step 2 missione 04 — PASSAGGIO DI CONSEGNE (lavoro INCOMPLETO)
+# Step 2 missione 04 — PASSAGGIO DI CONSEGNE (storico, superato)
+
+**Nota successiva:** dopo il ripristino della quota il lavoro è stato completato in `../step2_modelli_di_misura.md` e `../step2_modelli_fonti_e_ricerche.md`, che integrano anche i report dei subagenti. Questo file resta come traccia dell'interruzione.
 
 Interrotto per limite d'uso. **Non è la consegna dello step 2**: `step2_modelli_di_misura.md` e `step2_modelli_fonti_e_ricerche.md` NON sono stati scritti.
 
