@@ -1,0 +1,18 @@
+{
+  "freeze_sha256": "c1da4e57e1794bdeed3cab389f5863a0b5ba516cdce5bd8f89eeb01b1dff351d",
+  "baselines": "cb96687cf3614c5393bc9658ec3469980313413f495f32930fd2e810ffc070b3",
+  "files": {
+    "INDEX.md": "00c0f0805b2de1b885e38230f11ec57ae925a21f2c7a87ef48894871def74723",
+    "fields_index.json": "1a70eaa096241901a33a717fd635180f80f1233fde95fd131343f4b534e8eb11",
+    "figures/fig1_gain_matrix_best.png": "ee9100afccbafa8f096c950e5290659661e1a44d5f31fcb905991d97b457316a",
+    "figures/fig1_gain_matrix_last.png": "8719beb08c215bfac2c30a7acb63eeaf0b2a50f8fa28ba3543f5c73e03f96417",
+    "figures/fig2_own_scenario.png": "a06489051ffff5311d0334b655639cb72436dbd2a3929dd8cc2cb5f5ce966350",
+    "figures/fig3_clean_cost.png": "163d97fbaedc0d78156e5213ed475fe7036c4c62b1faf65e2c45b08d6481e78c",
+    "tables/diagonal_own_scenario.csv": "b8daeacf2bfa4918e70339f94e1f219c3ff084d25a97bbe2712d1a8b4b5441c3",
+    "tables/macro_by_replica.csv": "b158838c530ab2996e67141367518386513afd77a44e09cd8363f9eb315e3ca3",
+    "tables/per_condition.csv": "305a803f1bbaf10c7506a71a0906adb93890c597aaa31c8dba702240a23e40fe",
+    "tables/per_run_scenario.csv": "3f368b12da3eff56c37d690bac6e04747ca88950e83583e2a3f2086d942e40a0",
+    "tables/seed_summary.csv": "105439439a4bc21db5cc3f96aa742eced4b774ed5d872f0f4aa215330282b6b1",
+    "tables/training_diagnostics.csv": "6f5a5072562036e403de62f74fe2eb51f3a2a96c6709f9e72e8a4310f8ee0e71"
+  }
+}

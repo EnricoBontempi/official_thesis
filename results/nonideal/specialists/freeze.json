@@ -1,0 +1,6522 @@
+{
+ "degradation_spec_sha256": "0946e6fb7a4572d043f9384bf97ed1a1d2cf7a390a40fe39ccecb7343eab45c4",
+ "git_sha": "b6fc9fefda5a1d4776c87c9285d7187c0d89fc48",
+ "n_budget_exhausted_valid": 0,
+ "n_plateau_valid": 30,
+ "n_runs": 30,
+ "n_valid": 30,
+ "post_processing_git_sha": "b1c095507b803e5fa27ad8ba8bdad2febd8d2541",
+ "problems": [],
+ "runs": {
+  "NI-glu-on-G1-s0": {
+   "best": {
+    "epoch": 500,
+    "file_sha256": "d36f0ad890c94b04584607977fecc1781e98c9509f0259ee2a5d4d24c8e47f69",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-glu-on-G1-s0/checkpoints/best.pt",
+    "status": "running",
+    "weights_sha256": "a60ccd2222d3996f4d7c5f563f62e2d27ff970a724b502a86671f58d6f950daf"
+   },
+   "best_val_epoch": 500,
+   "best_val_metric": 44.295872602189185,
+   "budget_exhausted": false,
+   "clip_events": 1465,
+   "declared_converged": null,
+   "epochs_completed": 950,
+   "eval_history_epochs": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    170,
+    180,
+    190,
+    200,
+    210,
+    220,
+    230,
+    240,
+    250,
+    260,
+    270,
+    280,
+    290,
+    300,
+    310,
+    320,
+    330,
+    340,
+    350,
+    360,
+    370,
+    380,
+    390,
+    400,
+    410,
+    420,
+    430,
+    440,
+    450,
+    460,
+    470,
+    480,
+    490,
+    500,
+    510,
+    520,
+    530,
+    540,
+    550,
+    560,
+    570,
+    580,
+    590,
+    600,
+    610,
+    620,
+    630,
+    640,
+    650,
+    660,
+    670,
+    680,
+    690,
+    700,
+    710,
+    720,
+    730,
+    740,
+    750,
+    760,
+    770,
+    780,
+    790,
+    800,
+    810,
+    820,
+    830,
+    840,
+    850,
+    860,
+    870,
+    880,
+    890,
+    900,
+    910,
+    920,
+    930,
+    940,
+    950
+   ],
+   "family": "adapted_glu",
+   "init_state_dict_sha256": "c00c16f6cf287460fc630f6b1d1bf85ee1c2c5345a58c368f56504315221a196",
+   "last": {
+    "epoch": 950,
+    "file_sha256": "b5685ee1c72b759d69d5442790f2bb076db6a877e69883ff160e38c3bd812500",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-glu-on-G1-s0/checkpoints/last.pt",
+    "status": "stopped_early_plateau",
+    "weights_sha256": "6316a76b59260bee0433641665dff2a29b58fb37bac8b600bf919f18de882e8e"
+   },
+   "last_same_as_best": false,
+   "ledger": {
+    "actions": [
+     "fresh"
+    ],
+    "attempts": 1,
+    "extension": false,
+    "partitions": [
+     "mit_normal_gpu"
+    ],
+    "signals": 0
+   },
+   "loop_at_best": {
+    "best_val_metric": 44.295872602189185,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 44.295872602189185,
+    "epoch": 500,
+    "lr": 0.00025,
+    "lr_reduced": false,
+    "mask_epoch": 499,
+    "seen_mean_condition_rmse_K": 49.175197642820734,
+    "specialist_regime": "G1",
+    "specialist_val_mean_condition_rmse_K": 46.22539274304517,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 45.88586887042302,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 46.79917370539951,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 45.99113565331296,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 39.97670133034815,
+    "update": 47500,
+    "val_mean_condition_rmse_K": 44.295872602189185,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 44.481874399905685,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 44.49840930836905,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 43.90733409829283,
+      "replica_id": 2
+     }
+    ]
+   },
+   "loop_at_last": {
+    "best_val_metric": 44.295872602189185,
+    "early_stop_bad_evals": 15,
+    "early_stop_ref_metric": 44.295872602189185,
+    "epoch": 950,
+    "lr": 1e-05,
+    "lr_reduced": false,
+    "mask_epoch": 949,
+    "seen_mean_condition_rmse_K": 46.832655516614,
+    "specialist_regime": "G1",
+    "specialist_val_mean_condition_rmse_K": 47.997180232451626,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 47.36181538343743,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 48.789921659895235,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 47.83980365402221,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 35.56675939021991,
+    "update": 90250,
+    "val_mean_condition_rmse_K": 45.76323749436899,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 45.951379991515545,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 45.88570253580847,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 45.452629955782946,
+      "replica_id": 2
+     }
+    ]
+   },
+   "n_evals": 95,
+   "problems": [],
+   "regime": "G1",
+   "run_id": "NI-glu-on-G1-s0",
+   "seed": 0,
+   "specialist_val_at_best": 46.22539274304517,
+   "state": "plateau",
+   "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+   "summary_status": "stopped_early_plateau",
+   "training_outcome": "plateau_by_operational_early_stop_rule",
+   "valid": true
+  },
+  "NI-glu-on-G1-s1": {
+   "best": {
+    "epoch": 410,
+    "file_sha256": "04ad2f4e52bb417dab2c95e769f4f6dd8a6800085209848c850ce55361dba067",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-glu-on-G1-s1/checkpoints/best.pt",
+    "status": "running",
+    "weights_sha256": "4e3d0daf4d040edcc89b81ab7cd9fb9b7b69be0d9421b6c7e132ea764b2c9e11"
+   },
+   "best_val_epoch": 410,
+   "best_val_metric": 48.979208583308605,
+   "budget_exhausted": false,
+   "clip_events": 1280,
+   "declared_converged": null,
+   "epochs_completed": 920,
+   "eval_history_epochs": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    170,
+    180,
+    190,
+    200,
+    210,
+    220,
+    230,
+    240,
+    250,
+    260,
+    270,
+    280,
+    290,
+    300,
+    310,
+    320,
+    330,
+    340,
+    350,
+    360,
+    370,
+    380,
+    390,
+    400,
+    410,
+    420,
+    430,
+    440,
+    450,
+    460,
+    470,
+    480,
+    490,
+    500,
+    510,
+    520,
+    530,
+    540,
+    550,
+    560,
+    570,
+    580,
+    590,
+    600,
+    610,
+    620,
+    630,
+    640,
+    650,
+    660,
+    670,
+    680,
+    690,
+    700,
+    710,
+    720,
+    730,
+    740,
+    750,
+    760,
+    770,
+    780,
+    790,
+    800,
+    810,
+    820,
+    830,
+    840,
+    850,
+    860,
+    870,
+    880,
+    890,
+    900,
+    910,
+    920
+   ],
+   "family": "adapted_glu",
+   "init_state_dict_sha256": "1ab986c682cd0b5af06434b5d7957af1a193e775c0d8278b472b00d886602fa8",
+   "last": {
+    "epoch": 920,
+    "file_sha256": "2819452b93d5cf7f43993d763c8b01468843afd57a01c41bbba63190fe515d22",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-glu-on-G1-s1/checkpoints/last.pt",
+    "status": "stopped_early_plateau",
+    "weights_sha256": "b5542a3913d04d4bdc94be963b32313a6b0f4665923769374c30970e2952e8bd"
+   },
+   "last_same_as_best": false,
+   "ledger": {
+    "actions": [
+     "fresh"
+    ],
+    "attempts": 1,
+    "extension": false,
+    "partitions": [
+     "mit_normal_gpu"
+    ],
+    "signals": 0
+   },
+   "loop_at_best": {
+    "best_val_metric": 48.979208583308605,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 48.979208583308605,
+    "epoch": 410,
+    "lr": 0.0005,
+    "lr_reduced": false,
+    "mask_epoch": 409,
+    "seen_mean_condition_rmse_K": 53.03435665194102,
+    "specialist_regime": "G1",
+    "specialist_val_mean_condition_rmse_K": 51.74486635058356,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 51.7409658581656,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 52.21908612565553,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 51.27454706792954,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 46.75764406433558,
+    "update": 38950,
+    "val_mean_condition_rmse_K": 48.979208583308605,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 49.10632426156959,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 49.14947460018458,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 48.681826888171635,
+      "replica_id": 2
+     }
+    ]
+   },
+   "loop_at_last": {
+    "best_val_metric": 48.979208583308605,
+    "early_stop_bad_evals": 15,
+    "early_stop_ref_metric": 48.979208583308605,
+    "epoch": 920,
+    "lr": 1e-05,
+    "lr_reduced": false,
+    "mask_epoch": 919,
+    "seen_mean_condition_rmse_K": 48.293228824424354,
+    "specialist_regime": "G1",
+    "specialist_val_mean_condition_rmse_K": 54.651743641907935,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 54.54383464706617,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 54.36323625904401,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 55.048160019613626,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 39.01867067670482,
+    "update": 87400,
+    "val_mean_condition_rmse_K": 52.25742525706145,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 52.781937204597305,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 51.837719357395116,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 52.152619209191926,
+      "replica_id": 2
+     }
+    ]
+   },
+   "n_evals": 92,
+   "problems": [],
+   "regime": "G1",
+   "run_id": "NI-glu-on-G1-s1",
+   "seed": 1,
+   "specialist_val_at_best": 51.74486635058356,
+   "state": "plateau",
+   "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+   "summary_status": "stopped_early_plateau",
+   "training_outcome": "plateau_by_operational_early_stop_rule",
+   "valid": true
+  },
+  "NI-glu-on-G1-s2": {
+   "best": {
+    "epoch": 180,
+    "file_sha256": "f6027fec5930ad0c550e029d4af09cbcd1f042b9da037562b481a96230ba5f43",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-glu-on-G1-s2/checkpoints/best.pt",
+    "status": "running",
+    "weights_sha256": "d5730949eb9c3e8696993d77569bd4588b13da8feb4fa8ee91668b9fe82b241d"
+   },
+   "best_val_epoch": 180,
+   "best_val_metric": 47.17192769650939,
+   "budget_exhausted": false,
+   "clip_events": 1871,
+   "declared_converged": null,
+   "epochs_completed": 750,
+   "eval_history_epochs": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    170,
+    180,
+    190,
+    200,
+    210,
+    220,
+    230,
+    240,
+    250,
+    260,
+    270,
+    280,
+    290,
+    300,
+    310,
+    320,
+    330,
+    340,
+    350,
+    360,
+    370,
+    380,
+    390,
+    400,
+    410,
+    420,
+    430,
+    440,
+    450,
+    460,
+    470,
+    480,
+    490,
+    500,
+    510,
+    520,
+    530,
+    540,
+    550,
+    560,
+    570,
+    580,
+    590,
+    600,
+    610,
+    620,
+    630,
+    640,
+    650,
+    660,
+    670,
+    680,
+    690,
+    700,
+    710,
+    720,
+    730,
+    740,
+    750
+   ],
+   "family": "adapted_glu",
+   "init_state_dict_sha256": "cb336744c4748106901b1269a368b62f559a8bf270900784e42590b7ccb74b43",
+   "last": {
+    "epoch": 750,
+    "file_sha256": "5883bb4942e9a3d35f556a1306e14a8d2c47366c930a49056411bddc9fc7bf56",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-glu-on-G1-s2/checkpoints/last.pt",
+    "status": "stopped_early_plateau",
+    "weights_sha256": "318cb0935ba03a200ed1d3b55eae9af24dc83a45d64146b189186ae3a8e27d69"
+   },
+   "last_same_as_best": false,
+   "ledger": {
+    "actions": [
+     "fresh",
+     "resume",
+     "resume"
+    ],
+    "attempts": 3,
+    "extension": false,
+    "partitions": [
+     "mit_preemptable"
+    ],
+    "signals": 2
+   },
+   "loop_at_best": {
+    "best_val_metric": 47.17192769650939,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 47.17192769650939,
+    "epoch": 180,
+    "lr": 0.001,
+    "lr_reduced": false,
+    "mask_epoch": 179,
+    "seen_mean_condition_rmse_K": 62.937977349634515,
+    "specialist_regime": "G1",
+    "specialist_val_mean_condition_rmse_K": 50.00097506023653,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 49.38388033212743,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 51.23999053227768,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 49.37905431630446,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 59.22203709681543,
+    "update": 17100,
+    "val_mean_condition_rmse_K": 47.17192769650939,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 47.267558332872284,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 47.4323902838224,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 46.815834472833494,
+      "replica_id": 2
+     }
+    ]
+   },
+   "loop_at_last": {
+    "best_val_metric": 47.17192769650939,
+    "early_stop_bad_evals": 15,
+    "early_stop_ref_metric": 47.17192769650939,
+    "epoch": 750,
+    "lr": 1e-05,
+    "lr_reduced": false,
+    "mask_epoch": 749,
+    "seen_mean_condition_rmse_K": 46.62013377654879,
+    "specialist_regime": "G1",
+    "specialist_val_mean_condition_rmse_K": 53.40200183200188,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 53.14492847327349,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 53.90718565503723,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 53.15389136769492,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 40.11115703302156,
+    "update": 71250,
+    "val_mean_condition_rmse_K": 52.18779585870743,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 52.71400326444179,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 51.92345436009462,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 51.92592995158589,
+      "replica_id": 2
+     }
+    ]
+   },
+   "n_evals": 75,
+   "problems": [],
+   "regime": "G1",
+   "run_id": "NI-glu-on-G1-s2",
+   "seed": 2,
+   "specialist_val_at_best": 50.00097506023653,
+   "state": "plateau",
+   "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+   "summary_status": "stopped_early_plateau",
+   "training_outcome": "plateau_by_operational_early_stop_rule",
+   "valid": true
+  },
+  "NI-glu-on-G1eq-s0": {
+   "best": {
+    "epoch": 380,
+    "file_sha256": "8b981dd7f76cfa90edd23e0660c0ba6c71d69f70ddfa3a1f051fba4db4261013",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-glu-on-G1eq-s0/checkpoints/best.pt",
+    "status": "running",
+    "weights_sha256": "bb93c98870eba42c33a50ead07c44a7e929725d5742c02cc4dbaf3fdf91f2d1a"
+   },
+   "best_val_epoch": 380,
+   "best_val_metric": 45.29232776246193,
+   "budget_exhausted": false,
+   "clip_events": 1343,
+   "declared_converged": null,
+   "epochs_completed": 890,
+   "eval_history_epochs": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    170,
+    180,
+    190,
+    200,
+    210,
+    220,
+    230,
+    240,
+    250,
+    260,
+    270,
+    280,
+    290,
+    300,
+    310,
+    320,
+    330,
+    340,
+    350,
+    360,
+    370,
+    380,
+    390,
+    400,
+    410,
+    420,
+    430,
+    440,
+    450,
+    460,
+    470,
+    480,
+    490,
+    500,
+    510,
+    520,
+    530,
+    540,
+    550,
+    560,
+    570,
+    580,
+    590,
+    600,
+    610,
+    620,
+    630,
+    640,
+    650,
+    660,
+    670,
+    680,
+    690,
+    700,
+    710,
+    720,
+    730,
+    740,
+    750,
+    760,
+    770,
+    780,
+    790,
+    800,
+    810,
+    820,
+    830,
+    840,
+    850,
+    860,
+    870,
+    880,
+    890
+   ],
+   "family": "adapted_glu",
+   "init_state_dict_sha256": "c00c16f6cf287460fc630f6b1d1bf85ee1c2c5345a58c368f56504315221a196",
+   "last": {
+    "epoch": 890,
+    "file_sha256": "30bc13240585b2bd30db3d4aa09673df4da8111671262ade4aa791f67b767ddc",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-glu-on-G1eq-s0/checkpoints/last.pt",
+    "status": "stopped_early_plateau",
+    "weights_sha256": "c00fc5acd325fc187c7824505465dd71c42314926f97a0fe36f2b3101d44a75b"
+   },
+   "last_same_as_best": false,
+   "ledger": {
+    "actions": [
+     "fresh"
+    ],
+    "attempts": 1,
+    "extension": false,
+    "partitions": [
+     "mit_normal_gpu"
+    ],
+    "signals": 0
+   },
+   "loop_at_best": {
+    "best_val_metric": 45.29232776246193,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 45.29232776246193,
+    "epoch": 380,
+    "lr": 0.0005,
+    "lr_reduced": false,
+    "mask_epoch": 379,
+    "seen_mean_condition_rmse_K": 50.934780574916694,
+    "specialist_regime": "G1-eq",
+    "specialist_val_mean_condition_rmse_K": 46.026906313249604,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 46.33499601819318,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 46.061934917082965,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 45.68378800447265,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 44.31415604047417,
+    "update": 36100,
+    "val_mean_condition_rmse_K": 45.29232776246193,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 45.491674295186606,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 45.52944408889754,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 44.855864903301644,
+      "replica_id": 2
+     }
+    ]
+   },
+   "loop_at_last": {
+    "best_val_metric": 45.29232776246193,
+    "early_stop_bad_evals": 15,
+    "early_stop_ref_metric": 45.29232776246193,
+    "epoch": 890,
+    "lr": 1e-05,
+    "lr_reduced": false,
+    "mask_epoch": 889,
+    "seen_mean_condition_rmse_K": 46.85083359659944,
+    "specialist_regime": "G1-eq",
+    "specialist_val_mean_condition_rmse_K": 48.131560134499544,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 48.695988342156,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 48.065510724815255,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 47.633181336527365,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 36.11022030227781,
+    "update": 84550,
+    "val_mean_condition_rmse_K": 47.37701043775897,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 47.73155818690281,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 47.49469757599831,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 46.90477555037578,
+      "replica_id": 2
+     }
+    ]
+   },
+   "n_evals": 89,
+   "problems": [],
+   "regime": "G1-eq",
+   "run_id": "NI-glu-on-G1eq-s0",
+   "seed": 0,
+   "specialist_val_at_best": 46.026906313249604,
+   "state": "plateau",
+   "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+   "summary_status": "stopped_early_plateau",
+   "training_outcome": "plateau_by_operational_early_stop_rule",
+   "valid": true
+  },
+  "NI-glu-on-G1eq-s1": {
+   "best": {
+    "epoch": 460,
+    "file_sha256": "bce11299f7f6030a0e22b4c555223d7316047fdc354fc3f5f8675381bcc0a521",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-glu-on-G1eq-s1/checkpoints/best.pt",
+    "status": "running",
+    "weights_sha256": "ba5f1fedac0aeeedfe20a80aae8d5a23d5ac2f9a594dad0b5279b3317e3a85da"
+   },
+   "best_val_epoch": 460,
+   "best_val_metric": 46.044465275136155,
+   "budget_exhausted": false,
+   "clip_events": 1263,
+   "declared_converged": null,
+   "epochs_completed": 890,
+   "eval_history_epochs": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    170,
+    180,
+    190,
+    200,
+    210,
+    220,
+    230,
+    240,
+    250,
+    260,
+    270,
+    280,
+    290,
+    300,
+    310,
+    320,
+    330,
+    340,
+    350,
+    360,
+    370,
+    380,
+    390,
+    400,
+    410,
+    420,
+    430,
+    440,
+    450,
+    460,
+    470,
+    480,
+    490,
+    500,
+    510,
+    520,
+    530,
+    540,
+    550,
+    560,
+    570,
+    580,
+    590,
+    600,
+    610,
+    620,
+    630,
+    640,
+    650,
+    660,
+    670,
+    680,
+    690,
+    700,
+    710,
+    720,
+    730,
+    740,
+    750,
+    760,
+    770,
+    780,
+    790,
+    800,
+    810,
+    820,
+    830,
+    840,
+    850,
+    860,
+    870,
+    880,
+    890
+   ],
+   "family": "adapted_glu",
+   "init_state_dict_sha256": "1ab986c682cd0b5af06434b5d7957af1a193e775c0d8278b472b00d886602fa8",
+   "last": {
+    "epoch": 890,
+    "file_sha256": "e6f227ed8ad379d8644787106ec1188a3d1855452bfabbe8575332a5d5b836dc",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-glu-on-G1eq-s1/checkpoints/last.pt",
+    "status": "stopped_early_plateau",
+    "weights_sha256": "7f971896723eb7562cc5b47daf2042aa66f3f7d927a1c556b23700bde6503c95"
+   },
+   "last_same_as_best": false,
+   "ledger": {
+    "actions": [
+     "fresh"
+    ],
+    "attempts": 1,
+    "extension": false,
+    "partitions": [
+     "mit_normal_gpu"
+    ],
+    "signals": 0
+   },
+   "loop_at_best": {
+    "best_val_metric": 46.044465275136155,
+    "early_stop_bad_evals": 2,
+    "early_stop_ref_metric": 46.062317562203965,
+    "epoch": 460,
+    "lr": 0.00025,
+    "lr_reduced": false,
+    "mask_epoch": 459,
+    "seen_mean_condition_rmse_K": 49.85130413343712,
+    "specialist_regime": "G1-eq",
+    "specialist_val_mean_condition_rmse_K": 46.81479790747668,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 47.64778080119732,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 46.48018296129493,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 46.31642995993781,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 42.024417160407836,
+    "update": 43700,
+    "val_mean_condition_rmse_K": 46.044465275136155,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 46.73481781411723,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 45.83991389265003,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 45.55866411864118,
+      "replica_id": 2
+     }
+    ]
+   },
+   "loop_at_last": {
+    "best_val_metric": 46.044465275136155,
+    "early_stop_bad_evals": 15,
+    "early_stop_ref_metric": 46.062317562203965,
+    "epoch": 890,
+    "lr": 1e-05,
+    "lr_reduced": false,
+    "mask_epoch": 889,
+    "seen_mean_condition_rmse_K": 48.33012770086788,
+    "specialist_regime": "G1-eq",
+    "specialist_val_mean_condition_rmse_K": 48.73125698840451,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 49.62870532438237,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 48.51992393444747,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 48.045141706383696,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 38.445401542110254,
+    "update": 84550,
+    "val_mean_condition_rmse_K": 48.05242492596151,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 48.81106223560016,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 47.92791007354581,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 47.41830246873858,
+      "replica_id": 2
+     }
+    ]
+   },
+   "n_evals": 89,
+   "problems": [],
+   "regime": "G1-eq",
+   "run_id": "NI-glu-on-G1eq-s1",
+   "seed": 1,
+   "specialist_val_at_best": 46.81479790747668,
+   "state": "plateau",
+   "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+   "summary_status": "stopped_early_plateau",
+   "training_outcome": "plateau_by_operational_early_stop_rule",
+   "valid": true
+  },
+  "NI-glu-on-G1eq-s2": {
+   "best": {
+    "epoch": 440,
+    "file_sha256": "19af2447920dc3b3cdb5b81e495da800e20634578aab86d7266ef21a3aa1464c",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-glu-on-G1eq-s2/checkpoints/best.pt",
+    "status": "running",
+    "weights_sha256": "4f847a32c13ef100bf0740887731dd830a5d4f23be520e3ff339cddb282ede35"
+   },
+   "best_val_epoch": 440,
+   "best_val_metric": 43.89244416184085,
+   "budget_exhausted": false,
+   "clip_events": 1548,
+   "declared_converged": null,
+   "epochs_completed": 950,
+   "eval_history_epochs": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    170,
+    180,
+    190,
+    200,
+    210,
+    220,
+    230,
+    240,
+    250,
+    260,
+    270,
+    280,
+    290,
+    300,
+    310,
+    320,
+    330,
+    340,
+    350,
+    360,
+    370,
+    380,
+    390,
+    400,
+    410,
+    420,
+    430,
+    440,
+    450,
+    460,
+    470,
+    480,
+    490,
+    500,
+    510,
+    520,
+    530,
+    540,
+    550,
+    560,
+    570,
+    580,
+    590,
+    600,
+    610,
+    620,
+    630,
+    640,
+    650,
+    660,
+    670,
+    680,
+    690,
+    700,
+    710,
+    720,
+    730,
+    740,
+    750,
+    760,
+    770,
+    780,
+    790,
+    800,
+    810,
+    820,
+    830,
+    840,
+    850,
+    860,
+    870,
+    880,
+    890,
+    900,
+    910,
+    920,
+    930,
+    940,
+    950
+   ],
+   "family": "adapted_glu",
+   "init_state_dict_sha256": "cb336744c4748106901b1269a368b62f559a8bf270900784e42590b7ccb74b43",
+   "last": {
+    "epoch": 950,
+    "file_sha256": "8fe498438c1ccf06a8328c63aa366f8b53a5b36ba5d954c0d5227c220cbda905",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-glu-on-G1eq-s2/checkpoints/last.pt",
+    "status": "stopped_early_plateau",
+    "weights_sha256": "acdfc9a66bd489ce3b7af8300ffd1b770c82a4fbc6489a3bc27f283dbd796c75"
+   },
+   "last_same_as_best": false,
+   "ledger": {
+    "actions": [
+     "fresh",
+     "resume",
+     "resume",
+     "resume",
+     "resume",
+     "resume",
+     "resume",
+     "resume",
+     "resume"
+    ],
+    "attempts": 9,
+    "extension": false,
+    "partitions": [
+     "mit_preemptable"
+    ],
+    "signals": 8
+   },
+   "loop_at_best": {
+    "best_val_metric": 43.89244416184085,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 43.89244416184085,
+    "epoch": 440,
+    "lr": 0.0005,
+    "lr_reduced": false,
+    "mask_epoch": 439,
+    "seen_mean_condition_rmse_K": 51.53042155956253,
+    "specialist_regime": "G1-eq",
+    "specialist_val_mean_condition_rmse_K": 44.74133407589087,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 44.86985456712748,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 44.83346371106372,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 44.520683949481395,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 45.066673246394195,
+    "update": 41800,
+    "val_mean_condition_rmse_K": 43.89244416184085,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 43.96952118923583,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 43.98113631773728,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 43.726674978549454,
+      "replica_id": 2
+     }
+    ]
+   },
+   "loop_at_last": {
+    "best_val_metric": 43.89244416184085,
+    "early_stop_bad_evals": 15,
+    "early_stop_ref_metric": 43.89244416184085,
+    "epoch": 950,
+    "lr": 1e-05,
+    "lr_reduced": false,
+    "mask_epoch": 949,
+    "seen_mean_condition_rmse_K": 46.13077400607462,
+    "specialist_regime": "G1-eq",
+    "specialist_val_mean_condition_rmse_K": 46.09525751488749,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 46.015146084019044,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 46.457821457080826,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 45.81280500356261,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 36.93781404570204,
+    "update": 90250,
+    "val_mean_condition_rmse_K": 45.44544133846401,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 45.2058458717768,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 45.7614587302243,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 45.36901941339094,
+      "replica_id": 2
+     }
+    ]
+   },
+   "n_evals": 95,
+   "problems": [],
+   "regime": "G1-eq",
+   "run_id": "NI-glu-on-G1eq-s2",
+   "seed": 2,
+   "specialist_val_at_best": 44.74133407589087,
+   "state": "plateau",
+   "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+   "summary_status": "stopped_early_plateau",
+   "training_outcome": "plateau_by_operational_early_stop_rule",
+   "valid": true
+  },
+  "NI-glu-on-N1-s0": {
+   "best": {
+    "epoch": 530,
+    "file_sha256": "0d5115f81690a9ca2224446771c2b38874639362e56dac5c258f9d98386c36b3",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-glu-on-N1-s0/checkpoints/best.pt",
+    "status": "running",
+    "weights_sha256": "af3ddc7be2eda93f4ff6a017b3622e422be64c9a2d70ef54bdf589bdac6ca522"
+   },
+   "best_val_epoch": 530,
+   "best_val_metric": 41.775769537224996,
+   "budget_exhausted": false,
+   "clip_events": 1282,
+   "declared_converged": null,
+   "epochs_completed": 980,
+   "eval_history_epochs": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    170,
+    180,
+    190,
+    200,
+    210,
+    220,
+    230,
+    240,
+    250,
+    260,
+    270,
+    280,
+    290,
+    300,
+    310,
+    320,
+    330,
+    340,
+    350,
+    360,
+    370,
+    380,
+    390,
+    400,
+    410,
+    420,
+    430,
+    440,
+    450,
+    460,
+    470,
+    480,
+    490,
+    500,
+    510,
+    520,
+    530,
+    540,
+    550,
+    560,
+    570,
+    580,
+    590,
+    600,
+    610,
+    620,
+    630,
+    640,
+    650,
+    660,
+    670,
+    680,
+    690,
+    700,
+    710,
+    720,
+    730,
+    740,
+    750,
+    760,
+    770,
+    780,
+    790,
+    800,
+    810,
+    820,
+    830,
+    840,
+    850,
+    860,
+    870,
+    880,
+    890,
+    900,
+    910,
+    920,
+    930,
+    940,
+    950,
+    960,
+    970,
+    980
+   ],
+   "family": "adapted_glu",
+   "init_state_dict_sha256": "c00c16f6cf287460fc630f6b1d1bf85ee1c2c5345a58c368f56504315221a196",
+   "last": {
+    "epoch": 980,
+    "file_sha256": "cdb8943bddb084cd603f012f34a3be68a6db7308f36fd9ed4040feb2e380b6d7",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-glu-on-N1-s0/checkpoints/last.pt",
+    "status": "stopped_early_plateau",
+    "weights_sha256": "8d3e178b6aa25c84be3e25dda91bb12f4a6442655afea4d6bd645207a750dea7"
+   },
+   "last_same_as_best": false,
+   "ledger": {
+    "actions": [
+     "fresh"
+    ],
+    "attempts": 1,
+    "extension": false,
+    "partitions": [
+     "mit_normal_gpu"
+    ],
+    "signals": 0
+   },
+   "loop_at_best": {
+    "best_val_metric": 41.775769537224996,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 41.775769537224996,
+    "epoch": 530,
+    "lr": 0.00025,
+    "lr_reduced": false,
+    "mask_epoch": 529,
+    "seen_mean_condition_rmse_K": 47.49758290447625,
+    "specialist_regime": "N1",
+    "specialist_val_mean_condition_rmse_K": 41.97236436702582,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 42.31074468384711,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 42.002033294978965,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 41.60431512225137,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 37.45214876902366,
+    "update": 50350,
+    "val_mean_condition_rmse_K": 41.775769537224996,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 42.06970062212236,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 41.75978002200032,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 41.497827967552304,
+      "replica_id": 2
+     }
+    ]
+   },
+   "loop_at_last": {
+    "best_val_metric": 41.775769537224996,
+    "early_stop_bad_evals": 15,
+    "early_stop_ref_metric": 41.775769537224996,
+    "epoch": 980,
+    "lr": 1e-05,
+    "lr_reduced": false,
+    "mask_epoch": 979,
+    "seen_mean_condition_rmse_K": 45.428905532133406,
+    "specialist_regime": "N1",
+    "specialist_val_mean_condition_rmse_K": 44.117938475540065,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 44.10147700701077,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 44.06197077220829,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 44.190367647401125,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 33.844587510008935,
+    "update": 93100,
+    "val_mean_condition_rmse_K": 43.88383126319328,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 43.847907168043,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 43.80478122881428,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 43.99880539272255,
+      "replica_id": 2
+     }
+    ]
+   },
+   "n_evals": 98,
+   "problems": [],
+   "regime": "N1",
+   "run_id": "NI-glu-on-N1-s0",
+   "seed": 0,
+   "specialist_val_at_best": 41.97236436702582,
+   "state": "plateau",
+   "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+   "summary_status": "stopped_early_plateau",
+   "training_outcome": "plateau_by_operational_early_stop_rule",
+   "valid": true
+  },
+  "NI-glu-on-N1-s1": {
+   "best": {
+    "epoch": 330,
+    "file_sha256": "1412119371702a67f9b027c656ac2c3cefd9f5ba829bd2226a97871374831dd3",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-glu-on-N1-s1/checkpoints/best.pt",
+    "status": "running",
+    "weights_sha256": "46c16c0bdd86000cbe2624612760b124e25ed4b940507ca9d41631734e984a28"
+   },
+   "best_val_epoch": 330,
+   "best_val_metric": 45.36247440811436,
+   "budget_exhausted": false,
+   "clip_events": 1387,
+   "declared_converged": null,
+   "epochs_completed": 840,
+   "eval_history_epochs": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    170,
+    180,
+    190,
+    200,
+    210,
+    220,
+    230,
+    240,
+    250,
+    260,
+    270,
+    280,
+    290,
+    300,
+    310,
+    320,
+    330,
+    340,
+    350,
+    360,
+    370,
+    380,
+    390,
+    400,
+    410,
+    420,
+    430,
+    440,
+    450,
+    460,
+    470,
+    480,
+    490,
+    500,
+    510,
+    520,
+    530,
+    540,
+    550,
+    560,
+    570,
+    580,
+    590,
+    600,
+    610,
+    620,
+    630,
+    640,
+    650,
+    660,
+    670,
+    680,
+    690,
+    700,
+    710,
+    720,
+    730,
+    740,
+    750,
+    760,
+    770,
+    780,
+    790,
+    800,
+    810,
+    820,
+    830,
+    840
+   ],
+   "family": "adapted_glu",
+   "init_state_dict_sha256": "1ab986c682cd0b5af06434b5d7957af1a193e775c0d8278b472b00d886602fa8",
+   "last": {
+    "epoch": 840,
+    "file_sha256": "d89b00dcbd131b2f9721fb3749a589e59e0cef4cba7a76ad809c40f22dcdcee0",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-glu-on-N1-s1/checkpoints/last.pt",
+    "status": "stopped_early_plateau",
+    "weights_sha256": "03d07984bd1db14cfaecdd90bd836649871f0641997c8247826e76eefe0df95b"
+   },
+   "last_same_as_best": false,
+   "ledger": {
+    "actions": [
+     "fresh"
+    ],
+    "attempts": 1,
+    "extension": false,
+    "partitions": [
+     "mit_normal_gpu"
+    ],
+    "signals": 0
+   },
+   "loop_at_best": {
+    "best_val_metric": 45.36247440811436,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 45.36247440811436,
+    "epoch": 330,
+    "lr": 0.0005,
+    "lr_reduced": false,
+    "mask_epoch": 329,
+    "seen_mean_condition_rmse_K": 53.893106241117756,
+    "specialist_regime": "N1",
+    "specialist_val_mean_condition_rmse_K": 45.43895961178615,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 45.502119750179496,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 45.71268026650995,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 45.102078818669014,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 47.2756792282637,
+    "update": 31350,
+    "val_mean_condition_rmse_K": 45.36247440811436,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 45.4080211694584,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 45.642004328176405,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 45.037397726708264,
+      "replica_id": 2
+     }
+    ]
+   },
+   "loop_at_last": {
+    "best_val_metric": 45.36247440811436,
+    "early_stop_bad_evals": 15,
+    "early_stop_ref_metric": 45.36247440811436,
+    "epoch": 840,
+    "lr": 1e-05,
+    "lr_reduced": false,
+    "mask_epoch": 839,
+    "seen_mean_condition_rmse_K": 49.39442645395407,
+    "specialist_regime": "N1",
+    "specialist_val_mean_condition_rmse_K": 46.75865205598141,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 46.73145452483458,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 47.182976628096704,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 46.36152501501295,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 39.011027116421474,
+    "update": 79800,
+    "val_mean_condition_rmse_K": 46.66815151562173,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 46.5669104282872,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 47.041320811540196,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 46.39622330703778,
+      "replica_id": 2
+     }
+    ]
+   },
+   "n_evals": 84,
+   "problems": [],
+   "regime": "N1",
+   "run_id": "NI-glu-on-N1-s1",
+   "seed": 1,
+   "specialist_val_at_best": 45.43895961178615,
+   "state": "plateau",
+   "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+   "summary_status": "stopped_early_plateau",
+   "training_outcome": "plateau_by_operational_early_stop_rule",
+   "valid": true
+  },
+  "NI-glu-on-N1-s2": {
+   "best": {
+    "epoch": 560,
+    "file_sha256": "b33213abb8715f0be8aafefe0a1c9a7595087990e3dbc36dcb709fafaf641328",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-glu-on-N1-s2/checkpoints/best.pt",
+    "status": "running",
+    "weights_sha256": "ee784fb9d4e6ff30dcda4874583654ccf842afcca26af44ffc2da503a3074047"
+   },
+   "best_val_epoch": 560,
+   "best_val_metric": 45.01083263552414,
+   "budget_exhausted": false,
+   "clip_events": 1425,
+   "declared_converged": null,
+   "epochs_completed": 1070,
+   "eval_history_epochs": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    170,
+    180,
+    190,
+    200,
+    210,
+    220,
+    230,
+    240,
+    250,
+    260,
+    270,
+    280,
+    290,
+    300,
+    310,
+    320,
+    330,
+    340,
+    350,
+    360,
+    370,
+    380,
+    390,
+    400,
+    410,
+    420,
+    430,
+    440,
+    450,
+    460,
+    470,
+    480,
+    490,
+    500,
+    510,
+    520,
+    530,
+    540,
+    550,
+    560,
+    570,
+    580,
+    590,
+    600,
+    610,
+    620,
+    630,
+    640,
+    650,
+    660,
+    670,
+    680,
+    690,
+    700,
+    710,
+    720,
+    730,
+    740,
+    750,
+    760,
+    770,
+    780,
+    790,
+    800,
+    810,
+    820,
+    830,
+    840,
+    850,
+    860,
+    870,
+    880,
+    890,
+    900,
+    910,
+    920,
+    930,
+    940,
+    950,
+    960,
+    970,
+    980,
+    990,
+    1000,
+    1010,
+    1020,
+    1030,
+    1040,
+    1050,
+    1060,
+    1070
+   ],
+   "family": "adapted_glu",
+   "init_state_dict_sha256": "cb336744c4748106901b1269a368b62f559a8bf270900784e42590b7ccb74b43",
+   "last": {
+    "epoch": 1070,
+    "file_sha256": "ebcad285a15973b54736385c013226d16f942033a027de9c9d955adab41a2d5b",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-glu-on-N1-s2/checkpoints/last.pt",
+    "status": "stopped_early_plateau",
+    "weights_sha256": "17a3834691408aa3e5aa717ca110e93c4b1b62b6ebb7d91618bfdf8ee1d66cbe"
+   },
+   "last_same_as_best": false,
+   "ledger": {
+    "actions": [
+     "fresh",
+     "resume",
+     "resume",
+     "resume",
+     "resume",
+     "extend"
+    ],
+    "attempts": 6,
+    "extension": true,
+    "partitions": [
+     "mit_preemptable"
+    ],
+    "signals": 4
+   },
+   "loop_at_best": {
+    "best_val_metric": 45.01083263552414,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 45.01083263552414,
+    "epoch": 560,
+    "lr": 0.0005,
+    "lr_reduced": false,
+    "mask_epoch": 559,
+    "seen_mean_condition_rmse_K": 48.60225055764379,
+    "specialist_regime": "N1",
+    "specialist_val_mean_condition_rmse_K": 45.228808647039806,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 45.34544656040779,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 45.2588024284986,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 45.082176952213025,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 39.611113834130876,
+    "update": 53200,
+    "val_mean_condition_rmse_K": 45.01083263552414,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 45.12974309399139,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 45.12401014168574,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 44.77874467089529,
+      "replica_id": 2
+     }
+    ]
+   },
+   "loop_at_last": {
+    "best_val_metric": 45.01083263552414,
+    "early_stop_bad_evals": 15,
+    "early_stop_ref_metric": 45.01083263552414,
+    "epoch": 1070,
+    "lr": 1e-05,
+    "lr_reduced": false,
+    "mask_epoch": 1069,
+    "seen_mean_condition_rmse_K": 44.942034742205614,
+    "specialist_regime": "N1",
+    "specialist_val_mean_condition_rmse_K": 45.88096621061908,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 46.23216485607673,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 45.78966436045912,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 45.62106941532138,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 33.455547044820634,
+    "update": 101650,
+    "val_mean_condition_rmse_K": 45.70622446646191,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 46.090817567733865,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 45.70581648599049,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 45.32203934566137,
+      "replica_id": 2
+     }
+    ]
+   },
+   "n_evals": 107,
+   "problems": [],
+   "regime": "N1",
+   "run_id": "NI-glu-on-N1-s2",
+   "seed": 2,
+   "specialist_val_at_best": 45.228808647039806,
+   "state": "plateau",
+   "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+   "summary_status": "stopped_early_plateau",
+   "training_outcome": "plateau_by_operational_early_stop_rule",
+   "valid": true
+  },
+  "NI-glu-on-N1G1-s0": {
+   "best": {
+    "epoch": 390,
+    "file_sha256": "d9d91f0d523e1918f508dc2011db9c987a0ea34edfc786df7a725b9687cb7d8c",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-glu-on-N1G1-s0/checkpoints/best.pt",
+    "status": "running",
+    "weights_sha256": "01326b402212053b664a6878e54edb388404080eeff2b334060db0255ac05637"
+   },
+   "best_val_epoch": 390,
+   "best_val_metric": 47.44923237088354,
+   "budget_exhausted": false,
+   "clip_events": 1476,
+   "declared_converged": null,
+   "epochs_completed": 780,
+   "eval_history_epochs": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    170,
+    180,
+    190,
+    200,
+    210,
+    220,
+    230,
+    240,
+    250,
+    260,
+    270,
+    280,
+    290,
+    300,
+    310,
+    320,
+    330,
+    340,
+    350,
+    360,
+    370,
+    380,
+    390,
+    400,
+    410,
+    420,
+    430,
+    440,
+    450,
+    460,
+    470,
+    480,
+    490,
+    500,
+    510,
+    520,
+    530,
+    540,
+    550,
+    560,
+    570,
+    580,
+    590,
+    600,
+    610,
+    620,
+    630,
+    640,
+    650,
+    660,
+    670,
+    680,
+    690,
+    700,
+    710,
+    720,
+    730,
+    740,
+    750,
+    760,
+    770,
+    780
+   ],
+   "family": "adapted_glu",
+   "init_state_dict_sha256": "c00c16f6cf287460fc630f6b1d1bf85ee1c2c5345a58c368f56504315221a196",
+   "last": {
+    "epoch": 780,
+    "file_sha256": "c260ae588fa28f481a105bfb0f9e9a187bf43eb0bb5e7d91f63d69a98796ca06",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-glu-on-N1G1-s0/checkpoints/last.pt",
+    "status": "stopped_early_plateau",
+    "weights_sha256": "a21a88c8ffd95954ce4cad41b9499bf43aacf31093c6a9dcc86449e697d55a10"
+   },
+   "last_same_as_best": false,
+   "ledger": {
+    "actions": [
+     "fresh"
+    ],
+    "attempts": 1,
+    "extension": false,
+    "partitions": [
+     "mit_normal_gpu"
+    ],
+    "signals": 0
+   },
+   "loop_at_best": {
+    "best_val_metric": 47.44923237088354,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 47.44923237088354,
+    "epoch": 390,
+    "lr": 0.000125,
+    "lr_reduced": false,
+    "mask_epoch": 389,
+    "seen_mean_condition_rmse_K": 51.460500457968735,
+    "specialist_regime": "N1G1",
+    "specialist_val_mean_condition_rmse_K": 49.64897587289234,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 49.09506864548769,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 50.901312646699104,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 48.95054632649021,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 44.51673841528871,
+    "update": 37050,
+    "val_mean_condition_rmse_K": 47.44923237088354,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 47.700772644356185,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 47.71799207749992,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 46.9289323907945,
+      "replica_id": 2
+     }
+    ]
+   },
+   "loop_at_last": {
+    "best_val_metric": 47.44923237088354,
+    "early_stop_bad_evals": 15,
+    "early_stop_ref_metric": 47.44923237088354,
+    "epoch": 780,
+    "lr": 1e-05,
+    "lr_reduced": false,
+    "mask_epoch": 779,
+    "seen_mean_condition_rmse_K": 49.92946266207427,
+    "specialist_regime": "N1G1",
+    "specialist_val_mean_condition_rmse_K": 51.42331720301028,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 50.56511861299862,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 52.845596713014494,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 50.859236283017744,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 41.497561567659695,
+    "update": 74100,
+    "val_mean_condition_rmse_K": 49.33292699124248,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 49.630678739942056,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 49.3421833309416,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 49.025918902843785,
+      "replica_id": 2
+     }
+    ]
+   },
+   "n_evals": 78,
+   "problems": [],
+   "regime": "N1G1",
+   "run_id": "NI-glu-on-N1G1-s0",
+   "seed": 0,
+   "specialist_val_at_best": 49.64897587289234,
+   "state": "plateau",
+   "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+   "summary_status": "stopped_early_plateau",
+   "training_outcome": "plateau_by_operational_early_stop_rule",
+   "valid": true
+  },
+  "NI-glu-on-N1G1-s1": {
+   "best": {
+    "epoch": 110,
+    "file_sha256": "bf922674075149fca5fc7d9bf1a905cf0401a4e22761f1ad9099789c9eda6a2d",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-glu-on-N1G1-s1/checkpoints/best.pt",
+    "status": "running",
+    "weights_sha256": "99206ae7fe969946df8a60d02b26622c91a76edef6fb3159bc8246ab0140a46a"
+   },
+   "best_val_epoch": 110,
+   "best_val_metric": 51.00941246031983,
+   "budget_exhausted": false,
+   "clip_events": 1213,
+   "declared_converged": null,
+   "epochs_completed": 680,
+   "eval_history_epochs": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    170,
+    180,
+    190,
+    200,
+    210,
+    220,
+    230,
+    240,
+    250,
+    260,
+    270,
+    280,
+    290,
+    300,
+    310,
+    320,
+    330,
+    340,
+    350,
+    360,
+    370,
+    380,
+    390,
+    400,
+    410,
+    420,
+    430,
+    440,
+    450,
+    460,
+    470,
+    480,
+    490,
+    500,
+    510,
+    520,
+    530,
+    540,
+    550,
+    560,
+    570,
+    580,
+    590,
+    600,
+    610,
+    620,
+    630,
+    640,
+    650,
+    660,
+    670,
+    680
+   ],
+   "family": "adapted_glu",
+   "init_state_dict_sha256": "1ab986c682cd0b5af06434b5d7957af1a193e775c0d8278b472b00d886602fa8",
+   "last": {
+    "epoch": 680,
+    "file_sha256": "decf348ef9eb0b442a531d89cd6267df2e12856ed4c51a74c6ed0b9a9e1395ba",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-glu-on-N1G1-s1/checkpoints/last.pt",
+    "status": "stopped_early_plateau",
+    "weights_sha256": "2ebe05da648f685abef8e8b3247e67905082e21513debb5bfb47771008dfc73f"
+   },
+   "last_same_as_best": false,
+   "ledger": {
+    "actions": [
+     "fresh"
+    ],
+    "attempts": 1,
+    "extension": false,
+    "partitions": [
+     "mit_normal_gpu"
+    ],
+    "signals": 0
+   },
+   "loop_at_best": {
+    "best_val_metric": 51.00941246031983,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 51.00941246031983,
+    "epoch": 110,
+    "lr": 0.001,
+    "lr_reduced": false,
+    "mask_epoch": 109,
+    "seen_mean_condition_rmse_K": 72.37247271195551,
+    "specialist_regime": "N1G1",
+    "specialist_val_mean_condition_rmse_K": 53.940381140716035,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 55.03536943419092,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 53.590136440595835,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 53.19563754736134,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 68.77372993025234,
+    "update": 10450,
+    "val_mean_condition_rmse_K": 51.00941246031983,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 51.52571763756888,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 50.728412057520444,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 50.774107685870185,
+      "replica_id": 2
+     }
+    ]
+   },
+   "loop_at_last": {
+    "best_val_metric": 51.00941246031983,
+    "early_stop_bad_evals": 15,
+    "early_stop_ref_metric": 51.00941246031983,
+    "epoch": 680,
+    "lr": 1e-05,
+    "lr_reduced": false,
+    "mask_epoch": 679,
+    "seen_mean_condition_rmse_K": 52.81315341214209,
+    "specialist_regime": "N1G1",
+    "specialist_val_mean_condition_rmse_K": 56.65228016302125,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 56.6166634445345,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 57.301223492479856,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 56.038953552049385,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 46.46159792698267,
+    "update": 64600,
+    "val_mean_condition_rmse_K": 54.032686582843844,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 54.51688166534945,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 53.903217303294475,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 53.67796077988762,
+      "replica_id": 2
+     }
+    ]
+   },
+   "n_evals": 68,
+   "problems": [],
+   "regime": "N1G1",
+   "run_id": "NI-glu-on-N1G1-s1",
+   "seed": 1,
+   "specialist_val_at_best": 53.940381140716035,
+   "state": "plateau",
+   "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+   "summary_status": "stopped_early_plateau",
+   "training_outcome": "plateau_by_operational_early_stop_rule",
+   "valid": true
+  },
+  "NI-glu-on-N1G1-s2": {
+   "best": {
+    "epoch": 330,
+    "file_sha256": "2c532c14469684f0222b859c8f2b0a5b25ab390249d94efdaab16a76534b505d",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-glu-on-N1G1-s2/checkpoints/best.pt",
+    "status": "running",
+    "weights_sha256": "93b740169c9c91a82420d102a25599dedd821d3d53e9d62a6fdeb7d24fb43ba8"
+   },
+   "best_val_epoch": 330,
+   "best_val_metric": 44.22716833725061,
+   "budget_exhausted": false,
+   "clip_events": 1820,
+   "declared_converged": null,
+   "epochs_completed": 840,
+   "eval_history_epochs": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    170,
+    180,
+    190,
+    200,
+    210,
+    220,
+    230,
+    240,
+    250,
+    260,
+    270,
+    280,
+    290,
+    300,
+    310,
+    320,
+    330,
+    340,
+    350,
+    360,
+    370,
+    380,
+    390,
+    400,
+    410,
+    420,
+    430,
+    440,
+    450,
+    460,
+    470,
+    480,
+    490,
+    500,
+    510,
+    520,
+    530,
+    540,
+    550,
+    560,
+    570,
+    580,
+    590,
+    600,
+    610,
+    620,
+    630,
+    640,
+    650,
+    660,
+    670,
+    680,
+    690,
+    700,
+    710,
+    720,
+    730,
+    740,
+    750,
+    760,
+    770,
+    780,
+    790,
+    800,
+    810,
+    820,
+    830,
+    840
+   ],
+   "family": "adapted_glu",
+   "init_state_dict_sha256": "cb336744c4748106901b1269a368b62f559a8bf270900784e42590b7ccb74b43",
+   "last": {
+    "epoch": 840,
+    "file_sha256": "36e4648ed7eb246ebabc4ece2b61cfca5928956c85039ab02b1d3cb5f0b74493",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-glu-on-N1G1-s2/checkpoints/last.pt",
+    "status": "stopped_early_plateau",
+    "weights_sha256": "938d9e30e5c0cc87454709eefd3b07477b658d1702cf28b7b9881898401dbdea"
+   },
+   "last_same_as_best": false,
+   "ledger": {
+    "actions": [
+     "fresh"
+    ],
+    "attempts": 1,
+    "extension": false,
+    "partitions": [
+     "mit_normal_gpu"
+    ],
+    "signals": 0
+   },
+   "loop_at_best": {
+    "best_val_metric": 44.22716833725061,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 44.22716833725061,
+    "epoch": 330,
+    "lr": 0.0005,
+    "lr_reduced": false,
+    "mask_epoch": 329,
+    "seen_mean_condition_rmse_K": 52.49921861079796,
+    "specialist_regime": "N1G1",
+    "specialist_val_mean_condition_rmse_K": 46.54351372698042,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 46.11204914966519,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 46.60338397531407,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 46.915108055962,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 46.98413930346471,
+    "update": 31350,
+    "val_mean_condition_rmse_K": 44.22716833725061,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 44.254051862603454,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 44.08938056638936,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 44.338072582759004,
+      "replica_id": 2
+     }
+    ]
+   },
+   "loop_at_last": {
+    "best_val_metric": 44.22716833725061,
+    "early_stop_bad_evals": 15,
+    "early_stop_ref_metric": 44.22716833725061,
+    "epoch": 840,
+    "lr": 1e-05,
+    "lr_reduced": false,
+    "mask_epoch": 839,
+    "seen_mean_condition_rmse_K": 46.546420417542706,
+    "specialist_regime": "N1G1",
+    "specialist_val_mean_condition_rmse_K": 47.91967120840243,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 47.48588138769093,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 47.960472386795146,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 48.3126598507212,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 38.57353316105158,
+    "update": 79800,
+    "val_mean_condition_rmse_K": 45.97854207327194,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 45.84170451356034,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 45.833929137052166,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 46.25999256920331,
+      "replica_id": 2
+     }
+    ]
+   },
+   "n_evals": 84,
+   "problems": [],
+   "regime": "N1G1",
+   "run_id": "NI-glu-on-N1G1-s2",
+   "seed": 2,
+   "specialist_val_at_best": 46.54351372698042,
+   "state": "plateau",
+   "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+   "summary_status": "stopped_early_plateau",
+   "training_outcome": "plateau_by_operational_early_stop_rule",
+   "valid": true
+  },
+  "NI-glu-on-N2-s0": {
+   "best": {
+    "epoch": 320,
+    "file_sha256": "8bb774083a4e14f8d1c3fb2d90d4dfd367eae0398adb2bdd7aae9444a75340b5",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-glu-on-N2-s0/checkpoints/best.pt",
+    "status": "running",
+    "weights_sha256": "bfbd74a424d4b599629ae8a77e98112eb0351da967df57d15667a7cbf011524e"
+   },
+   "best_val_epoch": 320,
+   "best_val_metric": 47.91593028765727,
+   "budget_exhausted": false,
+   "clip_events": 1305,
+   "declared_converged": null,
+   "epochs_completed": 770,
+   "eval_history_epochs": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    170,
+    180,
+    190,
+    200,
+    210,
+    220,
+    230,
+    240,
+    250,
+    260,
+    270,
+    280,
+    290,
+    300,
+    310,
+    320,
+    330,
+    340,
+    350,
+    360,
+    370,
+    380,
+    390,
+    400,
+    410,
+    420,
+    430,
+    440,
+    450,
+    460,
+    470,
+    480,
+    490,
+    500,
+    510,
+    520,
+    530,
+    540,
+    550,
+    560,
+    570,
+    580,
+    590,
+    600,
+    610,
+    620,
+    630,
+    640,
+    650,
+    660,
+    670,
+    680,
+    690,
+    700,
+    710,
+    720,
+    730,
+    740,
+    750,
+    760,
+    770
+   ],
+   "family": "adapted_glu",
+   "init_state_dict_sha256": "c00c16f6cf287460fc630f6b1d1bf85ee1c2c5345a58c368f56504315221a196",
+   "last": {
+    "epoch": 770,
+    "file_sha256": "3ffd0c3b346517afbb5dafac98b523a49c6d35354ddee1fa67afef6b78f541e7",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-glu-on-N2-s0/checkpoints/last.pt",
+    "status": "stopped_early_plateau",
+    "weights_sha256": "f6878600cef21c1262e16e3947a908a73bd0f38896f639c387e93cedadc8a0a1"
+   },
+   "last_same_as_best": false,
+   "ledger": {
+    "actions": [
+     "fresh"
+    ],
+    "attempts": 1,
+    "extension": false,
+    "partitions": [
+     "mit_normal_gpu"
+    ],
+    "signals": 0
+   },
+   "loop_at_best": {
+    "best_val_metric": 47.91593028765727,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 47.91593028765727,
+    "epoch": 320,
+    "lr": 0.00025,
+    "lr_reduced": false,
+    "mask_epoch": 319,
+    "seen_mean_condition_rmse_K": 54.230925678190104,
+    "specialist_regime": "N2",
+    "specialist_val_mean_condition_rmse_K": 48.37283218797737,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 48.66941004379604,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 48.63550144497191,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 47.81358507516419,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 48.16005544978299,
+    "update": 30400,
+    "val_mean_condition_rmse_K": 47.91593028765727,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 48.32257044955056,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 48.04180249622135,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 47.3834179171999,
+      "replica_id": 2
+     }
+    ]
+   },
+   "loop_at_last": {
+    "best_val_metric": 47.91593028765727,
+    "early_stop_bad_evals": 15,
+    "early_stop_ref_metric": 47.91593028765727,
+    "epoch": 770,
+    "lr": 1e-05,
+    "lr_reduced": false,
+    "mask_epoch": 769,
+    "seen_mean_condition_rmse_K": 50.69491239836094,
+    "specialist_regime": "N2",
+    "specialist_val_mean_condition_rmse_K": 49.31072068219701,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 49.3975868905677,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 49.383279445385675,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 49.15129571063767,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 42.4517205438375,
+    "update": 73150,
+    "val_mean_condition_rmse_K": 48.78224410615113,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 48.851342242530585,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 48.83382516042682,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 48.661564915495994,
+      "replica_id": 2
+     }
+    ]
+   },
+   "n_evals": 77,
+   "problems": [],
+   "regime": "N2",
+   "run_id": "NI-glu-on-N2-s0",
+   "seed": 0,
+   "specialist_val_at_best": 48.37283218797737,
+   "state": "plateau",
+   "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+   "summary_status": "stopped_early_plateau",
+   "training_outcome": "plateau_by_operational_early_stop_rule",
+   "valid": true
+  },
+  "NI-glu-on-N2-s1": {
+   "best": {
+    "epoch": 290,
+    "file_sha256": "620fd72284a4300d2648ce241a19b49a60bbf06632553ad049f45e7ffe33a528",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-glu-on-N2-s1/checkpoints/best.pt",
+    "status": "running",
+    "weights_sha256": "620863f0dc2be76ac49e68eb20676a27c7b3b2a9c33d5f3c5efc3eb2d2b10578"
+   },
+   "best_val_epoch": 290,
+   "best_val_metric": 44.64162580386096,
+   "budget_exhausted": false,
+   "clip_events": 1299,
+   "declared_converged": null,
+   "epochs_completed": 860,
+   "eval_history_epochs": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    170,
+    180,
+    190,
+    200,
+    210,
+    220,
+    230,
+    240,
+    250,
+    260,
+    270,
+    280,
+    290,
+    300,
+    310,
+    320,
+    330,
+    340,
+    350,
+    360,
+    370,
+    380,
+    390,
+    400,
+    410,
+    420,
+    430,
+    440,
+    450,
+    460,
+    470,
+    480,
+    490,
+    500,
+    510,
+    520,
+    530,
+    540,
+    550,
+    560,
+    570,
+    580,
+    590,
+    600,
+    610,
+    620,
+    630,
+    640,
+    650,
+    660,
+    670,
+    680,
+    690,
+    700,
+    710,
+    720,
+    730,
+    740,
+    750,
+    760,
+    770,
+    780,
+    790,
+    800,
+    810,
+    820,
+    830,
+    840,
+    850,
+    860
+   ],
+   "family": "adapted_glu",
+   "init_state_dict_sha256": "1ab986c682cd0b5af06434b5d7957af1a193e775c0d8278b472b00d886602fa8",
+   "last": {
+    "epoch": 860,
+    "file_sha256": "e6678846114cd905cdbdc95538e31576eb1f8ee6b85ff371b6cb0828b0bdc8e0",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-glu-on-N2-s1/checkpoints/last.pt",
+    "status": "stopped_early_plateau",
+    "weights_sha256": "5d393b5e1dc7d6c7efdbfdd63a75dcc27bb2d044b5752abe242c4dfc3a0bfd27"
+   },
+   "last_same_as_best": false,
+   "ledger": {
+    "actions": [
+     "fresh"
+    ],
+    "attempts": 1,
+    "extension": false,
+    "partitions": [
+     "mit_normal_gpu"
+    ],
+    "signals": 0
+   },
+   "loop_at_best": {
+    "best_val_metric": 44.64162580386096,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 44.64162580386096,
+    "epoch": 290,
+    "lr": 0.001,
+    "lr_reduced": false,
+    "mask_epoch": 289,
+    "seen_mean_condition_rmse_K": 59.554278857083055,
+    "specialist_regime": "N2",
+    "specialist_val_mean_condition_rmse_K": 45.02802209383682,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 44.89704317044188,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 44.97227283796403,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 45.21475027310453,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 55.411725140410695,
+    "update": 27550,
+    "val_mean_condition_rmse_K": 44.64162580386096,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 44.768988275944885,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 44.44896083200481,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 44.70692830363319,
+      "replica_id": 2
+     }
+    ]
+   },
+   "loop_at_last": {
+    "best_val_metric": 44.64162580386096,
+    "early_stop_bad_evals": 15,
+    "early_stop_ref_metric": 44.64162580386096,
+    "epoch": 860,
+    "lr": 1e-05,
+    "lr_reduced": false,
+    "mask_epoch": 859,
+    "seen_mean_condition_rmse_K": 50.53038402763072,
+    "specialist_regime": "N2",
+    "specialist_val_mean_condition_rmse_K": 46.116056485786686,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 46.513472828423915,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 45.828053239673125,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 46.00664338926301,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 41.45460869124577,
+    "update": 81700,
+    "val_mean_condition_rmse_K": 46.448899343820536,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 46.95043938806183,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 46.0643491521629,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 46.33190949123689,
+      "replica_id": 2
+     }
+    ]
+   },
+   "n_evals": 86,
+   "problems": [],
+   "regime": "N2",
+   "run_id": "NI-glu-on-N2-s1",
+   "seed": 1,
+   "specialist_val_at_best": 45.02802209383682,
+   "state": "plateau",
+   "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+   "summary_status": "stopped_early_plateau",
+   "training_outcome": "plateau_by_operational_early_stop_rule",
+   "valid": true
+  },
+  "NI-glu-on-N2-s2": {
+   "best": {
+    "epoch": 470,
+    "file_sha256": "e935465699e2099e29f3659f425fdb5c3617f894ba080481450031c8f029ea35",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-glu-on-N2-s2/checkpoints/best.pt",
+    "status": "running",
+    "weights_sha256": "54539d22cc3902998226b1459e23ec2ff497d8514fab096249597534f6b96b35"
+   },
+   "best_val_epoch": 470,
+   "best_val_metric": 43.06769490144375,
+   "budget_exhausted": false,
+   "clip_events": 1276,
+   "declared_converged": null,
+   "epochs_completed": 980,
+   "eval_history_epochs": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    170,
+    180,
+    190,
+    200,
+    210,
+    220,
+    230,
+    240,
+    250,
+    260,
+    270,
+    280,
+    290,
+    300,
+    310,
+    320,
+    330,
+    340,
+    350,
+    360,
+    370,
+    380,
+    390,
+    400,
+    410,
+    420,
+    430,
+    440,
+    450,
+    460,
+    470,
+    480,
+    490,
+    500,
+    510,
+    520,
+    530,
+    540,
+    550,
+    560,
+    570,
+    580,
+    590,
+    600,
+    610,
+    620,
+    630,
+    640,
+    650,
+    660,
+    670,
+    680,
+    690,
+    700,
+    710,
+    720,
+    730,
+    740,
+    750,
+    760,
+    770,
+    780,
+    790,
+    800,
+    810,
+    820,
+    830,
+    840,
+    850,
+    860,
+    870,
+    880,
+    890,
+    900,
+    910,
+    920,
+    930,
+    940,
+    950,
+    960,
+    970,
+    980
+   ],
+   "family": "adapted_glu",
+   "init_state_dict_sha256": "cb336744c4748106901b1269a368b62f559a8bf270900784e42590b7ccb74b43",
+   "last": {
+    "epoch": 980,
+    "file_sha256": "d31f8e29edadc2d4c210028143bd875b16d8f4186dd2d957543593f3b74fcfb2",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-glu-on-N2-s2/checkpoints/last.pt",
+    "status": "stopped_early_plateau",
+    "weights_sha256": "ab4248e1aac2a55b7ee6ee9bbd3535a611fb604d70d2c3bb52589c37e68989ef"
+   },
+   "last_same_as_best": false,
+   "ledger": {
+    "actions": [
+     "fresh",
+     "resume"
+    ],
+    "attempts": 2,
+    "extension": false,
+    "partitions": [
+     "mit_preemptable"
+    ],
+    "signals": 1
+   },
+   "loop_at_best": {
+    "best_val_metric": 43.06769490144375,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 43.06769490144375,
+    "epoch": 470,
+    "lr": 0.0005,
+    "lr_reduced": false,
+    "mask_epoch": 469,
+    "seen_mean_condition_rmse_K": 50.10573132660691,
+    "specialist_regime": "N2",
+    "specialist_val_mean_condition_rmse_K": 43.17532489736184,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 43.34308866633436,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 43.275390244125155,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 42.90749578162602,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 42.98573469937152,
+    "update": 44650,
+    "val_mean_condition_rmse_K": 43.06769490144375,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 43.371204387629064,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 42.88688326532894,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 42.94499705137323,
+      "replica_id": 2
+     }
+    ]
+   },
+   "loop_at_last": {
+    "best_val_metric": 43.06769490144375,
+    "early_stop_bad_evals": 15,
+    "early_stop_ref_metric": 43.06769490144375,
+    "epoch": 980,
+    "lr": 1e-05,
+    "lr_reduced": false,
+    "mask_epoch": 979,
+    "seen_mean_condition_rmse_K": 47.06598444024625,
+    "specialist_regime": "N2",
+    "specialist_val_mean_condition_rmse_K": 43.63793747022808,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 43.79141983850482,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 43.61447997565612,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 43.507912596523305,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 36.24021760658603,
+    "update": 93100,
+    "val_mean_condition_rmse_K": 43.63389419567155,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 43.88716573695201,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 43.38576629709352,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 43.62875055296911,
+      "replica_id": 2
+     }
+    ]
+   },
+   "n_evals": 98,
+   "problems": [],
+   "regime": "N2",
+   "run_id": "NI-glu-on-N2-s2",
+   "seed": 2,
+   "specialist_val_at_best": 43.17532489736184,
+   "state": "plateau",
+   "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+   "summary_status": "stopped_early_plateau",
+   "training_outcome": "plateau_by_operational_early_stop_rule",
+   "valid": true
+  },
+  "NI-unet-on-G1-s0": {
+   "best": {
+    "epoch": 180,
+    "file_sha256": "8658f9898aae67070f0bf72035fd27370b16048eac33b933324085c6bb9bd1d4",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-unet-on-G1-s0/checkpoints/best.pt",
+    "status": "running",
+    "weights_sha256": "3853c9b236d498dc05d2e09542d28b798f5dac58b87cb6fdbdf8921fa4b07e36"
+   },
+   "best_val_epoch": 180,
+   "best_val_metric": 41.95672882129938,
+   "budget_exhausted": false,
+   "clip_events": 669,
+   "declared_converged": null,
+   "epochs_completed": 690,
+   "eval_history_epochs": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    170,
+    180,
+    190,
+    200,
+    210,
+    220,
+    230,
+    240,
+    250,
+    260,
+    270,
+    280,
+    290,
+    300,
+    310,
+    320,
+    330,
+    340,
+    350,
+    360,
+    370,
+    380,
+    390,
+    400,
+    410,
+    420,
+    430,
+    440,
+    450,
+    460,
+    470,
+    480,
+    490,
+    500,
+    510,
+    520,
+    530,
+    540,
+    550,
+    560,
+    570,
+    580,
+    590,
+    600,
+    610,
+    620,
+    630,
+    640,
+    650,
+    660,
+    670,
+    680,
+    690
+   ],
+   "family": "sparse_unet",
+   "init_state_dict_sha256": "18c51863f8cbcb94afc7184afab61c631beb679e0f26e01074551352a5a91765",
+   "last": {
+    "epoch": 690,
+    "file_sha256": "141da5d7fbd14c8a56d79eb97e3a154fbde3e9a23097eb418de06bf22239da32",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-unet-on-G1-s0/checkpoints/last.pt",
+    "status": "stopped_early_plateau",
+    "weights_sha256": "5afc36a4cedd6cc7d9e3be1ed6ddcaef5dbd9911dfab4c4ffad4cea4abc26b4e"
+   },
+   "last_same_as_best": false,
+   "ledger": {
+    "actions": [
+     "fresh"
+    ],
+    "attempts": 1,
+    "extension": false,
+    "partitions": [
+     "mit_preemptable"
+    ],
+    "signals": 0
+   },
+   "loop_at_best": {
+    "best_val_metric": 41.95672882129938,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 41.95672882129938,
+    "epoch": 180,
+    "lr": 0.0005,
+    "lr_reduced": false,
+    "mask_epoch": 179,
+    "seen_mean_condition_rmse_K": 42.76261575249119,
+    "specialist_regime": "G1",
+    "specialist_val_mean_condition_rmse_K": 44.17838471621559,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 43.49554818862538,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 44.657407071513454,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 44.38219888850792,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 28.037753084504924,
+    "update": 17100,
+    "val_mean_condition_rmse_K": 41.95672882129938,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 41.843630210017686,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 42.18649097230415,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 41.84006528157631,
+      "replica_id": 2
+     }
+    ]
+   },
+   "loop_at_last": {
+    "best_val_metric": 41.95672882129938,
+    "early_stop_bad_evals": 15,
+    "early_stop_ref_metric": 41.95672882129938,
+    "epoch": 690,
+    "lr": 1e-05,
+    "lr_reduced": false,
+    "mask_epoch": 689,
+    "seen_mean_condition_rmse_K": 43.73766189525109,
+    "specialist_regime": "G1",
+    "specialist_val_mean_condition_rmse_K": 46.4141831316374,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 46.01207682016881,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 46.627634342244,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 46.60283823249939,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 16.499497452398593,
+    "update": 65550,
+    "val_mean_condition_rmse_K": 45.15268347075133,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 45.10671100590073,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 45.27615257354091,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 45.075186832812335,
+      "replica_id": 2
+     }
+    ]
+   },
+   "n_evals": 69,
+   "problems": [],
+   "regime": "G1",
+   "run_id": "NI-unet-on-G1-s0",
+   "seed": 0,
+   "specialist_val_at_best": 44.17838471621559,
+   "state": "plateau",
+   "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+   "summary_status": "stopped_early_plateau",
+   "training_outcome": "plateau_by_operational_early_stop_rule",
+   "valid": true
+  },
+  "NI-unet-on-G1-s1": {
+   "best": {
+    "epoch": 110,
+    "file_sha256": "f7cca80558d79b7712e0a13f8419010594286833cfc0c8450d53e53a55b6ad7b",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-unet-on-G1-s1/checkpoints/best.pt",
+    "status": "running",
+    "weights_sha256": "3ff8e06cb8667bc665844cb277fa54afc4b85d6e69c4f42c9ef12fab9ce94c72"
+   },
+   "best_val_epoch": 110,
+   "best_val_metric": 44.220577154130154,
+   "budget_exhausted": false,
+   "clip_events": 675,
+   "declared_converged": null,
+   "epochs_completed": 680,
+   "eval_history_epochs": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    170,
+    180,
+    190,
+    200,
+    210,
+    220,
+    230,
+    240,
+    250,
+    260,
+    270,
+    280,
+    290,
+    300,
+    310,
+    320,
+    330,
+    340,
+    350,
+    360,
+    370,
+    380,
+    390,
+    400,
+    410,
+    420,
+    430,
+    440,
+    450,
+    460,
+    470,
+    480,
+    490,
+    500,
+    510,
+    520,
+    530,
+    540,
+    550,
+    560,
+    570,
+    580,
+    590,
+    600,
+    610,
+    620,
+    630,
+    640,
+    650,
+    660,
+    670,
+    680
+   ],
+   "family": "sparse_unet",
+   "init_state_dict_sha256": "14f3dc567b0e8daa873e2ffe8d2e2a7636a87ae44c91594fd13513cd55151506",
+   "last": {
+    "epoch": 680,
+    "file_sha256": "31b3eec8aed61834816cdac77e2fafb73f6d3914baec3df471d1c73a2ede14ab",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-unet-on-G1-s1/checkpoints/last.pt",
+    "status": "stopped_early_plateau",
+    "weights_sha256": "e2204c65af0a9847f6195ee5eadd7088dd02df645db5adf5ce6bcbb36dcebe64"
+   },
+   "last_same_as_best": false,
+   "ledger": {
+    "actions": [
+     "fresh"
+    ],
+    "attempts": 1,
+    "extension": false,
+    "partitions": [
+     "mit_preemptable"
+    ],
+    "signals": 0
+   },
+   "loop_at_best": {
+    "best_val_metric": 44.220577154130154,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 44.220577154130154,
+    "epoch": 110,
+    "lr": 0.001,
+    "lr_reduced": false,
+    "mask_epoch": 109,
+    "seen_mean_condition_rmse_K": 46.297877645649564,
+    "specialist_regime": "G1",
+    "specialist_val_mean_condition_rmse_K": 46.968267024419326,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 46.163000920549685,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 47.640963119515135,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 47.10083703319316,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 37.923177341201274,
+    "update": 10450,
+    "val_mean_condition_rmse_K": 44.220577154130154,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 43.960903739554,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 44.63858870299231,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 44.06223901984416,
+      "replica_id": 2
+     }
+    ]
+   },
+   "loop_at_last": {
+    "best_val_metric": 44.220577154130154,
+    "early_stop_bad_evals": 15,
+    "early_stop_ref_metric": 44.220577154130154,
+    "epoch": 680,
+    "lr": 1e-05,
+    "lr_reduced": false,
+    "mask_epoch": 679,
+    "seen_mean_condition_rmse_K": 45.152965737536505,
+    "specialist_regime": "G1",
+    "specialist_val_mean_condition_rmse_K": 50.775113794123705,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 50.554346464869305,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 51.004248655784515,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 50.766746261717294,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 16.64448790672235,
+    "update": 64600,
+    "val_mean_condition_rmse_K": 49.101983624571346,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 49.120380594737185,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 49.301198039740854,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 48.88437223923601,
+      "replica_id": 2
+     }
+    ]
+   },
+   "n_evals": 68,
+   "problems": [],
+   "regime": "G1",
+   "run_id": "NI-unet-on-G1-s1",
+   "seed": 1,
+   "specialist_val_at_best": 46.968267024419326,
+   "state": "plateau",
+   "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+   "summary_status": "stopped_early_plateau",
+   "training_outcome": "plateau_by_operational_early_stop_rule",
+   "valid": true
+  },
+  "NI-unet-on-G1-s2": {
+   "best": {
+    "epoch": 130,
+    "file_sha256": "c258c55356470d1b7cdee3f44e101107762b0cd797fc0ccb0f7ff2702aa2a63c",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-unet-on-G1-s2/checkpoints/best.pt",
+    "status": "running",
+    "weights_sha256": "fcd279ede01e0ae8631f38417e63ccac815cf1645d2568968d213156fb4c56a5"
+   },
+   "best_val_epoch": 130,
+   "best_val_metric": 44.694173454032786,
+   "budget_exhausted": false,
+   "clip_events": 671,
+   "declared_converged": null,
+   "epochs_completed": 700,
+   "eval_history_epochs": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    170,
+    180,
+    190,
+    200,
+    210,
+    220,
+    230,
+    240,
+    250,
+    260,
+    270,
+    280,
+    290,
+    300,
+    310,
+    320,
+    330,
+    340,
+    350,
+    360,
+    370,
+    380,
+    390,
+    400,
+    410,
+    420,
+    430,
+    440,
+    450,
+    460,
+    470,
+    480,
+    490,
+    500,
+    510,
+    520,
+    530,
+    540,
+    550,
+    560,
+    570,
+    580,
+    590,
+    600,
+    610,
+    620,
+    630,
+    640,
+    650,
+    660,
+    670,
+    680,
+    690,
+    700
+   ],
+   "family": "sparse_unet",
+   "init_state_dict_sha256": "f8d2ed895beabd117d709ff89743a46512911094a2da17ecf2501cc627ff086f",
+   "last": {
+    "epoch": 700,
+    "file_sha256": "f8b61a23456ebce699a82fd1b4030bbc9146f49e51e6dd725b663c10714abfe3",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-unet-on-G1-s2/checkpoints/last.pt",
+    "status": "stopped_early_plateau",
+    "weights_sha256": "2607294a2d0ed666b8d503e8ff0e62cd2a164c510b8d36364e6266a447f507ed"
+   },
+   "last_same_as_best": false,
+   "ledger": {
+    "actions": [
+     "fresh"
+    ],
+    "attempts": 1,
+    "extension": false,
+    "partitions": [
+     "mit_preemptable"
+    ],
+    "signals": 0
+   },
+   "loop_at_best": {
+    "best_val_metric": 44.694173454032786,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 44.694173454032786,
+    "epoch": 130,
+    "lr": 0.001,
+    "lr_reduced": false,
+    "mask_epoch": 129,
+    "seen_mean_condition_rmse_K": 46.134996302460486,
+    "specialist_regime": "G1",
+    "specialist_val_mean_condition_rmse_K": 46.909881064968,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 46.45417606486583,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 47.37482654060103,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 46.90064058943714,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 36.179375064030886,
+    "update": 12350,
+    "val_mean_condition_rmse_K": 44.694173454032786,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 44.763058014378124,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 44.90563552288921,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 44.41382682483104,
+      "replica_id": 2
+     }
+    ]
+   },
+   "loop_at_last": {
+    "best_val_metric": 44.694173454032786,
+    "early_stop_bad_evals": 15,
+    "early_stop_ref_metric": 44.694173454032786,
+    "epoch": 700,
+    "lr": 1e-05,
+    "lr_reduced": false,
+    "mask_epoch": 699,
+    "seen_mean_condition_rmse_K": 43.794232989006055,
+    "specialist_regime": "G1",
+    "specialist_val_mean_condition_rmse_K": 47.83641494465238,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 47.46181090799069,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 48.209359410516726,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 47.83807451544974,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 16.397166145484466,
+    "update": 66500,
+    "val_mean_condition_rmse_K": 46.06997401754837,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 45.86388018068158,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 46.263997721169936,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 46.08204415079359,
+      "replica_id": 2
+     }
+    ]
+   },
+   "n_evals": 70,
+   "problems": [],
+   "regime": "G1",
+   "run_id": "NI-unet-on-G1-s2",
+   "seed": 2,
+   "specialist_val_at_best": 46.909881064968,
+   "state": "plateau",
+   "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+   "summary_status": "stopped_early_plateau",
+   "training_outcome": "plateau_by_operational_early_stop_rule",
+   "valid": true
+  },
+  "NI-unet-on-G1eq-s0": {
+   "best": {
+    "epoch": 180,
+    "file_sha256": "183415f0f38c179571089334fd9d41de6c3b58f24b6d8962fcd5caea92e11dc9",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-unet-on-G1eq-s0/checkpoints/best.pt",
+    "status": "running",
+    "weights_sha256": "31939eae8a0e217f06a8e92777e9ae72b73b7af80e677ee8cf009ddee1b83c7e"
+   },
+   "best_val_epoch": 180,
+   "best_val_metric": 37.20974799918403,
+   "budget_exhausted": false,
+   "clip_events": 601,
+   "declared_converged": null,
+   "epochs_completed": 690,
+   "eval_history_epochs": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    170,
+    180,
+    190,
+    200,
+    210,
+    220,
+    230,
+    240,
+    250,
+    260,
+    270,
+    280,
+    290,
+    300,
+    310,
+    320,
+    330,
+    340,
+    350,
+    360,
+    370,
+    380,
+    390,
+    400,
+    410,
+    420,
+    430,
+    440,
+    450,
+    460,
+    470,
+    480,
+    490,
+    500,
+    510,
+    520,
+    530,
+    540,
+    550,
+    560,
+    570,
+    580,
+    590,
+    600,
+    610,
+    620,
+    630,
+    640,
+    650,
+    660,
+    670,
+    680,
+    690
+   ],
+   "family": "sparse_unet",
+   "init_state_dict_sha256": "18c51863f8cbcb94afc7184afab61c631beb679e0f26e01074551352a5a91765",
+   "last": {
+    "epoch": 690,
+    "file_sha256": "d71c17f67b20ffe9364289ebdafac5904a13fab7d8423f38745997eb79a32849",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-unet-on-G1eq-s0/checkpoints/last.pt",
+    "status": "stopped_early_plateau",
+    "weights_sha256": "373d57dd5a45a837ea130008c2cc7335eb4488f3c466a1134559c4ca578e4544"
+   },
+   "last_same_as_best": false,
+   "ledger": {
+    "actions": [
+     "fresh"
+    ],
+    "attempts": 1,
+    "extension": false,
+    "partitions": [
+     "mit_preemptable"
+    ],
+    "signals": 0
+   },
+   "loop_at_best": {
+    "best_val_metric": 37.20974799918403,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 37.20974799918403,
+    "epoch": 180,
+    "lr": 0.0005,
+    "lr_reduced": false,
+    "mask_epoch": 179,
+    "seen_mean_condition_rmse_K": 41.535968404435025,
+    "specialist_regime": "G1-eq",
+    "specialist_val_mean_condition_rmse_K": 39.498282392793975,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 39.396134262914565,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 39.55618041075224,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 39.54253250471512,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 25.529149981655422,
+    "update": 17100,
+    "val_mean_condition_rmse_K": 37.20974799918403,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 37.177878236369494,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 37.29045597657865,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 37.16090978460395,
+      "replica_id": 2
+     }
+    ]
+   },
+   "loop_at_last": {
+    "best_val_metric": 37.20974799918403,
+    "early_stop_bad_evals": 15,
+    "early_stop_ref_metric": 37.20974799918403,
+    "epoch": 690,
+    "lr": 1e-05,
+    "lr_reduced": false,
+    "mask_epoch": 689,
+    "seen_mean_condition_rmse_K": 42.49636984620029,
+    "specialist_regime": "G1-eq",
+    "specialist_val_mean_condition_rmse_K": 42.79844869919626,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 42.65827195328675,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 42.95037456397949,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 42.786699580322534,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 14.977115978615624,
+    "update": 65550,
+    "val_mean_condition_rmse_K": 40.786997054762544,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 40.73090002578888,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 40.83783245095886,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 40.79225868753992,
+      "replica_id": 2
+     }
+    ]
+   },
+   "n_evals": 69,
+   "problems": [],
+   "regime": "G1-eq",
+   "run_id": "NI-unet-on-G1eq-s0",
+   "seed": 0,
+   "specialist_val_at_best": 39.498282392793975,
+   "state": "plateau",
+   "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+   "summary_status": "stopped_early_plateau",
+   "training_outcome": "plateau_by_operational_early_stop_rule",
+   "valid": true
+  },
+  "NI-unet-on-G1eq-s1": {
+   "best": {
+    "epoch": 110,
+    "file_sha256": "396141affa63f7cdb1b4326457a159c4a89dc358b1096701e03787ff586f0944",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-unet-on-G1eq-s1/checkpoints/best.pt",
+    "status": "running",
+    "weights_sha256": "fc4e18d5118dc4b096553086136fa71582cec44aad867d3e90aa35e1013120be"
+   },
+   "best_val_epoch": 110,
+   "best_val_metric": 43.41996669071585,
+   "budget_exhausted": false,
+   "clip_events": 644,
+   "declared_converged": null,
+   "epochs_completed": 680,
+   "eval_history_epochs": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    170,
+    180,
+    190,
+    200,
+    210,
+    220,
+    230,
+    240,
+    250,
+    260,
+    270,
+    280,
+    290,
+    300,
+    310,
+    320,
+    330,
+    340,
+    350,
+    360,
+    370,
+    380,
+    390,
+    400,
+    410,
+    420,
+    430,
+    440,
+    450,
+    460,
+    470,
+    480,
+    490,
+    500,
+    510,
+    520,
+    530,
+    540,
+    550,
+    560,
+    570,
+    580,
+    590,
+    600,
+    610,
+    620,
+    630,
+    640,
+    650,
+    660,
+    670,
+    680
+   ],
+   "family": "sparse_unet",
+   "init_state_dict_sha256": "14f3dc567b0e8daa873e2ffe8d2e2a7636a87ae44c91594fd13513cd55151506",
+   "last": {
+    "epoch": 680,
+    "file_sha256": "aaeaf4e79be03484cc9e2326d93884ce908f59fbfd24d90f9416a7ad5b38153a",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-unet-on-G1eq-s1/checkpoints/last.pt",
+    "status": "stopped_early_plateau",
+    "weights_sha256": "fdf8a7d430959f69fccbd96d5ca8365d7b0f6fb5f0841090e481b79fefcac65d"
+   },
+   "last_same_as_best": false,
+   "ledger": {
+    "actions": [
+     "fresh",
+     "resume",
+     "resume",
+     "resume"
+    ],
+    "attempts": 4,
+    "extension": false,
+    "partitions": [
+     "mit_preemptable"
+    ],
+    "signals": 3
+   },
+   "loop_at_best": {
+    "best_val_metric": 43.41996669071585,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 43.41996669071585,
+    "epoch": 110,
+    "lr": 0.001,
+    "lr_reduced": false,
+    "mask_epoch": 109,
+    "seen_mean_condition_rmse_K": 44.49038776613602,
+    "specialist_regime": "G1-eq",
+    "specialist_val_mean_condition_rmse_K": 45.2456209660727,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 45.23885758800916,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 45.41823636558299,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 45.07976894462595,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 35.471834710048725,
+    "update": 10450,
+    "val_mean_condition_rmse_K": 43.41996669071585,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 43.2352207902052,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 43.85882411048556,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 43.16585517145679,
+      "replica_id": 2
+     }
+    ]
+   },
+   "loop_at_last": {
+    "best_val_metric": 43.41996669071585,
+    "early_stop_bad_evals": 15,
+    "early_stop_ref_metric": 43.41996669071585,
+    "epoch": 680,
+    "lr": 1e-05,
+    "lr_reduced": false,
+    "mask_epoch": 679,
+    "seen_mean_condition_rmse_K": 43.28880457053278,
+    "specialist_regime": "G1-eq",
+    "specialist_val_mean_condition_rmse_K": 45.79889835370566,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 45.682869349779175,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 45.98037220691534,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 45.73345350442248,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 15.40239035486169,
+    "update": 64600,
+    "val_mean_condition_rmse_K": 45.037960596103034,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 44.98890812840881,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 45.184160912150425,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 44.94081274774988,
+      "replica_id": 2
+     }
+    ]
+   },
+   "n_evals": 68,
+   "problems": [],
+   "regime": "G1-eq",
+   "run_id": "NI-unet-on-G1eq-s1",
+   "seed": 1,
+   "specialist_val_at_best": 45.2456209660727,
+   "state": "plateau",
+   "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+   "summary_status": "stopped_early_plateau",
+   "training_outcome": "plateau_by_operational_early_stop_rule",
+   "valid": true
+  },
+  "NI-unet-on-G1eq-s2": {
+   "best": {
+    "epoch": 250,
+    "file_sha256": "e8ae89149ae09ebf9cf6584ce6bad36ee94582e4ce6769bd9c80acf6ad35e4cf",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-unet-on-G1eq-s2/checkpoints/best.pt",
+    "status": "running",
+    "weights_sha256": "59045d40513ca122020156e7b2fede6693ae5001f205802947a6964798e8be39"
+   },
+   "best_val_epoch": 250,
+   "best_val_metric": 40.149059241897945,
+   "budget_exhausted": false,
+   "clip_events": 620,
+   "declared_converged": null,
+   "epochs_completed": 760,
+   "eval_history_epochs": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    170,
+    180,
+    190,
+    200,
+    210,
+    220,
+    230,
+    240,
+    250,
+    260,
+    270,
+    280,
+    290,
+    300,
+    310,
+    320,
+    330,
+    340,
+    350,
+    360,
+    370,
+    380,
+    390,
+    400,
+    410,
+    420,
+    430,
+    440,
+    450,
+    460,
+    470,
+    480,
+    490,
+    500,
+    510,
+    520,
+    530,
+    540,
+    550,
+    560,
+    570,
+    580,
+    590,
+    600,
+    610,
+    620,
+    630,
+    640,
+    650,
+    660,
+    670,
+    680,
+    690,
+    700,
+    710,
+    720,
+    730,
+    740,
+    750,
+    760
+   ],
+   "family": "sparse_unet",
+   "init_state_dict_sha256": "f8d2ed895beabd117d709ff89743a46512911094a2da17ecf2501cc627ff086f",
+   "last": {
+    "epoch": 760,
+    "file_sha256": "1456a636e9c1ae159e58fe03b8c1873ac59abc09710ca84f2af7ee7a9dac1520",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-unet-on-G1eq-s2/checkpoints/last.pt",
+    "status": "stopped_early_plateau",
+    "weights_sha256": "9ac916d176c3a1ec37bb0d0a7a93aab2abeb2c8a7f1ded9af133c1336ae85e67"
+   },
+   "last_same_as_best": false,
+   "ledger": {
+    "actions": [
+     "fresh",
+     "resume",
+     "resume"
+    ],
+    "attempts": 3,
+    "extension": false,
+    "partitions": [
+     "mit_preemptable"
+    ],
+    "signals": 2
+   },
+   "loop_at_best": {
+    "best_val_metric": 40.149059241897945,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 40.149059241897945,
+    "epoch": 250,
+    "lr": 0.0005,
+    "lr_reduced": false,
+    "mask_epoch": 249,
+    "seen_mean_condition_rmse_K": 41.8339914014408,
+    "specialist_regime": "G1-eq",
+    "specialist_val_mean_condition_rmse_K": 41.417644843207874,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 41.34422054615159,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 41.3698804553624,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 41.53883352810961,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 21.19829027834491,
+    "update": 23750,
+    "val_mean_condition_rmse_K": 40.149059241897945,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 40.07946498403623,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 40.05810711418775,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 40.30960562746985,
+      "replica_id": 2
+     }
+    ]
+   },
+   "loop_at_last": {
+    "best_val_metric": 40.149059241897945,
+    "early_stop_bad_evals": 15,
+    "early_stop_ref_metric": 40.149059241897945,
+    "epoch": 760,
+    "lr": 1e-05,
+    "lr_reduced": false,
+    "mask_epoch": 759,
+    "seen_mean_condition_rmse_K": 43.88187750766748,
+    "specialist_regime": "G1-eq",
+    "specialist_val_mean_condition_rmse_K": 42.57444835130077,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 42.64825657883278,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 42.47555893602203,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 42.59952953904749,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 13.665594400209576,
+    "update": 72200,
+    "val_mean_condition_rmse_K": 41.46894729423081,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 41.64110174337677,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 41.313835422977206,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 41.45190471633844,
+      "replica_id": 2
+     }
+    ]
+   },
+   "n_evals": 76,
+   "problems": [],
+   "regime": "G1-eq",
+   "run_id": "NI-unet-on-G1eq-s2",
+   "seed": 2,
+   "specialist_val_at_best": 41.417644843207874,
+   "state": "plateau",
+   "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+   "summary_status": "stopped_early_plateau",
+   "training_outcome": "plateau_by_operational_early_stop_rule",
+   "valid": true
+  },
+  "NI-unet-on-N1-s0": {
+   "best": {
+    "epoch": 140,
+    "file_sha256": "5b679684f70ca198220e5cce217aced178811c1dc0ca21cca819f5ae94efca9b",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-unet-on-N1-s0/checkpoints/best.pt",
+    "status": "running",
+    "weights_sha256": "8e9362abae7026e5e2ff7fcaa9e4ee3ad5337dcb8463f3b17e92ab20a87e51f6"
+   },
+   "best_val_epoch": 140,
+   "best_val_metric": 39.60001282296739,
+   "budget_exhausted": false,
+   "clip_events": 631,
+   "declared_converged": null,
+   "epochs_completed": 710,
+   "eval_history_epochs": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    170,
+    180,
+    190,
+    200,
+    210,
+    220,
+    230,
+    240,
+    250,
+    260,
+    270,
+    280,
+    290,
+    300,
+    310,
+    320,
+    330,
+    340,
+    350,
+    360,
+    370,
+    380,
+    390,
+    400,
+    410,
+    420,
+    430,
+    440,
+    450,
+    460,
+    470,
+    480,
+    490,
+    500,
+    510,
+    520,
+    530,
+    540,
+    550,
+    560,
+    570,
+    580,
+    590,
+    600,
+    610,
+    620,
+    630,
+    640,
+    650,
+    660,
+    670,
+    680,
+    690,
+    700,
+    710
+   ],
+   "family": "sparse_unet",
+   "init_state_dict_sha256": "18c51863f8cbcb94afc7184afab61c631beb679e0f26e01074551352a5a91765",
+   "last": {
+    "epoch": 710,
+    "file_sha256": "8d03ccb8c090e927e4d37e8e3696826f7129d66109bf3477d7f42cb4768f9ba7",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-unet-on-N1-s0/checkpoints/last.pt",
+    "status": "stopped_early_plateau",
+    "weights_sha256": "91d08f3861910742a927f701ba0d79084d052f6bed2a013e980ba0d21dc7d48b"
+   },
+   "last_same_as_best": false,
+   "ledger": {
+    "actions": [
+     "fresh",
+     "resume",
+     "resume",
+     "resume"
+    ],
+    "attempts": 4,
+    "extension": false,
+    "partitions": [
+     "mit_preemptable"
+    ],
+    "signals": 3
+   },
+   "loop_at_best": {
+    "best_val_metric": 39.60001282296739,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 39.60001282296739,
+    "epoch": 140,
+    "lr": 0.001,
+    "lr_reduced": false,
+    "mask_epoch": 139,
+    "seen_mean_condition_rmse_K": 42.99609722331095,
+    "specialist_regime": "N1",
+    "specialist_val_mean_condition_rmse_K": 39.73643863501192,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 39.43280103852149,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 40.22735719891326,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 39.549157667601015,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 31.94828058273631,
+    "update": 13300,
+    "val_mean_condition_rmse_K": 39.60001282296739,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 39.35363550271046,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 39.96521542187852,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 39.48118754431321,
+      "replica_id": 2
+     }
+    ]
+   },
+   "loop_at_last": {
+    "best_val_metric": 39.60001282296739,
+    "early_stop_bad_evals": 15,
+    "early_stop_ref_metric": 39.60001282296739,
+    "epoch": 710,
+    "lr": 1e-05,
+    "lr_reduced": false,
+    "mask_epoch": 709,
+    "seen_mean_condition_rmse_K": 42.422862370131625,
+    "specialist_regime": "N1",
+    "specialist_val_mean_condition_rmse_K": 41.077238965120394,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 40.7034356578981,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 41.39285788123885,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 41.135423356224244,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 13.878092201496589,
+    "update": 67450,
+    "val_mean_condition_rmse_K": 41.07350500855832,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 40.859265012947,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 41.192330155947054,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 41.16891985678092,
+      "replica_id": 2
+     }
+    ]
+   },
+   "n_evals": 71,
+   "problems": [],
+   "regime": "N1",
+   "run_id": "NI-unet-on-N1-s0",
+   "seed": 0,
+   "specialist_val_at_best": 39.73643863501192,
+   "state": "plateau",
+   "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+   "summary_status": "stopped_early_plateau",
+   "training_outcome": "plateau_by_operational_early_stop_rule",
+   "valid": true
+  },
+  "NI-unet-on-N1-s1": {
+   "best": {
+    "epoch": 70,
+    "file_sha256": "a41f6327921b9a24e02ed5a4401a3e45ea4ef761cb45f7fad2cde7c73be0f463",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-unet-on-N1-s1/checkpoints/best.pt",
+    "status": "running",
+    "weights_sha256": "a37704c02bfffcffc31e7f4e3585ed233799674d6f0739c565dc81fb116f1b28"
+   },
+   "best_val_epoch": 70,
+   "best_val_metric": 42.86801414966495,
+   "budget_exhausted": false,
+   "clip_events": 641,
+   "declared_converged": null,
+   "epochs_completed": 640,
+   "eval_history_epochs": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    170,
+    180,
+    190,
+    200,
+    210,
+    220,
+    230,
+    240,
+    250,
+    260,
+    270,
+    280,
+    290,
+    300,
+    310,
+    320,
+    330,
+    340,
+    350,
+    360,
+    370,
+    380,
+    390,
+    400,
+    410,
+    420,
+    430,
+    440,
+    450,
+    460,
+    470,
+    480,
+    490,
+    500,
+    510,
+    520,
+    530,
+    540,
+    550,
+    560,
+    570,
+    580,
+    590,
+    600,
+    610,
+    620,
+    630,
+    640
+   ],
+   "family": "sparse_unet",
+   "init_state_dict_sha256": "14f3dc567b0e8daa873e2ffe8d2e2a7636a87ae44c91594fd13513cd55151506",
+   "last": {
+    "epoch": 640,
+    "file_sha256": "0025100064ddc16f99e4ff4dc886994d230b2cc6b7c841e4934d49670563087b",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-unet-on-N1-s1/checkpoints/last.pt",
+    "status": "stopped_early_plateau",
+    "weights_sha256": "b73fb43ba7b1f0e9998fb4eb3d40bfdc9e6ba6954d7a55996f685b7b5f7b821c"
+   },
+   "last_same_as_best": false,
+   "ledger": {
+    "actions": [
+     "fresh"
+    ],
+    "attempts": 1,
+    "extension": false,
+    "partitions": [
+     "mit_preemptable"
+    ],
+    "signals": 0
+   },
+   "loop_at_best": {
+    "best_val_metric": 42.86801414966495,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 42.86801414966495,
+    "epoch": 70,
+    "lr": 0.001,
+    "lr_reduced": false,
+    "mask_epoch": 69,
+    "seen_mean_condition_rmse_K": 47.48496186328021,
+    "specialist_regime": "N1",
+    "specialist_val_mean_condition_rmse_K": 42.98546943776554,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 42.75597129496413,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 43.465173970270534,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 42.73526304806194,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 41.91244183877653,
+    "update": 6650,
+    "val_mean_condition_rmse_K": 42.86801414966495,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 42.67529770042344,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 43.28200194210515,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 42.64674280646624,
+      "replica_id": 2
+     }
+    ]
+   },
+   "loop_at_last": {
+    "best_val_metric": 42.86801414966495,
+    "early_stop_bad_evals": 15,
+    "early_stop_ref_metric": 42.86801414966495,
+    "epoch": 640,
+    "lr": 1e-05,
+    "lr_reduced": false,
+    "mask_epoch": 639,
+    "seen_mean_condition_rmse_K": 41.40361954470077,
+    "specialist_regime": "N1",
+    "specialist_val_mean_condition_rmse_K": 44.90358180616868,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 44.79728949072912,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 45.20806156227304,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 44.705394365503885,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 15.51154826833926,
+    "update": 60800,
+    "val_mean_condition_rmse_K": 44.91103405178031,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 44.91276260230978,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 44.996086844574876,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 44.82425270845627,
+      "replica_id": 2
+     }
+    ]
+   },
+   "n_evals": 64,
+   "problems": [],
+   "regime": "N1",
+   "run_id": "NI-unet-on-N1-s1",
+   "seed": 1,
+   "specialist_val_at_best": 42.98546943776554,
+   "state": "plateau",
+   "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+   "summary_status": "stopped_early_plateau",
+   "training_outcome": "plateau_by_operational_early_stop_rule",
+   "valid": true
+  },
+  "NI-unet-on-N1-s2": {
+   "best": {
+    "epoch": 180,
+    "file_sha256": "c6d1987c8eed9541be3c61db2ef8c6f7395a1f844c95fde17dd8b1c44a08666c",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-unet-on-N1-s2/checkpoints/best.pt",
+    "status": "running",
+    "weights_sha256": "b55f96d8cee8f0bf8c65ba3c738bfa3b2586f8466b92042273c6c0f6c0792944"
+   },
+   "best_val_epoch": 180,
+   "best_val_metric": 39.30305665528886,
+   "budget_exhausted": false,
+   "clip_events": 621,
+   "declared_converged": null,
+   "epochs_completed": 690,
+   "eval_history_epochs": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    170,
+    180,
+    190,
+    200,
+    210,
+    220,
+    230,
+    240,
+    250,
+    260,
+    270,
+    280,
+    290,
+    300,
+    310,
+    320,
+    330,
+    340,
+    350,
+    360,
+    370,
+    380,
+    390,
+    400,
+    410,
+    420,
+    430,
+    440,
+    450,
+    460,
+    470,
+    480,
+    490,
+    500,
+    510,
+    520,
+    530,
+    540,
+    550,
+    560,
+    570,
+    580,
+    590,
+    600,
+    610,
+    620,
+    630,
+    640,
+    650,
+    660,
+    670,
+    680,
+    690
+   ],
+   "family": "sparse_unet",
+   "init_state_dict_sha256": "f8d2ed895beabd117d709ff89743a46512911094a2da17ecf2501cc627ff086f",
+   "last": {
+    "epoch": 690,
+    "file_sha256": "07b2877c07d28b5746f4fc329ca3653797fd020eb561d3d5d21eb1b403d44f10",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-unet-on-N1-s2/checkpoints/last.pt",
+    "status": "stopped_early_plateau",
+    "weights_sha256": "cc6b851e966293058a2741f81098dd62018e1f7a28817598eb860c599275844b"
+   },
+   "last_same_as_best": false,
+   "ledger": {
+    "actions": [
+     "fresh",
+     "resume",
+     "resume"
+    ],
+    "attempts": 3,
+    "extension": false,
+    "partitions": [
+     "mit_preemptable"
+    ],
+    "signals": 2
+   },
+   "loop_at_best": {
+    "best_val_metric": 39.30305665528886,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 39.30305665528886,
+    "epoch": 180,
+    "lr": 0.0005,
+    "lr_reduced": false,
+    "mask_epoch": 179,
+    "seen_mean_condition_rmse_K": 41.360094995838566,
+    "specialist_regime": "N1",
+    "specialist_val_mean_condition_rmse_K": 39.343264779386764,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 38.943470952744406,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 39.52492497425152,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 39.561398411164355,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 25.511783401732536,
+    "update": 17100,
+    "val_mean_condition_rmse_K": 39.30305665528886,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 38.99114518797703,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 39.348908739984594,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 39.56911603790495,
+      "replica_id": 2
+     }
+    ]
+   },
+   "loop_at_last": {
+    "best_val_metric": 39.30305665528886,
+    "early_stop_bad_evals": 15,
+    "early_stop_ref_metric": 39.30305665528886,
+    "epoch": 690,
+    "lr": 1e-05,
+    "lr_reduced": false,
+    "mask_epoch": 689,
+    "seen_mean_condition_rmse_K": 42.436406115863406,
+    "specialist_regime": "N1",
+    "specialist_val_mean_condition_rmse_K": 40.168800096951294,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 39.91272437447801,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 40.26485783944726,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 40.32881807692862,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 14.605657249482457,
+    "update": 65550,
+    "val_mean_condition_rmse_K": 40.16643256275003,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 39.936509744755874,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 40.21899504171868,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 40.343792901775544,
+      "replica_id": 2
+     }
+    ]
+   },
+   "n_evals": 69,
+   "problems": [],
+   "regime": "N1",
+   "run_id": "NI-unet-on-N1-s2",
+   "seed": 2,
+   "specialist_val_at_best": 39.343264779386764,
+   "state": "plateau",
+   "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+   "summary_status": "stopped_early_plateau",
+   "training_outcome": "plateau_by_operational_early_stop_rule",
+   "valid": true
+  },
+  "NI-unet-on-N1G1-s0": {
+   "best": {
+    "epoch": 180,
+    "file_sha256": "cda9251b2eebf554af6658e94322f671cc28a45a853d484e632fff4765e26520",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-unet-on-N1G1-s0/checkpoints/best.pt",
+    "status": "running",
+    "weights_sha256": "b5bf35e0f3b7e64943e45ef0e930f44e4a5f74b37f20b0ecedd7460c7d1858f6"
+   },
+   "best_val_epoch": 180,
+   "best_val_metric": 38.909371460648885,
+   "budget_exhausted": false,
+   "clip_events": 666,
+   "declared_converged": null,
+   "epochs_completed": 690,
+   "eval_history_epochs": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    170,
+    180,
+    190,
+    200,
+    210,
+    220,
+    230,
+    240,
+    250,
+    260,
+    270,
+    280,
+    290,
+    300,
+    310,
+    320,
+    330,
+    340,
+    350,
+    360,
+    370,
+    380,
+    390,
+    400,
+    410,
+    420,
+    430,
+    440,
+    450,
+    460,
+    470,
+    480,
+    490,
+    500,
+    510,
+    520,
+    530,
+    540,
+    550,
+    560,
+    570,
+    580,
+    590,
+    600,
+    610,
+    620,
+    630,
+    640,
+    650,
+    660,
+    670,
+    680,
+    690
+   ],
+   "family": "sparse_unet",
+   "init_state_dict_sha256": "18c51863f8cbcb94afc7184afab61c631beb679e0f26e01074551352a5a91765",
+   "last": {
+    "epoch": 690,
+    "file_sha256": "c463eccbbd8b90d6f0ee296b9622a671c00857912890d1a57a32bcf112414029",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-unet-on-N1G1-s0/checkpoints/last.pt",
+    "status": "stopped_early_plateau",
+    "weights_sha256": "a554e44e7751ad62c41244855276793ad3d6176aa0ffb9810ef2a24eaaa9b315"
+   },
+   "last_same_as_best": false,
+   "ledger": {
+    "actions": [
+     "fresh",
+     "resume"
+    ],
+    "attempts": 2,
+    "extension": false,
+    "partitions": [
+     "mit_preemptable"
+    ],
+    "signals": 1
+   },
+   "loop_at_best": {
+    "best_val_metric": 38.909371460648885,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 38.909371460648885,
+    "epoch": 180,
+    "lr": 0.0005,
+    "lr_reduced": false,
+    "mask_epoch": 179,
+    "seen_mean_condition_rmse_K": 43.88194689286975,
+    "specialist_regime": "N1G1",
+    "specialist_val_mean_condition_rmse_K": 41.450542415208275,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 41.01862291881437,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 41.90378629967492,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 41.429218027135526,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 27.498616663383167,
+    "update": 17100,
+    "val_mean_condition_rmse_K": 38.909371460648885,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 38.684905174551844,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 39.262902887132064,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 38.780306320262746,
+      "replica_id": 2
+     }
+    ]
+   },
+   "loop_at_last": {
+    "best_val_metric": 38.909371460648885,
+    "early_stop_bad_evals": 15,
+    "early_stop_ref_metric": 38.909371460648885,
+    "epoch": 690,
+    "lr": 1e-05,
+    "lr_reduced": false,
+    "mask_epoch": 689,
+    "seen_mean_condition_rmse_K": 45.161472245310826,
+    "specialist_regime": "N1G1",
+    "specialist_val_mean_condition_rmse_K": 45.3038657512518,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 45.08645442536564,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 45.6227044085698,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 45.202438419819934,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 16.272568054319898,
+    "update": 65550,
+    "val_mean_condition_rmse_K": 43.53988717870882,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 43.4314827589234,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 43.786193476242765,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 43.40198530096027,
+      "replica_id": 2
+     }
+    ]
+   },
+   "n_evals": 69,
+   "problems": [],
+   "regime": "N1G1",
+   "run_id": "NI-unet-on-N1G1-s0",
+   "seed": 0,
+   "specialist_val_at_best": 41.450542415208275,
+   "state": "plateau",
+   "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+   "summary_status": "stopped_early_plateau",
+   "training_outcome": "plateau_by_operational_early_stop_rule",
+   "valid": true
+  },
+  "NI-unet-on-N1G1-s1": {
+   "best": {
+    "epoch": 200,
+    "file_sha256": "de439536741ddac18890d3362963b14ef5bf006f6c7d6fe8038aaccc729f4a2e",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-unet-on-N1G1-s1/checkpoints/best.pt",
+    "status": "running",
+    "weights_sha256": "e47dac89e37d596752eb39c2c00057ebbf5a8079a78d9478f31a64a55f707bb5"
+   },
+   "best_val_epoch": 200,
+   "best_val_metric": 44.39192193881821,
+   "budget_exhausted": false,
+   "clip_events": 633,
+   "declared_converged": null,
+   "epochs_completed": 710,
+   "eval_history_epochs": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    170,
+    180,
+    190,
+    200,
+    210,
+    220,
+    230,
+    240,
+    250,
+    260,
+    270,
+    280,
+    290,
+    300,
+    310,
+    320,
+    330,
+    340,
+    350,
+    360,
+    370,
+    380,
+    390,
+    400,
+    410,
+    420,
+    430,
+    440,
+    450,
+    460,
+    470,
+    480,
+    490,
+    500,
+    510,
+    520,
+    530,
+    540,
+    550,
+    560,
+    570,
+    580,
+    590,
+    600,
+    610,
+    620,
+    630,
+    640,
+    650,
+    660,
+    670,
+    680,
+    690,
+    700,
+    710
+   ],
+   "family": "sparse_unet",
+   "init_state_dict_sha256": "14f3dc567b0e8daa873e2ffe8d2e2a7636a87ae44c91594fd13513cd55151506",
+   "last": {
+    "epoch": 710,
+    "file_sha256": "745c559011289cbcf7e497177a0eb0c050028257f921a3759c95ebf7a0d41061",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-unet-on-N1G1-s1/checkpoints/last.pt",
+    "status": "stopped_early_plateau",
+    "weights_sha256": "9c1980b0e660f51390b138bb3258f4f2f483c5c70b9992a83caa92635958382d"
+   },
+   "last_same_as_best": false,
+   "ledger": {
+    "actions": [
+     "fresh",
+     "resume",
+     "resume"
+    ],
+    "attempts": 3,
+    "extension": false,
+    "partitions": [
+     "mit_preemptable"
+    ],
+    "signals": 2
+   },
+   "loop_at_best": {
+    "best_val_metric": 44.39192193881821,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 44.39192193881821,
+    "epoch": 200,
+    "lr": 0.0005,
+    "lr_reduced": false,
+    "mask_epoch": 199,
+    "seen_mean_condition_rmse_K": 42.905199894440486,
+    "specialist_regime": "N1G1",
+    "specialist_val_mean_condition_rmse_K": 46.40225174189919,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 45.854120470753024,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 46.88278672954328,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 46.46984802540127,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 25.864904718009086,
+    "update": 19000,
+    "val_mean_condition_rmse_K": 44.39192193881821,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 44.34502997075801,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 44.49233673972433,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 44.33839910597228,
+      "replica_id": 2
+     }
+    ]
+   },
+   "loop_at_last": {
+    "best_val_metric": 44.39192193881821,
+    "early_stop_bad_evals": 15,
+    "early_stop_ref_metric": 44.39192193881821,
+    "epoch": 710,
+    "lr": 1e-05,
+    "lr_reduced": false,
+    "mask_epoch": 709,
+    "seen_mean_condition_rmse_K": 44.609187902210735,
+    "specialist_regime": "N1G1",
+    "specialist_val_mean_condition_rmse_K": 48.28490436750505,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 48.03280281748223,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 48.62098659800083,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 48.20092368703208,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 16.229428590152246,
+    "update": 67450,
+    "val_mean_condition_rmse_K": 46.59218080314373,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 46.64822352650979,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 46.55847836236213,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 46.56984052055926,
+      "replica_id": 2
+     }
+    ]
+   },
+   "n_evals": 71,
+   "problems": [],
+   "regime": "N1G1",
+   "run_id": "NI-unet-on-N1G1-s1",
+   "seed": 1,
+   "specialist_val_at_best": 46.40225174189919,
+   "state": "plateau",
+   "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+   "summary_status": "stopped_early_plateau",
+   "training_outcome": "plateau_by_operational_early_stop_rule",
+   "valid": true
+  },
+  "NI-unet-on-N1G1-s2": {
+   "best": {
+    "epoch": 310,
+    "file_sha256": "1ec2a8c30b6a5c698c5dc8ab7f0912341787c376b591c92fd6a8a8c4b200ef00",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-unet-on-N1G1-s2/checkpoints/best.pt",
+    "status": "running",
+    "weights_sha256": "05213b6992ef291fa0ffdb7d052e9501804650477a02030db5142a1c68d58e83"
+   },
+   "best_val_epoch": 310,
+   "best_val_metric": 41.439253910780145,
+   "budget_exhausted": false,
+   "clip_events": 675,
+   "declared_converged": null,
+   "epochs_completed": 760,
+   "eval_history_epochs": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    170,
+    180,
+    190,
+    200,
+    210,
+    220,
+    230,
+    240,
+    250,
+    260,
+    270,
+    280,
+    290,
+    300,
+    310,
+    320,
+    330,
+    340,
+    350,
+    360,
+    370,
+    380,
+    390,
+    400,
+    410,
+    420,
+    430,
+    440,
+    450,
+    460,
+    470,
+    480,
+    490,
+    500,
+    510,
+    520,
+    530,
+    540,
+    550,
+    560,
+    570,
+    580,
+    590,
+    600,
+    610,
+    620,
+    630,
+    640,
+    650,
+    660,
+    670,
+    680,
+    690,
+    700,
+    710,
+    720,
+    730,
+    740,
+    750,
+    760
+   ],
+   "family": "sparse_unet",
+   "init_state_dict_sha256": "f8d2ed895beabd117d709ff89743a46512911094a2da17ecf2501cc627ff086f",
+   "last": {
+    "epoch": 760,
+    "file_sha256": "52921cd792c677aecdb8881f6e1cb254e50c5cbe0272e80668b8b80d3eba8e64",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-unet-on-N1G1-s2/checkpoints/last.pt",
+    "status": "stopped_early_plateau",
+    "weights_sha256": "12a38b8eaff9f68bd508775105d0513484b655a5c2476a1df47c5bb0503e846f"
+   },
+   "last_same_as_best": false,
+   "ledger": {
+    "actions": [
+     "fresh",
+     "resume"
+    ],
+    "attempts": 2,
+    "extension": false,
+    "partitions": [
+     "mit_preemptable"
+    ],
+    "signals": 1
+   },
+   "loop_at_best": {
+    "best_val_metric": 41.439253910780145,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 41.439253910780145,
+    "epoch": 310,
+    "lr": 0.00025,
+    "lr_reduced": false,
+    "mask_epoch": 309,
+    "seen_mean_condition_rmse_K": 43.813590451641424,
+    "specialist_regime": "N1G1",
+    "specialist_val_mean_condition_rmse_K": 43.31550654680117,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 42.67982355862032,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 43.694275646509595,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 43.57242043527358,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 19.204267158566886,
+    "update": 29450,
+    "val_mean_condition_rmse_K": 41.439253910780145,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 41.277311530714954,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 41.44961828339279,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 41.5908319182327,
+      "replica_id": 2
+     }
+    ]
+   },
+   "loop_at_last": {
+    "best_val_metric": 41.439253910780145,
+    "early_stop_bad_evals": 15,
+    "early_stop_ref_metric": 41.439253910780145,
+    "epoch": 760,
+    "lr": 1e-05,
+    "lr_reduced": false,
+    "mask_epoch": 759,
+    "seen_mean_condition_rmse_K": 46.08310571906323,
+    "specialist_regime": "N1G1",
+    "specialist_val_mean_condition_rmse_K": 44.39587803802835,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 44.135038230039754,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 44.64889227055341,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 44.4037036134919,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 15.286644333745329,
+    "update": 72200,
+    "val_mean_condition_rmse_K": 42.602661289471655,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 42.52531014447468,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 42.64946712208181,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 42.63320660185848,
+      "replica_id": 2
+     }
+    ]
+   },
+   "n_evals": 76,
+   "problems": [],
+   "regime": "N1G1",
+   "run_id": "NI-unet-on-N1G1-s2",
+   "seed": 2,
+   "specialist_val_at_best": 43.31550654680117,
+   "state": "plateau",
+   "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+   "summary_status": "stopped_early_plateau",
+   "training_outcome": "plateau_by_operational_early_stop_rule",
+   "valid": true
+  },
+  "NI-unet-on-N2-s0": {
+   "best": {
+    "epoch": 140,
+    "file_sha256": "8fc19a0da271e843cf4d8d282d2c0f0dbea0bed13469b62d1b7d025ba1acf65e",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-unet-on-N2-s0/checkpoints/best.pt",
+    "status": "running",
+    "weights_sha256": "e649be016a2ba6bbc19194a2c7e18f699ae5b8aa1411bb134208c64ea0ed1b50"
+   },
+   "best_val_epoch": 140,
+   "best_val_metric": 42.2194087156376,
+   "budget_exhausted": false,
+   "clip_events": 627,
+   "declared_converged": null,
+   "epochs_completed": 710,
+   "eval_history_epochs": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    170,
+    180,
+    190,
+    200,
+    210,
+    220,
+    230,
+    240,
+    250,
+    260,
+    270,
+    280,
+    290,
+    300,
+    310,
+    320,
+    330,
+    340,
+    350,
+    360,
+    370,
+    380,
+    390,
+    400,
+    410,
+    420,
+    430,
+    440,
+    450,
+    460,
+    470,
+    480,
+    490,
+    500,
+    510,
+    520,
+    530,
+    540,
+    550,
+    560,
+    570,
+    580,
+    590,
+    600,
+    610,
+    620,
+    630,
+    640,
+    650,
+    660,
+    670,
+    680,
+    690,
+    700,
+    710
+   ],
+   "family": "sparse_unet",
+   "init_state_dict_sha256": "18c51863f8cbcb94afc7184afab61c631beb679e0f26e01074551352a5a91765",
+   "last": {
+    "epoch": 710,
+    "file_sha256": "aba2e54056fcc77e9c7da3f4e478036b76dafb65c3127a40b543c94211dce083",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-unet-on-N2-s0/checkpoints/last.pt",
+    "status": "stopped_early_plateau",
+    "weights_sha256": "7f6ba3738dfda897202a29d4d7d7212bb29fb22b656ab0c117aeb54750f91fe4"
+   },
+   "last_same_as_best": false,
+   "ledger": {
+    "actions": [
+     "fresh"
+    ],
+    "attempts": 1,
+    "extension": false,
+    "partitions": [
+     "mit_preemptable"
+    ],
+    "signals": 0
+   },
+   "loop_at_best": {
+    "best_val_metric": 42.2194087156376,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 42.2194087156376,
+    "epoch": 140,
+    "lr": 0.001,
+    "lr_reduced": false,
+    "mask_epoch": 139,
+    "seen_mean_condition_rmse_K": 43.767200429803076,
+    "specialist_regime": "N2",
+    "specialist_val_mean_condition_rmse_K": 42.56711587094863,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 42.17544501097097,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 43.17409042974279,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 42.351812172132135,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 32.42779958355329,
+    "update": 13300,
+    "val_mean_condition_rmse_K": 42.2194087156376,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 41.98232891246297,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 42.4558894759441,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 42.22000775850574,
+      "replica_id": 2
+     }
+    ]
+   },
+   "loop_at_last": {
+    "best_val_metric": 42.2194087156376,
+    "early_stop_bad_evals": 15,
+    "early_stop_ref_metric": 42.2194087156376,
+    "epoch": 710,
+    "lr": 1e-05,
+    "lr_reduced": false,
+    "mask_epoch": 709,
+    "seen_mean_condition_rmse_K": 45.28469069809235,
+    "specialist_regime": "N2",
+    "specialist_val_mean_condition_rmse_K": 45.532190077388,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 45.367597234768056,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 45.63688854925825,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 45.59208444813769,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 14.84288614999721,
+    "update": 67450,
+    "val_mean_condition_rmse_K": 45.35124086866522,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 45.185774974239166,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 45.3790665994047,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 45.488881032351806,
+      "replica_id": 2
+     }
+    ]
+   },
+   "n_evals": 71,
+   "problems": [],
+   "regime": "N2",
+   "run_id": "NI-unet-on-N2-s0",
+   "seed": 0,
+   "specialist_val_at_best": 42.56711587094863,
+   "state": "plateau",
+   "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+   "summary_status": "stopped_early_plateau",
+   "training_outcome": "plateau_by_operational_early_stop_rule",
+   "valid": true
+  },
+  "NI-unet-on-N2-s1": {
+   "best": {
+    "epoch": 100,
+    "file_sha256": "fe016545d284af8e9a3e36dc29bb92c0ca78c0ef74089d11cc1d497660cf7081",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-unet-on-N2-s1/checkpoints/best.pt",
+    "status": "running",
+    "weights_sha256": "b44166e5866bb1ef42a424a167cb827229cfd97b23d606f87fdf4544a612c8a3"
+   },
+   "best_val_epoch": 100,
+   "best_val_metric": 44.56901324189774,
+   "budget_exhausted": false,
+   "clip_events": 639,
+   "declared_converged": null,
+   "epochs_completed": 670,
+   "eval_history_epochs": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    170,
+    180,
+    190,
+    200,
+    210,
+    220,
+    230,
+    240,
+    250,
+    260,
+    270,
+    280,
+    290,
+    300,
+    310,
+    320,
+    330,
+    340,
+    350,
+    360,
+    370,
+    380,
+    390,
+    400,
+    410,
+    420,
+    430,
+    440,
+    450,
+    460,
+    470,
+    480,
+    490,
+    500,
+    510,
+    520,
+    530,
+    540,
+    550,
+    560,
+    570,
+    580,
+    590,
+    600,
+    610,
+    620,
+    630,
+    640,
+    650,
+    660,
+    670
+   ],
+   "family": "sparse_unet",
+   "init_state_dict_sha256": "14f3dc567b0e8daa873e2ffe8d2e2a7636a87ae44c91594fd13513cd55151506",
+   "last": {
+    "epoch": 670,
+    "file_sha256": "16d2592a8255b83829a0b7a0d883329ecc51428e7dcd2b671a21faba9aace8cb",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-unet-on-N2-s1/checkpoints/last.pt",
+    "status": "stopped_early_plateau",
+    "weights_sha256": "e755e72957eb0f07a5be6088768ab575b2fd7b2e91f60840f607245b3dc84eec"
+   },
+   "last_same_as_best": false,
+   "ledger": {
+    "actions": [
+     "fresh",
+     "resume",
+     "resume",
+     "resume"
+    ],
+    "attempts": 4,
+    "extension": false,
+    "partitions": [
+     "mit_preemptable"
+    ],
+    "signals": 3
+   },
+   "loop_at_best": {
+    "best_val_metric": 44.56901324189774,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 44.56901324189774,
+    "epoch": 100,
+    "lr": 0.001,
+    "lr_reduced": false,
+    "mask_epoch": 99,
+    "seen_mean_condition_rmse_K": 47.07912572842328,
+    "specialist_regime": "N2",
+    "specialist_val_mean_condition_rmse_K": 45.147369631774204,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 45.02911699329099,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 45.52797571342179,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 44.88501618860983,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 38.598660514844156,
+    "update": 9500,
+    "val_mean_condition_rmse_K": 44.56901324189774,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 44.43655164502936,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 44.74232616730194,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 44.528161913361906,
+      "replica_id": 2
+     }
+    ]
+   },
+   "loop_at_last": {
+    "best_val_metric": 44.56901324189774,
+    "early_stop_bad_evals": 15,
+    "early_stop_ref_metric": 44.56901324189774,
+    "epoch": 670,
+    "lr": 1e-05,
+    "lr_reduced": false,
+    "mask_epoch": 669,
+    "seen_mean_condition_rmse_K": 44.964682880632424,
+    "specialist_regime": "N2",
+    "specialist_val_mean_condition_rmse_K": 49.78761737195751,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 49.65807714482734,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 50.02300723717076,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 49.68176773387443,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 16.1061050450218,
+    "update": 63650,
+    "val_mean_condition_rmse_K": 49.64460920514759,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 49.580860943507865,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 49.740658300530136,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 49.61230837140477,
+      "replica_id": 2
+     }
+    ]
+   },
+   "n_evals": 67,
+   "problems": [],
+   "regime": "N2",
+   "run_id": "NI-unet-on-N2-s1",
+   "seed": 1,
+   "specialist_val_at_best": 45.147369631774204,
+   "state": "plateau",
+   "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+   "summary_status": "stopped_early_plateau",
+   "training_outcome": "plateau_by_operational_early_stop_rule",
+   "valid": true
+  },
+  "NI-unet-on-N2-s2": {
+   "best": {
+    "epoch": 200,
+    "file_sha256": "37716be1d12dc26c0899ca2f3a4e2e4ed81f79b95cf069b09111dc6de980ee2c",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-unet-on-N2-s2/checkpoints/best.pt",
+    "status": "running",
+    "weights_sha256": "5b4d91e52e70ae8de23409964bab7227e76f05d5d547b11ec1006ae55bd6b67b"
+   },
+   "best_val_epoch": 200,
+   "best_val_metric": 43.22608199309696,
+   "budget_exhausted": false,
+   "clip_events": 613,
+   "declared_converged": null,
+   "epochs_completed": 710,
+   "eval_history_epochs": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    170,
+    180,
+    190,
+    200,
+    210,
+    220,
+    230,
+    240,
+    250,
+    260,
+    270,
+    280,
+    290,
+    300,
+    310,
+    320,
+    330,
+    340,
+    350,
+    360,
+    370,
+    380,
+    390,
+    400,
+    410,
+    420,
+    430,
+    440,
+    450,
+    460,
+    470,
+    480,
+    490,
+    500,
+    510,
+    520,
+    530,
+    540,
+    550,
+    560,
+    570,
+    580,
+    590,
+    600,
+    610,
+    620,
+    630,
+    640,
+    650,
+    660,
+    670,
+    680,
+    690,
+    700,
+    710
+   ],
+   "family": "sparse_unet",
+   "init_state_dict_sha256": "f8d2ed895beabd117d709ff89743a46512911094a2da17ecf2501cc627ff086f",
+   "last": {
+    "epoch": 710,
+    "file_sha256": "d7dbe1e7823e33901de3293bbb559631891f704dd7f7f3a2a23662d9d6f3391e",
+    "path": "/home/bontempi/official_thesis_nonideal_spec_runs/NI-unet-on-N2-s2/checkpoints/last.pt",
+    "status": "stopped_early_plateau",
+    "weights_sha256": "7410001b5ea531d14e04e724a450f8cc41fdc02b6e71a9ae6f4abcf075acee85"
+   },
+   "last_same_as_best": false,
+   "ledger": {
+    "actions": [
+     "fresh",
+     "resume",
+     "resume"
+    ],
+    "attempts": 3,
+    "extension": false,
+    "partitions": [
+     "mit_preemptable"
+    ],
+    "signals": 2
+   },
+   "loop_at_best": {
+    "best_val_metric": 43.22608199309696,
+    "early_stop_bad_evals": 0,
+    "early_stop_ref_metric": 43.22608199309696,
+    "epoch": 200,
+    "lr": 0.0005,
+    "lr_reduced": false,
+    "mask_epoch": 199,
+    "seen_mean_condition_rmse_K": 43.52351811588558,
+    "specialist_regime": "N2",
+    "specialist_val_mean_condition_rmse_K": 43.42931511726374,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 43.035959687607864,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 43.967732911032336,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 43.28425275315101,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 25.682460528215977,
+    "update": 19000,
+    "val_mean_condition_rmse_K": 43.22608199309696,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 42.94907142460544,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 43.34017828549067,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 43.38899626919477,
+      "replica_id": 2
+     }
+    ]
+   },
+   "loop_at_last": {
+    "best_val_metric": 43.22608199309696,
+    "early_stop_bad_evals": 15,
+    "early_stop_ref_metric": 43.22608199309696,
+    "epoch": 710,
+    "lr": 1e-05,
+    "lr_reduced": false,
+    "mask_epoch": 709,
+    "seen_mean_condition_rmse_K": 45.53342476783942,
+    "specialist_regime": "N2",
+    "specialist_val_mean_condition_rmse_K": 44.14320364444463,
+    "specialist_val_per_replica": [
+     {
+      "mean_condition_rmse_K": 43.857036067986236,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 44.41419310317057,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 44.1583817621771,
+      "replica_id": 2
+     }
+    ],
+    "specialist_val_used_for_selection": false,
+    "train_mean_condition_rmse_K": 15.224136930932247,
+    "update": 67450,
+    "val_mean_condition_rmse_K": 43.978016189658376,
+    "val_per_replica": [
+     {
+      "mean_condition_rmse_K": 43.67343656598737,
+      "replica_id": 0
+     },
+     {
+      "mean_condition_rmse_K": 44.06796564378546,
+      "replica_id": 1
+     },
+     {
+      "mean_condition_rmse_K": 44.192646359202286,
+      "replica_id": 2
+     }
+    ]
+   },
+   "n_evals": 71,
+   "problems": [],
+   "regime": "N2",
+   "run_id": "NI-unet-on-N2-s2",
+   "seed": 2,
+   "specialist_val_at_best": 43.42931511726374,
+   "state": "plateau",
+   "stop_reason": "early_stop_no_rel_improvement_0.001_for_15_evals",
+   "summary_status": "stopped_early_plateau",
+   "training_outcome": "plateau_by_operational_early_stop_rule",
+   "valid": true
+  }
+ },
+ "training_git_sha": "b6fc9fefda5a1d4776c87c9285d7187c0d89fc48"
+}

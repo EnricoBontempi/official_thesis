@@ -45,7 +45,7 @@ Il Blocco II **misura** il problema; non modifica i modelli per farli funzionare
 | Ricognizione, roadmap, nota di ricognizione, note di sospensione A/B/C | Eseguite con l'incarico del 24 novembre 2026 |
 | Blocco I (step I.1–I.5) | Eseguito il 24 novembre 2026 con incarico separato: ricognizione documentale completata nei limiti registrati, specifica scritta, operatori e test CPU, qualificazione G1 su TRAIN. Nessun calcolo GPU, nessun download EngineBench. STOP I: revisione di Enrico |
 | Blocco II | Eseguito il 24 novembre 2026 su 12 modelli (gate R0 12/12, 74 088 valutazioni): [docs/nonideal/02_block2_robustness.md](docs/nonideal/02_block2_robustness.md). STOP II: decisione di Enrico sul Blocco III |
-| Blocco III | Autorizzato il 24 novembre 2026 nella forma dei 30 training specialistici (voce 8 del riepilogo); nessun'altra configurazione |
+| Blocco III | Autorizzato il 24 novembre 2026 nella forma dei 30 training specialistici (voce 8 del riepilogo); nessun'altra configurazione; **eseguito**: 30/30 training validi (plateau), 60/60 valutazioni e gate, aggregazione e grafici completati il 27 novembre 2026. Sintesi verificata: [docs/nonideal/05_specialist_results.md](docs/nonideal/05_specialist_results.md); risultati: [results/nonideal/specialists/](results/nonideal/specialists/). Nessun recupero consistente su VAL, costo sul pulito positivo; pannelli spaziali appaiati con le baseline non disponibili (frame diversi, inferenza non autorizzata) |
 | TEST | Chiuso. La storia dei TEST esaminati nel Mese 1 va preservata e non va estesa |
 | Termocoppie all'uscita | Tema separato, fuori da questa roadmap |
 | `documents_thesis`, HONF, presentazioni, contatti con persone (incl. Franzelli) | Fuori perimetro |

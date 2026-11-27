@@ -1,0 +1,301 @@
+{
+ "format": "nonideal_specialist_delivery_check_v1",
+ "all_ok": true,
+ "training_git_sha": "b6fc9fefda5a1d4776c87c9285d7187c0d89fc48",
+ "post_processing_git_sha": "b1c095507b803e5fa27ad8ba8bdad2febd8d2541",
+ "runs_with_extension": [
+  "NI-glu-on-N1-s2"
+ ],
+ "attempts_per_run": {
+  "NI-glu-on-N1-s0": 1,
+  "NI-glu-on-N1-s1": 1,
+  "NI-glu-on-N1-s2": 6,
+  "NI-glu-on-N2-s0": 1,
+  "NI-glu-on-N2-s1": 1,
+  "NI-glu-on-N2-s2": 2,
+  "NI-glu-on-G1-s0": 1,
+  "NI-glu-on-G1-s1": 1,
+  "NI-glu-on-G1-s2": 3,
+  "NI-glu-on-G1eq-s0": 1,
+  "NI-glu-on-G1eq-s1": 1,
+  "NI-glu-on-G1eq-s2": 9,
+  "NI-glu-on-N1G1-s0": 1,
+  "NI-glu-on-N1G1-s1": 1,
+  "NI-glu-on-N1G1-s2": 1,
+  "NI-unet-on-N1-s0": 4,
+  "NI-unet-on-N1-s1": 1,
+  "NI-unet-on-N1-s2": 3,
+  "NI-unet-on-N2-s0": 1,
+  "NI-unet-on-N2-s1": 4,
+  "NI-unet-on-N2-s2": 3,
+  "NI-unet-on-G1-s0": 1,
+  "NI-unet-on-G1-s1": 1,
+  "NI-unet-on-G1-s2": 1,
+  "NI-unet-on-G1eq-s0": 1,
+  "NI-unet-on-G1eq-s1": 4,
+  "NI-unet-on-G1eq-s2": 3,
+  "NI-unet-on-N1G1-s0": 2,
+  "NI-unet-on-N1G1-s1": 3,
+  "NI-unet-on-N1G1-s2": 2
+ },
+ "states": {
+  "plateau": 30
+ },
+ "checks": [
+  {
+   "name": "freeze: 30 expected run ids",
+   "ok": true,
+   "detail": "30 runs"
+  },
+  {
+   "name": "freeze: n_runs/n_valid = 30, problems empty",
+   "ok": true,
+   "detail": "n_runs=30 n_valid=30 problems=[]"
+  },
+  {
+   "name": "freeze: training SHA",
+   "ok": true,
+   "detail": "b6fc9fefda5a1d4776c87c9285d7187c0d89fc48"
+  },
+  {
+   "name": "freeze: post-processing SHA",
+   "ok": true,
+   "detail": "b1c095507b803e5fa27ad8ba8bdad2febd8d2541"
+  },
+  {
+   "name": "NI-glu-on-N1-s0: valid, no problems, terminal state",
+   "ok": true,
+   "detail": "plateau"
+  },
+  {
+   "name": "NI-glu-on-N1-s1: valid, no problems, terminal state",
+   "ok": true,
+   "detail": "plateau"
+  },
+  {
+   "name": "NI-glu-on-N1-s2: valid, no problems, terminal state",
+   "ok": true,
+   "detail": "plateau"
+  },
+  {
+   "name": "NI-glu-on-N2-s0: valid, no problems, terminal state",
+   "ok": true,
+   "detail": "plateau"
+  },
+  {
+   "name": "NI-glu-on-N2-s1: valid, no problems, terminal state",
+   "ok": true,
+   "detail": "plateau"
+  },
+  {
+   "name": "NI-glu-on-N2-s2: valid, no problems, terminal state",
+   "ok": true,
+   "detail": "plateau"
+  },
+  {
+   "name": "NI-glu-on-G1-s0: valid, no problems, terminal state",
+   "ok": true,
+   "detail": "plateau"
+  },
+  {
+   "name": "NI-glu-on-G1-s1: valid, no problems, terminal state",
+   "ok": true,
+   "detail": "plateau"
+  },
+  {
+   "name": "NI-glu-on-G1-s2: valid, no problems, terminal state",
+   "ok": true,
+   "detail": "plateau"
+  },
+  {
+   "name": "NI-glu-on-G1eq-s0: valid, no problems, terminal state",
+   "ok": true,
+   "detail": "plateau"
+  },
+  {
+   "name": "NI-glu-on-G1eq-s1: valid, no problems, terminal state",
+   "ok": true,
+   "detail": "plateau"
+  },
+  {
+   "name": "NI-glu-on-G1eq-s2: valid, no problems, terminal state",
+   "ok": true,
+   "detail": "plateau"
+  },
+  {
+   "name": "NI-glu-on-N1G1-s0: valid, no problems, terminal state",
+   "ok": true,
+   "detail": "plateau"
+  },
+  {
+   "name": "NI-glu-on-N1G1-s1: valid, no problems, terminal state",
+   "ok": true,
+   "detail": "plateau"
+  },
+  {
+   "name": "NI-glu-on-N1G1-s2: valid, no problems, terminal state",
+   "ok": true,
+   "detail": "plateau"
+  },
+  {
+   "name": "NI-unet-on-N1-s0: valid, no problems, terminal state",
+   "ok": true,
+   "detail": "plateau"
+  },
+  {
+   "name": "NI-unet-on-N1-s1: valid, no problems, terminal state",
+   "ok": true,
+   "detail": "plateau"
+  },
+  {
+   "name": "NI-unet-on-N1-s2: valid, no problems, terminal state",
+   "ok": true,
+   "detail": "plateau"
+  },
+  {
+   "name": "NI-unet-on-N2-s0: valid, no problems, terminal state",
+   "ok": true,
+   "detail": "plateau"
+  },
+  {
+   "name": "NI-unet-on-N2-s1: valid, no problems, terminal state",
+   "ok": true,
+   "detail": "plateau"
+  },
+  {
+   "name": "NI-unet-on-N2-s2: valid, no problems, terminal state",
+   "ok": true,
+   "detail": "plateau"
+  },
+  {
+   "name": "NI-unet-on-G1-s0: valid, no problems, terminal state",
+   "ok": true,
+   "detail": "plateau"
+  },
+  {
+   "name": "NI-unet-on-G1-s1: valid, no problems, terminal state",
+   "ok": true,
+   "detail": "plateau"
+  },
+  {
+   "name": "NI-unet-on-G1-s2: valid, no problems, terminal state",
+   "ok": true,
+   "detail": "plateau"
+  },
+  {
+   "name": "NI-unet-on-G1eq-s0: valid, no problems, terminal state",
+   "ok": true,
+   "detail": "plateau"
+  },
+  {
+   "name": "NI-unet-on-G1eq-s1: valid, no problems, terminal state",
+   "ok": true,
+   "detail": "plateau"
+  },
+  {
+   "name": "NI-unet-on-G1eq-s2: valid, no problems, terminal state",
+   "ok": true,
+   "detail": "plateau"
+  },
+  {
+   "name": "NI-unet-on-N1G1-s0: valid, no problems, terminal state",
+   "ok": true,
+   "detail": "plateau"
+  },
+  {
+   "name": "NI-unet-on-N1G1-s1: valid, no problems, terminal state",
+   "ok": true,
+   "detail": "plateau"
+  },
+  {
+   "name": "NI-unet-on-N1G1-s2: valid, no problems, terminal state",
+   "ok": true,
+   "detail": "plateau"
+  },
+  {
+   "name": "freeze: 30 plateau, 0 budget_exhausted",
+   "ok": true,
+   "detail": "{'plateau': 30}"
+  },
+  {
+   "name": "60/60 gate.json all_pass (5/5 comparisons within 0.05 K)",
+   "ok": true,
+   "detail": "60/60, max |delta| 0.0024 K"
+  },
+  {
+   "name": "60/60 COMPLETE.json ok, 6174 rows, gate_all_pass",
+   "ok": true,
+   "detail": "60/60"
+  },
+  {
+   "name": "60/60 provenance = freeze (weights, file, epoch, regime, spec, eval SHA, weights unchanged)",
+   "ok": true,
+   "detail": "60/60"
+  },
+  {
+   "name": "one observation-matrix hash, one cache identity, one spec hash across 60 evaluations",
+   "ok": true,
+   "detail": "1 matrix, 1 cache, 1 spec"
+  },
+  {
+   "name": "per_run_scenario.csv has 720 rows",
+   "ok": true,
+   "detail": "720"
+  },
+  {
+   "name": "keys unique",
+   "ok": true,
+   "detail": "720 unique"
+  },
+  {
+   "name": "keys = 30 runs x 2 checkpoints x 6 cells x 2 roles",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "finite values",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "gain = base - spec, delta = spec - base, clean_cost = spec_R0 - base_R0 (<1e-9 K)",
+   "ok": true,
+   "detail": "max 0.00e+00"
+  },
+  {
+   "name": "baseline RMSE identical across regimes and checkpoints for each (family, seed, cell, role)",
+   "ok": true,
+   "detail": "72 baseline groups (expect 2 families x 3 seeds x 6 cells x 2 roles = 72)"
+  },
+  {
+   "name": "72 baseline groups",
+   "ok": true,
+   "detail": "72"
+  },
+  {
+   "name": "package_manifest hashes match files",
+   "ok": true,
+   "detail": "12 files; mismatch: []"
+  },
+  {
+   "name": "package_manifest freeze hash = sha256(freeze.json)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "baseline per-frame CSV sha256 = expected = package manifest",
+   "ok": true,
+   "detail": "cb96687cf3614c5393bc9658ec3469980313413f495f32930fd2e810ffc070b3"
+  },
+  {
+   "name": "fields_index.json readable",
+   "ok": true,
+   "detail": "keys ['format', 'n_runs', 'eval_root', 'per_frame_csvs']"
+  },
+  {
+   "name": "720 aggregated RMSE = re-reduction of per-frame CSVs (frames -> conditions -> replicas)",
+   "ok": true,
+   "detail": "720 rows, max |diff| 2.13e-14 K (tol 1e-06)"
+  }
+ ]
+}

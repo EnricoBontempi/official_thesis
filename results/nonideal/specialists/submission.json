@@ -1,0 +1,19 @@
+{
+ "git_sha": "b6fc9fefda5a1d4776c87c9285d7187c0d89fc48",
+ "tip": "/home/bontempi/projects/official_thesis_nonideal_spec_run",
+ "submitted_at": "2026-11-24T20:22:01-05:00",
+ "normal_array": "30405180",
+ "preempt_array": "30405220",
+ "stage_b": "30406321",
+ "dest": "/home/bontempi/official_thesis_nonideal_spec_pkg",
+ "train_out_root": "/home/bontempi/official_thesis_nonideal_spec_runs",
+ "normal_runs": "NI-glu-on-N1-s0 NI-glu-on-N1-s1 NI-glu-on-N2-s0 NI-glu-on-N2-s1 NI-glu-on-G1-s0 NI-glu-on-G1-s1 NI-glu-on-G1eq-s0 NI-glu-on-G1eq-s1 NI-glu-on-N1G1-s0 NI-glu-on-N1G1-s1 NI-glu-on-N1G1-s2",
+ "preempt_runs": "NI-glu-on-N1-s2 NI-glu-on-N2-s2 NI-glu-on-G1-s2 NI-glu-on-G1eq-s2 NI-unet-on-N1-s0 NI-unet-on-N1-s1 NI-unet-on-N1-s2 NI-unet-on-N2-s0 NI-unet-on-N2-s1 NI-unet-on-N2-s2 NI-unet-on-G1-s0 NI-unet-on-G1-s1 NI-unet-on-G1-s2 NI-unet-on-G1eq-s0 NI-unet-on-G1eq-s1 NI-unet-on-G1eq-s2 NI-unet-on-N1G1-s0 NI-unet-on-N1G1-s1 NI-unet-on-N1G1-s2",
+ "normal_time": "12:00:00",
+ "normal_wall_hours": 11.5,
+ "preempt_wall_hours": 40,
+ "stage_b_superseded": "30405221",
+ "post_processing_git_sha": "b1c095507b803e5fa27ad8ba8bdad2febd8d2541",
+ "training_git_sha": "b6fc9fefda5a1d4776c87c9285d7187c0d89fc48",
+ "post_processing_tip": "/home/bontempi/projects/official_thesis_nonideal_spec_post"
+}

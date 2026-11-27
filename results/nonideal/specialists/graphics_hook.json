@@ -1,0 +1,14 @@
+{
+ "format": "nonideal_specialist_graphics_hook_v1",
+ "hook_path": "/home/bontempi/projects/official_thesis_spec_graphics/scripts/engaging/nonideal_graphics.sbatch",
+ "graphics_sha": "1e498dccf6e156946377ea4313f8d5edc5218f30",
+ "graphics_checkout": "/home/bontempi/projects/official_thesis_spec_graphics",
+ "campaign_sha": "b6fc9fefda5a1d4776c87c9285d7187c0d89fc48",
+ "campaign_tip": "/home/bontempi/projects/official_thesis_nonideal_spec_run",
+ "campaign_dest": "/home/bontempi/official_thesis_nonideal_spec_pkg",
+ "stage_b": "30405221",
+ "aggregate_job": null,
+ "attachment": "post_hook.path is read by the aggregate script already in the campaign checkout. That job, created later by stage C, submits this one sbatch and appends its id to post_hook_submitted.txt.",
+ "output": "/home/bontempi/official_thesis_nonideal_spec_pkg/graphics",
+ "recorded_at": "2026-11-24T20:34:15-05:00"
+}

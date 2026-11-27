@@ -1,0 +1,18 @@
+{
+ "format": "nonideal_specialist_graphics_hook_v2",
+ "supersedes": "graphics_hook.json (kept unchanged; its checkout resolution came from a spool copy of the sbatch)",
+ "graphics_checkout": "/home/bontempi/projects/official_thesis_spec_graphics_v2",
+ "graphics_sha": "c5963373c94e8ea7fa3a71855b7cb0493c2481b4",
+ "graphics_branch": "nonideal/specialist-results",
+ "launcher": "scripts/engaging/nonideal_graphics_submit.sh <checkout> <sha> <dest> (NI_GRAPHICS_ROOT and EXPECT_GRAPHICS_SHA mandatory; --chdir/--output/--error explicit)",
+ "campaign_training_sha": "b6fc9fefda5a1d4776c87c9285d7187c0d89fc48",
+ "campaign_post_processing_sha": "b1c095507b803e5fa27ad8ba8bdad2febd8d2541",
+ "attempts": [
+  {"job": "30685595", "submitted_by": "aggregate 30673750 post_hook", "graphics_sha": "1e498dccf6e156946377ea4313f8d5edc5218f30", "state": "FAILED", "exit": "128:0", "elapsed_s": 2,
+   "cause": "ROOT derived from dirname of the Slurm spool copy; git rev-parse HEAD failed (not a git repository) before any graphics code ran. Log: /home/bontempi/projects/official_thesis_nonideal_spec_post/slurm-30685595.out",
+   "outputs": "none"},
+  {"job": "30711670", "submitted_by": "nonideal_graphics_submit.sh (manual)", "graphics_sha": "c5963373c94e8ea7fa3a71855b7cb0493c2481b4", "state": "COMPLETED", "exit": "0:0", "elapsed_s": 105,
+   "log": "/home/bontempi/official_thesis_nonideal_spec_pkg/slurm/graphics-30711670.{out,err}", "outputs": "/home/bontempi/official_thesis_nonideal_spec_pkg/graphics (GRAPHICS_OK, COMPLETE.json ok n_runs 30)"}
+ ],
+ "recorded_at": "2026-11-27T10:35:00-05:00"
+}

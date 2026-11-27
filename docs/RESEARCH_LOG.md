@@ -615,9 +615,6 @@ Roadmap A/B/C (`plan/abc-preparatory-studies` @ `9d2c3af`) **sospese, non cancel
 
 ---
 
-
----
-
 ## 2026-11-25 — Indicazioni dei supervisori e organizzazione delle missioni del Mese 3
 
 ### Contesto e stato dello studio in corso
@@ -702,3 +699,15 @@ Paper identificati dagli screenshot condivisi: Nie et al., *Combustion and Flame
 **Evidenze e limiti:** lettura della giunzione distinta dalla stima del gas; segno radiativo dipendente dall'ambiente; primo ordine costante come approssimazione; campionamento distinto dalla risposta termica. HYLON ha campagne separate, Waterloo statistiche congiunte LDA–TC simultanee; TG/TG_RMS NIST sono uscite di modello, non sua validazione indipendente. Nel materiale cercato e ispezionato manca un riferimento aperto T gas–PIV simultaneo nello swirl confinato. Nessun giudizio universale sulla sufficienza dei 0,5 s LES: dipende da risposta, inizializzazione e obiettivo.
 
 **Perimetro:** integrazione basata sui rapporti, controlli di campioni attribuiti agli scout; nessuna nuova lettura dei paper, verifica raw/TEST, download, esperimento o training. Nessuna modifica ai branch o ai file della 04/02. F5 attiva, consegne intermedie 02/04 integrate; specifica termica e decisioni sperimentali restano nella 04 secondo roadmap.
+
+---
+
+## 2026-11-27 — Chiusura dello studio sulle degradazioni: consegna dei 30 specialisti e correzione dei grafici
+
+**Cosa è stato fatto.** Verifica di sola lettura della consegna numerica dei 30 specialisti p_on (training `b6fc9fef`, post-processing `b1c09550`): 30 run validi, 60/60 gate best/last, 720 righe aggregate con chiavi uniche, RMSE ricalcolate dai CSV per frame (2·10⁻¹⁴ K), hash di manifest e baseline coerenti ([script](../scripts/71_nonideal_specialist_delivery_check.py), [esito](../results/nonideal/specialists/delivery_check/delivery_check.md)). Il job grafico del post-hook (30685595) era fallito in 2 s (exit 128): lo script ricavava il checkout dal percorso della copia Slurm. Corretto con checkout e SHA espliciti, directory di lavoro e log espliciti; unico job risottomesso: 30711670 (checkout `c5963373`), `COMPLETED`, `GRAPHICS_OK`, 179 file del manifest verificati.
+
+**Risultati.** [docs/nonideal/05_specialist_results.md](nonideal/05_specialist_results.md). Su VAL, best: guadagno medio positivo in 2 celle su 10 sul proprio regime (U-Net N1G1 +0,29 K, GLU N2 +0,10 K, entro la dispersione fra seed), costo sul pulito positivo in tutte e 10 (0,5–4,8 K); 8 run su 30 con guadagno positivo sullo scenario proprio. Su seen il quadro è misto; il last del GLU migliora il seen e peggiora VAL e pulito. Valgono per questi regimi, dati e protocollo di selezione; VAL è già usata per selezione e sviluppo; il batching GLU confonde il confronto e non è risolto dai test CPU.
+
+**Limiti e mancanze.** I campi spaziali delle baseline sono a frame 0 (VAL) e 1600 (seen), quelli degli specialisti a frame 1000: nessun pannello appaiato è stato disegnato; completarli richiederebbe una nuova inferenza non autorizzata. Dispersione fra seed non è incertezza fisica calibrata.
+
+**Non fatto.** Nessun training, nessuna nuova valutazione, nessun accesso al TEST, nessuna modifica di protocollo, soglie, selezione, baseline o metriche. Pacchetto numerico e figure restano nei percorsi canonici sul cluster; nel repository solo tabelle aggregate, figure di riepilogo e manifest ([results/nonideal/specialists/](../results/nonideal/specialists/)). Branch `nonideal/specialist-results`, senza merge.

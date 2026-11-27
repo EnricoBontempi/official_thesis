@@ -26,6 +26,12 @@ Sotto `<dest>/graphics`, solo a matrice completa:
 
 ## Aggancio
 
-Un solo job, `ni_graphics_spec`, sottomesso dallo script di aggregazione già in catena quando trova `<dest>/post_hook.path`. Nessuna seconda valutazione. Lo script è `scripts/engaging/nonideal_graphics.sbatch` nel checkout congelato di questo branch. L’output è `<dest>/graphics`. Il job gira sul cluster: non richiede che questo PC resti acceso.
+Un solo job, `ni_graphics_spec`, sottomesso dallo script di aggregazione già in catena quando trova `<dest>/post_hook.path`. Nessuna seconda valutazione. Lo script è `scripts/engaging/nonideal_graphics.sbatch`. L’output è `<dest>/graphics`. Il job gira sul cluster: non richiede che questo PC resti acceso.
 
 Le figure dei 12 modelli già pubblicate restano in `results/nonideal/block2/package/figures/` e in `results/nonideal/block2/reading/`.
+
+## Esecuzione e correzione (27 novembre 2026)
+
+Il job del post-hook (30685595, checkout `1e498dcc`) è fallito in 2 s con exit 128. Causa: Slurm esegue una copia dello script dalla sua directory di spool, quindi `ROOT` ricavato da `$0` non era il checkout e `git rev-parse HEAD` falliva prima del codice grafico (log: `slurm-30685595.out`, «not a git repository»). Le variabili `NI_*` erano corrette (stesse di `nonideal_aggregate_spec.sbatch`).
+
+Correzione: `NI_GRAPHICS_ROOT` ed `EXPECT_GRAPHICS_SHA` sono obbligatori (nessun default), il launcher [nonideal_graphics_submit.sh](../../scripts/engaging/nonideal_graphics_submit.sh) verifica checkout, SHA e file di ingresso e passa `--chdir`, `--output`, `--error`; il checkout e lo SHA realmente eseguiti compaiono nel log, e lo SHA in `figure_manifest.json`. Test: `tests/test_nonideal_graphics_launcher.py`. Job risottomesso: 30711670, `COMPLETED`, `GRAPHICS_OK` (checkout `c5963373`, `/home/bontempi/projects/official_thesis_spec_graphics_v2`); tracciato in [graphics_hook_v2.json](../../results/nonideal/specialists/graphics_hook_v2.json). Risultati e lettura: [05_specialist_results.md](05_specialist_results.md).

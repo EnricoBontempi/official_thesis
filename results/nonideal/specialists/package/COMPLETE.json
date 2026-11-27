@@ -1,0 +1,10 @@
+{
+ "ok": true,
+ "n_files": 12,
+ "n_runs": 30,
+ "n_plateau": 30,
+ "n_budget_exhausted": 0,
+ "budget_exhausted_runs": [],
+ "all_declared_converged": null,
+ "note": "budget_exhausted runs are included and labelled; none is declared converged"
+}
