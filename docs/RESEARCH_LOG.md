@@ -594,3 +594,21 @@ Roadmap A/B/C (`plan/abc-preparatory-studies` @ `9d2c3af`) **sospese, non cancel
 **Submission (24 novembre 2026, 20:22 Boston).** Codice eseguito `b6fc9fefda5a1d4776c87c9285d7187c0d89fc48` (checkout `/home/bontempi/projects/official_thesis_nonideal_spec_run`). Array normal 30405180 (11 GLU, concorrenza 4, 12 h per tentativo), array preemptable 30405220 (19 run: 4 GLU seed 2 e 15 U-Net, concorrenza 4, tentativi da 40 h), stage B 30405221 dopo entrambi; stage B, stage C, valutazione e aggregazione creano da sole i job successivi (ID in `/home/bontempi/official_thesis_nonideal_spec_pkg/chain_ids.json`). Nessun risultato di training ancora disponibile.
 
 **Aggiornamento di verifica/aggregazione (24 novembre 2026).** Documentati separatamente i due criteri GLU non superati dallo smoke (identità contro l'originale; resume) con evidenze e limiti (i controlli CPU non provano l'equivalenza della traiettoria GPU), e fissata la politica `budget_exhausted` a 1200 epoche (incluso ed etichettato se gli artefatti sono validi, mai dichiarato convergente; errori tecnici, continuazione mancante e gate falliti bloccano): `docs/nonideal/04_specialist_smoke_criteria_and_budget_policy.md`. Verifica, freeze e aggregazione corrette in una versione tracciata (`b1c0955`) eseguita da un checkout separato; i training restano sul checkout `b6fc9fe`. Lo stage B pendente (30405221) è stato annullato e sostituito (30406321, stessa dipendenza sui due array); nessun training toccato.
+
+---
+
+## 2026-11-24 — Blocco II: lettura per la discussione, senza nuova valutazione
+
+**Già scritto sopra.** La campagna sui 12 modelli, i gate e i risultati principali stanno nella voce precedente e in [docs/nonideal/02_block2_robustness.md](nonideal/02_block2_robustness.md). Questa voce non li ripete e non modifica quello storico.
+
+**Consegna nuova.** Branch `nonideal/block2-reading`, dalla base `d4f2e3a`. Cartella distinta [results/nonideal/block2/reading/](../results/nonideal/block2/reading/INDEX.md); il pacchetto originale e le figure precedenti restano, con un collegamento nell'indice. Nota [docs/nonideal/03_block2_reading.md](nonideal/03_block2_reading.md). Script `scripts/63_nonideal_block2_reading.py`: legge solo le CSV aggregate.
+
+**Controlli.** Ricalcolate dalle tabelle aggregate le 48 RMSE medie del report, entro 0,02 K, e i 460 contrasti famiglia × φ/NH3 × condizione × cella × ruolo, di cui 9 migliorano. Soltanto letti: `VERIFY_OK.json` (12/12), `COMPLETE.json`, il conteggio 74 088 e il ricalcolo per-frame del report. Il CSV per frame e i campi delle mappe non sono nel repository: nessuna inferenza, nessuna mappa nuova. Le figure di campo già pubblicate mostrano temperatura vera e modulo dell'errore.
+
+**Cosa aggiunge la lettura.** Su seen il peggioramento è quasi tutto centered-RMSE: il bias si sposta di meno di 1 K. Su VAL la U-Net senza φ e NH3, con le lacune, sposta il bias di −8,6 K in media, e il GLU senza φ e NH3, col rumore a 1,5 m/s, di −10,7 K. Entrambi i salti sono tirati da `40NH3_0.9`, dove anche togliere i siti a caso sposta il livello della U-Net. I getti freddi portano l'aumento regionale (+8…+22 K sulle medie di gruppo); la zona calda resta entro +1,5…+4,6 K. Il rapporto N2/N1 delle medie di gruppo è 6,4–41. L'interazione rumore–lacune, media sui seed, resta fra −0,09 e +0,23 K in questi scenari; i singoli seed arrivano a −0,18 e +0,35 K. Non è una prova di additività generale, e il rapporto G1-eq/G1 non è una quota causale della contiguità.
+
+**Limiti.** Stress test sintetici, VAL123 già usata per selezione, seen220 non è un dominio nuovo, tre seed, repliche non indipendenti. Effetto piccolo del rumore a 0,5 m/s sulla RMSE: non è un margine per altre metriche o per una PIV reale. La U-Net resta più bassa in errore assoluto; «più robusto» sul deterioramento va guardato a parte e non è uniforme fra i ruoli.
+
+**Matrice dei 30 specialisti p_on.** Autorizzata e affidata a Sonnet per preparazione e sottomissione. Questa voce non ne dichiara submission, esecuzione o completamento.
+
+**Non fatto qui.** Nessun training, nessun job, nessun forward, nessun TEST, nessuna modifica di specifiche, dati o risultati del pacchetto, nessuna modifica di `documents_thesis`, nessuna riattivazione di A/B/C.
