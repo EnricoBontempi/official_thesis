@@ -1,5 +1,7 @@
 # Missione 02 — Proposta: osservazioni PIV per la nostra LES e comportamento delle reti
 
+> **Nota (27/11/2026):** per la definizione delle osservazioni e per la campagna questa proposta è **superata** da [roadmap_tecnica_piv.md](roadmap_tecnica_piv.md). Resta valida la scelta del GTMC come ancoraggio dei parametri. Sono abbandonati il trasferimento dei rigetti da Cardiff e i gruppi di training qui elencati.
+
 **Data:** 27 novembre 2026 · **Branch:** `piv/experiment-proposal` · **Base:** `2f2faff588b4268d9c46f0efa8e324e9af359cc4`
 **Stato:** proposta a parole da discutere con Enrico. Non è la roadmap tecnica: non contiene comandi, configurazioni né la matrice definitiva dei run. Non autorizza download, job, training, inferenze o accesso a TEST.
 

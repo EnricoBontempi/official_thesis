@@ -1,5 +1,7 @@
 # Missione 02 — Sintesi trasversale delle evidenze PIV e modello di osservazione per la LES
 
+> **Nota (27/11/2026):** questa sintesi è la base di [roadmap_tecnica_piv.md](roadmap_tecnica_piv.md). La roadmap non adotta la variante olio né la sensibilità dipendente da T sulla densità di particelle. Corregge inoltre alcune ambiguità: ± ≠ σ; correlazione nulla a una distanza ≠ indipendenza; risposta e autocorrelazione dell'errore come kernel distinti (roadmap §2.7).
+
 **Data:** 27 novembre 2026 · **Branch:** `piv/experiment-proposal`
 **Stato:** sintesi da discutere con Enrico prima di approvare la rappresentazione delle osservazioni. Non contiene una campagna di training, una matrice dei run o una roadmap tecnica. Nessun operatore implementato, nessun download di dataset, nessun job, nessun accesso a TEST.
 
