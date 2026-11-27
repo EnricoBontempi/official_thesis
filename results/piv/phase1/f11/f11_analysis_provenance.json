@@ -1,0 +1,11 @@
+{
+ "code_sha": "5dd4888a6749707862a551e64147d37575142200",
+ "code_dirty_in_scripts_src_configs": false,
+ "stats_sha256": "678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e",
+ "read_log": [],
+ "numpy": "2.5.4",
+ "scipy": "1.18.1",
+ "python": "3.13.13",
+ "script": "f11_analyze.py",
+ "n_patches_total": 14196
+}

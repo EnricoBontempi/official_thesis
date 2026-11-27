@@ -1,0 +1,37 @@
+{
+ "code_sha": "6573393345bc2d4e18076b2ebf70486707fc0bb2",
+ "code_dirty_in_scripts_src_configs": false,
+ "stats_sha256": "678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e",
+ "read_log": [
+  {
+   "file": "/home/enric/projects/official_thesis/data/raw/combustion/hf_dataset/numerical/data-00008-of-00030.arrow",
+   "sha256": "df315dfb5ba75fbc559b8f64db890c50060dfe575e6c0856e1120e8af060ed89",
+   "frames": "0..1480 step 10 (149)"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/raw/combustion/hf_dataset/numerical/data-00023-of-00030.arrow",
+   "sha256": "335fff3637ad85424120abd62e0333b8ccfc2e22a3f8534163a8e48250e02670",
+   "frames": "0..1480 step 10 (149)"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/raw/combustion/hf_dataset/numerical/data-00026-of-00030.arrow",
+   "sha256": "569a668c920506510f8c86ca68998df31bd2ab8329f63babf451ee23c6601aa5",
+   "frames": "0..1480 step 10 (149)"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/raw/combustion/hf_dataset/numerical/data-00011-of-00030.arrow",
+   "sha256": "4d616a77c753f07ae05262b2cb5094caebbae0c3261ea17ae8976fe9f591a462",
+   "frames": "0..1480 step 10 (149)"
+  }
+ ],
+ "numpy": "2.5.4",
+ "scipy": "1.18.1",
+ "python": "3.13.13",
+ "script": "f11c_mean_symmetry.py",
+ "conds": [
+  "0NH3_1.h5",
+  "40NH3_1.h5",
+  "80NH3_1.05.h5",
+  "20NH3_0.9.h5"
+ ]
+}

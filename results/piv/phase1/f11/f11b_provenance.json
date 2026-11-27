@@ -1,0 +1,15 @@
+{
+ "code_sha": "5dd4888a6749707862a551e64147d37575142200",
+ "code_dirty_in_scripts_src_configs": false,
+ "stats_sha256": "678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e",
+ "read_log": [
+  {
+   "file": "/home/enric/projects/official_thesis/data/processed/month2_dense_unet_cache_c149/geometry.npz",
+   "sha256": "97e2e9df79c87a3fbf019fa1d9ac270aafe42319f83425afb5f3fb3be8f36ce7"
+  }
+ ],
+ "numpy": "2.5.4",
+ "scipy": "1.18.1",
+ "python": "3.13.13",
+ "script": "f11b_method_validation.py"
+}

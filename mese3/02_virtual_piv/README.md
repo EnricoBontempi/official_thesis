@@ -15,3 +15,7 @@ L’ordine è:
 ---
 
 Stato al 25 novembre 2026: [roadmap 02](roadmap02.md) pubblicata; step 1 completato e approvato da Enrico dopo il confronto delle tre letture di Sciacchitano. Consegna: [scheda critica integrata](step1_sciacchitano.md). Prossimo passo: preparare i prompt dei due scout dello step 2 nella chat di missione. Nessuno scouting o esperimento avviato da questo aggiornamento. Per contesto e coordinamento: [indice delle missioni](../README.md).
+
+---
+
+**Aggiornamento del 27 novembre 2026 (esecuzione, branch `mission02/piv-execution`):** Fase 1 della [roadmap tecnica](roadmap_tecnica_piv.md) completata fino alla revisione R1 (F1.1–F1.3): [report R1](fase1_report_R1.md), [nota di orientamento](orientation_note.md), artefatti in [results/piv/phase1/](../../results/piv/phase1/INDEX.md). Nessun training né inferenza; Fase 2 in attesa delle decisioni di R1.

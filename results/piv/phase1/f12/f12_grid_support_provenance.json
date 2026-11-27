@@ -1,0 +1,35 @@
+{
+ "code_sha": "6573393345bc2d4e18076b2ebf70486707fc0bb2",
+ "code_dirty_in_scripts_src_configs": false,
+ "stats_sha256": "678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e",
+ "read_log": [
+  {
+   "file": "/home/enric/projects/official_thesis/data/processed/month2_dense_unet_cache_c149/geometry.npz",
+   "sha256": "97e2e9df79c87a3fbf019fa1d9ac270aafe42319f83425afb5f3fb3be8f36ce7"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/manifests/train_norm_stats_month2_fit.json",
+   "sha256": "678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/processed/month2_dense_unet_cache_c149/train_fit/vi_norm.npy",
+   "sha256": "4d422ec8812c31a4e27a133ee629412c50cd15a47b3e37acbda5169e88f3a75b"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/processed/month2_dense_unet_cache_c149/train_fit/vj_norm.npy",
+   "sha256": "2c699f7c685e30ef4350d699c025ac1c5ff14faff9848dd88f4e81f319dfb0f7"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/processed/month2_dense_unet_cache_c149/train_fit/target_T_K.npy",
+   "sha256": "6617d623d42b95a16217736053075b92b54110ebc90f77c3105fd3a5d55cf993"
+  }
+ ],
+ "numpy": "2.5.4",
+ "scipy": "1.18.1",
+ "python": "3.13.13",
+ "script": "f12_grid_support.py",
+ "role": "train_fit (C149)",
+ "runtime_s": 135.72041034698486,
+ "sigma_px": 0.1,
+ "dmax_px": 6.0
+}

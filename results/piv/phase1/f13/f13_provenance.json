@@ -1,0 +1,66 @@
+{
+ "code_sha": "6573393345bc2d4e18076b2ebf70486707fc0bb2",
+ "code_dirty_in_scripts_src_configs": false,
+ "stats_sha256": "678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e",
+ "read_log": [
+  {
+   "file": "/home/enric/projects/official_thesis/data/manifests/train_norm_stats_month2_fit.json",
+   "sha256": "678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/processed/month2_dense_unet_cache_c149/train_fit/vi_norm.npy",
+   "sha256": "4d422ec8812c31a4e27a133ee629412c50cd15a47b3e37acbda5169e88f3a75b"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/processed/month2_dense_unet_cache_c149/train_fit/vj_norm.npy",
+   "sha256": "2c699f7c685e30ef4350d699c025ac1c5ff14faff9848dd88f4e81f319dfb0f7"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/manifests/train_norm_stats_month2_fit.json",
+   "sha256": "678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/processed/month2_dense_unet_cache/train_fit/vi_norm.npy",
+   "sha256": "3ba172568728dc629e7d6e948e1284f7e664ddb74509ff4cc12cea1342c51251"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/processed/month2_dense_unet_cache/train_fit/vj_norm.npy",
+   "sha256": "dec56cf8d6127b9a655e57782b15a6593c44542c0bff3809e0e02829d073dbce"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/manifests/train_norm_stats_month2_fit.json",
+   "sha256": "678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/processed/month2_dense_unet_cache_c149/seen_train_eval/vi_norm.npy",
+   "sha256": "b406b2b435f95a1910ecf7a09ce05a63979e7cf1bfdd2b1524c1c6541d883d8e"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/processed/month2_dense_unet_cache_c149/seen_train_eval/vj_norm.npy",
+   "sha256": "9b486f9ce42b1dfeeec41ae8e68261bb7e633d5f1e22344ed54bf0642345f40b"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/manifests/train_norm_stats_month2_fit.json",
+   "sha256": "678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/processed/month2_dense_unet_cache_c149/val_eval/vi_norm.npy",
+   "sha256": "79b357b69402c8e01038ff0b46cb000023a51ba1708c3645a4c1c46d6b5281a1"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/processed/month2_dense_unet_cache_c149/val_eval/vj_norm.npy",
+   "sha256": "969634ba374a7963f71b706174d3fd9b82c5db79297e32dfd1ad928e0f0c036f"
+  }
+ ],
+ "numpy": "2.5.4",
+ "scipy": "1.18.1",
+ "python": "3.13.13",
+ "script": "f13_vref.py",
+ "bootstrap_seed": 20261127,
+ "roles": [
+  "train_fit_C149",
+  "train_fit_A38",
+  "seen_train_eval",
+  "val_eval"
+ ]
+}

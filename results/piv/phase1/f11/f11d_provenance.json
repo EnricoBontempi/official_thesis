@@ -1,0 +1,10 @@
+{
+ "code_sha": "6573393345bc2d4e18076b2ebf70486707fc0bb2",
+ "code_dirty_in_scripts_src_configs": false,
+ "stats_sha256": "678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e",
+ "read_log": [],
+ "numpy": "2.5.4",
+ "scipy": "1.18.1",
+ "python": "3.13.13",
+ "script": "f11d_symmetry_and_decorrelation.py"
+}
