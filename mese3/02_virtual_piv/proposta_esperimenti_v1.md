@@ -1,3 +1,11 @@
+# ALTRA PROPOSTA — Studio dei limiti della misura PIV
+
+> **Proposta alternativa conservata per discussione futura. Non costituisce il piano approvato della missione 02.**
+>
+> La proposta della missione 02 da discutere con Enrico è in [proposta_missione02.md](proposta_missione02.md).
+
+---
+
 # Missione 02 — Proposta di esperimenti v1 (da discutere con Enrico)
 
 **Data:** 27 novembre 2026 · **Branch:** `piv/experiment-proposal` · **Base:** `2f2faff588b4268d9c46f0efa8e324e9af359cc4`
