@@ -1,7 +1,7 @@
 # Missione 04 — Step 2 (agente A): fonti, ricerche e registro d'accesso
 
 **Documento collegato a:** [step2_modelli_di_misura.md](step2_modelli_di_misura.md).
-**Data:** 27 novembre 2026.
+**Data:** 27 novembre 2026. **Versione:** v2, revisione mirata dopo il confronto con la consegna dataset (`mission04/step2-thermal-datasets`, commit `cf318f6`, letto in sola lettura con `git show`). Aggiunte marcate **[v2]**.
 **Stato:** consegna da revisionare, non approvata.
 **Nessun PDF in repository.** Le fonti sono indicate con DOI o URL.
 
@@ -66,6 +66,16 @@ Più letture della stessa fonte non sono conferme indipendenti.
 | Equazione FDS con U/4; default 1 mm, ε 0,85, tipo K; Nu = 2 + 0,6 Re^½ Pr^⅓ | FDS User Guide, righe 10516–10519; `func.f90` riga 3358 | **Confermato** (segnalato da S3) |
 | Bead da 90 µm; "lags behind" | Hubbard 2022, OSTI 1887423, §3.3 | **Confermato.** La frase sui ~100 K di T_rms non è stata ricercata dal coordinatore: livello del subagente |
 
+**[v2] Verifiche della revisione.**
+
+| Affermazione | Fonte | Esito |
+|---|---|---|
+| Termocoppia a doppia giunzione all'**uscita** del convergente; metodo RRE (Brohez 2004); T_CRZ dal Raman; Tab. 2 (A 945/1050 K, L 1110/1300 K); due pareti in quarzo e due in acciaio forate; PIV con TiO₂ da 200 nm, sessioni da 30 s, finestre pulite; effetto dei fori *«negligible»*; Raman entro 60 K, precisione 4,6–77 K; *«multiple and simultaneous diagnostics»* nella novelty statement | Vilespy et al. 2026, [HAL hal-05347258](https://hal.science/hal-05347258v1/document), §1, §2.1–2.3, §3.3, Tab. 2 | **Confermato.** Traversata in camera, Eq. 4, ±4 mm, ±10 % e scarti TC–Raman **non verificati da me**: sono nel PDF TNF, host bloccato. Dipendono dall'agente dataset |
+| Waterloo: LDA a 2 componenti e TC acquisite simultaneamente, 125 Hz, 40 000 campioni; filo da 50 µm, bead 75–100 µm; compensazione digitale con più tecniche; nessuna correzione radiativa o catalitica (< 5 %); medie ±5 % | README MaCFP `Liquid_Pool_Fires/Waterloo_Methanol/Documentation/README.md` (clone sparso di github.com/MaCFP/macfp-db, master) | **Confermato.** Stato (compensato o no) delle T_rms rilasciate: **non univoco** |
+| NIST: TC e TC_RMS misurati; TG *«estimated considering radiative loss and thermal inertia»*; incertezza 5,2 % | README MaCFP `NIST_Pool_Fires/Documentation/README.md`, righe 239–247 | **Confermato** |
+| *«simulated Trms values would over-predict experimental values by approximately 100 K in regions above 6 cm in height»*; Fig. 5, linea centrale; incertezza delle fluttuazioni 25–30 % | Hubbard 2022, OSTI 1887423, §3.3 | **Confermato e circoscritto** |
+| Solero 2017: tipo R da 0,3 mm, 500 Hz, 5000 campioni, Morgan 1991, h da PIV/LDA | `re.public.polimi.it/bitstream/11311/1152656/1/IJETR2102.pdf` (URL confermato da OpenAlex) | **Non verificato da me**: CONNECT 403 dal proxy. Dipende dalla lettura integrale dell'agente dataset |
+
 **Non riverificati dal coordinatore** (livello del subagente):
 
 - Kim 2024;
@@ -94,6 +104,12 @@ Più letture della stessa fonte non sono conferme indipendenti.
 | Tesi Sampat | R. P. Sampat, *Phenomenology of combustion in a jet-stabilized combustor*, tesi di dottorato TU Delft (2025), [PDF](https://repository.tudelft.nl/file/File_bd189a65-5831-4433-8cbf-4f73c2857607); record uuid:132eb207-492d-435f-9292-3bdae208b4de | TS | §3.1 (pp. 34–35), §3.2.5, §6.2.2 (Eq. 6.1), App. C.2.1 (Eq. C.1–C.5), Fig. C.4, §7.3 | C |
 | van den Berg 2024 | van den Berg, Sampat, Gangoli Rao, AECS 20 (2024) 100298, [10.1016/j.jaecs.2024.100298](https://doi.org/10.1016/j.jaecs.2024.100298); [PDF](https://repository.tudelft.nl/file/File_3e5ff27b-6bbc-43d9-8e1e-0c40a3c3a845) | TS | §2, §2.2, Eq. 1–3, Tab. 1–2, conclusioni | C |
 | Mercier 2016 | Mercier et al., Combust. Flame 171 (2016) 42–58, [10.1016/j.combustflame.2016.05.006](https://doi.org/10.1016/j.combustflame.2016.05.006); [HAL hal-01405801](https://hal.science/hal-01405801/document) | TS | §2.3–2.5, §3.2–3.3, Fig. 2–6 | C |
+| **[v2]** Vilespy 2026 (HYLON) | Vilespy, Marragou, Al Hadi, … Poinsot, Schuller, Combust. Flame 283 (2026) 114536, [10.1016/j.combustflame.2025.114536](https://doi.org/10.1016/j.combustflame.2025.114536); [HAL hal-05347258](https://hal.science/hal-05347258v1/document) | TS | §1, §2 (setup, PIV, Raman, temperature e pareti), §3.3, Tab. 2 | C |
+| **[v2]** Database HYLON Phase 2 | `https://tnfworkshop.org/wp-content/uploads/2026/01/HYLON_TNF_2026_01_Phase2-1.zip` (PDF 24 pp., profili) | Non letto da me (403); letto dall'agente dataset | §3.3, §5.1, §5.4, §5.7 secondo `cf318f6` | Agente dataset |
+| **[v2]** Solero 2017 | G. Solero, IJETR 7(2) (2017) 13–17, handle 11311/1152656, `re.public.polimi.it/bitstream/11311/1152656/1/IJETR2102.pdf` | Per me SEC; TI per l'agente dataset | — | Agente dataset |
+| **[v2]** Waterloo (MaCFP) | Weckman & Strong, Combust. Flame 105 (1996) 245–266; [github.com/MaCFP/macfp-db](https://github.com/MaCFP/macfp-db/tree/master/Liquid_Pool_Fires/Waterloo_Methanol) README e `Mean_and_rms_values_z10cm.csv` | TS (README) | Documentation/README righe 14–18 | C |
+| **[v2]** NIST Pool Fires (MaCFP) | [github.com/MaCFP/macfp-db, NIST_Pool_Fires/Documentation/README.md](https://github.com/MaCFP/macfp-db/tree/master/Liquid_Pool_Fires/NIST_Pool_Fires) | PZ | righe 239–247 | C |
+| **[v2]** Brohez 2004; Lemaire & Menanteau 2017 | Fire Saf. J. 39 (2004) 399–411; Int. J. Therm. Sci. 122 (2017) 186–200 | Citati da Vilespy, non letti | — | — |
 | ERAU 2022 | Martin et al., *Improving NOx Entitlement with Axial Staging*, rapporto DOE DE-FE0031227, [OSTI 1846098](https://www.osti.gov/servlets/purl/1846098) | TS | §2.4–2.5 (pp. 16–18), p. 82 circa (K esposta), C-type | S2, C |
 
 ### 2.2 Modelli della sonda e dinamica
@@ -226,6 +242,13 @@ Solo dati bibliografici, nessun abstract:
 
 ---
 
+**[v2] Revisione:**
+
+- `git show cf318f6:` sui tre file della consegna dataset;
+- OpenAlex per DOI 10.1016/j.combustflame.2025.114536 (copia HAL) e per la ricerca "Solero swirl burner propulsion applications" (URL del PDF IRIS);
+- clone sparso di MaCFP/macfp-db;
+- ricerche per parole chiave nei testi.
+
 ## 4. Accessi falliti
 
 | Host | Errore | Che cosa non è stato letto |
@@ -245,6 +268,9 @@ Solo dati bibliografici, nessun abstract:
 | export.arxiv.org | DNS | API arXiv (le pagine dirette funzionavano) |
 | api.crossref.org | 429 | Metadati (sostituiti da OpenAlex) |
 | api.github.com | 403 | Sostituito da git clone |
+| **[v2]** tnfworkshop.org | CONNECT 403 | Database HYLON Phase 2 (letto solo dall'agente dataset) |
+| **[v2]** re.public.polimi.it, erpublication.org, ijetr.org | CONNECT 403 / 000 | Solero 2017 (letto solo dall'agente dataset) |
+| **[v2]** raw.githubusercontent.com (percorso README in radice) / api.github.com | 404 / accesso non abilitato | Aggirato con clone sparso pubblico di MaCFP/macfp-db |
 | repository.tudelft.nl, File_072bee9b… (GT2022-81808) e File_12cf7b04… | *«campus only property … under embargo or closed»* | Sampat GT2022; supplementi |
 | Appendice supplementare B.1 di Fuel 2025 | Non reperita | Sostituita dalla tesi, App. C.2.1 |
 
