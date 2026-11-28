@@ -299,6 +299,7 @@ def assert_sparse_resume_compatible(
         "eval_mask_aggregate_payload_sha256",
         "family",
         "nonideal_specialist",
+        "piv_campaign",
     ):
         if key not in ck_identity or key not in run_identity:
             continue
@@ -342,6 +343,8 @@ def assert_sparse_scientific_candidate_contract(cand: dict[str, Any]) -> dict[st
             "s7_submission_authorized",
             "nonideal_submission_authorized",
             "nonideal_specialist",
+            "piv_submission_authorized",
+            "piv_campaign",
             "operational_s7",
             "operational_provisional_pending_s4_profiling",
             "operational_from_s4_profiling_candidate",

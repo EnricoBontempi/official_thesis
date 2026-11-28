@@ -106,6 +106,11 @@ def main() -> int:
         action="store_true",
         help="Authorize a non-ideal specialist candidate (YAML nonideal_submission_authorized must be true)",
     )
+    p.add_argument(
+        "--authorize-scientific-piv",
+        action="store_true",
+        help="Authorize a mission-02 virtual-PIV candidate (YAML piv_submission_authorized must be true)",
+    )
     p.add_argument("--expect-mask-manifest-sha256", type=str, default=None)
     p.add_argument("--expect-mask-aggregate-sha256", type=str, default=None)
     p.add_argument("--expect-stats-sha256", type=str, default=None)
@@ -161,6 +166,7 @@ def main() -> int:
         args.authorize_scientific_opus,
         args.authorize_scientific_s7,
         args.authorize_scientific_nonideal,
+        args.authorize_scientific_piv,
     ]
     if not any(auth_flags):
         raise SystemExit(
@@ -172,7 +178,7 @@ def main() -> int:
         raise SystemExit("pass exactly one --authorize-scientific-* flag")
     if args.smoke and "smoke" not in str(args.out_root):
         raise SystemExit(f"--smoke requires 'smoke' in --out-root, got {args.out_root}")
-    if (args.authorize_scientific_s7 or args.authorize_scientific_nonideal) and not args.smoke:
+    if (args.authorize_scientific_s7 or args.authorize_scientific_nonideal or args.authorize_scientific_piv) and not args.smoke:
         for need in ("expect_mask_manifest_sha256", "expect_mask_aggregate_sha256",
                      "expect_stats_sha256", "expect_cache_hashes",
                      "expect_cache_aggregate_sha256"):
@@ -199,6 +205,10 @@ def main() -> int:
         )
     if args.authorize_scientific_nonideal and cand.get("nonideal_submission_authorized") is not True:
         raise SystemExit("non-ideal launch requires nonideal_submission_authorized: true in the candidate YAML")
+    if args.authorize_scientific_piv and cand.get("piv_submission_authorized") is not True:
+        raise SystemExit("PIV launch requires piv_submission_authorized: true in the candidate YAML")
+    if bool(cand.get("piv_campaign")) != bool(args.authorize_scientific_piv):
+        raise SystemExit("a candidate with piv_campaign needs --authorize-scientific-piv (and only it)")
     if bool(cand.get("nonideal_specialist")) != bool(args.authorize_scientific_nonideal):
         raise SystemExit("a candidate with nonideal_specialist needs --authorize-scientific-nonideal (and only it)")
     if args.authorize_scientific_s5 and cand.get("s5_submission_authorized") is not True:
@@ -361,6 +371,23 @@ def main() -> int:
         DS_TRAIN = SpecialistTrainDataset
     else:
         DS_TRAIN = DS
+    piv_block = cand.get("piv_campaign")
+    piv_kw: dict = {}
+    PivDS = None
+    if piv_block:
+        from combustion_recon.training.piv_training import BRIDGE, PivDataset, make_generator, validate_piv_block
+
+        if args.assisted or spec_block:
+            raise SystemExit("PIV campaign is temperature-free and exclusive of specialist/assisted modes")
+        piv_res = validate_piv_block(piv_block, family=cfg.family, tc=cand["training_candidate"], root=ROOT)
+        if piv_res["observation"] != BRIDGE:
+            import numpy as _np
+
+            _geo = _np.load(cache_root / "geometry.npz")
+            piv_gen = make_generator(piv_res["spec"], args.stats, _geo["x"], _geo["y"], expected_stats_sha256=args.expect_stats_sha256 or None)
+            PivDS = PivDataset
+            piv_kw = {"generator": piv_gen, "config_id": piv_res["observation"]}
+            DS_TRAIN = PivDS
     train_ds = DS_TRAIN(
         "train_fit",
         cache_root=cache_root,
@@ -373,8 +400,11 @@ def main() -> int:
         eval_mask_payload_root=args.mask_root,
         require_eval_mask_payload=require_payload,
         **spec_extra,
+        **({**piv_kw, "obs_role": "train"} if PivDS else {}),
         **cache_kwargs,
     )
+    if PivDS:
+        DS = lambda *a_, **k_: PivDS(*a_, **piv_kw, obs_role="selection", **k_)  # noqa: E731  selection namespace (VAL, seen, train diagnostic)
     # Historical 760-frame reference for TRAIN diagnostic (B19/C149 included).
     train_eval_ds = DS(
         "train_fit",
@@ -506,6 +536,8 @@ def main() -> int:
         "authorization_flag": (
             "authorize-scientific-s7"
             if args.authorize_scientific_s7
+            else "authorize-scientific-piv"
+            if args.authorize_scientific_piv
             else "authorize-scientific-nonideal"
             if args.authorize_scientific_nonideal
             else "authorize-scientific-opus"
@@ -573,6 +605,10 @@ def main() -> int:
             "selection": "original clean VAL 5% macro (3 replicas); specialist VAL recorded only",
             "batching": {"microbatch_size": cfg.microbatch_size, "effective_batch": cfg.batch_size},
         }
+    if piv_block:
+        identity["piv_campaign"] = {**piv_block, "spec_content_sha256": (piv_res["spec"].raw["frozen"]["content_sha256"] if "spec" in piv_res else None),
+                                    "namespaces": {"train": "role train, replica = epoch", "selection": "role selection, replica = mask replica (3)"},
+                                    "batching": {"microbatch_size": cfg.microbatch_size, "effective_batch": cfg.batch_size}}
     if args.assisted:
         identity["assisted"] = {
             "study": "month2_temperature_study_v1",
@@ -629,6 +665,18 @@ def main() -> int:
     )
     _log("fit_end", status=summary.get("status"), epochs=summary.get("epochs_completed"),
          elapsed_s=round(float(summary.get("elapsed_s") or 0), 1))
+    if os.environ.get("PIV_PROFILE") == "1" and args.smoke:
+        # F2.7 profiling (non-scientific smoke only): peak memory and the cost of one full-VAL replica evaluation
+        t_e = time.perf_counter()
+        n_val = len(val_ds)
+        trainer.evaluate_dataset(val_ds, role="val_eval", replica_id=0, method=cfg.family, variant="p_on", model_seed=int(cfg.seed),
+                                 batch_size=1 if cfg.family == "adapted_glu" else 8, extra_tags={"profile": True})
+        prof = {"run_id": run_id, "elapsed_fit_s": float(summary.get("elapsed_s") or 0), "epochs": summary.get("epochs_completed"),
+                "presentations_per_epoch": cfg.presentations_per_scientific_epoch, "val_frames_timed": n_val, "val_eval_s": time.perf_counter() - t_e,
+                "peak_mem_bytes": int(torch.cuda.max_memory_allocated()) if torch.cuda.is_available() else 0,
+                "gpu": torch.cuda.get_device_name(0) if torch.cuda.is_available() else "cpu"}
+        write_json(out_dir / "profile.json", prof)
+        _log("profile", **{k: v for k, v in prof.items() if k != "run_id"})
     print(json.dumps({"run_id": run_id, "status": summary.get("status"), "out_dir": str(out_dir)}, indent=2), flush=True)
     return 0
 
