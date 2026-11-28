@@ -1,0 +1,13 @@
+{
+ "code_sha": "3105f3ed7b23a4110dbbf4e2d8327eaba89891e7",
+ "code_dirty_in_scripts_src_configs": true,
+ "stats_sha256": "678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e",
+ "read_log": [],
+ "numpy": "2.5.4",
+ "scipy": "1.18.1",
+ "python": "3.13.13",
+ "script": "f25_analyze.py",
+ "runtime_s": 3.0223188400268555,
+ "decoder": "step2_datasets_dynamicstudio_vectors.py @ ee9948e (unofficial)",
+ "code_dirty_phase2_paths": false
+}

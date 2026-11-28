@@ -1,0 +1,236 @@
+{
+ "counts": {
+  "IDEAL-A": {
+   "n_valid": 15624,
+   "n_observed": 15624,
+   "field_rect": [
+    0,
+    127,
+    0,
+    127
+   ]
+  },
+  "FILT-A": {
+   "n_valid": 15624,
+   "n_observed": 15624,
+   "field_rect": [
+    0,
+    127,
+    0,
+    127
+   ]
+  },
+  "PIV-A": {
+   "n_valid": 15624,
+   "n_observed": 15624,
+   "field_rect": [
+    0,
+    127,
+    0,
+    127
+   ]
+  },
+  "FILT-B-in": {
+   "n_valid": 1824,
+   "n_observed": 1824,
+   "field_rect": [
+    38,
+    89,
+    88,
+    127
+   ]
+  },
+  "PIV-B-in": {
+   "n_valid": 1824,
+   "n_observed": 1824,
+   "field_rect": [
+    38,
+    89,
+    88,
+    127
+   ]
+  },
+  "PIV-B-down": {
+   "n_valid": 1824,
+   "n_observed": 1824,
+   "field_rect": [
+    38,
+    89,
+    48,
+    87
+   ]
+  },
+  "PIV-B-off": {
+   "n_valid": 1824,
+   "n_observed": 1824,
+   "field_rect": [
+    64,
+    115,
+    88,
+    127
+   ]
+  },
+  "SENS-TH-A": {
+   "n_valid": 15624,
+   "n_observed": 15624,
+   "field_rect": [
+    0,
+    127,
+    0,
+    127
+   ]
+  },
+  "SENS-TH-B-in": {
+   "n_valid": 1824,
+   "n_observed": 1824,
+   "field_rect": [
+    38,
+    89,
+    88,
+    127
+   ]
+  },
+  "SENS-SWAP-A": {
+   "n_valid": 15624,
+   "n_observed": 15624,
+   "field_rect": [
+    0,
+    127,
+    0,
+    127
+   ]
+  },
+  "SENS-SWAP-B-in": {
+   "n_valid": 1824,
+   "n_observed": 1824,
+   "field_rect": [
+    44,
+    83,
+    76,
+    127
+   ]
+  },
+  "SENS-W1.0-A": {
+   "n_valid": 15876,
+   "n_observed": 15876,
+   "field_rect": [
+    0,
+    127,
+    0,
+    127
+   ]
+  },
+  "SENS-W1.9-A": {
+   "n_valid": 15376,
+   "n_observed": 15376,
+   "field_rect": [
+    0,
+    127,
+    0,
+    127
+   ]
+  },
+  "SENS-SIGLO-A": {
+   "n_valid": 15624,
+   "n_observed": 15624,
+   "field_rect": [
+    0,
+    127,
+    0,
+    127
+   ]
+  },
+  "SENS-SIGHI-A": {
+   "n_valid": 15624,
+   "n_observed": 15624,
+   "field_rect": [
+    0,
+    127,
+    0,
+    127
+   ]
+  },
+  "SENS-RHO0-A": {
+   "n_valid": 15624,
+   "n_observed": 15624,
+   "field_rect": [
+    0,
+    127,
+    0,
+    127
+   ]
+  },
+  "SENS-RHO0-B-in": {
+   "n_valid": 1824,
+   "n_observed": 1824,
+   "field_rect": [
+    38,
+    89,
+    88,
+    127
+   ]
+  },
+  "SENS-EDGE-A": {
+   "n_valid": 14640,
+   "n_observed": 14640,
+   "field_rect": [
+    0,
+    127,
+    0,
+    127
+   ]
+  },
+  "SENS-REJ-iso-flag-A": {
+   "n_valid": 15624,
+   "n_observed": 14062,
+   "field_rect": [
+    0,
+    127,
+    0,
+    127
+   ]
+  },
+  "SENS-REJ-iso-sub-A": {
+   "n_valid": 15624,
+   "n_observed": 15624,
+   "field_rect": [
+    0,
+    127,
+    0,
+    127
+   ]
+  },
+  "SENS-REJ-clu-flag-A": {
+   "n_valid": 15624,
+   "n_observed": 14062,
+   "field_rect": [
+    0,
+    127,
+    0,
+    127
+   ]
+  },
+  "SENS-REJ-clu-sub-A": {
+   "n_valid": 15624,
+   "n_observed": 15624,
+   "field_rect": [
+    0,
+    127,
+    0,
+    127
+   ]
+  },
+  "IDEAL-B-in": {
+   "n_valid": 1824,
+   "n_observed": 1824,
+   "field_rect": [
+    38,
+    89,
+    88,
+    127
+   ]
+  }
+ },
+ "frames": 760,
+ "runtime_s": 80.02287554740906
+}

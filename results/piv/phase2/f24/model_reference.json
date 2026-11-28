@@ -1,0 +1,10 @@
+{
+ "model_noise_kernel_L_over_W": 1.2000000000004007,
+ "model_rho_at_W": 0.14695685516472043,
+ "model_rho_at_0.5W": 0.6778724100208118,
+ "reference_values": {
+  "WIE17_rho_2d_50pct_representative": 0.11,
+  "WIE17_rho_2d_75pct_representative": 0.45,
+  "review_rho_2h_le_50pct": 0.0
+ }
+}

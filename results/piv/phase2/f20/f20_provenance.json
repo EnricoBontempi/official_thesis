@@ -1,0 +1,197 @@
+{
+ "code_sha": "3105f3ed7b23a4110dbbf4e2d8327eaba89891e7",
+ "code_dirty_in_scripts_src_configs": false,
+ "stats_sha256": "678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e",
+ "read_log": [
+  {
+   "file": "/home/enric/projects/official_thesis/data/processed/month2_dense_unet_cache_c149/geometry.npz",
+   "sha256": "97e2e9df79c87a3fbf019fa1d9ac270aafe42319f83425afb5f3fb3be8f36ce7"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/raw/combustion/hf_dataset/numerical/data-00000-of-00030.arrow",
+   "sha256": "850cba25412b66de1e1af074152573706df220d9a0e2b37d05cbbbcb08622adf",
+   "inventory_lfs_sha256": "850cba25412b66de1e1af074152573706df220d9a0e2b37d05cbbbcb08622adf",
+   "channels": "Velocity[i], Velocity[j] only",
+   "frames": "0:2001:10"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/raw/combustion/hf_dataset/numerical/data-00001-of-00030.arrow",
+   "sha256": "164bd9de67e275f9982e4a89b9e24436bc20d9b59bf4f46a055a6be7c7c94a3a",
+   "inventory_lfs_sha256": "164bd9de67e275f9982e4a89b9e24436bc20d9b59bf4f46a055a6be7c7c94a3a",
+   "channels": "Velocity[i], Velocity[j] only",
+   "frames": "0:2001:10"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/raw/combustion/hf_dataset/numerical/data-00008-of-00030.arrow",
+   "sha256": "df315dfb5ba75fbc559b8f64db890c50060dfe575e6c0856e1120e8af060ed89",
+   "inventory_lfs_sha256": "df315dfb5ba75fbc559b8f64db890c50060dfe575e6c0856e1120e8af060ed89",
+   "channels": "Velocity[i], Velocity[j] only",
+   "frames": "0:2001:10"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/raw/combustion/hf_dataset/numerical/data-00003-of-00030.arrow",
+   "sha256": "3b7cf1b8436199fa11111c8a372b95da8331d274ece028c2cd651e7066836965",
+   "inventory_lfs_sha256": "3b7cf1b8436199fa11111c8a372b95da8331d274ece028c2cd651e7066836965",
+   "channels": "Velocity[i], Velocity[j] only",
+   "frames": "0:2001:10"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/raw/combustion/hf_dataset/numerical/data-00004-of-00030.arrow",
+   "sha256": "0515af19677e731688569fb0d297bac5864c28e207880ab1130918b15b4b4e38",
+   "inventory_lfs_sha256": "0515af19677e731688569fb0d297bac5864c28e207880ab1130918b15b4b4e38",
+   "channels": "Velocity[i], Velocity[j] only",
+   "frames": "0:2001:10"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/raw/combustion/hf_dataset/numerical/data-00005-of-00030.arrow",
+   "sha256": "4d73784cd1dca920f5593451869b86409cd79b3ebb694403a0544ccc26e5ab49",
+   "inventory_lfs_sha256": "4d73784cd1dca920f5593451869b86409cd79b3ebb694403a0544ccc26e5ab49",
+   "channels": "Velocity[i], Velocity[j] only",
+   "frames": "0:2001:10"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/raw/combustion/hf_dataset/numerical/data-00006-of-00030.arrow",
+   "sha256": "2877522a0ccfe3a8f1d95933f6b5b1760f2448288c8310ac2bf91ff5f3487b7b",
+   "inventory_lfs_sha256": "2877522a0ccfe3a8f1d95933f6b5b1760f2448288c8310ac2bf91ff5f3487b7b",
+   "channels": "Velocity[i], Velocity[j] only",
+   "frames": "0:2001:10"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/raw/combustion/hf_dataset/numerical/data-00010-of-00030.arrow",
+   "sha256": "464ebca974fd371357da3677306470d4af65189556457785ad348b6cbf35d867",
+   "inventory_lfs_sha256": "464ebca974fd371357da3677306470d4af65189556457785ad348b6cbf35d867",
+   "channels": "Velocity[i], Velocity[j] only",
+   "frames": "0:2001:10"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/raw/combustion/hf_dataset/numerical/data-00011-of-00030.arrow",
+   "sha256": "4d616a77c753f07ae05262b2cb5094caebbae0c3261ea17ae8976fe9f591a462",
+   "inventory_lfs_sha256": "4d616a77c753f07ae05262b2cb5094caebbae0c3261ea17ae8976fe9f591a462",
+   "channels": "Velocity[i], Velocity[j] only",
+   "frames": "0:2001:10"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/raw/combustion/hf_dataset/numerical/data-00012-of-00030.arrow",
+   "sha256": "baceffab2b949c304f27192bf30029516d63f0d5c1e3e718efa6e3409ae4021f",
+   "inventory_lfs_sha256": "baceffab2b949c304f27192bf30029516d63f0d5c1e3e718efa6e3409ae4021f",
+   "channels": "Velocity[i], Velocity[j] only",
+   "frames": "0:2001:10"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/raw/combustion/hf_dataset/numerical/data-00014-of-00030.arrow",
+   "sha256": "f2730adbfe0c27707f841dc1865d53401646853f5429d2ddc40c95413a3f8ae9",
+   "inventory_lfs_sha256": "f2730adbfe0c27707f841dc1865d53401646853f5429d2ddc40c95413a3f8ae9",
+   "channels": "Velocity[i], Velocity[j] only",
+   "frames": "0:2001:10"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/raw/combustion/hf_dataset/numerical/data-00015-of-00030.arrow",
+   "sha256": "fe7fb53da405cc7db61bf043c31399e8b474ca40ed5880f42ffb8e457edc725b",
+   "inventory_lfs_sha256": "fe7fb53da405cc7db61bf043c31399e8b474ca40ed5880f42ffb8e457edc725b",
+   "channels": "Velocity[i], Velocity[j] only",
+   "frames": "0:2001:10"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/raw/combustion/hf_dataset/numerical/data-00018-of-00030.arrow",
+   "sha256": "c217bf8752173bd2ddc4d7129b0416d22a3cf2464d774e8876b5db335f93776e",
+   "inventory_lfs_sha256": "c217bf8752173bd2ddc4d7129b0416d22a3cf2464d774e8876b5db335f93776e",
+   "channels": "Velocity[i], Velocity[j] only",
+   "frames": "0:2001:10"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/raw/combustion/hf_dataset/numerical/data-00023-of-00030.arrow",
+   "sha256": "335fff3637ad85424120abd62e0333b8ccfc2e22a3f8534163a8e48250e02670",
+   "inventory_lfs_sha256": "335fff3637ad85424120abd62e0333b8ccfc2e22a3f8534163a8e48250e02670",
+   "channels": "Velocity[i], Velocity[j] only",
+   "frames": "0:2001:10"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/raw/combustion/hf_dataset/numerical/data-00020-of-00030.arrow",
+   "sha256": "f5bb9ad3abbcb3d6ddc593720ffa298439dc1f481285a866256270cac1ca2ea6",
+   "inventory_lfs_sha256": "f5bb9ad3abbcb3d6ddc593720ffa298439dc1f481285a866256270cac1ca2ea6",
+   "channels": "Velocity[i], Velocity[j] only",
+   "frames": "0:2001:10"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/raw/combustion/hf_dataset/numerical/data-00022-of-00030.arrow",
+   "sha256": "3d908c0dc2913dc658fd227c5750d99a7f4c4293ae29a634cd96d02129e4dbdb",
+   "inventory_lfs_sha256": "3d908c0dc2913dc658fd227c5750d99a7f4c4293ae29a634cd96d02129e4dbdb",
+   "channels": "Velocity[i], Velocity[j] only",
+   "frames": "0:2001:10"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/raw/combustion/hf_dataset/numerical/data-00025-of-00030.arrow",
+   "sha256": "719b4a0f5058fe96d3dfff4476a50bd5f713e69cdbd18f03aef59b1cc812eb80",
+   "inventory_lfs_sha256": "719b4a0f5058fe96d3dfff4476a50bd5f713e69cdbd18f03aef59b1cc812eb80",
+   "channels": "Velocity[i], Velocity[j] only",
+   "frames": "0:2001:10"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/raw/combustion/hf_dataset/numerical/data-00026-of-00030.arrow",
+   "sha256": "569a668c920506510f8c86ca68998df31bd2ab8329f63babf451ee23c6601aa5",
+   "inventory_lfs_sha256": "569a668c920506510f8c86ca68998df31bd2ab8329f63babf451ee23c6601aa5",
+   "channels": "Velocity[i], Velocity[j] only",
+   "frames": "0:2001:10"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/raw/combustion/hf_dataset/numerical/data-00027-of-00030.arrow",
+   "sha256": "61905b2dbff835d5af2450fafbe74105bf1fe6602812b30c5152417449b22bb7",
+   "inventory_lfs_sha256": "61905b2dbff835d5af2450fafbe74105bf1fe6602812b30c5152417449b22bb7",
+   "channels": "Velocity[i], Velocity[j] only",
+   "frames": "0:2001:10"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/raw/combustion/hf_dataset/numerical/data-00028-of-00030.arrow",
+   "sha256": "7dcdb14b9aa9d8c3862d44339785858600fcea43df15f634b3872ea6c38f6ea7",
+   "inventory_lfs_sha256": "7dcdb14b9aa9d8c3862d44339785858600fcea43df15f634b3872ea6c38f6ea7",
+   "channels": "Velocity[i], Velocity[j] only",
+   "frames": "0:2001:10"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/raw/combustion/hf_dataset/numerical/data-00002-of-00030.arrow",
+   "sha256": "ba504096c67a638d3630b7af46b945f71a9da384ba3aa6c01a23c65ab9c2f90a",
+   "inventory_lfs_sha256": "ba504096c67a638d3630b7af46b945f71a9da384ba3aa6c01a23c65ab9c2f90a",
+   "channels": "Velocity[i], Velocity[j] only",
+   "frames": "0:2001:10"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/raw/combustion/hf_dataset/numerical/data-00013-of-00030.arrow",
+   "sha256": "b8e6961642e4b7c92ff2727d96fa0531ce9077bd2d6fb836cd26941cfa8de266",
+   "inventory_lfs_sha256": "b8e6961642e4b7c92ff2727d96fa0531ce9077bd2d6fb836cd26941cfa8de266",
+   "channels": "Velocity[i], Velocity[j] only",
+   "frames": "0:2001:10"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/raw/combustion/hf_dataset/numerical/data-00019-of-00030.arrow",
+   "sha256": "22a99f3d5c507edd326d0125c2f2f4c28d90e4bf6ae43b9c1f03cfa79a3ef8b0",
+   "inventory_lfs_sha256": "22a99f3d5c507edd326d0125c2f2f4c28d90e4bf6ae43b9c1f03cfa79a3ef8b0",
+   "channels": "Velocity[i], Velocity[j] only",
+   "frames": "0:2001:10"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/manifests/train_norm_stats_month2_fit.json",
+   "sha256": "678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/processed/month2_dense_unet_cache_c149/train_fit/vi_norm.npy",
+   "sha256": "4d422ec8812c31a4e27a133ee629412c50cd15a47b3e37acbda5169e88f3a75b"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/processed/month2_dense_unet_cache_c149/train_fit/vj_norm.npy",
+   "sha256": "2c699f7c685e30ef4350d699c025ac1c5ff14faff9848dd88f4e81f319dfb0f7"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/processed/month2_dense_unet_cache_c149/train_fit/target_T_K.npy",
+   "sha256": "6617d623d42b95a16217736053075b92b54110ebc90f77c3105fd3a5d55cf993"
+  }
+ ],
+ "numpy": "2.5.4",
+ "scipy": "1.18.1",
+ "python": "3.13.13",
+ "script": "f20_preliminaries.py",
+ "runtime_s": 341.87824392318726,
+ "bootstrap_seed": 20261128,
+ "n_boot": 400,
+ "block_frames": 10,
+ "code_dirty_phase2_paths": false
+}

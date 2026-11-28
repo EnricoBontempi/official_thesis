@@ -1,0 +1,17 @@
+{
+ "rule": "TRAIN conditions with minimum, median-rank and maximum v_ref; frames 400 and 1000 fixed a priori",
+ "conditions": {
+  "low v_ref": "80NH3_1.2.h5",
+  "median v_ref": "40NH3_1.1.h5",
+  "high v_ref": "0NH3_0.85.h5"
+ },
+ "v_ref": {
+  "low v_ref": 27.482071,
+  "median v_ref": 32.102089,
+  "high v_ref": 52.884134
+ },
+ "frames": [
+  400,
+  1000
+ ]
+}

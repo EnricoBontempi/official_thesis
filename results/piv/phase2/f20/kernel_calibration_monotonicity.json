@@ -1,0 +1,44 @@
+[
+ {
+  "step_mm": 0.5810574316105278,
+  "tophat_L_vs_width_monotone_nondecreasing": true,
+  "mhg_L_vs_sigma_non_monotone_only_below_sigma_mm": 0.1712037345781927,
+  "mhg_max_decrease_mm": -0.0007744192760470447,
+  "roots_per_target": {
+   "W1.0_response": 1,
+   "W1.0_noise": 1,
+   "W1.0_tophat": 1,
+   "W1.3_response": 1,
+   "W1.3_noise": 1,
+   "W1.3_tophat": 1,
+   "W1.5_response": 1,
+   "W1.5_noise": 1,
+   "W1.5_tophat": 1,
+   "W1.9_response": 1,
+   "W1.9_noise": 1,
+   "W1.9_tophat": 1
+  },
+  "all_targets_have_unique_root": true
+ },
+ {
+  "step_mm": 0.7581226848528722,
+  "tophat_L_vs_width_monotone_nondecreasing": true,
+  "mhg_L_vs_sigma_non_monotone_only_below_sigma_mm": 0.22388796265421806,
+  "mhg_max_decrease_mm": -0.0007744211937760204,
+  "roots_per_target": {
+   "W1.0_response": 1,
+   "W1.0_noise": 1,
+   "W1.0_tophat": 1,
+   "W1.3_response": 1,
+   "W1.3_noise": 1,
+   "W1.3_tophat": 1,
+   "W1.5_response": 1,
+   "W1.5_noise": 1,
+   "W1.5_tophat": 1,
+   "W1.9_response": 1,
+   "W1.9_noise": 1,
+   "W1.9_tophat": 1
+  },
+  "all_targets_have_unique_root": true
+ }
+]

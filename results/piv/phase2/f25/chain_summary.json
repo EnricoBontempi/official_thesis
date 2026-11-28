@@ -1,0 +1,64 @@
+{
+ "frames": 514,
+ "vectors_per_frame": 4941,
+ "codes_seen": [
+  0,
+  1,
+  16,
+  17
+ ],
+ "mean_share": {
+  "stage1_code0": 0.7390184724496136,
+  "stage1_code1": 0.16178257524390927,
+  "stage1_code16": 0.09919895230647713,
+  "stage1_code17": 0.0,
+  "stage2_code0": 0.7079983493944498,
+  "stage2_code1": 0.19280269829907304,
+  "stage2_code16": 0.09840514963731566,
+  "stage2_code17": 0.0007938026691614751,
+  "stage3_code0": 0.701613277924647,
+  "stage3_code1": 0.0,
+  "stage3_code16": 0.298386722075353,
+  "stage3_code17": 0.0
+ },
+ "mean_share_nonfinite": {
+  "stage1": 0.16178257524390927,
+  "stage2": 0.16178257524390927,
+  "stage3": 0.0
+ },
+ "final_code16_share_mean_min_max": [
+  0.298386722075353,
+  0.2515685083991095,
+  0.34891722323416313
+ ],
+ "code0_vectors_changed_raw_to_final_total": 0,
+ "note": "describes THIS isothermal dataset; not transferable to combustion or to SENS-REJ",
+ "substitution_comparison": {
+  "U": {
+   "n_substituted_vectors": 757805,
+   "n_compared": 406582,
+   "rms_actual_minus_3x3_mean_known": 6.157380434643724,
+   "rms_actual_minus_5x5_mean_known": 3.7135885247536873,
+   "rms_actual_minus_generator_iterative_3x3": 6.157380434643724,
+   "median_abs_actual_minus_3x3": 1.6773450374603271,
+   "median_abs_actual_minus_5x5": 0.9141788482666016,
+   "median_abs_actual_minus_iterative_3x3": 1.6773450374603271,
+   "rms_valid_vector_minus_3x3_mean_of_neighbours (leave-one-out variability scale)": 5.384361566218242,
+   "rms_actual_minus_raw_stage1_value (how much the chain changed the substituted vectors)": 34.651445870328956,
+   "frac_with_nonfinite_stage1_value": 0.542190933023667
+  },
+  "V": {
+   "n_substituted_vectors": 757805,
+   "n_compared": 406582,
+   "rms_actual_minus_3x3_mean_known": 7.246571606048426,
+   "rms_actual_minus_5x5_mean_known": 4.3443645081152695,
+   "rms_actual_minus_generator_iterative_3x3": 7.246571606048426,
+   "median_abs_actual_minus_3x3": 2.441810131072998,
+   "median_abs_actual_minus_5x5": 1.2154216021299362,
+   "median_abs_actual_minus_iterative_3x3": 2.441810131072998,
+   "rms_valid_vector_minus_3x3_mean_of_neighbours (leave-one-out variability scale)": 5.522592326754003,
+   "rms_actual_minus_raw_stage1_value (how much the chain changed the substituted vectors)": 39.74715194610454,
+   "frac_with_nonfinite_stage1_value": 0.542190933023667
+  }
+ }
+}

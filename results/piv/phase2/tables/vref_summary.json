@@ -1,0 +1,15 @@
+{
+ "train_min": 27.48207133653165,
+ "train_max": 52.884134379296874,
+ "train_mean": 35.39505175507202,
+ "sigma_train_min": 0.45803452227552754,
+ "sigma_train_max": 0.8814022396549479,
+ "sigma_train_mean": 0.5899175292512002,
+ "val_min": 27.686312248420194,
+ "val_max": 38.47648279388333,
+ "rel_diff_phase1_mean": 0.002987258090175753,
+ "rel_diff_phase1_max_abs": 0.01795465452142686,
+ "ci_halfwidth_max": 2.5754783312655256,
+ "ci_halfwidth_median": 0.26761111433868123,
+ "sha_matches_inventory_all": true
+}

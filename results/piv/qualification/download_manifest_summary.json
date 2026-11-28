@@ -1,0 +1,8 @@
+{
+ "rows": 3550,
+ "neal_zip_check": "PASS",
+ "cardiff_members_ok": 1553,
+ "cardiff_members_failed": 0,
+ "scripts_commit": "3105f3ed7b23a4110dbbf4e2d8327eaba89891e7",
+ "note": "figshare answered HTTP 429 during a first parallel attempt (10 threads); the 1212 members affected were fetched later with 2 threads and backoff; no checksum discrepancy occurred"
+}

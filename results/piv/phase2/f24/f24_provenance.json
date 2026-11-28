@@ -1,0 +1,11 @@
+{
+ "zip_md5_declared": "eb6d86228f534d6285859ccc0f16c369",
+ "zip_md5_computed": "eb6d86228f534d6285859ccc0f16c369",
+ "openpiv": "0.26.3",
+ "numpy": "2.5.5",
+ "datasets": {},
+ "zip_sha256": "be86ad84c1900890da73107bd0a81977447f9a052e75879cf6db7df967db80eb",
+ "zip_bytes": 271827177,
+ "runtime_s": 51.2723753452301,
+ "n_pairs": 120
+}

@@ -1,0 +1,29 @@
+{
+ "code_sha": "3105f3ed7b23a4110dbbf4e2d8327eaba89891e7",
+ "code_dirty_in_scripts_src_configs": true,
+ "stats_sha256": "678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e",
+ "read_log": [
+  {
+   "file": "/home/enric/projects/official_thesis/data/manifests/train_norm_stats_month2_fit.json",
+   "sha256": "678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/processed/month2_dense_unet_cache/train_fit/vi_norm.npy",
+   "sha256": "3ba172568728dc629e7d6e948e1284f7e664ddb74509ff4cc12cea1342c51251"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/processed/month2_dense_unet_cache/train_fit/vj_norm.npy",
+   "sha256": "dec56cf8d6127b9a655e57782b15a6593c44542c0bff3809e0e02829d073dbce"
+  }
+ ],
+ "numpy": "2.5.4",
+ "scipy": "1.18.1",
+ "python": "3.13.13",
+ "script": "f26_stats.py",
+ "spec_sha256": "9f24afc9359bf3568aa693cf43fe21135717538924152148c8c50d50893b3d47",
+ "cache": "month2_dense_unet_cache train_fit (760 frames)",
+ "role_for_observations": "train",
+ "replica": 0,
+ "runtime_s": 80.02311825752258,
+ "code_dirty_phase2_paths": false
+}

@@ -73,3 +73,4 @@ Thumbs.db
 *.out
 *.synctex.gz
 *.toc
+results/piv/phase2/f26/z_samples_*.npz

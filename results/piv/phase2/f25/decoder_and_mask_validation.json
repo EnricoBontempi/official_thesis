@@ -1,0 +1,54 @@
+{
+ "decoder_validation": {
+  "statistics_file": "I.4xd8gr7l/0h6c/bled/h4h3/99f/data/StatisticsVec#0.vectors",
+  "bytes": 1006716,
+  "decoded": false,
+  "error": "ValueError('rank-2 Vector array not found')"
+ },
+ "mask_check": {
+  "bytes": 1379435,
+  "xml_width_height_candidates": [
+   "1344",
+   "1024",
+   "867",
+   "553"
+  ],
+  "stage1_nonfinite_counts_frames_0_1_257_513": [
+   801,
+   801,
+   800,
+   799
+  ],
+  "nonfinite_intersection": 799,
+  "nonfinite_union": 804,
+  "mask_payload_unique_values": [
+   0,
+   1
+  ],
+  "origin_0_value0_overlap_with_nonfinite_intersection": {
+   "mask_nodes": 2758,
+   "intersection_nodes": 799,
+   "overlap": 36,
+   "jaccard": 0.010224368077250781
+  },
+  "origin_0_value_nonzero_overlap_with_nonfinite_intersection": {
+   "mask_nodes": 2183,
+   "intersection_nodes": 799,
+   "overlap": 763,
+   "jaccard": 0.3438485804416404
+  },
+  "origin_8_value0_overlap_with_nonfinite_intersection": {
+   "mask_nodes": 2691,
+   "intersection_nodes": 799,
+   "overlap": 189,
+   "jaccard": 0.057255377158436836
+  },
+  "origin_8_value_nonzero_overlap_with_nonfinite_intersection": {
+   "mask_nodes": 2250,
+   "intersection_nodes": 799,
+   "overlap": 610,
+   "jaccard": 0.25010250102501025
+  }
+ },
+ "decode_errors": []
+}
