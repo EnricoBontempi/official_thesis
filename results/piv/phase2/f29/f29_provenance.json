@@ -1,0 +1,26 @@
+{
+ "code_sha": "82e37e0e9b5e9fa54da43634074d5881fb8f0ef0",
+ "code_dirty_in_scripts_src_configs": true,
+ "stats_sha256": "678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e",
+ "read_log": [
+  {
+   "file": "/home/enric/projects/official_thesis/data/manifests/train_norm_stats_month2_fit.json",
+   "sha256": "678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/processed/month2_dense_unet_cache/train_fit/vi_norm.npy",
+   "sha256": "3ba172568728dc629e7d6e948e1284f7e664ddb74509ff4cc12cea1342c51251"
+  },
+  {
+   "file": "/home/enric/projects/official_thesis/data/processed/month2_dense_unet_cache/train_fit/vj_norm.npy",
+   "sha256": "dec56cf8d6127b9a655e57782b15a6593c44542c0bff3809e0e02829d073dbce"
+  }
+ ],
+ "numpy": "2.5.4",
+ "scipy": "1.18.1",
+ "python": "3.13.13",
+ "script": "f29_qualify_v11.py",
+ "spec_v11_sha256": "607510895c24a324a230e3f96a739daf6507f30c531693ffbc7bb2f0a2d842d2",
+ "runtime_s": 51.248748540878296,
+ "code_dirty_phase2_paths": true
+}
