@@ -63,16 +63,16 @@ open(T / "t3_swapcells_index.md", "w").write(md(t))
 # ---- windows
 bw = json.load(open(R2 / "f20/b_windows_content.json"))
 rows = [{"finestra": "intera slice", "righe × colonne": "0–127 × 0–127", "vettori validi (W)": "A: 15 624 (W = 1,3)", "% nodi con modulo di u > 20 m/s": round(100 * bw["slice_full"]["frac_u_gt_20"], 1),
-         "|u| medio (m/s)": round(bw["slice_full"]["mean_speed"], 1), "RMS di vj (m/s)": round(bw["slice_full"]["rms_vj"], 1), "% T < 1800 K (diagnostica)": round(100 * bw["slice_full"]["frac_T_lt_1800_DIAGNOSTIC"], 1)}]
+         "modulo medio di u (m/s)": round(bw["slice_full"]["mean_speed"], 1), "RMS di vj (m/s)": round(bw["slice_full"]["rms_vj"], 1), "% T < 1800 K (diagnostica)": round(100 * bw["slice_full"]["frac_T_lt_1800_DIAGNOSTIC"], 1)}]
 for f in ("B-in", "B-down", "B-off"):
     e = bw[f"{f}|primary"]
     rows.append({"finestra": f, "righe × colonne": f"{e['rows'][0]}–{e['rows'][1]} × {e['cols'][0]}–{e['cols'][1]}", "vettori validi (W)": f"{e['n_valid_vectors_W1.5']} (W = 1,5)",
-                 "% nodi con modulo di u > 20 m/s": round(100 * e["frac_u_gt_20"], 1), "|u| medio (m/s)": round(e["mean_speed"], 1), "RMS di vj (m/s)": round(e["rms_vj"], 1),
+                 "% nodi con modulo di u > 20 m/s": round(100 * e["frac_u_gt_20"], 1), "modulo medio di u (m/s)": round(e["mean_speed"], 1), "RMS di vj (m/s)": round(e["rms_vj"], 1),
                  "% T < 1800 K (diagnostica)": round(100 * e["frac_T_lt_1800_DIAGNOSTIC"], 1)})
 for f in ("B-in", "B-down", "B-off"):
     e = bw[f"{f}|swap"]
     rows.append({"finestra": f"{f} (SENS-SWAP)", "righe × colonne": f"{e['rows'][0]}–{e['rows'][1]} × {e['cols'][0]}–{e['cols'][1]}", "vettori validi (W)": f"{e['n_valid_vectors_W1.5']} (W = 1,5)",
-                 "% nodi con modulo di u > 20 m/s": round(100 * e["frac_u_gt_20"], 1), "|u| medio (m/s)": round(e["mean_speed"], 1), "RMS di vj (m/s)": round(e["rms_vj"], 1),
+                 "% nodi con modulo di u > 20 m/s": round(100 * e["frac_u_gt_20"], 1), "modulo medio di u (m/s)": round(e["mean_speed"], 1), "RMS di vj (m/s)": round(e["rms_vj"], 1),
                  "% T < 1800 K (diagnostica)": round(100 * e["frac_T_lt_1800_DIAGNOSTIC"], 1)})
 open(T / "t4_B_windows.md", "w").write(md(pd.DataFrame(rows)))
 
