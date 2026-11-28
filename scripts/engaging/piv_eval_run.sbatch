@@ -11,7 +11,7 @@ cd "${PIV_TIP:?}" || exit 2
 [[ "$(git rev-parse HEAD)" == "${EXPECT_SHA:?}" ]] || { echo "REFUSE sha"; exit 5; }
 [[ -z "$(git status --porcelain | grep -v '^[?][?] \.git_commit$' || true)" ]] || { echo "REFUSE dirty"; exit 5; }
 IFS=':' read -r -a LIST <<< "${PIV_RUN_IDS:?}"
-RUN="${LIST[${SLURM_ARRAY_TASK_ID:?}]:?}"
+RUN="${LIST[${SLURM_ARRAY_TASK_ID:-0}]:?}"
 PY="${PY:-$HOME/envs/official_thesis/bin/python}"
 export PYTHONPATH="$PIV_TIP/src" PYTHONUNBUFFERED=1
 TR="$($PY -c "import json;print(json.load(open('${PIV_MATRIX:?}'))['out_root'])")"
