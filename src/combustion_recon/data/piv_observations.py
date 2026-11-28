@@ -42,7 +42,8 @@ import numpy as np
 import yaml
 from scipy.ndimage import convolve, correlate1d, label
 from scipy.optimize import brentq
-from scipy.special import erf
+from scipy.special import erf, ndtr
+from scipy.stats import t as student_t
 
 from combustion_recon.data.masks import stable_seed
 from combustion_recon.data.month2_observations import mask_hash
@@ -381,13 +382,19 @@ class PivObservationGenerator:
 
     # -- main entry ------------------------------------------------------------------
     def observe(self, config_id: str, vi_phys: np.ndarray, vj_phys: np.ndarray, *, sim_id: str, frame_index: int,
-                role: str, replica: int = 0, return_intermediates: bool = False) -> PivObservation:
-        """One observation packet.  The signature has no temperature argument by design."""
+                role: str, replica: int = 0, return_intermediates: bool = False, restrict_sites: np.ndarray | None = None,
+                cfg_override: Mapping[str, Any] | None = None) -> PivObservation:
+        """One observation packet.  The signature has no temperature argument by design.
+
+        ``restrict_sites`` (evaluation only): flat node indices; the observed set is intersected with them *after* the validity
+        rule and before rejections (the E0v/E1/E2 contrasts at the historical sites). ``cfg_override`` (evaluation only) replaces the
+        named configuration by an explicit mapping, labelled ``config_id`` (the E4*/E5* diagnostics on all 16 384 nodes).
+        """
         if role not in ROLE_SEEDS:
             raise PivError(f"role {role!r} refused (allowed: {tuple(ROLE_SEEDS)}); TEST is never generated here")
         if any(sim_id.startswith(p) for p in FORBIDDEN_ROLE_PREFIXES):
             raise PivError("TEST identifiers refused")
-        cfg = self.spec.config(config_id)
+        cfg = dict(cfg_override) if cfg_override is not None else self.spec.config(config_id)
         vref = self.spec.vref(sim_id)  # raises for any condition that is not TRAIN/VAL
         H, W = GRID_HW
         for a in (vi_phys, vj_phys):
@@ -410,6 +417,9 @@ class PivObservationGenerator:
         which_edge = "response_tophat" if response == "tophat" else "response_mhg"
         if cfg.get("edge_strict", False):
             valid = valid & ~self._edge_mask(rect, which_edge, conv, w_mm)
+        if restrict_sites is not None:
+            rm = np.zeros(H * W, dtype=bool); rm[np.asarray(restrict_sites, dtype=np.int64)] = True
+            valid = valid & rm.reshape(H, W)
         sites_all = np.flatnonzero(valid.ravel())
 
         fields = {"vi": np.asarray(vi_phys, dtype=np.float64), "vj": np.asarray(vj_phys, dtype=np.float64)}
@@ -425,7 +435,11 @@ class PivObservationGenerator:
             if noise_mode == "none" or sigma_px == 0.0:
                 err[name] = np.zeros((H, W))
             else:
-                z = self._noise_field(role, comp, sim_id, frame_index, replica, conv, w_mm, correlated=(noise_mode == "corr"))
+                z = self._noise_field(role, comp, sim_id, frame_index, replica, conv, w_mm, correlated=(noise_mode in ("corr", "corr_t")))
+                if noise_mode == "corr_t":
+                    # SENS-TAIL (v1.1, R2 sec. 4): monotone marginal map z -> F_t^-1(Phi(z); nu), rescaled to unit variance
+                    nu = float(cfg["t_nu"])
+                    z = student_t.ppf(ndtr(z), nu) / math.sqrt(nu / (nu - 2.0))
                 err[name] = (sigma_px * vref / d_max) * z
         vals = {n: filtered[n] + err[n] for n in VELOCITY_COMPONENTS}
 
@@ -446,11 +460,17 @@ class PivObservationGenerator:
             else:
                 raise PivError(f"unknown rejection {rej!r}")
         sub_info = None
+        sub_rule = cfg.get("substitution", "mean3x3_iterative")
+        if sub_rule not in SUBSTITUTION_HALF:
+            raise PivError(f"unknown substitution rule {sub_rule!r}")
         if level == "sub":
             if rej is None:
                 raise PivError("level 'sub' requires a rejection mask")
+            passes = []
             for n in VELOCITY_COMPONENTS:
-                vals[n], sub_info = substitute_iterative_3x3(vals[n], valid & ~rejected, valid)
+                vals[n], pn = substitute_iterative(vals[n], valid & ~rejected, valid, half=SUBSTITUTION_HALF[sub_rule])
+                passes.append(pn)
+            sub_info = max(passes)
             keep = valid
         elif level == "flag":
             keep = valid & ~rejected
@@ -479,6 +499,7 @@ class PivObservationGenerator:
             "response": response, "noise": noise_mode, "sigma_px": sigma_px, "sigma_u_m_s": sigma_px * vref / d_max if noise_mode != "none" else 0.0,
             "v_ref_m_s": vref, "rejection": rej, "level": level, "n_valid_vectors": int(valid.sum()),
             "n_observed": int(sites.size), "n_rejected": int(rejected.sum()), "n_substituted": int(rejected.sum()) if level == "sub" else 0,
+            "substitution_rule": sub_rule if level == "sub" else None, "sub_passes": sub_info, "sub_passes_gt3": (sub_info > 3) if sub_info is not None else None,
             "valid_mask_hash": mask_hash(valid), "observed_mask_hash": obs.mask_hash, "obs_hash": obs_hash,
             "n_edge_vectors": int((valid & self._edge_mask(rect, which_edge, conv, w_mm)).sum()) if response != "ideal" else None,
             "temperature_used": False,
@@ -493,15 +514,24 @@ class PivObservationGenerator:
         return PivObservation(obs=obs, phys_coords=phys_coords, config_id=config_id, meta=meta, obs_hash=obs_hash, intermediates=inter)
 
 
-def substitute_iterative_3x3(values: np.ndarray, known: np.ndarray, domain: np.ndarray):
-    """Replace unknown vectors of ``domain`` with the mean of their known 3x3 (8-)neighbours, iteratively.
+SUBSTITUTION_HALF = {"mean3x3_iterative": 1, "mean5x5_iterative": 2}
 
+
+def substitute_iterative_3x3(values: np.ndarray, known: np.ndarray, domain: np.ndarray):
+    """Iterative 3x3 mean (v1 rule). Thin wrapper kept so that v1 behaviour is untouched."""
+    return substitute_iterative(values, known, domain, half=1)
+
+
+def substitute_iterative(values: np.ndarray, known: np.ndarray, domain: np.ndarray, half: int = 1):
+    """Replace unknown vectors of ``domain`` with the mean of their known (2*half+1)^2 neighbours, iteratively.
+
+    half=1: 3x3 (8 neighbours, v1 rule); half=2: 5x5 (24 neighbours, v1.1 variant, area declared in the Cardiff XML).
     Each pass fills every unknown node having at least one known neighbour (simultaneous update);
     nodes filled in a pass count as known in the next one.  Returns (new_values, n_passes).
     """
     vals = np.where(known, values, 0.0)
     kn = known.copy()
-    ker = np.ones((3, 3)); ker[1, 1] = 0.0
+    ker = np.ones((2 * half + 1, 2 * half + 1)); ker[half, half] = 0.0
     passes = 0
     while True:
         unknown = domain & ~kn

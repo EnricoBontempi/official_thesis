@@ -1,0 +1,1216 @@
+format: piv_observation_spec_v1
+spec_version: 1.1
+date: '2026-11-28'
+status: 'v1.1: additive correction after R2 (decisione_R2 sec. 7); every v1 value and configuration is unchanged; v1 stays in the repository'
+roadmap:
+  path: mese3/02_virtual_piv/roadmap_tecnica_piv.md
+  decision: mese3/02_virtual_piv/decisione_R1.md
+  commit_decision_R1: 05414c2
+  decision_R2: mese3/02_virtual_piv/decisione_R2.md
+  commit_decision_R2: 82e37e0
+orientation:
+  status: probable, NOT confirmed
+  components_observed:
+  - vi
+  - vj
+  vi: transverse in-plane (probable)
+  vj: axial in-plane (probable)
+  vk: out of plane, not used
+  residual_uncertainty: vi could be out of plane; sign of components and origin of coordinates unknown
+  oop_sensitivity: SENS-OOP disabled
+geometry:
+  grid_hw:
+  - 128
+  - 128
+  steps_mm:
+    rows: 0.5810574316105278
+    cols: 0.7581226848528722
+  physical_convention_for_generator: rows<->x (lateral, centred on the axis at row 63.5), cols<->y (axial, inlet at high columns)
+  historical_convention_for_networks: 'cols<->x, rows<->y: x_scaled/y_scaled, GLU coordinates and CanonicalSparseObservation.velocity_coords are
+    UNCHANGED'
+  B_side_mm: 30.0
+normalization:
+  stats_path: data/manifests/train_norm_stats_month2_fit.json
+  stats_sha256: 678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e
+  applied: after the observation operators, frozen fit-only z-score
+reference_velocity:
+  definition: p99.9 of |u_planar|=sqrt(vi^2+vj^2) over all nodes of frames 0:2001:10 (201 frames) of the raw record; velocity only
+  per_condition_m_s:
+    0NH3_0.85.h5: 52.884134
+    0NH3_0.9.h5: 42.573443
+    0NH3_1.h5: 34.885686
+    0NH3_1.1.h5: 43.73678
+    0NH3_1.15.h5: 28.680657
+    0NH3_1.2.h5: 47.028603
+    0NH3_1.25.h5: 45.719705
+    20NH3_0.85.h5: 36.717829
+    20NH3_0.9.h5: 34.436117
+    20NH3_1.05.h5: 29.450685
+    20NH3_1.2.h5: 30.94575
+    20NH3_1.25.h5: 29.579176
+    40NH3_0.85.h5: 35.951689
+    40NH3_1.h5: 31.234492
+    40NH3_1.1.h5: 32.102089
+    40NH3_1.2.h5: 30.535441
+    80NH3_0.9.h5: 34.270273
+    80NH3_1.05.h5: 31.480425
+    80NH3_1.15.h5: 28.205988
+    80NH3_1.2.h5: 27.482071
+    0NH3_1.05.h5: 38.476483
+    20NH3_1.1.h5: 27.686312
+    40NH3_0.9.h5: 33.712239
+  bootstrap95_blocks10:
+    0NH3_0.85.h5:
+    - 50.448
+    - 54.1409
+    0NH3_0.9.h5:
+    - 42.4404
+    - 42.6942
+    0NH3_1.h5:
+    - 34.7749
+    - 34.9916
+    0NH3_1.1.h5:
+    - 43.1193
+    - 44.3188
+    0NH3_1.15.h5:
+    - 28.5002
+    - 28.8852
+    0NH3_1.2.h5:
+    - 44.0497
+    - 49.2007
+    0NH3_1.25.h5:
+    - 43.6551
+    - 47.8724
+    20NH3_0.85.h5:
+    - 36.5148
+    - 37.0515
+    20NH3_0.9.h5:
+    - 34.1978
+    - 34.6135
+    20NH3_1.05.h5:
+    - 29.2455
+    - 29.7108
+    20NH3_1.2.h5:
+    - 30.6262
+    - 31.3393
+    20NH3_1.25.h5:
+    - 29.1026
+    - 29.9639
+    40NH3_0.85.h5:
+    - 35.7519
+    - 36.2107
+    40NH3_1.h5:
+    - 30.9759
+    - 31.5111
+    40NH3_1.1.h5:
+    - 31.7994
+    - 32.3574
+    40NH3_1.2.h5:
+    - 30.1187
+    - 30.9286
+    80NH3_0.9.h5:
+    - 34.0996
+    - 34.4292
+    80NH3_1.05.h5:
+    - 31.257
+    - 31.7034
+    80NH3_1.15.h5:
+    - 27.7739
+    - 28.5313
+    80NH3_1.2.h5:
+    - 27.1885
+    - 27.7503
+    0NH3_1.05.h5:
+    - 38.2217
+    - 38.7101
+    20NH3_1.1.h5:
+    - 27.5718
+    - 27.7987
+    40NH3_0.9.h5:
+    - 33.5132
+    - 33.9276
+  source_table: results/piv/phase2/f20/vref_full_record.csv
+  test_conditions: not computed; only at the authorised opening (R5)
+error:
+  sigma_px:
+    main: 0.1
+    lo: 0.06
+    hi: 0.15
+  d_max_px: 6.0
+  distribution: gaussian
+  unit: m/s
+  formula: sigma_u,c = sigma_px * v_ref,c / d_max, uniform over the field, per in-plane component
+  tail_sensitivity:
+    construction: standardised correlated Gaussian field of the matching PIV config -> z_t = F_t^-1(Phi(z); nu) / sqrt(nu/(nu-2)) node by node;
+      times sigma_u,c
+    nu: 7
+    excess_kurtosis_marginal: 6/(nu-4) = 2
+    motivation: 'Neal residuals after the 5-MAD mask: excess kurtosis 1.6-2.8 (different processing and reference: not transferred as a PIV-GTMC
+      property)'
+    keeps: sigma_u, rank order (rank correlation identical to the PIV config), spatial structure; Pearson correlation changes slightly and is
+      reported
+    class: sensibilita (not calibrated for flames)
+kernels:
+  primary:
+    '1.0':
+      response_mhg:
+        rows:
+          param_mm: 0.408282764858
+          param_nominal_mm: 0.460661629567
+          lsr_target_mm: 0.93
+          lsr_disc_mm: 0.93
+          err_rel: -0.0
+          half_nodes: 3
+          support_mm: 1.633131059431
+          neg_mass: -0.06061715567
+        cols:
+          param_mm: 0.413769306343
+          param_nominal_mm: 0.460661629567
+          lsr_target_mm: 0.93
+          lsr_disc_mm: 0.93
+          err_rel: -1.0e-12
+          half_nodes: 2
+          support_mm: 1.655077225372
+          neg_mass: -0.020523721914
+      noise:
+        rows:
+          param_mm: 0.540388129575
+          param_nominal_mm: 0.594402102667
+          lsr_target_mm: 1.2
+          lsr_disc_mm: 1.2
+          err_rel: 0.0
+          half_nodes: 4
+          support_mm: 2.161552518299
+          neg_mass: -0.081393019945
+        cols:
+          param_mm: 0.526837592988
+          param_nominal_mm: 0.594402102667
+          lsr_target_mm: 1.2
+          lsr_disc_mm: 1.2
+          err_rel: 0.0
+          half_nodes: 3
+          support_mm: 2.107350371953
+          neg_mass: -0.058834414241
+      response_tophat:
+        rows:
+          param_mm: 0.785510911317
+          param_nominal_mm: 1.0
+          lsr_target_mm: 1.0
+          lsr_disc_mm: 1.0
+          err_rel: 0.0
+          half_nodes: 1
+          support_mm: 0.392755455659
+          neg_mass: 0.0
+        cols:
+          param_mm: 0.875944133504
+          param_nominal_mm: 1.0
+          lsr_target_mm: 1.0
+          lsr_disc_mm: 1.0
+          err_rel: -0.0
+          half_nodes: 1
+          support_mm: 0.437972066752
+          neg_mass: 0.0
+      window_margin_nodes:
+        rows: 1
+        cols: 1
+    '1.3':
+      response_mhg:
+        rows:
+          param_mm: 0.545146066123
+          param_nominal_mm: 0.598860118437
+          lsr_target_mm: 1.209
+          lsr_disc_mm: 1.209
+          err_rel: 0.0
+          half_nodes: 4
+          support_mm: 2.180584264492
+          neg_mass: -0.080929387887
+        cols:
+          param_mm: 0.530769404251
+          param_nominal_mm: 0.598860118437
+          lsr_target_mm: 1.209
+          lsr_disc_mm: 1.209
+          err_rel: -0.0
+          half_nodes: 3
+          support_mm: 2.123077617004
+          neg_mass: -0.060036178596
+      noise:
+        rows:
+          param_mm: 0.731296400052
+          param_nominal_mm: 0.772722733467
+          lsr_target_mm: 1.56
+          lsr_disc_mm: 1.56
+          err_rel: -0.0
+          half_nodes: 5
+          support_mm: 2.925185600209
+          neg_mass: -0.071132879885
+        cols:
+          param_mm: 0.702064928952
+          param_nominal_mm: 0.772722733467
+          lsr_target_mm: 1.56
+          lsr_disc_mm: 1.56
+          err_rel: 0.0
+          half_nodes: 4
+          support_mm: 2.808259715808
+          neg_mass: -0.081588798657
+      response_tophat:
+        rows:
+          param_mm: 0.954789381399
+          param_nominal_mm: 1.3
+          lsr_target_mm: 1.3
+          lsr_disc_mm: 1.3
+          err_rel: 0.0
+          half_nodes: 1
+          support_mm: 0.477394690699
+          neg_mass: 0.0
+        cols:
+          param_mm: 1.022487559714
+          param_nominal_mm: 1.3
+          lsr_target_mm: 1.3
+          lsr_disc_mm: 1.3
+          err_rel: 0.0
+          half_nodes: 1
+          support_mm: 0.511243779857
+          neg_mass: 0.0
+      window_margin_nodes:
+        rows: 2
+        cols: 1
+    '1.5':
+      response_mhg:
+        rows:
+          param_mm: 0.644232812992
+          param_nominal_mm: 0.69099244435
+          lsr_target_mm: 1.395
+          lsr_disc_mm: 1.395
+          err_rel: 0.0
+          half_nodes: 4
+          support_mm: 2.576931251968
+          neg_mass: -0.056130990568
+        cols:
+          param_mm: 0.617365590172
+          param_nominal_mm: 0.69099244435
+          lsr_target_mm: 1.395
+          lsr_disc_mm: 1.395
+          err_rel: 0.0
+          half_nodes: 3
+          support_mm: 2.469462360688
+          neg_mass: -0.079052713698
+      noise:
+        rows:
+          param_mm: 0.855982845802
+          param_nominal_mm: 0.891603154
+          lsr_target_mm: 1.8
+          lsr_disc_mm: 1.8
+          err_rel: 0.0
+          half_nodes: 6
+          support_mm: 3.423931383207
+          neg_mass: -0.08250408212
+        cols:
+          param_mm: 0.829861686806
+          param_nominal_mm: 0.891603154
+          lsr_target_mm: 1.8
+          lsr_disc_mm: 1.8
+          err_rel: 0.0
+          half_nodes: 4
+          support_mm: 3.319446747225
+          neg_mass: -0.059101462732
+      response_tophat:
+        rows:
+          param_mm: 1.110716998944
+          param_nominal_mm: 1.5
+          lsr_target_mm: 1.5
+          lsr_disc_mm: 1.5
+          err_rel: -0.0
+          half_nodes: 1
+          support_mm: 0.555358499472
+          neg_mass: 0.0
+        cols:
+          param_mm: 1.128094118549
+          param_nominal_mm: 1.5
+          lsr_target_mm: 1.5
+          lsr_disc_mm: 1.5
+          err_rel: -0.0
+          half_nodes: 1
+          support_mm: 0.564047059275
+          neg_mass: 0.0
+      window_margin_nodes:
+        rows: 2
+        cols: 1
+    '1.9':
+      response_mhg:
+        rows:
+          param_mm: 0.838947570125
+          param_nominal_mm: 0.875257096177
+          lsr_target_mm: 1.767
+          lsr_disc_mm: 1.767
+          err_rel: 0.0
+          half_nodes: 6
+          support_mm: 3.355790280501
+          neg_mass: -0.082227887633
+        cols:
+          param_mm: 0.812287636016
+          param_nominal_mm: 0.875257096177
+          lsr_target_mm: 1.767
+          lsr_disc_mm: 1.767
+          err_rel: 0.0
+          half_nodes: 4
+          support_mm: 3.249150544063
+          neg_mass: -0.063680470816
+      noise:
+        rows:
+          param_mm: 1.101242817008
+          param_nominal_mm: 1.129363995067
+          lsr_target_mm: 2.28
+          lsr_disc_mm: 2.28
+          err_rel: 0.0
+          half_nodes: 8
+          support_mm: 4.40497126803
+          neg_mass: -0.078850491917
+        cols:
+          param_mm: 1.08143955469
+          param_nominal_mm: 1.129363995067
+          lsr_target_mm: 2.28
+          lsr_disc_mm: 2.28
+          err_rel: -0.0
+          half_nodes: 6
+          support_mm: 4.325758218759
+          neg_mass: -0.081875928183
+      response_tophat:
+        rows:
+          param_mm: 1.822739159575
+          param_nominal_mm: 1.9
+          lsr_target_mm: 1.9
+          lsr_disc_mm: 1.9
+          err_rel: -0.0
+          half_nodes: 2
+          support_mm: 0.911369579787
+          neg_mass: 0.0
+        cols:
+          param_mm: 1.397245463365
+          param_nominal_mm: 1.9
+          lsr_target_mm: 1.9
+          lsr_disc_mm: 1.9
+          err_rel: -0.0
+          half_nodes: 1
+          support_mm: 0.698622731683
+          neg_mass: 0.0
+      window_margin_nodes:
+        rows: 2
+        cols: 2
+  swap:
+    '1.0':
+      response_mhg:
+        rows:
+          param_mm: 0.413769306343
+          param_nominal_mm: 0.460661629567
+          lsr_target_mm: 0.93
+          lsr_disc_mm: 0.93
+          err_rel: -1.0e-12
+          half_nodes: 2
+          support_mm: 1.655077225372
+          neg_mass: -0.020523721914
+        cols:
+          param_mm: 0.408282764858
+          param_nominal_mm: 0.460661629567
+          lsr_target_mm: 0.93
+          lsr_disc_mm: 0.93
+          err_rel: -0.0
+          half_nodes: 3
+          support_mm: 1.633131059431
+          neg_mass: -0.06061715567
+      noise:
+        rows:
+          param_mm: 0.526837592988
+          param_nominal_mm: 0.594402102667
+          lsr_target_mm: 1.2
+          lsr_disc_mm: 1.2
+          err_rel: 0.0
+          half_nodes: 3
+          support_mm: 2.107350371953
+          neg_mass: -0.058834414241
+        cols:
+          param_mm: 0.540388129575
+          param_nominal_mm: 0.594402102667
+          lsr_target_mm: 1.2
+          lsr_disc_mm: 1.2
+          err_rel: 0.0
+          half_nodes: 4
+          support_mm: 2.161552518299
+          neg_mass: -0.081393019945
+      response_tophat:
+        rows:
+          param_mm: 0.875944133504
+          param_nominal_mm: 1.0
+          lsr_target_mm: 1.0
+          lsr_disc_mm: 1.0
+          err_rel: -0.0
+          half_nodes: 1
+          support_mm: 0.437972066752
+          neg_mass: 0.0
+        cols:
+          param_mm: 0.785510911317
+          param_nominal_mm: 1.0
+          lsr_target_mm: 1.0
+          lsr_disc_mm: 1.0
+          err_rel: 0.0
+          half_nodes: 1
+          support_mm: 0.392755455659
+          neg_mass: 0.0
+      window_margin_nodes:
+        rows: 1
+        cols: 1
+    '1.3':
+      response_mhg:
+        rows:
+          param_mm: 0.530769404251
+          param_nominal_mm: 0.598860118437
+          lsr_target_mm: 1.209
+          lsr_disc_mm: 1.209
+          err_rel: -0.0
+          half_nodes: 3
+          support_mm: 2.123077617004
+          neg_mass: -0.060036178596
+        cols:
+          param_mm: 0.545146066123
+          param_nominal_mm: 0.598860118437
+          lsr_target_mm: 1.209
+          lsr_disc_mm: 1.209
+          err_rel: 0.0
+          half_nodes: 4
+          support_mm: 2.180584264492
+          neg_mass: -0.080929387887
+      noise:
+        rows:
+          param_mm: 0.702064928952
+          param_nominal_mm: 0.772722733467
+          lsr_target_mm: 1.56
+          lsr_disc_mm: 1.56
+          err_rel: 0.0
+          half_nodes: 4
+          support_mm: 2.808259715808
+          neg_mass: -0.081588798657
+        cols:
+          param_mm: 0.731296400052
+          param_nominal_mm: 0.772722733467
+          lsr_target_mm: 1.56
+          lsr_disc_mm: 1.56
+          err_rel: -0.0
+          half_nodes: 5
+          support_mm: 2.925185600209
+          neg_mass: -0.071132879885
+      response_tophat:
+        rows:
+          param_mm: 1.022487559714
+          param_nominal_mm: 1.3
+          lsr_target_mm: 1.3
+          lsr_disc_mm: 1.3
+          err_rel: 0.0
+          half_nodes: 1
+          support_mm: 0.511243779857
+          neg_mass: 0.0
+        cols:
+          param_mm: 0.954789381399
+          param_nominal_mm: 1.3
+          lsr_target_mm: 1.3
+          lsr_disc_mm: 1.3
+          err_rel: 0.0
+          half_nodes: 1
+          support_mm: 0.477394690699
+          neg_mass: 0.0
+      window_margin_nodes:
+        rows: 1
+        cols: 2
+    '1.5':
+      response_mhg:
+        rows:
+          param_mm: 0.617365590172
+          param_nominal_mm: 0.69099244435
+          lsr_target_mm: 1.395
+          lsr_disc_mm: 1.395
+          err_rel: 0.0
+          half_nodes: 3
+          support_mm: 2.469462360688
+          neg_mass: -0.079052713698
+        cols:
+          param_mm: 0.644232812992
+          param_nominal_mm: 0.69099244435
+          lsr_target_mm: 1.395
+          lsr_disc_mm: 1.395
+          err_rel: 0.0
+          half_nodes: 4
+          support_mm: 2.576931251968
+          neg_mass: -0.056130990568
+      noise:
+        rows:
+          param_mm: 0.829861686806
+          param_nominal_mm: 0.891603154
+          lsr_target_mm: 1.8
+          lsr_disc_mm: 1.8
+          err_rel: 0.0
+          half_nodes: 4
+          support_mm: 3.319446747225
+          neg_mass: -0.059101462732
+        cols:
+          param_mm: 0.855982845802
+          param_nominal_mm: 0.891603154
+          lsr_target_mm: 1.8
+          lsr_disc_mm: 1.8
+          err_rel: 0.0
+          half_nodes: 6
+          support_mm: 3.423931383207
+          neg_mass: -0.08250408212
+      response_tophat:
+        rows:
+          param_mm: 1.128094118549
+          param_nominal_mm: 1.5
+          lsr_target_mm: 1.5
+          lsr_disc_mm: 1.5
+          err_rel: -0.0
+          half_nodes: 1
+          support_mm: 0.564047059275
+          neg_mass: 0.0
+        cols:
+          param_mm: 1.110716998944
+          param_nominal_mm: 1.5
+          lsr_target_mm: 1.5
+          lsr_disc_mm: 1.5
+          err_rel: -0.0
+          half_nodes: 1
+          support_mm: 0.555358499472
+          neg_mass: 0.0
+      window_margin_nodes:
+        rows: 1
+        cols: 2
+    '1.9':
+      response_mhg:
+        rows:
+          param_mm: 0.812287636016
+          param_nominal_mm: 0.875257096177
+          lsr_target_mm: 1.767
+          lsr_disc_mm: 1.767
+          err_rel: 0.0
+          half_nodes: 4
+          support_mm: 3.249150544063
+          neg_mass: -0.063680470816
+        cols:
+          param_mm: 0.838947570125
+          param_nominal_mm: 0.875257096177
+          lsr_target_mm: 1.767
+          lsr_disc_mm: 1.767
+          err_rel: 0.0
+          half_nodes: 6
+          support_mm: 3.355790280501
+          neg_mass: -0.082227887633
+      noise:
+        rows:
+          param_mm: 1.08143955469
+          param_nominal_mm: 1.129363995067
+          lsr_target_mm: 2.28
+          lsr_disc_mm: 2.28
+          err_rel: -0.0
+          half_nodes: 6
+          support_mm: 4.325758218759
+          neg_mass: -0.081875928183
+        cols:
+          param_mm: 1.101242817008
+          param_nominal_mm: 1.129363995067
+          lsr_target_mm: 2.28
+          lsr_disc_mm: 2.28
+          err_rel: 0.0
+          half_nodes: 8
+          support_mm: 4.40497126803
+          neg_mass: -0.078850491917
+      response_tophat:
+        rows:
+          param_mm: 1.397245463365
+          param_nominal_mm: 1.9
+          lsr_target_mm: 1.9
+          lsr_disc_mm: 1.9
+          err_rel: -0.0
+          half_nodes: 1
+          support_mm: 0.698622731683
+          neg_mass: 0.0
+        cols:
+          param_mm: 1.822739159575
+          param_nominal_mm: 1.9
+          lsr_target_mm: 1.9
+          lsr_disc_mm: 1.9
+          err_rel: -0.0
+          half_nodes: 2
+          support_mm: 0.911369579787
+          neg_mass: 0.0
+      window_margin_nodes:
+        rows: 2
+        cols: 2
+kernel_definitions:
+  mhg: F(s) = (1 - b s^2/sig^2) exp(-s^2/2sig^2)/((1-b) sig sqrt(2 pi)), b=0.35; discrete weights = integral of F over the LES cell, clipped to
+    +-4 sig, renormalised
+  tophat: weights = overlap of [-W_eff/2, W_eff/2] with the cell, / W_eff
+  lsr_discrete: step / sum(w^2)
+  calibration: param tuned per axis so that the DISCRETE L_sr equals the target (response 0.93 W, noise 1.2 W, top-hat W); tolerance 1 %; failure
+    raises instead of forcing
+windows_B:
+  rule: '30 x 30 mm; B-in: rows centred on the axis (63.5), columns adjacent to the inlet (last column); B-down: same rows, adjacent window towards
+    lower columns; B-off: columns as B-in, rows starting at row 64'
+  primary_steps:
+    B-in:
+    - 38
+    - 89
+    - 88
+    - 127
+    B-down:
+    - 38
+    - 89
+    - 48
+    - 87
+    B-off:
+    - 64
+    - 115
+    - 88
+    - 127
+  swap_steps:
+    B-in:
+    - 44
+    - 83
+    - 76
+    - 127
+    B-down:
+    - 44
+    - 83
+    - 24
+    - 75
+    B-off:
+    - 64
+    - 103
+    - 76
+    - 127
+  format: '[row0, row1, col0, col1] inclusive'
+  train_position: B-in
+configs:
+  PIV-A:
+    field: A
+    W_mm: 1.3
+    response: mhg
+    noise: corr
+    sigma_px: 0.1
+    steps: primary
+    role: main
+    note: training+evaluation
+  IDEAL-A:
+    field: A
+    W_mm: 1.3
+    response: ideal
+    noise: none
+    sigma_px: 0.0
+    steps: primary
+    role: control
+    note: ideal LES values at the valid nodes of the matching PIV config
+  FILT-A:
+    field: A
+    W_mm: 1.3
+    response: mhg
+    noise: none
+    sigma_px: 0.0
+    steps: primary
+    role: control
+    note: response only, no random error (contrast filter vs error)
+  PIV-B-in:
+    field: B-in
+    W_mm: 1.5
+    response: mhg
+    noise: corr
+    sigma_px: 0.1
+    steps: primary
+    role: main
+    note: training+evaluation
+  IDEAL-B-in:
+    field: B-in
+    W_mm: 1.5
+    response: ideal
+    noise: none
+    sigma_px: 0.0
+    steps: primary
+    role: control
+    note: ideal LES values at the valid nodes of the matching PIV config
+  FILT-B-in:
+    field: B-in
+    W_mm: 1.5
+    response: mhg
+    noise: none
+    sigma_px: 0.0
+    steps: primary
+    role: control
+    note: response only, no random error (contrast filter vs error)
+  PIV-B-down:
+    field: B-down
+    W_mm: 1.5
+    response: mhg
+    noise: corr
+    sigma_px: 0.1
+    steps: primary
+    role: main
+    note: evaluation only
+  IDEAL-B-down:
+    field: B-down
+    W_mm: 1.5
+    response: ideal
+    noise: none
+    sigma_px: 0.0
+    steps: primary
+    role: control
+    note: ideal LES values at the valid nodes of the matching PIV config
+  FILT-B-down:
+    field: B-down
+    W_mm: 1.5
+    response: mhg
+    noise: none
+    sigma_px: 0.0
+    steps: primary
+    role: control
+    note: response only, no random error (contrast filter vs error)
+  PIV-B-off:
+    field: B-off
+    W_mm: 1.5
+    response: mhg
+    noise: corr
+    sigma_px: 0.1
+    steps: primary
+    role: main
+    note: evaluation only
+  IDEAL-B-off:
+    field: B-off
+    W_mm: 1.5
+    response: ideal
+    noise: none
+    sigma_px: 0.0
+    steps: primary
+    role: control
+    note: ideal LES values at the valid nodes of the matching PIV config
+  FILT-B-off:
+    field: B-off
+    W_mm: 1.5
+    response: mhg
+    noise: none
+    sigma_px: 0.0
+    steps: primary
+    role: control
+    note: response only, no random error (contrast filter vs error)
+  IDEAL-full:
+    field: full
+    W_mm: 1.3
+    response: ideal
+    noise: none
+    sigma_px: 0.0
+    steps: primary
+    role: control
+    note: all 16384 nodes, evaluation layout reference; never trained
+  SENS-TH-A:
+    field: A
+    W_mm: 1.3
+    response: tophat
+    noise: corr
+    sigma_px: 0.1
+    steps: primary
+    role: sensitivity
+    note: single-pass top-hat calibrated to L_sr,disc = W (R1 sec. 5)
+  SENS-SWAP-A:
+    field: A
+    W_mm: 1.3
+    response: mhg
+    noise: corr
+    sigma_px: 0.1
+    steps: swap
+    role: sensitivity
+    note: swapped steps = historical convention (cols<->x)
+  SENS-EDGE-A:
+    field: A
+    W_mm: 1.3
+    response: mhg
+    noise: corr
+    sigma_px: 0.1
+    steps: primary
+    role: sensitivity
+    note: only vectors whose kernel support is fully inside the field
+    edge_strict: true
+  SENS-SIGLO-A:
+    field: A
+    W_mm: 1.3
+    response: mhg
+    noise: corr
+    sigma_px: 0.06
+    steps: primary
+    role: sensitivity
+    note: sigma_px 0.06 (WIE17 measured)
+  SENS-SIGHI-A:
+    field: A
+    W_mm: 1.3
+    response: mhg
+    noise: corr
+    sigma_px: 0.15
+    steps: primary
+    role: sensitivity
+    note: sigma_px 0.15 (WIE17 synthetic DaVis)
+  SENS-RHO0-A:
+    field: A
+    W_mm: 1.3
+    response: mhg
+    noise: indep
+    sigma_px: 0.1
+    steps: primary
+    role: sensitivity
+    note: 'independent error per node: modelling limit case, not the review result'
+  SENS-TH-B-in:
+    field: B-in
+    W_mm: 1.5
+    response: tophat
+    noise: corr
+    sigma_px: 0.1
+    steps: primary
+    role: sensitivity
+    note: single-pass top-hat calibrated to L_sr,disc = W (R1 sec. 5)
+  SENS-SWAP-B-in:
+    field: B-in
+    W_mm: 1.5
+    response: mhg
+    noise: corr
+    sigma_px: 0.1
+    steps: swap
+    role: sensitivity
+    note: swapped steps = historical convention (cols<->x)
+  SENS-EDGE-B-in:
+    field: B-in
+    W_mm: 1.5
+    response: mhg
+    noise: corr
+    sigma_px: 0.1
+    steps: primary
+    role: sensitivity
+    note: only vectors whose kernel support is fully inside the field
+    edge_strict: true
+  SENS-SIGLO-B-in:
+    field: B-in
+    W_mm: 1.5
+    response: mhg
+    noise: corr
+    sigma_px: 0.06
+    steps: primary
+    role: sensitivity
+    note: sigma_px 0.06 (WIE17 measured)
+  SENS-SIGHI-B-in:
+    field: B-in
+    W_mm: 1.5
+    response: mhg
+    noise: corr
+    sigma_px: 0.15
+    steps: primary
+    role: sensitivity
+    note: sigma_px 0.15 (WIE17 synthetic DaVis)
+  SENS-RHO0-B-in:
+    field: B-in
+    W_mm: 1.5
+    response: mhg
+    noise: indep
+    sigma_px: 0.1
+    steps: primary
+    role: sensitivity
+    note: 'independent error per node: modelling limit case, not the review result'
+  SENS-W1.0-A:
+    field: A
+    W_mm: 1.0
+    response: mhg
+    noise: corr
+    sigma_px: 0.1
+    steps: primary
+    role: sensitivity
+    note: window not seen in the main configs (OBE15 / BOX10; KAR20 non-GTMC)
+  SENS-W1.9-A:
+    field: A
+    W_mm: 1.9
+    response: mhg
+    noise: corr
+    sigma_px: 0.1
+    steps: primary
+    role: sensitivity
+    note: window not seen in the main configs (OBE15 / BOX10; KAR20 non-GTMC)
+  SENS-REJ-iso-flag-A:
+    field: A
+    W_mm: 1.3
+    response: mhg
+    noise: corr
+    sigma_px: 0.1
+    steps: primary
+    role: sensitivity
+    note: 10 % of the valid vectors rejected; NOT calibrated, NOT transferred
+    rejection: iso
+    level: flag
+  SENS-REJ-iso-sub-A:
+    field: A
+    W_mm: 1.3
+    response: mhg
+    noise: corr
+    sigma_px: 0.1
+    steps: primary
+    role: sensitivity
+    note: 10 % of the valid vectors rejected; NOT calibrated, NOT transferred
+    rejection: iso
+    level: sub
+  SENS-REJ-clu-flag-A:
+    field: A
+    W_mm: 1.3
+    response: mhg
+    noise: corr
+    sigma_px: 0.1
+    steps: primary
+    role: sensitivity
+    note: 10 % of the valid vectors rejected; NOT calibrated, NOT transferred
+    rejection: clu
+    level: flag
+  SENS-REJ-clu-sub-A:
+    field: A
+    W_mm: 1.3
+    response: mhg
+    noise: corr
+    sigma_px: 0.1
+    steps: primary
+    role: sensitivity
+    note: 10 % of the valid vectors rejected; NOT calibrated, NOT transferred
+    rejection: clu
+    level: sub
+  SENS-TAIL-A:
+    field: A
+    W_mm: 1.3
+    response: mhg
+    noise: corr_t
+    sigma_px: 0.1
+    steps: primary
+    role: sensitivity
+    note: 'heavy tails: marginal map to Student t (nu=7, excess kurtosis 2), same standardised correlated realisation, same nodes (v1.1, R2 sec.
+      4); not calibrated'
+    t_nu: 7
+  SENS-TAIL-B-in:
+    field: B-in
+    W_mm: 1.5
+    response: mhg
+    noise: corr_t
+    sigma_px: 0.1
+    steps: primary
+    role: sensitivity
+    note: 'heavy tails: marginal map to Student t (nu=7, excess kurtosis 2), same standardised correlated realisation, same nodes (v1.1, R2 sec.
+      4); not calibrated'
+    t_nu: 7
+  SENS-REJ-iso-sub5-A:
+    field: A
+    W_mm: 1.3
+    response: mhg
+    noise: corr
+    sigma_px: 0.1
+    steps: primary
+    role: sensitivity
+    note: same rejected positions as SENS-REJ-iso-sub, substituted with the iterative mean of the known 5x5 neighbours (area declared in the Cardiff
+      XML, not validated; v1.1, R2 sec. 5)
+    rejection: iso
+    level: sub
+    substitution: mean5x5_iterative
+  SENS-REJ-clu-sub5-A:
+    field: A
+    W_mm: 1.3
+    response: mhg
+    noise: corr
+    sigma_px: 0.1
+    steps: primary
+    role: sensitivity
+    note: same rejected positions as SENS-REJ-clu-sub, substituted with the iterative mean of the known 5x5 neighbours (area declared in the Cardiff
+      XML, not validated; v1.1, R2 sec. 5)
+    rejection: clu
+    level: sub
+    substitution: mean5x5_iterative
+rejection_sensitivity:
+  fraction: 0.1
+  levels:
+    flag: rejected vectors absent (U-Net Mv=0; GLU token removed)
+    sub: rejected vectors replaced by the iterative 3x3 mean and presented as measured (Mv=1)
+  applied_to: PIV-A only
+  same_positions_in_both_levels: true
+  substitution_rules:
+    mean3x3_iterative: principal rule of the `sub` level (TUM micro-PIV, GTMC practice)
+    mean5x5_iterative: 'variant: iterative mean of known neighbours in a 5x5 area; area declared in the Cardiff processing XML; the comparison
+      with real substituted values depends on an unofficial decoder and is NOT a validation'
+    passes: the passes are repeated until every rejected vector is filled; meta.sub_passes and meta.sub_passes_gt3 are recorded
+operation_order:
+- LES velocity in m/s (frozen statistics)
+- response convolution limited to the field, renormalised at the edge
+- valid-vector selection (window rule)
+- correlated error
+- rejections (SENS-REJ only)
+- substitution (level sub only)
+- frozen normalisation
+- U-Net / GLU packet
+no_temperature: no generator argument, helper or test fixture reads T; temperature diagnostics are separate scripts
+seeds:
+  namespace: piv_observation_v1
+  role_seeds:
+    train: 20261210
+    selection: 20261211
+    eval: 20261212
+  key: stable_seed(namespace, role_seed, operator, component, sim_id, frame_index, replica_or_epoch) via zlib.crc32; model family and model seed
+    are NOT part of the key
+  training: one new error realisation per (frame, epoch)
+  evaluation: 3 replicas
+  excluded_historical:
+  - 20261114
+  - 20261116
+  - 20261118
+  - 20261125
+  - 20261201
+  - 20261202
+parameter_classification:
+- id: grid_steps_mm
+  value: rows 0.581057, cols 0.758123
+  class: documentato
+  source: 'dataset geometry (INV B-data-audit-001); assignment rows<->x, cols<->y: ipotesi R1 ''probabile'''
+- id: assignment_rows_x_cols_y
+  value: rows<->x (lateral), cols<->y (axial)
+  class: scelta di modellazione (R1)
+  source: decisione_R1 sec. 3; SENS-SWAP covers the historical convention
+- id: components
+  value: (vi, vj) planar; vi transverse, vj axial; vk out of plane, not used
+  class: ipotesi dichiarata (probabile)
+  source: orientation_note.md, decisione_R1 sec. 2
+- id: W_A_mm
+  value: 1.3
+  class: documentato
+  source: STO12 sec. 2.3.2 (GTMC 5 Hz, 1.3 mm, 50 % overlap)
+- id: W_B_mm
+  value: 1.5
+  class: documentato
+  source: STO12 sec. 2.3.3 (GTMC 5 kHz, 1.5 x 1.5 mm^2; BOX10 p.15 quotes 1.0 mm)
+- id: layout_one_vector_per_LES_node
+  value: step = LES cell, anisotropic
+  class: trasferimento
+  source: PIV step = W/2 (BOX10, SAI16, KAR20); LES cell 0.581/0.758 mm used instead of 0.5W (declared)
+- id: field_A
+  value: whole slice (extreme nodes)
+  class: trasferimento
+  source: STO12 'entire vertical section'; assumption slice = observed section
+- id: field_B_size
+  value: 30 x 30 mm (52 rows x 40 cols)
+  class: documentato
+  source: STO12 sec. 2.3.3
+- id: field_B_positions
+  value: B-in (train+eval), B-down, B-off (eval)
+  class: scelta di modellazione (R1)
+  source: STO12 'above the nozzle'; decisione_R1 sec. 7; nozzle position relative to the slice unknown
+- id: window_rule
+  value: vector exists iff [-W/2, W/2]^2 inside the field
+  class: trasferimento
+  source: PIV practice; margin 2 rows / 1 col for W=1.3 and 1.5
+- id: response_kernel
+  value: MHG b=0.35, discrete L_sr = 0.93 W, calibrated per axis (1 %)
+  class: trasferimento
+  source: WIE17 Tab. 2.1/2.4 (synthetic DaVis multi-pass); GTMC weighting not declared
+- id: kernel_support
+  value: 4 sigma, truncated and renormalised; truncated at the field edge
+  class: scelta di modellazione (R1)
+  source: decisione_R1 sec. 4; edge behaviour is a declared approximation
+- id: field_discretisation
+  value: piecewise constant per LES cell, cell-integrated weights
+  class: scelta di modellazione (R1)
+  source: roadmap sec. 2.3(3)
+- id: error_amplitude
+  value: sigma_u,c = sigma_px * v_ref,c / d_max, sigma_px = 0.10 px, d_max = 6 px
+  class: trasferimento
+  source: STO12 sec. 2.3.2 (+-0.1 px, Delta t per condition); WIE17 s4.4.2 (0.060 px measured) and Tab. 2.4 (0.146 px synthetic). '+-0.1 px' is
+    NOT read as sigma
+- id: d_max_px
+  value: 6
+  class: trasferimento
+  source: inference from STO12 (16 px = 1.3 mm, v ~ 80 m/s, 6 us)
+- id: v_ref
+  value: p99.9 of |u_planar|, all nodes, frames 0:2001:10 of each condition
+  class: trasferimento
+  source: 'STO12: Delta t chosen per condition on the instantaneous velocity scale; decisione_R1 sec. 6'
+- id: error_distribution
+  value: Gaussian
+  class: ipotesi di modello
+  source: not established for flames
+- id: error_correlation
+  value: separate noise kernel g, MHG b=0.35, L_sr = 1.2 W, discrete, calibrated
+  class: trasferimento
+  source: 'WIE17 Tab. 2.4 / s4.3 (rho(2d)=0.11 at 50 % overlap vs 0 in the review: unresolved). D-rho closed at R2: Neal (different processing,
+    residual includes the reference) does not confirm the model at the first lag; principal unchanged; SENS-RHO0 mandatory next to the principal
+    on A and B-in'
+- id: components_independent
+  value: u and v errors independent
+  class: ipotesi
+  source: WIE17 s4.3
+- id: error_stationarity
+  value: white noise on a grid padded by 16 nodes
+  class: scelta di modellazione (R1)
+  source: numerical choice
+- id: bias
+  value: none
+  class: scelta di modellazione (R1)
+  source: no transferable bias documented (SINT 2.2)
+- id: rejections_main
+  value: none in main/controls
+  class: approssimazione dichiarata
+  source: released GTMC data are complete after interpolation (BOX10 p.31); this does not prove the absence of rejections
+- id: rejection_fraction
+  value: 0.1
+  class: sensibilita
+  source: 'upper bound quoted by BAU15 p.49 (micro-PIV H2): NOT calibrated, NOT transferred'
+- id: rejection_clu
+  value: top-fraction nodes of a correlated Gaussian field on the noise-kernel scale
+  class: sensibilita
+  source: morphology not documented in swirl flames
+- id: substitution
+  value: iterative 3x3 mean of known neighbours, presented as measured (Mv=1)
+  class: trasferimento
+  source: BAU15 p.49, BOX10 p.31 practice; Cardiff F2.5 qualifies the rule, not the frequency
+- id: top_hat
+  value: width tuned so that discrete L_sr = W
+  class: sensibilita
+  source: decisione_R1 sec. 5
+- id: seeds
+  value: new namespace piv_observation_v1; roles train/selection/eval
+  class: scelta di modellazione (R1)
+  source: distinct from 20261114/16/18 and 20261125/20261201/20261202
+- id: tail_sensitivity
+  value: 'SENS-TAIL: Student t, nu = 7 (excess kurtosis 2), same realisation'
+  class: sensibilita
+  source: Neal residual kurtosis 1.6-2.8; not calibrated
+- id: substitution_5x5
+  value: mean5x5_iterative
+  class: sensibilita
+  source: area declared in the Cardiff XML (PIVD:S2D-01); comparison with real values is not a validation (unofficial decoder)
+- id: rho0_mandatory
+  value: SENS-RHO0 reported next to the principal in every phase-3 comparison on A and B-in
+  class: decisione R2
+  source: decisione_R2 sec. 3
+sources:
+  STO12: Stohr, Boxx, Carter, Meier, Combust. Flame 159 (2012), DLR elib 77484
+  WIE17: Wieneke, TU Delft thesis 2017
+  BOX10: Boxx et al., Combust. Flame 157 (2010)
+  BAU15: Baumgartner, TU Munchen thesis 2015
+  OBE15: Oberleithner et al., Combust. Flame 162 (2015)
+  SAI16: Saini, Steinberg, Arndt, AIAA 2016-0436
+  KAR20: Karmarkar et al., arXiv:2011.14662
+  SINT: mese3/02_virtual_piv/sintesi_evidenze_modello_piv.md
+provenance:
+  phase2_f20_code_sha: 3105f3ed7b23a4110dbbf4e2d8327eaba89891e7
+  phase1_report_commit: a1cb3a07ade3df624549b4d261ab815a6121f13d
+  f20_files:
+    kernel_registry_v2.csv: 61d33724db88179ad0b815f3926e782395ffd2f5fb81af434f625684968ddf4e
+    swapcells_index.csv: f98f60167c233947e0d0ffebcede0df878677a4ce144a56bafa521faa1ad1e5b
+    vref_full_record.csv: 144e7ac463a9c9a9779fce1ac874730f5397f24598f254eb5b6ab8870a18eaa1
+    b_windows_content.json: 547e11521aff1e076a438eda4e043e7c3bb3b6fff264d8d6ddc7eaf20369e73f
+    kernel_calibration_monotonicity.json: 76a5f5d19ec6368e724b114600c261ed097db7d333513f2ace9b52b6429ed179
+    kernel_registry_v2.json: 50ca83689a8f4d1d3a39a63ad1be7dbcbb5dd04298b29f37b86afd81def30ad2
+  v1_1_written_by_code_sha: 82e37e0e9b5e9fa54da43634074d5881fb8f0ef0
+  parent_file_sha256: 9f24afc9359bf3568aa693cf43fe21135717538924152148c8c50d50893b3d47
+frozen:
+  content_sha256: 8a5991ef5f1c04a88fd9d404ff965193a4b86b04c4aef7d11f9c57f2417f25d2
+  note: sha256 of the canonical JSON of every key except 'frozen'; file sha256 in piv_observation_spec_v1_1.sha256
+parent:
+  spec: configs/observations/piv_observation_spec_v1.yaml
+  file_sha256: 9f24afc9359bf3568aa693cf43fe21135717538924152148c8c50d50893b3d47
+  content_sha256: 3d6610e3d9581d5ea362125075862a6a9080f4565066a5253d914885cc456d38
