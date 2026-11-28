@@ -3,6 +3,13 @@
 **Data:** 27 novembre 2026 · **Branch:** `piv/experiment-proposal` · **Destinatario dell'esecuzione:** Sonnet IDE, dopo l'approvazione di Enrico
 **Stato:** impostazione approvata da Enrico il 27/11/2026; revisione v2 con le correzioni richieste per il passaggio a Sonnet (supporto e discretizzazione del filtro, confronti sugli stessi nodi, significato dei campi completi, download autorizzati: §10). Questo documento non implementa nulla e non autorizza download di dataset, job, training, inferenze o accesso a TEST. Ogni fase parte solo dopo il punto di revisione che la precede (§6).
 
+**§0bis — Decisioni R2 (28/11/2026).** La revisione R2 è chiusa con [decisione_R2.md](decisione_R2.md), che prevale su questa roadmap dove le due divergono:
+- modello principale invariato;
+- correlazione dell'errore: SENS-ρ0 (SENS-RHO0) diventa **obbligatoria** accanto al principale in ogni confronto su A e B-in;
+- specifica **v1.1 additiva**: + SENS-TAIL (code pesanti, ν = 7) su A e B-in; + sostituzione 5×5 (`sub5`) per SENS-REJ iso e clu;
+- prima della Fase 3: F2.8 (v1.1), F2.9 (regressione, test nuovi, qualifica supplementare) e controllo dell'hash fra macchine;
+- F2.7 autorizzata subito.
+
 **§0 — Decisioni R1 (27/11/2026).** La revisione R1 è chiusa con [decisione_R1.md](decisione_R1.md), che prevale su questa roadmap dove le due divergono. Le sezioni interessate sono state aggiornate:
 - componenti (vi, vj), con vi trasversale e vj assiale (esito *probabile*); SENS-OOP disattivata;
 - righe ↔ `x` (passo 0,581 mm), colonne ↔ `y` (passo 0,758 mm) per generatore e metriche in mm; la convenzione storica diventa SENS-SWAP;
@@ -243,8 +250,10 @@ Nuovo namespace, distinto da quelli storici (20261114/16/18) e della 00 (2026112
 | SENS-SWAP | Passi di cella scambiati (convenzione storica colonne ↔ x) | Qualifica F2.6 e valutazione in Fase 3 |
 | SENS-EDGE | Esclusione stretta: solo vettori con supporto R_r interamente nel campo | Valutazione |
 | SENS-σlo / SENS-σhi | σ_px 0,06 / 0,15 | Valutazione |
-| SENS-ρ0 | Rumore indipendente | Valutazione |
+| SENS-ρ0 | Rumore indipendente | Valutazione; **obbligatoria** accanto al principale su A e B-in (R2) |
+| SENS-TAIL | Code pesanti: trasformazione marginale a t di Student, ν = 7 (eccesso di curtosi 2), stessa σ e stessa realizzazione (v1.1, R2 §4) | Valutazione, A e B-in |
 | SENS-REJ-{iso,clu}-{flag,sub} | Rigetti non calibrati al 10 % | Valutazione; training condizionato (gruppo T8) |
+| SENS-REJ-{iso,clu}-sub5 | Stessi rigetti, sostituzione con media iterativa 5×5 (area dichiarata nell'XML Cardiff, non validata; v1.1, R2 §5) | Valutazione |
 | SENS-B-pos | Posizioni B-down e B-off | Valutazione |
 | SENS-W | W = 1,0 mm (OBE15 10 kHz; BOX10) e W = 1,9 mm (KAR20, configurazione non GTMC) | Solo valutazione: test di configurazioni non viste |
 | SENS-OOP | Perdita di coppie da vk | Condizionata a F1.1 |
@@ -410,7 +419,7 @@ Ogni attività riporta ID, dipendenze e criterio di completamento. Tutto si eseg
 | E7 − E6 | Uguali (per posizione) | Misura dentro il campo ridotto |
 | E4* − E3, E5* − E4* | Uguali | Filtro ed errore per le U-Net dense (diagnostica) |
 
-Sensibilità in sola valutazione, dopo E0–E7: SENS-TH, SENS-SWAP, SENS-EDGE, SENS-σlo/hi, SENS-ρ0, SENS-REJ (4 combinazioni), SENS-B-pos, SENS-W. Ognuna è confrontata con la configurazione principale **sugli stessi nodi**. Per SENS-EDGE il confronto si fa sull'intersezione dei nodi validi.
+Sensibilità in sola valutazione, dopo E0–E7: **SENS-ρ0 (obbligatoria, sempre accanto a E5 ed E7)**, SENS-TH, SENS-SWAP, SENS-EDGE, SENS-σlo/hi, SENS-TAIL, SENS-REJ (4 combinazioni più 2 `sub5`), SENS-B-pos, SENS-W. Gli effetti del filtro (E1 − E0v, E4 − E3a) si leggono con la cautela di decisione_R2 §2: una parte rimuove artefatti di esportazione della LES. Ognuna è confrontata con la configurazione principale **sugli stessi nodi**. Per SENS-EDGE il confronto si fa sull'intersezione dei nodi validi.
 
 **Interpretazione.** I modelli al 5 % su E3–E7 sono **fuori distribuzione**: U-Net con maschera quasi piena, GLU con migliaia di token. Questi test misurano la robustezza di modelli costruiti per un'altra osservazione, non l'informazione contenuta nella PIV. Il GLU originale a 819 token potrebbe richiedere molta memoria con input densi: la profilazione F2.7 decide se valutarlo a microbatch 1. Nessuna riduzione silenziosa dei token.
 
@@ -426,7 +435,7 @@ Sensibilità in sola valutazione, dopo E0–E7: SENS-TH, SENS-SWAP, SENS-EDGE, S
 |---|---|---|---|
 | D-ori | 2C in piano? SENS-OOP sì o no? | F1.1 | **Chiusa a R1:** esito *probabile*, 2C = (vi, vj), SENS-OOP disattivata (decisione_R1 §2). Regola originale: con esito **confermato** o **probabile** si procede con 2C. Con esito **ignoto** si procede con 2C come ipotesi dichiarata e SENS-OOP viene escluso |
 | D-kern | Kernel principale MHG o top-hat | F1.2 | **Chiusa a R1:** MHG principale; top-hat tarato solo come sensibilità di valutazione; T10 deciso a R4 se i modelli T2 su SENS-TH perdono più della deviazione standard fra seed di T2 (decisione_R1 §5). Regola originale, sostituita: se la differenza fra i due filtrati è piccola rispetto a σ_u (RMS < 0,25 σ_u nelle regioni ad alto gradiente), MHG resta principale e il top-hat si valuta solo nella Fase 3. Altrimenti il top-hat entra anche in training (gruppo T10) |
-| D-ρ | Correlazione principale | F2.4 se autorizzata | R2: se i residui Neal al 50 % mostrano una correlazione incompatibile con il kernel di rumore, si rivede il kernel e lo si registra (resta qualifica non reagente). Senza F2.4: principale invariato, SENS-ρ0 riportato sempre |
+| D-ρ | Correlazione principale | F2.4 se autorizzata | **Chiusa a R2:** Neal non conferma il modello al primo ritardo, ma con un processamento diverso (single-pass) e un residuo che include il riferimento; principale invariato, SENS-ρ0 obbligatoria (decisione_R2 §3). Regola originale: R2: se i residui Neal al 50 % mostrano una correlazione incompatibile con il kernel di rumore, si rivede il kernel e lo si registra (resta qualifica non reagente). Senza F2.4: principale invariato, SENS-ρ0 riportato sempre |
 | D-σ | σ_px | Nessuna nuova misura possibile sulla nostra fiamma | Congelato a 0,10 px con sensibilità 0,06 e 0,15 |
 | D-REJ | Training con rigetti | Fase 3 e risultati di T1/T2 | R4: si allena (T8) solo se la valutazione dei modelli T2 su SENS-REJ mostra una perdita superiore alla dispersione fra seed della cella T2 |
 | D-GLU | Layout del GLU | F2.7 | R3: con costo stimato per run GLU su A ≤ 10× la 00 (≤ 90 GPU-h) si usano **tutti** i nodi. Altrimenti si propone un layout ridotto dichiarato (per esempio passo di 2 nodi, che corrisponde a un overlap più basso), applicato **a entrambe le famiglie** come configurazione separata A2 con cella U-Net corrispondente. Mai solo al GLU |
@@ -440,7 +449,7 @@ Sensibilità in sola valutazione, dopo E0–E7: SENS-TH, SENS-SWAP, SENS-EDGE, S
 |---|---|---|---|
 | **R0** | Ora | Questa roadmap | Enrico |
 | **R1** | Dopo F1.1–F1.3 | Orientamento, supporto della griglia, v_ref; chiusura di D-ori e D-kern; congelamento della specifica v1 | **Chiusa** il 27/11/2026: [decisione_R1.md](decisione_R1.md) (mandato tecnico delegato da Enrico) |
-| **R2** | Dopo F2.6 (ed eventualmente F2.4–F2.5) | **Osservazioni generate**: figure, statistiche, confronto con le proprietà delle fonti. Nessuna rete prima di R2 | Enrico |
+| **R2** | Dopo F2.6 (ed eventualmente F2.4–F2.5) | **Osservazioni generate**: figure, statistiche, confronto con le proprietà delle fonti. Nessuna rete prima di R2 | **Chiusa** il 28/11/2026: [decisione_R2.md](decisione_R2.md) (mandato tecnico delegato da Enrico) |
 | **R3** | Dopo la Fase 3 e F2.7 | Risultati dei checkpoint esistenti; D-GLU; conferma della matrice di training | Enrico |
 | **R4** | Dopo T1–T7 e le valutazioni | Risultati; D-REJ, D-mix, D-kern-train; preregistrazione per TEST | Enrico |
 | **R5** | Eventuale | Apertura di TEST, una sola volta | Enrico |
@@ -543,7 +552,7 @@ Riferimento: la 00 è costata 210,1 GPU-h per 30 run (95 % training), in circa 5
 ## 8. Istruzioni operative per Sonnet IDE
 
 1. **Branch:** lavorare su un branch dedicato da `piv/experiment-proposal` (nome da concordare); niente merge in `main`. Nessuna modifica a `nonideal_observations.py`, alle specifiche della 00, ai risultati storici o ai documenti delle missioni 00 e 01: si propongono gli aggiornamenti alla 01.
-2. **Ordine vincolante:** Fase 1 → R1 (chiusa) → Fase 2 (F2.0 → F2.1 → F2.2–F2.3 → F2.4–F2.5 opzionali → F2.6) → R2 → F2.7 e Fase 3 → R3 → Fase 4 (T1–T7) → R4 → condizionati. Non anticipare training o valutazioni neurali prima di R2.
+2. **Ordine vincolante:** Fase 1 → R1 (chiusa) → Fase 2 (F2.0 → F2.1 → F2.2–F2.3 → F2.4–F2.5 opzionali → F2.6) → R2 (chiusa) → F2.7 (subito) e F2.8–F2.9 con il controllo dell'hash fra macchine (decisione_R2 §8) → Fase 3 → R3 → Fase 4 (T1–T7) → R4 → condizionati. Non anticipare training o valutazioni neurali prima di R2.
 3. **Divieti:** TEST mai letto (rifiutare i ruoli `test*` come nella 00); nessun uso di T nel generatore; nessun parametro scelto guardando metriche delle reti; nessuna riduzione di token o di nodi non dichiarata nella specifica.
 4. **Download:** F2.4 e F2.5 sono **già autorizzati** (§10): non chiedere di nuovo l'autorizzazione. Le verifiche restano opzionali e motivate. Seguire esattamente §10: file, destinazione fuori dalla repository, checksum e manifest. Nessun altro download di dataset.
 5. **Provenienza:** ogni artefatto registra SHA del codice, sha256 della specifica, della cache e delle statistiche, namespace e seed, configurazione, posizione di B, livello `flag` o `sub`.

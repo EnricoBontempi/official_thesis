@@ -23,3 +23,5 @@ Stato al 25 novembre 2026: [roadmap 02](roadmap02.md) pubblicata; step 1 complet
 **Revisione R1 chiusa (27 novembre 2026):** [decisione_R1.md](decisione_R1.md). Roadmap tecnica aggiornata (§0). Sonnet può eseguire la Fase 2 da F2.0 a F2.6; F2.7 e Fase 3 solo dopo R2.
 
 **Aggiornamento del 28 novembre 2026 (esecuzione, branch `mission02/piv-execution`):** R1 chiusa ([decisione_R1.md](decisione_R1.md)); Fase 2 completata fino alla revisione R2 (F2.0–F2.6): [report R2](fase2_report_R2.md), specifica congelata `configs/observations/piv_observation_spec_v1.yaml`, artefatti in [results/piv/phase2/](../../results/piv/phase2/INDEX.md). Nessun training né inferenza neurale; F2.7 e Fase 3 in attesa di R2.
+
+**Revisione R2 chiusa (28 novembre 2026):** [decisione_R2.md](decisione_R2.md). Specifica v1.1 additiva (SENS-TAIL, sostituzione 5×5); F2.7 autorizzata subito; Fase 3 dopo F2.8–F2.9 e il controllo dell'hash fra macchine.
