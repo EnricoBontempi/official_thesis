@@ -13,8 +13,8 @@ cd "$TIP" || exit 2
 M=configs/experiments/piv_campaign_matrix.json
 read -r OUT_ROOT SPEC_SHA < <("$PY" -c "import json;m=json.load(open('$M'));print(m['out_root'],m['observation_spec_sha256'])")
 EVAL_ROOT=/home/bontempi/official_thesis_piv_eval; PKG=/home/bontempi/official_thesis_piv_package
-LEDGER="$OUT_ROOT/_ledger"; REG="$LEDGER/campaign_registry.json"
-[[ ! -e "$REG" ]] || { echo "REFUSE: registry $REG exists (campaign already submitted)" >&2; exit 7; }
+LEDGER="$OUT_ROOT/_ledger"; REG="$LEDGER/campaign_registry.json"; [[ "$DRY" == 1 ]] && REG="$LEDGER/campaign_registry.dryrun.json"
+[[ "$DRY" == 1 || ! -e "$REG" ]] || { echo "REFUSE: registry $REG exists (campaign already submitted)" >&2; exit 7; }
 # pools (time-balanced from the F2.7 profiling; GLU on A ~83 GPU-h/run, everything else 4-9 GPU-h/run)
 NORMAL="PIV-T5-piv-glu-s0,PIV-T5-piv-glu-s1,PIV-T5-piv-glu-s2,PIV-T2-unet-s0,PIV-T2-unet-s1,PIV-T2-unet-s2,PIV-T2-unet-s3,PIV-T2-unet-s4,PIV-T4-unet-s0,PIV-T4-unet-s1,PIV-T4-unet-s2,PIV-T4-unet-s3,PIV-T4-unet-s4,PIV-T7-glu-s0,PIV-T7-glu-s1,PIV-T7-glu-s2"
 PREEMPT="PIV-T5-ideal-glu-s0,PIV-T5-ideal-glu-s1,PIV-T5-ideal-glu-s2,PIV-T6-piv-glu-s0,PIV-T6-piv-glu-s1,PIV-T6-piv-glu-s2,PIV-T6-ideal-glu-s0,PIV-T6-ideal-glu-s1,PIV-T6-ideal-glu-s2,PIV-T1-unet-s0,PIV-T1-unet-s1,PIV-T1-unet-s2,PIV-T1-unet-s3,PIV-T1-unet-s4,PIV-T3-unet-s0,PIV-T3-unet-s1,PIV-T3-unet-s2,PIV-T3-unet-s3,PIV-T3-unet-s4"
@@ -61,7 +61,7 @@ for POOL in normal preempt; do
   done
 done
 # manifest, audit (afterany: always runs), strict post-processing
-MAN="$LEDGER/piv_manifest.json"
+MAN="$LEDGER/piv_manifest.json"; [[ "$DRY" == 1 ]] && MAN="$LEDGER/piv_manifest.dryrun.json"
 PYTHONPATH="$TIP/src" "$PY" scripts/77_piv_write_manifest.py --eval-root "$EVAL_ROOT" --training-git-sha "$SHA" --out "$MAN" | tail -1
 ALL_DEP="$(IFS=:; echo "${JOBS[*]}:${EVAL_IDS[*]}")"
 ACPU=(--account mit_amf_advanced_cpu --partition mit_normal --qos mit_amf_advanced_cpu)
