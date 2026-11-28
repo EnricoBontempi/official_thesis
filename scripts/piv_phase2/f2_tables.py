@@ -62,17 +62,17 @@ open(T / "t3_swapcells_index.md", "w").write(md(t))
 
 # ---- windows
 bw = json.load(open(R2 / "f20/b_windows_content.json"))
-rows = [{"finestra": "intera slice", "righe × colonne": "0–127 × 0–127", "vettori validi (W)": "A: 15 624 (W = 1,3)", "% nodi con |u| > 20 m/s": round(100 * bw["slice_full"]["frac_u_gt_20"], 1),
+rows = [{"finestra": "intera slice", "righe × colonne": "0–127 × 0–127", "vettori validi (W)": "A: 15 624 (W = 1,3)", "% nodi con modulo di u > 20 m/s": round(100 * bw["slice_full"]["frac_u_gt_20"], 1),
          "|u| medio (m/s)": round(bw["slice_full"]["mean_speed"], 1), "RMS di vj (m/s)": round(bw["slice_full"]["rms_vj"], 1), "% T < 1800 K (diagnostica)": round(100 * bw["slice_full"]["frac_T_lt_1800_DIAGNOSTIC"], 1)}]
 for f in ("B-in", "B-down", "B-off"):
     e = bw[f"{f}|primary"]
     rows.append({"finestra": f, "righe × colonne": f"{e['rows'][0]}–{e['rows'][1]} × {e['cols'][0]}–{e['cols'][1]}", "vettori validi (W)": f"{e['n_valid_vectors_W1.5']} (W = 1,5)",
-                 "% nodi con |u| > 20 m/s": round(100 * e["frac_u_gt_20"], 1), "|u| medio (m/s)": round(e["mean_speed"], 1), "RMS di vj (m/s)": round(e["rms_vj"], 1),
+                 "% nodi con modulo di u > 20 m/s": round(100 * e["frac_u_gt_20"], 1), "|u| medio (m/s)": round(e["mean_speed"], 1), "RMS di vj (m/s)": round(e["rms_vj"], 1),
                  "% T < 1800 K (diagnostica)": round(100 * e["frac_T_lt_1800_DIAGNOSTIC"], 1)})
 for f in ("B-in", "B-down", "B-off"):
     e = bw[f"{f}|swap"]
     rows.append({"finestra": f"{f} (SENS-SWAP)", "righe × colonne": f"{e['rows'][0]}–{e['rows'][1]} × {e['cols'][0]}–{e['cols'][1]}", "vettori validi (W)": f"{e['n_valid_vectors_W1.5']} (W = 1,5)",
-                 "% nodi con |u| > 20 m/s": round(100 * e["frac_u_gt_20"], 1), "|u| medio (m/s)": round(e["mean_speed"], 1), "RMS di vj (m/s)": round(e["rms_vj"], 1),
+                 "% nodi con modulo di u > 20 m/s": round(100 * e["frac_u_gt_20"], 1), "|u| medio (m/s)": round(e["mean_speed"], 1), "RMS di vj (m/s)": round(e["rms_vj"], 1),
                  "% T < 1800 K (diagnostica)": round(100 * e["frac_T_lt_1800_DIAGNOSTIC"], 1)})
 open(T / "t4_B_windows.md", "w").write(md(pd.DataFrame(rows)))
 
@@ -139,7 +139,7 @@ for cfg, W in (("PIV-A", 1.3), ("PIV-B-in", 1.5)):
 open(T / "t9_error_autocorrelation.md", "w").write(md(pd.DataFrame(rows)))
 ed = json.load(open(R2 / "f26/error_distribution.json"))
 open(T / "t9b_error_distribution.md", "w").write(md(pd.DataFrame([{"config": k, "n": v["n"], "media": round(v["mean"], 4), "std": round(v["std"], 4), "asimmetria": round(v["skew"], 4), "curtosi in eccesso": round(v["excess_kurtosis"], 4),
-                                                                      "frazione |z|>3": round(v["frac_abs_gt_3"], 5), "gaussiana": round(v["gauss_frac_abs_gt_3"], 5)} for k, v in ed.items()])))
+                                                                      "frazione con modulo di z > 3": round(v["frac_abs_gt_3"], 5), "gaussiana": round(v["gauss_frac_abs_gt_3"], 5)} for k, v in ed.items()])))
 
 # ---- rejections
 rj = json.load(open(R2 / "f26/rejection_morphology.json"))
@@ -191,8 +191,8 @@ sc = cs["substitution_comparison"]
 rows = []
 for comp in ("U", "V"):
     s_ = sc[comp]
-    rows.append({"componente": comp, "vettori sostituiti confrontabili": s_["n_compared"], "mediana |reale − media 3×3|": round(s_["median_abs_actual_minus_3x3"], 3), "mediana |reale − media 5×5|": round(s_["median_abs_actual_minus_5x5"], 3),
-                 "mediana |reale − regola del generatore|": round(s_["median_abs_actual_minus_iterative_3x3"], 3), "RMS reale − 3×3": round(s_["rms_actual_minus_3x3_mean_known"], 2), "RMS reale − 5×5": round(s_["rms_actual_minus_5x5_mean_known"], 2),
+    rows.append({"componente": comp, "vettori sostituiti confrontabili": s_["n_compared"], "mediana dello scarto assoluto reale − 3×3": round(s_["median_abs_actual_minus_3x3"], 3), "mediana dello scarto assoluto reale − 5×5": round(s_["median_abs_actual_minus_5x5"], 3),
+                 "mediana dello scarto assoluto reale − generatore": round(s_["median_abs_actual_minus_iterative_3x3"], 3), "RMS reale − 3×3": round(s_["rms_actual_minus_3x3_mean_known"], 2), "RMS reale − 5×5": round(s_["rms_actual_minus_5x5_mean_known"], 2),
                  "scala di variabilità (RMS vettore valido − media dei vicini)": round(s_["rms_valid_vector_minus_3x3_mean_of_neighbours (leave-one-out variability scale)"], 2)})
 open(T / "t12b_cardiff_substitution.md", "w").write(md(pd.DataFrame(rows)))
 print("tables:", sorted(p.name for p in T.glob("*.md")))
