@@ -153,7 +153,9 @@ def test_historical_default_allowlist_unchanged(tmp_path: Path):
 def test_trainer_passes_contract_into_every_dataset():
     source = (ROOT / "scripts/16_train_sparse_scientific.py").read_text()
     assert "cache_kwargs = cache_validation_kwargs(pool_id)" in source
-    assert source.count("**cache_kwargs") == 5
+    # 6 call sites: train, train-eval(ref760), val, seen, the specialist SELECTION dataset (added by 06ee61f) and the manifest validation; verified
+    # in mission 02 that the sixth passes the C149 cache contract into the dataset it builds.
+    assert source.count("**cache_kwargs") == 6
     on = (ROOT / "configs/experiments/opus_O-C149-on-s0.yaml").read_text()
     off = (ROOT / "configs/experiments/opus_O-C149-off-s0.yaml").read_text()
     for text, job in ((on, "29613545"), (off, "29613546")):
