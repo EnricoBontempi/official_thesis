@@ -1,0 +1,62 @@
+{
+ "title": "Mission 02 - campaign state (single persistent registry; updated only by commits)",
+ "written": "2026-11-28",
+ "code_sha": "1b3012da4cfc464d2b48284edd25ca3e7a941cb7",
+ "cluster_tip": "/home/bontempi/projects/official_thesis_piv_run (HEAD = code_sha; do NOT move it while jobs run)",
+ "observation_spec_v1_sha256": "9f24afc9359bf3568aa693cf43fe21135717538924152148c8c50d50893b3d47",
+ "observation_spec_v1_1_sha256": "607510895c24a324a230e3f96a739daf6507f30c531693ffbc7bb2f0a2d842d2",
+ "stats_sha256": "678263fb4cb2598350b8fd69a71ce4843f747aa61c19556cf7f0f9c5c3ceac0e",
+ "status": {
+  "prepared": [
+   "spec v1.1",
+   "generator extensions",
+   "86 CPU tests",
+   "PIV training datasets + 16_train wiring",
+   "35 run configs + matrix",
+   "evaluation wrapper 76",
+   "phase-3 evaluator 78",
+   "manifest writer 77",
+   "submit chain scripts"
+  ],
+  "submitted": [
+   "profiling (finished)",
+   "cross-machine check (finished, PASS)",
+   "Phase 3 array 30765971 (tasks 0-7) + 30769608 (tasks 0-3)",
+   "campaign launcher 30769609 (CPU, afterany Phase 3; submits trainings/extension/eval/audit/postproc only if all 12 gates and COMPLETE pass)"
+  ],
+  "completed": [
+   "F2.7 profiling",
+   "spec v1.1 + regression + qualification appendix",
+   "cross-machine check",
+   "Phase 3 replay gate for 8/12 models (pass); other 4 pending"
+  ],
+  "NOT_submitted_yet": "the 35 trainings, extension arrays, 35 evaluation jobs, audit and post-processing: they are submitted BY the launcher job 30769609 once Phase 3 is complete; their job ids will be in /home/bontempi/official_thesis_piv_runs/_ledger/campaign_registry.json"
+ },
+ "jobs": {
+  "profiling": {
+   "30763772": "PIV-T5-piv-glu-s0",
+   "30763773": "PIV-T5-ideal-glu-s0",
+   "30763774": "PIV-T6-piv-glu-s0",
+   "30763775": "PIV-T2-unet-s0"
+  },
+  "xcheck": {
+   "30765267": "TIMEOUT (slow first attempt)",
+   "30765271/30767541/30767543?": "see xcheck3",
+   "xcheck3": "PASS 0.0 m/s"
+  },
+  "phase3": {
+   "array": "30765971 (normal, %4, tasks 0-7; 8-11 cancelled before start)",
+   "phase3b": "30769608 (normal, tasks 0-3 = glu-on-s2, glu-off-s2, O-C149-on-s0, O-C149-off-s0, afterany 30765971)"
+  },
+  "launcher": "30769609 (afterany:30765971,30769608)",
+  "smoke_s7_task": "30769581 (preempt, informational; PIV-T4-unet-s0 through s7_run_task smoke)"
+ },
+ "paths": {
+  "phase3_out": "/home/bontempi/official_thesis_piv_phase3",
+  "training_root": "/home/bontempi/official_thesis_piv_runs",
+  "eval_root": "/home/bontempi/official_thesis_piv_eval",
+  "package": "/home/bontempi/official_thesis_piv_package",
+  "ledger": "/home/bontempi/official_thesis_piv_runs/_ledger",
+  "smoke": "/home/bontempi/official_thesis_piv_smoke_runs"
+ }
+}

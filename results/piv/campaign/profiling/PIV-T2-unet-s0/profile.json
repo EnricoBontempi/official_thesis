@@ -1,0 +1,10 @@
+{
+  "elapsed_fit_s": 45.5378187589813,
+  "epochs": 3,
+  "gpu": "NVIDIA L40S",
+  "peak_mem_bytes": 565772800,
+  "presentations_per_epoch": 760,
+  "run_id": "PIV-T2-unet-s0",
+  "val_eval_s": 1.8545606739935465,
+  "val_frames_timed": 123
+}

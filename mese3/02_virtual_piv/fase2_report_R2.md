@@ -530,3 +530,39 @@ La media 5×5 (che l'XML del dataset dichiara come area della media mobile) si a
 | Checksum degli artefatti | [`results/piv/phase2/SHA256SUMS`](../../results/piv/phase2/SHA256SUMS) |
 
 Nessuna modifica a `nonideal_observations.py`, ai risultati storici, alle specifiche della missione 00 o ai documenti delle missioni 00 e 01. Nessun contatto con gli autori. Nessun merge.
+
+---
+
+## 5.9 Appendice R2 — Qualifica supplementare della specifica v1.1 (SENS-TAIL e sostituzione 5×5)
+
+Richiesta da [decisione_R2.md](decisione_R2.md) §8. Stesso campione di F2.6 (760 frame `train_fit`, solo velocità, ruolo `train`, replica 0). Script `scripts/piv_phase2/f29_qualify_v11.py`, risultati in `results/piv/phase2/f29/`. Specifica v1.1: `configs/observations/piv_observation_spec_v1_1.yaml`, sha256 `607510895c24a324a230e3f96a739daf6507f30c531693ffbc7bb2f0a2d842d2` (v1 non modificata).
+
+**Regressione.** Le 31 configurazioni di v1 danno in v1.1 pacchetti **identici bit a bit** rispetto alle impronte (hash) calcolate con il codice precedente alle estensioni (`scripts/piv_phase2/f28_golden.py --compare`, `tests/test_piv_observations_v11.py`).
+
+**SENS-TAIL** (ν = 7, mappa marginale a t di Student sullo stesso campo gaussiano correlato):
+
+| Configurazione | σ realizzata / attesa | asimmetria | eccesso di curtosi | frazione \|z\| > 3 (gauss. 0,0027; t7 a varianza unitaria 0,0093) |
+|---|---|---|---|---|
+| PIV-A | 1,0006 | +0,0005 | −0,005 | 0,0027 |
+| SENS-TAIL-A | 1,0004 | −0,002 | **+1,96** | 0,0093 |
+| PIV-B-in | 1,0007 | −0,006 | +0,006 | 0,0027 |
+| SENS-TAIL-B-in | 1,0010 | −0,009 | **+2,00** | 0,0095 |
+
+σ conservata (entro 0,1 %), eccesso di curtosi 2 ± 0,04, correlazione di rango identica (test), stessi nodi. La **correlazione di Pearson** cambia poco: lungo le righe ρ(1 nodo) 0,728 → 0,723 e ρ(2) 0,232 → 0,229 in A; lungo le colonne 0,564 → 0,559 (tabella completa in `tail_autocorrelation.csv`).
+
+![Figura T](../../results/piv/phase2/f29/figures/figT_sens_tail.png)
+
+**Sostituzione 5×5** (stessi rigetti di `sub`; RMS(sostituito − non rigettato) / σ_u, nodi rigettati, 760 frame):
+
+| Rigetti | Regione | 3×3 vi / vj | 5×5 vi / vj |
+|---|---|---|---|
+| isolati | tutti | 0,84 / 0,98 | 1,39 / 1,66 |
+| isolati | alto gradiente | 1,33 / 1,94 | 2,21 / 3,22 |
+| cluster | tutti | 1,15 / 1,44 | 1,52 / 1,84 |
+| cluster | alto gradiente | 2,03 / 3,17 | 2,49 / 3,67 |
+
+La media 5×5 è **più lisciante**: l'errore introdotto ai vettori sostituiti è 1,7 volte quello della 3×3 per i rigetti isolati e 1,2–1,3 volte per i cluster. Numero di passate: 3×3 isolati 1, cluster in media 1,99 (massimo 3); 5×5 isolati 1, cluster 1,00 (massimo 2); nessun caso con più di 3 passate. Il test sulla prima passata (valore = media dei vicini noti 5×5) è verde.
+
+![Figura S5](../../results/piv/phase2/f29/figures/figS5_sub5_vs_sub3.png)
+
+**Controllo fra macchine** (decisione_R2 §8 punto 4). Stessi pacchetti PIV-A, PIV-B-in, IDEAL-A, FILT-A per 3 condizioni × 2 frame, generati sul cluster e in locale (`results/piv/campaign/profiling/xcheck/`): **nodi identici e differenza massima dei valori 0,0 m/s** (criterio ≤ 10⁻⁹ m/s). La Fase 3 usa comunque confronti a tolleranza.
