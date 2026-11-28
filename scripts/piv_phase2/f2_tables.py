@@ -88,11 +88,13 @@ for cfg in ("PIV-A", "PIV-B-in", "PIV-B-down", "PIV-B-off", "IDEAL-full", "SENS-
     o = gen.observe(cfg, z, z, sim_id="0NH3_1.h5", frame_index=0, role="train")
     rows.append({"configurazione": cfg, "campo (righe0, righe1, col0, col1)": str(tuple(o.meta["field_rect_rows_cols"])), "vettori validi": o.meta["n_valid_vectors"], "vettori osservati": o.meta["n_observed"],
                  "% della slice": round(100 * o.meta["n_observed"] / 16384, 1), "vettori di bordo": o.meta["n_edge_vectors"], "rigettati": o.meta["n_rejected"], "sostituiti": o.meta["n_substituted"]})
-open(T / "t5_counts.md", "w").write(md(pd.DataFrame(rows)))
+cnt = pd.DataFrame(rows)
+cnt["vettori di bordo"] = [("–" if pd.isna(x) else str(int(x))) for x in cnt["vettori di bordo"]]
+open(T / "t5_counts.md", "w").write(md(cnt))
 
 # ---- realised response
 rp = pd.read_csv(R2 / "f26/tables/realised_response_interior_vs_edge.csv")
-rp = rp.rename(columns={"axis": "asse", "field": "campo", "lambda_mm": "λ (mm) / L_sr", "H_interior": "interno", "H_edge_node0": "nodo di bordo (0)", "H_edge_node1": "nodo 1"})
+rp = rp.rename(columns={"axis": "asse", "field": "campo", "lambda_mm": "λ (mm) / L_sr (mm)", "H_interior": "interno", "H_first_valid_vector": "1° vettore valido", "H_second_valid_vector": "2° vettore valido", "H_excluded_node0": "nodo 0 (escluso)", "first_valid_node_index": "indice 1° vettore"})
 open(T / "t6_realised_response.md", "w").write(md(rp))
 
 # ---- RMS pooled

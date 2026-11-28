@@ -189,8 +189,12 @@ for col, (axis, step) in enumerate((("rows", steps[0]), ("cols", steps[1]))):
             amp = np.abs((M * np.exp(1j * kq * (np.arange(n)[None, :] - np.arange(n)[:, None]) * step)).sum(1))
             axs[1, col].plot(np.arange(n), amp, ls=ls, color=c_, lw=1.2, label=f"lambda={lam:g} mm" if fld.startswith("A") else None)
             mid = n // 2
-            rows_out.append({"axis": axis, "field": fld, "W_mm": W, "lambda_mm": lam, "H_interior": float(amp[mid]), "H_edge_node0": float(amp[0]), "H_edge_node1": float(amp[1])})
-        rows_out.append({"axis": axis, "field": fld, "W_mm": W, "lambda_mm": "L_sr", "H_interior": float(L[n // 2]), "H_edge_node0": float(L[0]), "H_edge_node1": float(L[1])})
+            mg = P.window_margin(W, step)
+            rows_out.append({"axis": axis, "field": fld, "W_mm": W, "lambda_mm": lam, "H_interior": float(amp[mid]), "H_first_valid_vector": float(amp[mg]), "H_second_valid_vector": float(amp[mg + 1]),
+                             "H_excluded_node0": float(amp[0]), "first_valid_node_index": mg})
+        mg = P.window_margin(W, step)
+        rows_out.append({"axis": axis, "field": fld, "W_mm": W, "lambda_mm": "L_sr", "H_interior": float(L[n // 2]), "H_first_valid_vector": float(L[mg]), "H_second_valid_vector": float(L[mg + 1]),
+                         "H_excluded_node0": float(L[0]), "first_valid_node_index": mg})
     axs[0, col].set_title(f"{axis}: realised discrete L_sr per node (dotted = target 0.93 W)", fontsize=8.5, loc="left"); axs[0, col].set_ylabel("L_sr,disc (mm)"); axs[0, col].legend(frameon=False, fontsize=7)
     axs[1, col].set_title(f"{axis}: amplitude of the realised transfer function |H|", fontsize=8.5, loc="left"); axs[1, col].set_xlabel("node index along the field"); axs[1, col].set_ylabel("|H|"); axs[1, col].legend(frameon=False, fontsize=7)
 fig.suptitle("Fig. E — Realised response of the discrete kernel: interior vs field edge (truncated and renormalised kernel; solid A, dashed B)", fontsize=9.5, x=0.005, ha="left")
